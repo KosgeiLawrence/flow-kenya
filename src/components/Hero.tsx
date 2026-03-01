@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 import { ArrowRight, Recycle } from "lucide-react";
+import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import heroBg from "@/assets/hero-bg.jpg";
 
@@ -49,8 +50,11 @@ const Hero = () => {
                 {item}
               </a>
             ))}
-            <Button variant="hero" size="sm">
-              Get Started
+            <Link to="/login" className="text-sm font-medium text-primary-foreground/80 transition-colors hover:text-gold-light">
+              Sign In
+            </Link>
+            <Button variant="hero" size="sm" asChild>
+              <Link to="/signup">Get Started</Link>
             </Button>
           </motion.div>
         </nav>
@@ -96,11 +100,11 @@ const Hero = () => {
             transition={{ delay: 0.7, duration: 0.8 }}
             className="flex flex-col gap-4 sm:flex-row"
           >
-            <Button variant="hero" size="lg" className="text-base">
-              Join the Platform <ArrowRight className="ml-1 h-5 w-5" />
+            <Button variant="hero" size="lg" className="text-base" asChild>
+              <Link to="/signup">Join the Platform <ArrowRight className="ml-1 h-5 w-5" /></Link>
             </Button>
-            <Button variant="hero-outline" size="lg" className="text-base">
-              View Demo
+            <Button variant="hero-outline" size="lg" className="text-base" asChild>
+              <Link to="/login">Sign In</Link>
             </Button>
           </motion.div>
         </div>
