@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import {
   LogOut, Package, ClipboardList, FileText, ClipboardCheck, TrendingUp,
   BarChart3, Leaf, Shield, Clock, CheckCircle2, AlertTriangle,
-  Menu, X, ChevronRight
+  Menu, X, ChevronRight, ShoppingBag
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
@@ -16,9 +16,11 @@ import MarketInsightsPanel from "@/components/dashboard/recycler/MarketInsightsP
 import SupplyForecastPanel from "@/components/dashboard/recycler/SupplyForecastPanel";
 import ESGPanel from "@/components/dashboard/recycler/ESGPanel";
 import ComplianceDocsPanel from "@/components/dashboard/recycler/ComplianceDocsPanel";
+import ProductCatalogPanel from "@/components/dashboard/recycler/ProductCatalogPanel";
 
 const navItems = [
   { id: "inventory", label: "Inventory", icon: Package },
+  { id: "products", label: "Products & Pricing", icon: ShoppingBag },
   { id: "orders", label: "Orders & Contracts", icon: ClipboardList },
   { id: "invoices", label: "Purchase Invoices", icon: FileText },
   { id: "receipts", label: "Receipt Confirm", icon: ClipboardCheck },
@@ -51,6 +53,7 @@ const RecyclerDashboard = () => {
   const renderPanel = () => {
     switch (activePanel) {
       case "inventory": return <InventoryAccessPanel />;
+      case "products": return <ProductCatalogPanel />;
       case "orders": return <OrdersPanel />;
       case "invoices": return <PurchaseInvoicesPanel />;
       case "receipts": return <ReceiptConfirmPanel />;

@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Download, FileText } from "lucide-react";
 import { format } from "date-fns";
 import jsPDF from "jspdf";
+import { toast } from "sonner";
 
 const PurchaseInvoicesPanel = () => {
   const { user, profile } = useAuth();
@@ -104,6 +105,51 @@ const PurchaseInvoicesPanel = () => {
     doc.setTextColor(130);
     doc.text("System-generated purchase invoice — Duara Flow", 20, 280);
     doc.save(`purchase-invoice-${invNo}.pdf`);
+    toast.success("Purchase invoice downloaded");
+  };
+
+  const generateIndividualInvoice = (payment: any) => {
+    const doc = new jsPDF();
+    const invNo = `PI-${payment.id.slice(0, 8).toUpperCase()}`;
+
+    doc.setFontSize(20);
+    doc.text("Duara Flow", 20, 22);
+    doc.setFontSize(10);
+    doc.setTextColor(100);
+    doc.text("Purchase Invoice", 20, 30);
+    doc.setTextColor(0);
+
+    doc.text(`Invoice #: ${invNo}`, 20, 44);
+    doc.text(`Date: ${format(new Date(payment.created_at), "MMM d, yyyy")}`, 20, 51);
+    doc.text(`Buyer: ${profile?.full_name || "Recycler"}`, 20, 58);
+    if (profile?.phone_number) doc.text(`Phone: ${profile.phone_number}`, 20, 65);
+    doc.text(`Payment Phone: ${payment.phone_number}`, 20, 72);
+
+    let y = 88;
+    doc.setFillColor(34, 87, 62);
+    doc.rect(20, y - 5, 170, 8, "F");
+    doc.setTextColor(255);
+    doc.setFontSize(9);
+    doc.text("Description", 22, y);
+    doc.text("Amount (KES)", 150, y);
+    doc.setTextColor(0);
+    y += 10;
+    doc.text(payment.description || "Material Purchase", 22, y);
+    doc.text(Number(payment.amount).toLocaleString(), 150, y);
+    y += 14;
+    doc.line(20, y - 3, 190, y - 3);
+    doc.setFontSize(12);
+    doc.text(`Total: KES ${Number(payment.amount).toLocaleString()}`, 110, y + 5);
+    if (payment.mpesa_receipt_number) {
+      y += 16;
+      doc.setFontSize(9);
+      doc.text(`M-Pesa Receipt: ${payment.mpesa_receipt_number}`, 20, y);
+    }
+    doc.setFontSize(7);
+    doc.setTextColor(130);
+    doc.text("System-generated purchase invoice — Duara Flow", 20, 280);
+    doc.save(`purchase-invoice-${invNo}.pdf`);
+    toast.success("Invoice downloaded");
   };
 
   return (
@@ -113,7 +159,7 @@ const PurchaseInvoicesPanel = () => {
           <div className="flex items-center gap-3">
             <FileText className="w-6 h-6 text-primary" />
             <div>
-              <p className="text-sm font-medium text-foreground">Purchase Invoice</p>
+              <p className="text-sm font-medium text-foreground">Bulk Purchase Invoice</p>
               <p className="text-xs text-muted-foreground">Generate a PDF invoice for all purchased materials</p>
             </div>
           </div>
@@ -136,9 +182,14 @@ const PurchaseInvoicesPanel = () => {
                     <p className="text-sm font-medium text-foreground">KES {Number(p.amount).toLocaleString()}</p>
                     <p className="text-xs text-muted-foreground">{p.phone_number} · {format(new Date(p.created_at), "MMM d, yyyy")}</p>
                   </div>
-                  {p.mpesa_receipt_number && (
-                    <span className="text-xs font-mono text-muted-foreground">{p.mpesa_receipt_number}</span>
-                  )}
+                  <div className="flex items-center gap-2">
+                    {p.mpesa_receipt_number && (
+                      <span className="text-xs font-mono text-muted-foreground">{p.mpesa_receipt_number}</span>
+                    )}
+                    <Button variant="ghost" size="icon" onClick={() => generateIndividualInvoice(p)} title="Download Invoice">
+                      <Download className="w-4 h-4" />
+                    </Button>
+                  </div>
                 </div>
               ))}
             </div>

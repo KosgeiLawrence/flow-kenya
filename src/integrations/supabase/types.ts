@@ -555,6 +555,99 @@ export type Database = {
           },
         ]
       }
+      recycler_orders: {
+        Row: {
+          created_at: string
+          delivery_date: string | null
+          id: string
+          material_type: string
+          notes: string | null
+          order_date: string
+          quantity: number
+          status: string
+          supplier_name: string
+          total_amount: number
+          unit: string
+          unit_price: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          delivery_date?: string | null
+          id?: string
+          material_type: string
+          notes?: string | null
+          order_date?: string
+          quantity?: number
+          status?: string
+          supplier_name: string
+          total_amount?: number
+          unit?: string
+          unit_price?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          delivery_date?: string | null
+          id?: string
+          material_type?: string
+          notes?: string | null
+          order_date?: string
+          quantity?: number
+          status?: string
+          supplier_name?: string
+          total_amount?: number
+          unit?: string
+          unit_price?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      recycler_products: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          material_source: string | null
+          name: string
+          price_per_unit: number
+          status: string
+          stock_quantity: number
+          unit: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          material_source?: string | null
+          name: string
+          price_per_unit?: number
+          status?: string
+          stock_quantity?: number
+          unit?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          material_source?: string | null
+          name?: string
+          price_per_unit?: number
+          status?: string
+          stock_quantity?: number
+          unit?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       training_resources: {
         Row: {
           category: string
