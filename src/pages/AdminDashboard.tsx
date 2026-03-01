@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
-import { LogOut, Users, BarChart3, DollarSign, ShieldAlert, FileText, Settings } from "lucide-react";
+import { LogOut, Users, BarChart3, DollarSign, ShieldAlert, FileText, Settings, MapPin } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import UserVerificationPanel from "@/components/dashboard/admin/UserVerificationPanel";
 import PlatformAnalyticsPanel from "@/components/dashboard/admin/PlatformAnalyticsPanel";
@@ -9,6 +9,7 @@ import TransactionTrackingPanel from "@/components/dashboard/admin/TransactionTr
 import FraudDetectionPanel from "@/components/dashboard/admin/FraudDetectionPanel";
 import AuditLogsPanel from "@/components/dashboard/admin/AuditLogsPanel";
 import SystemSettingsPanel from "@/components/dashboard/admin/SystemSettingsPanel";
+import CountyWasteFlowPanel from "@/components/dashboard/admin/CountyWasteFlowPanel";
 
 const tabs = [
   { id: "users", label: "User Verification", icon: Users },
@@ -16,6 +17,7 @@ const tabs = [
   { id: "transactions", label: "Transactions", icon: DollarSign },
   { id: "fraud", label: "Fraud Detection", icon: ShieldAlert },
   { id: "audit", label: "Audit Logs", icon: FileText },
+  { id: "county-flow", label: "County Waste Flow", icon: MapPin },
   { id: "settings", label: "System Settings", icon: Settings },
 ];
 
@@ -36,6 +38,7 @@ const AdminDashboard = () => {
       case "transactions": return <TransactionTrackingPanel />;
       case "fraud": return <FraudDetectionPanel />;
       case "audit": return <AuditLogsPanel />;
+      case "county-flow": return <CountyWasteFlowPanel />;
       case "settings": return <SystemSettingsPanel />;
       default: return <UserVerificationPanel />;
     }
