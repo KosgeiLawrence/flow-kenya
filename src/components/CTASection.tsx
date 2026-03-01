@@ -1,5 +1,6 @@
 import { motion, useInView } from "framer-motion";
 import { useRef } from "react";
+import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Recycle } from "lucide-react";
 
@@ -29,11 +30,11 @@ const CTA = () => {
               Whether you're a waste picker, aggregator, corporate, or county government — Duara Flow has a dashboard built for you.
             </p>
             <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
-              <Button variant="hero" size="lg" className="text-base">
-                Get Started <ArrowRight className="ml-1 h-5 w-5" />
+              <Button variant="hero" size="lg" className="text-base" asChild>
+                <Link to="/signup">Get Started <ArrowRight className="ml-1 h-5 w-5" /></Link>
               </Button>
-              <Button variant="hero-outline" size="lg" className="text-base">
-                Request a Demo
+              <Button variant="hero-outline" size="lg" className="text-base" asChild>
+                <Link to="/login">Sign In</Link>
               </Button>
             </div>
           </div>
