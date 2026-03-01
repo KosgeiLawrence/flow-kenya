@@ -110,12 +110,21 @@ const Footer = () => (
             <ul className="space-y-2.5">
               {links.map((link) => (
                 <li key={link.label}>
-                  <Link
-                    to={link.href}
-                    className="text-sm text-primary-foreground/50 transition-colors hover:text-gold-light"
-                  >
-                    {link.label}
-                  </Link>
+                  {link.href.startsWith("/") ? (
+                    <Link
+                      to={link.href}
+                      className="text-sm text-primary-foreground/50 transition-colors hover:text-gold-light"
+                    >
+                      {link.label}
+                    </Link>
+                  ) : (
+                    <a
+                      href={link.href}
+                      className="text-sm text-primary-foreground/50 transition-colors hover:text-gold-light"
+                    >
+                      {link.label}
+                    </a>
+                  )}
                 </li>
               ))}
             </ul>
