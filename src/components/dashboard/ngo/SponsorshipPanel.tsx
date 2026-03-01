@@ -10,7 +10,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
-import { Users, UserCheck, Heart, MapPin, DollarSign, Plus, History } from "lucide-react";
+import { Users, Heart, MapPin, DollarSign, Plus, History, Recycle, Factory } from "lucide-react";
 import { toast } from "sonner";
 import { format } from "date-fns";
 
@@ -26,6 +26,12 @@ const COUNTIES = [
   "Machakos", "Kajiado", "Kilifi", "Uasin Gishu", "Nyeri",
 ];
 
+const ROLE_OPTIONS = [
+  { value: "waste_picker", label: "Waste Pickers", icon: Users },
+  { value: "aggregator", label: "Aggregators", icon: Recycle },
+  { value: "recycler", label: "Recyclers", icon: Factory },
+];
+
 const SponsorshipPanel = () => {
   const { user } = useAuth();
   const queryClient = useQueryClient();
@@ -36,14 +42,17 @@ const SponsorshipPanel = () => {
   const [fundType, setFundType] = useState("general");
   const [amount, setAmount] = useState("");
   const [notes, setNotes] = useState("");
+  const [roleFilter, setRoleFilter] = useState("all");
+  const [selectedRole, setSelectedRole] = useState("waste_picker");
 
-  const { data: pickers } = useQuery({
-    queryKey: ["ngo_all_pickers"],
+  // Fetch all participants (pickers, aggregators, recyclers)
+  const { data: participants } = useQuery({
+    queryKey: ["ngo_all_participants"],
     queryFn: async () => {
       const { data, error } = await supabase
         .from("profiles")
         .select("*, user_roles!inner(role), organizations(name)")
-        .eq("user_roles.role", "waste_picker");
+        .in("user_roles.role", ["waste_picker", "aggregator", "recycler"]);
       if (error) throw error;
       return data;
     },
@@ -54,7 +63,7 @@ const SponsorshipPanel = () => {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("ngo_sponsorships")
-        .select("*, profiles!ngo_sponsorships_picker_profile_id_fkey(full_name, gender, date_of_birth, approval_status)")
+        .select("*, profiles!ngo_sponsorships_picker_profile_id_fkey(full_name, gender, date_of_birth, approval_status, user_roles!inner(role))")
         .order("created_at", { ascending: false });
       if (error) throw error;
       return data;
@@ -63,7 +72,7 @@ const SponsorshipPanel = () => {
 
   const createSponsorship = useMutation({
     mutationFn: async () => {
-      if (!user || !selectedPicker) throw new Error("Select a picker");
+      if (!user || !selectedPicker) throw new Error("Select a participant");
       const amt = parseFloat(amount);
       if (isNaN(amt) || amt < 0) throw new Error("Invalid amount");
 
@@ -87,9 +96,26 @@ const SponsorshipPanel = () => {
     onError: (e: Error) => toast.error(e.message),
   });
 
+  // Filter participants by selected role for the dialog
+  const filteredParticipants = participants?.filter(p => {
+    const role = (p as any).user_roles?.[0]?.role || (p as any).user_roles?.role;
+    return role === selectedRole;
+  }) || [];
+
   const activeSponsors = sponsorships?.filter(s => s.status === "active") || [];
   const totalAllocated = sponsorships?.reduce((s, sp) => s + Number(sp.amount_allocated), 0) || 0;
   const totalDisbursed = sponsorships?.reduce((s, sp) => s + Number(sp.amount_disbursed), 0) || 0;
+
+  // Count by role
+  const getRoleForSponsorship = (s: any) => {
+    const roles = s.profiles?.user_roles;
+    if (Array.isArray(roles)) return roles[0]?.role;
+    return roles?.role;
+  };
+
+  const pickerCount = sponsorships?.filter(s => getRoleForSponsorship(s) === "waste_picker").length || 0;
+  const aggregatorCount = sponsorships?.filter(s => getRoleForSponsorship(s) === "aggregator").length || 0;
+  const recyclerCount = sponsorships?.filter(s => getRoleForSponsorship(s) === "recycler").length || 0;
 
   // Group by county
   const countyMap = new Map<string, number>();
@@ -97,6 +123,15 @@ const SponsorshipPanel = () => {
     const c = s.county || "Unspecified";
     countyMap.set(c, (countyMap.get(c) || 0) + 1);
   });
+
+  // Filter sponsorship history
+  const filteredSponsorships = roleFilter === "all"
+    ? sponsorships
+    : sponsorships?.filter(s => getRoleForSponsorship(s) === roleFilter);
+
+  const getRoleLabel = (role: string) => {
+    return ROLE_OPTIONS.find(r => r.value === role)?.label?.replace(/s$/, "") || role;
+  };
 
   return (
     <div className="space-y-6">
@@ -106,8 +141,8 @@ const SponsorshipPanel = () => {
           <CardContent className="flex items-center gap-3 p-4">
             <Users className="w-7 h-7 text-primary" />
             <div>
-              <p className="text-xl font-bold text-foreground">{pickers?.length || 0}</p>
-              <p className="text-xs text-muted-foreground">Total Pickers</p>
+              <p className="text-xl font-bold text-foreground">{participants?.length || 0}</p>
+              <p className="text-xs text-muted-foreground">Total Participants</p>
             </div>
           </CardContent>
         </Card>
@@ -125,7 +160,7 @@ const SponsorshipPanel = () => {
             <DollarSign className="w-7 h-7 text-primary" />
             <div>
               <p className="text-xl font-bold text-foreground">KES {totalAllocated.toLocaleString()}</p>
-              <p className="text-xs text-muted-foreground">Funds Allocated</p>
+              <p className="text-xs text-muted-foreground">Allocated / {totalDisbursed.toLocaleString()} Disbursed</p>
             </div>
           </CardContent>
         </Card>
@@ -140,22 +175,60 @@ const SponsorshipPanel = () => {
         </Card>
       </div>
 
+      {/* Role breakdown */}
+      <div className="grid grid-cols-3 gap-4">
+        <Card className="shadow-soft">
+          <CardContent className="p-4 text-center">
+            <Users className="w-5 h-5 text-primary mx-auto mb-1" />
+            <p className="text-lg font-bold text-foreground">{pickerCount}</p>
+            <p className="text-xs text-muted-foreground">Waste Pickers</p>
+          </CardContent>
+        </Card>
+        <Card className="shadow-soft">
+          <CardContent className="p-4 text-center">
+            <Recycle className="w-5 h-5 text-primary mx-auto mb-1" />
+            <p className="text-lg font-bold text-foreground">{aggregatorCount}</p>
+            <p className="text-xs text-muted-foreground">Aggregators</p>
+          </CardContent>
+        </Card>
+        <Card className="shadow-soft">
+          <CardContent className="p-4 text-center">
+            <Factory className="w-5 h-5 text-primary mx-auto mb-1" />
+            <p className="text-lg font-bold text-foreground">{recyclerCount}</p>
+            <p className="text-xs text-muted-foreground">Recyclers</p>
+          </CardContent>
+        </Card>
+      </div>
+
       {/* Create sponsorship */}
       <div className="flex justify-end">
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger asChild>
-            <Button><Plus className="w-4 h-4 mr-1" /> Sponsor a Picker</Button>
+            <Button><Plus className="w-4 h-4 mr-1" /> Sponsor a Participant</Button>
           </DialogTrigger>
           <DialogContent className="max-w-md">
             <DialogHeader><DialogTitle>New Sponsorship</DialogTitle></DialogHeader>
             <div className="space-y-4">
               <div>
-                <Label>Waste Picker</Label>
-                <Select value={selectedPicker} onValueChange={setSelectedPicker}>
-                  <SelectTrigger><SelectValue placeholder="Select a picker" /></SelectTrigger>
+                <Label>Participant Type</Label>
+                <Select value={selectedRole} onValueChange={(v) => { setSelectedRole(v); setSelectedPicker(""); }}>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
                   <SelectContent>
-                    {pickers?.map(p => (
-                      <SelectItem key={p.id} value={p.id}>{p.full_name} {p.is_independent ? "(Ind.)" : ""}</SelectItem>
+                    {ROLE_OPTIONS.map(r => (
+                      <SelectItem key={r.value} value={r.value}>{r.label}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <Label>Select {getRoleLabel(selectedRole)}</Label>
+                <Select value={selectedPicker} onValueChange={setSelectedPicker}>
+                  <SelectTrigger><SelectValue placeholder={`Select a ${getRoleLabel(selectedRole).toLowerCase()}`} /></SelectTrigger>
+                  <SelectContent>
+                    {filteredParticipants.map(p => (
+                      <SelectItem key={p.id} value={p.id}>
+                        {p.full_name} {p.is_independent ? "(Ind.)" : (p as any).organizations?.name ? `(${(p as any).organizations.name})` : ""}
+                      </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
@@ -205,17 +278,27 @@ const SponsorshipPanel = () => {
       {/* Sponsorship history */}
       <Card className="shadow-soft">
         <CardHeader>
-          <CardTitle className="text-lg flex items-center gap-2">
-            <History className="w-5 h-5" /> Sponsorship History
-          </CardTitle>
+          <div className="flex items-center justify-between flex-wrap gap-2">
+            <CardTitle className="text-lg flex items-center gap-2">
+              <History className="w-5 h-5" /> Sponsorship History
+            </CardTitle>
+            <Select value={roleFilter} onValueChange={setRoleFilter}>
+              <SelectTrigger className="w-[160px]"><SelectValue /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Types</SelectItem>
+                {ROLE_OPTIONS.map(r => <SelectItem key={r.value} value={r.value}>{r.label}</SelectItem>)}
+              </SelectContent>
+            </Select>
+          </div>
         </CardHeader>
         <CardContent>
-          {!sponsorships?.length ? (
-            <p className="text-sm text-muted-foreground">No sponsorships yet. Sponsor a waste picker to get started.</p>
+          {!filteredSponsorships?.length ? (
+            <p className="text-sm text-muted-foreground">No sponsorships yet. Sponsor a participant to get started.</p>
           ) : (
             <div className="divide-y divide-border">
-              {sponsorships.map(s => {
+              {filteredSponsorships.map(s => {
                 const picker = (s as any).profiles;
+                const role = getRoleForSponsorship(s);
                 return (
                   <div key={s.id} className="flex items-center justify-between py-3 gap-3">
                     <div className="flex items-center gap-3 min-w-0">
@@ -223,9 +306,9 @@ const SponsorshipPanel = () => {
                         {picker?.full_name?.charAt(0) || "?"}
                       </div>
                       <div className="min-w-0">
-                        <p className="text-sm font-medium text-foreground truncate">{picker?.full_name || "Picker"}</p>
+                        <p className="text-sm font-medium text-foreground truncate">{picker?.full_name || "Participant"}</p>
                         <p className="text-xs text-muted-foreground">
-                          {s.county || "—"} · {FUND_TYPES.find(f => f.value === s.fund_type)?.label || s.fund_type} · KES {Number(s.amount_allocated).toLocaleString()}
+                          {getRoleLabel(role)} · {s.county || "—"} · {FUND_TYPES.find(f => f.value === s.fund_type)?.label || s.fund_type} · KES {Number(s.amount_allocated).toLocaleString()}
                         </p>
                       </div>
                     </div>
