@@ -12,6 +12,7 @@ import ResetPassword from "./pages/ResetPassword";
 import Dashboard from "./pages/Dashboard";
 import WastePickerDashboard from "./pages/WastePickerDashboard";
 import AggregatorDashboard from "./pages/AggregatorDashboard";
+import RecyclerDashboard from "./pages/RecyclerDashboard";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
 import NotFound from "./pages/NotFound";
 
@@ -43,6 +44,14 @@ const App = () => (
               element={
                 <ProtectedRoute allowedRoles={["aggregator"]}>
                   <AggregatorDashboard />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/dashboard/recycler/*"
+              element={
+                <ProtectedRoute allowedRoles={["recycler"]}>
+                  <RecyclerDashboard />
                 </ProtectedRoute>
               }
             />
