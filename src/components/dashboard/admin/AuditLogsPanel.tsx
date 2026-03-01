@@ -1,17 +1,24 @@
+import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { FileText, Download } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { FileText, Download, Search } from "lucide-react";
 import jsPDF from "jspdf";
+import { toast } from "sonner";
 
 const AuditLogsPanel = () => {
+  const [typeFilter, setTypeFilter] = useState("all");
+  const [searchQuery, setSearchQuery] = useState("");
+
   const { data: collections } = useQuery({
     queryKey: ["admin-audit-collections"],
     queryFn: async () => {
-      const { data, error } = await supabase.from("collections").select("*, material_types(name)").order("created_at", { ascending: false }).limit(100);
+      const { data, error } = await supabase.from("collections").select("*, material_types(name)").order("created_at", { ascending: false }).limit(200);
       if (error) throw error;
       return data;
     },
@@ -20,13 +27,21 @@ const AuditLogsPanel = () => {
   const { data: payments } = useQuery({
     queryKey: ["admin-audit-payments"],
     queryFn: async () => {
-      const { data, error } = await supabase.from("payments").select("*").order("created_at", { ascending: false }).limit(100);
+      const { data, error } = await supabase.from("payments").select("*").order("created_at", { ascending: false }).limit(200);
       if (error) throw error;
       return data;
     },
   });
 
-  // Combine into audit trail
+  const { data: profiles } = useQuery({
+    queryKey: ["admin-audit-profiles"],
+    queryFn: async () => {
+      const { data, error } = await supabase.from("profiles").select("full_name, user_id, created_at, approval_status").order("created_at", { ascending: false }).limit(100);
+      if (error) throw error;
+      return data;
+    },
+  });
+
   const logs = [
     ...(collections?.map((c) => ({
       timestamp: c.created_at,
@@ -40,14 +55,23 @@ const AuditLogsPanel = () => {
       detail: `KES ${Number(p.amount).toLocaleString()} to ${p.phone_number} — ${p.status}`,
       actor: p.user_id.slice(0, 8),
     })) || []),
-  ].sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+    ...(profiles?.map((p) => ({
+      timestamp: p.created_at,
+      type: "Registration",
+      detail: `${p.full_name} registered — Status: ${p.approval_status}`,
+      actor: p.user_id.slice(0, 8),
+    })) || []),
+  ]
+    .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
+    .filter((l) => typeFilter === "all" || l.type === typeFilter)
+    .filter((l) => !searchQuery || l.detail.toLowerCase().includes(searchQuery.toLowerCase()));
 
   const exportPDF = () => {
     const doc = new jsPDF();
     doc.setFontSize(16);
     doc.text("Audit Log Report", 20, 20);
     doc.setFontSize(8);
-    doc.text(`Generated: ${new Date().toLocaleString()}`, 20, 28);
+    doc.text(`Generated: ${new Date().toLocaleString()} | ${logs.length} events`, 20, 28);
 
     let y = 40;
     doc.setFontSize(9);
@@ -56,7 +80,7 @@ const AuditLogsPanel = () => {
     doc.text("Detail", 90, y);
     y += 8;
 
-    logs.slice(0, 60).forEach((l) => {
+    logs.slice(0, 80).forEach((l) => {
       if (y > 280) { doc.addPage(); y = 20; }
       doc.text(new Date(l.timestamp).toLocaleString(), 15, y);
       doc.text(l.type, 65, y);
@@ -65,22 +89,65 @@ const AuditLogsPanel = () => {
     });
 
     doc.save("audit-log.pdf");
+    toast.success("Audit log exported");
+  };
+
+  const exportCSV = () => {
+    const rows = [["Timestamp", "Type", "Detail", "Actor"]];
+    logs.forEach((l) => {
+      rows.push([new Date(l.timestamp).toLocaleString(), l.type, l.detail, l.actor]);
+    });
+    const csv = rows.map((r) => r.map((c) => `"${c}"`).join(",")).join("\n");
+    const blob = new Blob([csv], { type: "text/csv" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "audit-log.csv";
+    a.click();
+    URL.revokeObjectURL(url);
+    toast.success("CSV exported");
   };
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between flex-wrap gap-3">
         <div>
           <h2 className="text-2xl font-display font-bold text-foreground">Audit Logs</h2>
           <p className="text-muted-foreground">Complete activity trail across the platform</p>
         </div>
-        <Button onClick={exportPDF} className="gap-2">
-          <Download className="w-4 h-4" /> Export PDF
-        </Button>
+        <div className="flex gap-2">
+          <Button variant="outline" onClick={exportCSV} className="gap-2">
+            <Download className="w-4 h-4" /> CSV
+          </Button>
+          <Button onClick={exportPDF} className="gap-2">
+            <Download className="w-4 h-4" /> PDF
+          </Button>
+        </div>
+      </div>
+
+      <div className="flex gap-3 flex-wrap">
+        <div className="relative flex-1 min-w-[200px]">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+          <Input
+            placeholder="Search logs..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="pl-9"
+          />
+        </div>
+        <Select value={typeFilter} onValueChange={setTypeFilter}>
+          <SelectTrigger className="w-40"><SelectValue /></SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All Types</SelectItem>
+            <SelectItem value="Collection">Collections</SelectItem>
+            <SelectItem value="Payment">Payments</SelectItem>
+            <SelectItem value="Registration">Registrations</SelectItem>
+          </SelectContent>
+        </Select>
       </div>
 
       <Card>
-        <CardHeader><CardTitle className="text-base">Recent Activity ({logs.length} events)</CardTitle></CardHeader>
+        <CardHeader><CardTitle className="text-base">Activity Log ({logs.length} events)</CardTitle></CardHeader>
         <CardContent>
           <Table>
             <TableHeader>
@@ -96,7 +163,11 @@ const AuditLogsPanel = () => {
                 <TableRow key={i}>
                   <TableCell className="text-xs text-muted-foreground whitespace-nowrap">{new Date(l.timestamp).toLocaleString()}</TableCell>
                   <TableCell>
-                    <Badge variant="outline" className={l.type === "Payment" ? "border-secondary text-secondary" : "border-primary text-primary"}>
+                    <Badge variant="outline" className={
+                      l.type === "Payment" ? "border-secondary text-secondary" :
+                      l.type === "Registration" ? "border-accent text-accent-foreground" :
+                      "border-primary text-primary"
+                    }>
                       {l.type}
                     </Badge>
                   </TableCell>
