@@ -5,6 +5,17 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Shield, Leaf, FileCheck, AlertTriangle, CheckCircle2 } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
+import ComplianceDocUpload from "@/components/dashboard/shared/ComplianceDocUpload";
+
+const AGGREGATOR_DOC_TYPES = [
+  { value: "business_registration", label: "Business Registration" },
+  { value: "county_permit", label: "County Trade Permit" },
+  { value: "nema_license", label: "NEMA License" },
+  { value: "waste_transport_permit", label: "Waste Transport Permit" },
+  { value: "national_id", label: "National ID / Director ID" },
+  { value: "tax_compliance", label: "Tax Compliance Certificate" },
+  { value: "other", label: "Other" },
+];
 
 const CompliancePanel = () => {
   const { user, profile } = useAuth();
@@ -22,7 +33,6 @@ const CompliancePanel = () => {
     enabled: !!user,
   });
 
-  // Compute compliance metrics
   const totalKg = collections?.reduce((s, c) => s + Number(c.quantity), 0) || 0;
   const plasticCollections = collections?.filter((c) => {
     const name = ((c as any).material_types?.name || "").toLowerCase();
@@ -30,11 +40,8 @@ const CompliancePanel = () => {
   }) || [];
   const plasticKg = plasticCollections.reduce((s, c) => s + Number(c.quantity), 0);
 
-  // EPR target (example: 500kg/month)
   const eprTarget = 500;
   const eprProgress = Math.min((plasticKg / eprTarget) * 100, 100);
-
-  // CO2 offset estimate (~2.5kg CO2 per kg recycled plastic)
   const co2Offset = (plasticKg * 2.5).toFixed(1);
 
   const hasDocumentation = !!profile?.company_registration;
@@ -49,7 +56,6 @@ const CompliancePanel = () => {
 
   return (
     <div className="space-y-6">
-      {/* Compliance score */}
       <Card className="shadow-soft">
         <CardContent className="p-5">
           <div className="flex items-center gap-3 mb-4">
@@ -68,7 +74,6 @@ const CompliancePanel = () => {
         </CardContent>
       </Card>
 
-      {/* Checklist */}
       <Card className="shadow-soft">
         <CardHeader><CardTitle className="text-lg">Compliance Checklist</CardTitle></CardHeader>
         <CardContent className="space-y-3">
@@ -91,7 +96,8 @@ const CompliancePanel = () => {
         </CardContent>
       </Card>
 
-      {/* Environmental impact */}
+      <ComplianceDocUpload documentTypes={AGGREGATOR_DOC_TYPES} title="Upload Compliance Documents" />
+
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <Card className="shadow-soft">
           <CardContent className="p-4 text-center">

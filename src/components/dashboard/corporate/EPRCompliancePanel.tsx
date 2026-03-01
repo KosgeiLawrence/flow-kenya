@@ -10,6 +10,17 @@ import jsPDF from "jspdf";
 import { format } from "date-fns";
 import { useAuth } from "@/hooks/useAuth";
 import { loadImageAsBase64, renderDuaraFlowLogo } from "@/lib/pdfLogoUtils";
+import ComplianceDocUpload from "@/components/dashboard/shared/ComplianceDocUpload";
+
+const CORPORATE_DOC_TYPES = [
+  { value: "epr_registration", label: "EPR Scheme Registration" },
+  { value: "company_registration", label: "Company Registration" },
+  { value: "audit_report", label: "Audit Documentation" },
+  { value: "sustainability_report", label: "Sustainability Report" },
+  { value: "iso_certification", label: "ISO 14001 Certification" },
+  { value: "plastic_policy", label: "Plastic Policy Document" },
+  { value: "other", label: "Other" },
+];
 
 const EPRCompliancePanel = () => {
   const { profile } = useAuth();
@@ -216,6 +227,8 @@ const EPRCompliancePanel = () => {
           ))}
         </CardContent>
       </Card>
+
+      <ComplianceDocUpload documentTypes={CORPORATE_DOC_TYPES} title="Upload Compliance Documents" />
     </div>
   );
 };

@@ -2,10 +2,21 @@ import { useAuth } from "@/hooks/useAuth";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Shield, CheckCircle2, AlertTriangle, FileCheck, Download } from "lucide-react";
+import { Shield, CheckCircle2, AlertTriangle, Download } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 import jsPDF from "jspdf";
 import { format } from "date-fns";
+import ComplianceDocUpload from "@/components/dashboard/shared/ComplianceDocUpload";
+
+const RECYCLER_DOC_TYPES = [
+  { value: "nema_license", label: "NEMA License" },
+  { value: "epr_registration", label: "EPR Registration" },
+  { value: "business_registration", label: "Business Registration" },
+  { value: "national_id", label: "National ID / Director ID" },
+  { value: "fire_safety", label: "Fire Safety Certificate" },
+  { value: "environmental_audit", label: "Environmental Audit Report" },
+  { value: "other", label: "Other" },
+];
 
 const ComplianceDocsPanel = () => {
   const { profile } = useAuth();
@@ -100,6 +111,8 @@ const ComplianceDocsPanel = () => {
           ))}
         </CardContent>
       </Card>
+
+      <ComplianceDocUpload documentTypes={RECYCLER_DOC_TYPES} title="Upload Compliance Documents" />
     </div>
   );
 };
