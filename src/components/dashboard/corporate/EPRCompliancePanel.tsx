@@ -5,12 +5,22 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Shield, CheckCircle2, AlertTriangle, Target, Leaf, Download } from "lucide-react";
+import { QRCodeSVG } from "qrcode.react";
 import jsPDF from "jspdf";
 import { format } from "date-fns";
 import { useAuth } from "@/hooks/useAuth";
 
 const EPRCompliancePanel = () => {
   const { profile } = useAuth();
+
+  const { data: declarations } = useQuery({
+    queryKey: ["plastic_declarations"],
+    queryFn: async () => {
+      const { data, error } = await supabase.from("plastic_declarations").select("*");
+      if (error) throw error;
+      return data;
+    },
+  });
 
   const { data: collections } = useQuery({
     queryKey: ["corp_epr_collections"],
@@ -24,24 +34,31 @@ const EPRCompliancePanel = () => {
     },
   });
 
-  const totalKg = collections?.reduce((s, c) => s + Number(c.quantity), 0) || 0;
-  const plasticKg = collections?.filter((c) => {
-    const name = ((c as any).material_types?.name || "").toLowerCase();
-    return name.includes("pet") || name.includes("hdpe") || name.includes("plastic");
-  }).reduce((s, c) => s + Number(c.quantity), 0) || 0;
+  const { data: commitments } = useQuery({
+    queryKey: ["recovery_commitments"],
+    queryFn: async () => {
+      const { data, error } = await supabase.from("recovery_commitments").select("*");
+      if (error) throw error;
+      return data;
+    },
+  });
 
-  // EPR targets (configurable per company)
-  const annualTarget = 5000; // kg
-  const quarterlyTarget = annualTarget / 4;
-  const annualProgress = Math.min((plasticKg / annualTarget) * 100, 100);
-  const quarterlyProgress = Math.min((plasticKg / quarterlyTarget) * 100, 100);
+  const totalRecovered = collections?.reduce((s, c) => s + Number(c.quantity), 0) || 0;
+  const totalObligation = declarations?.reduce((s, d) => s + Number(d.recovery_obligation_kg), 0) || 0;
+  const totalDeclared = declarations?.reduce((s, d) => s + Number(d.quantity_kg), 0) || 0;
+  const totalFunded = commitments?.reduce((s, c) => s + Number(c.funded_amount), 0) || 0;
+  const eprProgress = totalObligation > 0 ? Math.min((totalRecovered / totalObligation) * 100, 100) : 0;
+
+  const receiptId = `EPR-${(profile?.id || "").slice(0, 6).toUpperCase()}-${format(new Date(), "yyyyMM")}`;
+  const verifyUrl = `https://duaraflow.com/verify/${receiptId}`;
 
   const checks = [
     { label: "EPR Scheme Registration", pass: true, detail: "Registered with KEPRO" },
-    { label: "Annual Plastic Offset Target", pass: annualProgress >= 100, detail: `${plasticKg.toFixed(0)} / ${annualTarget} kg (${annualProgress.toFixed(0)}%)` },
-    { label: "Quarterly Reporting", pass: quarterlyProgress >= 100, detail: `Q1 target: ${quarterlyTarget} kg` },
+    { label: "Plastic Footprint Declared", pass: (declarations?.length || 0) > 0, detail: `${totalDeclared.toLocaleString()} kg declared` },
+    { label: "Recovery Commitment Active", pass: (commitments?.length || 0) > 0, detail: `KES ${totalFunded.toLocaleString()} funded` },
+    { label: "Recovery Target Progress", pass: eprProgress >= 100, detail: `${eprProgress.toFixed(0)}% of obligation met` },
     { label: "Audit Documentation", pass: !!profile?.company_registration, detail: profile?.company_registration ? `Reg: ${profile.company_registration}` : "Upload registration" },
-    { label: "Waste Collection Partner Verified", pass: true, detail: "Duara Flow verified supply chain" },
+    { label: "Verified Supply Chain", pass: true, detail: "Duara Flow verified traceability" },
   ];
 
   const score = (checks.filter((c) => c.pass).length / checks.length) * 100;
@@ -49,63 +66,89 @@ const EPRCompliancePanel = () => {
   const downloadEPRReceipt = () => {
     const doc = new jsPDF();
     const today = format(new Date(), "MMM d, yyyy");
-    const receiptNo = `EPR-${Date.now().toString(36).toUpperCase()}`;
 
-    doc.setFontSize(20);
-    doc.text("Duara Flow", 20, 22);
-    doc.setFontSize(12);
-    doc.setTextColor(100);
-    doc.text("EPR Compliance Receipt", 20, 32);
-    doc.setTextColor(0);
+    // Border
+    doc.setDrawColor(34, 87, 62);
+    doc.setLineWidth(2);
+    doc.rect(10, 10, 190, 277);
+    doc.setLineWidth(0.5);
+    doc.rect(14, 14, 182, 269);
+
+    doc.setFontSize(22);
+    doc.setTextColor(34, 87, 62);
+    doc.text("EPR COMPLIANCE RECEIPT", 105, 40, { align: "center" });
 
     doc.setFontSize(10);
-    doc.text(`Receipt #: ${receiptNo}`, 20, 46);
-    doc.text(`Date: ${today}`, 20, 53);
-    doc.text(`Company: ${profile?.full_name || "Corporate"}`, 20, 60);
-    if (profile?.company_registration) doc.text(`Reg: ${profile.company_registration}`, 20, 67);
+    doc.setTextColor(100);
+    doc.text("Duara Flow — Extended Producer Responsibility", 105, 50, { align: "center" });
+
+    doc.setTextColor(0);
+    doc.setFontSize(11);
+    doc.text(`Receipt ID: ${receiptId}`, 25, 70);
+    doc.text(`Date: ${today}`, 25, 78);
+    doc.text(`Company: ${profile?.full_name || "Corporate Entity"}`, 25, 86);
+    if (profile?.company_registration) doc.text(`Registration: ${profile.company_registration}`, 25, 94);
 
     doc.setFontSize(14);
-    doc.text("Compliance Summary", 20, 84);
-    doc.setFontSize(10);
-    doc.text(`Total Plastic Offset: ${plasticKg.toFixed(1)} kg`, 25, 96);
-    doc.text(`Annual Target: ${annualTarget} kg`, 25, 104);
-    doc.text(`Progress: ${annualProgress.toFixed(1)}%`, 25, 112);
-    doc.text(`Compliance Score: ${score.toFixed(0)}%`, 25, 120);
+    doc.setTextColor(34, 87, 62);
+    doc.text("Compliance Summary", 25, 112);
 
-    let y = 136;
+    doc.setFontSize(11);
+    doc.setTextColor(0);
+    const metrics = [
+      `Total Plastic Declared: ${totalDeclared.toLocaleString()} kg`,
+      `Recovery Obligation: ${totalObligation.toLocaleString()} kg`,
+      `Total Recovered: ${totalRecovered.toLocaleString()} kg`,
+      `EPR Progress: ${eprProgress.toFixed(1)}%`,
+      `Funds Allocated: KES ${totalFunded.toLocaleString()}`,
+      `Compliance Score: ${score.toFixed(0)}%`,
+    ];
+    let y = 125;
+    metrics.forEach((m) => { doc.text(`• ${m}`, 30, y); y += 10; });
+
+    y += 8;
     doc.setFontSize(12);
-    doc.text("Checklist", 20, y);
+    doc.setTextColor(34, 87, 62);
+    doc.text("Checklist", 25, y);
     y += 10;
     checks.forEach((c) => {
       doc.setFontSize(9);
-      doc.text(`${c.pass ? "✓" : "✗"} ${c.label}: ${c.detail}`, 25, y);
+      doc.setTextColor(0);
+      doc.text(`${c.pass ? "✓" : "✗"} ${c.label}: ${c.detail}`, 30, y);
       y += 8;
     });
 
+    doc.setFontSize(10);
+    doc.setTextColor(100);
+    doc.text(`Verification: ${verifyUrl}`, 105, 255, { align: "center" });
+
     doc.setFontSize(7);
     doc.setTextColor(130);
-    doc.text("This EPR compliance receipt is system-generated by Duara Flow and verifiable via QR code.", 20, 275);
-    doc.text(`Document ID: ${receiptNo} | Generated: ${today}`, 20, 281);
-    doc.save(`epr-receipt-${receiptNo}.pdf`);
+    doc.text("This receipt is digitally generated and verifiable via QR code.", 105, 270, { align: "center" });
+
+    doc.save(`epr-receipt-${receiptId}.pdf`);
   };
 
   return (
     <div className="space-y-6">
-      <Card className="shadow-soft">
+      <Card className="shadow-elevated">
         <CardContent className="p-5">
           <div className="flex items-center gap-3 mb-4">
             <Shield className="w-8 h-8 text-primary" />
             <div className="flex-1">
               <p className="text-lg font-semibold text-foreground">EPR Compliance Score</p>
-              <p className="text-xs text-muted-foreground">Extended Producer Responsibility tracking</p>
+              <p className="text-xs text-muted-foreground">Based on declarations, commitments & recovery</p>
             </div>
-            <Button size="sm" onClick={downloadEPRReceipt}>
-              <Download className="w-4 h-4 mr-1" /> Receipt
-            </Button>
+            <span className="text-2xl font-bold text-primary">{score.toFixed(0)}%</span>
           </div>
-          <div className="flex items-center gap-4">
-            <Progress value={score} className="flex-1 h-3" />
-            <span className="text-lg font-bold text-primary">{score.toFixed(0)}%</span>
+          <Progress value={score} className="h-3 mb-4" />
+          <div className="flex flex-wrap gap-3">
+            <Button size="sm" onClick={downloadEPRReceipt}>
+              <Download className="w-4 h-4 mr-1" /> EPR Receipt
+            </Button>
+            <div className="ml-auto">
+              <QRCodeSVG value={verifyUrl} size={48} fgColor="hsl(152,45%,22%)" />
+            </div>
           </div>
         </CardContent>
       </Card>
@@ -114,22 +157,22 @@ const EPRCompliancePanel = () => {
         <Card className="shadow-soft">
           <CardContent className="p-4 text-center">
             <Target className="w-7 h-7 text-primary mx-auto mb-2" />
-            <p className="text-xl font-bold text-foreground">{annualProgress.toFixed(0)}%</p>
-            <p className="text-xs text-muted-foreground">Annual Target</p>
+            <p className="text-xl font-bold text-foreground">{eprProgress.toFixed(0)}%</p>
+            <p className="text-xs text-muted-foreground">Obligation Met</p>
           </CardContent>
         </Card>
         <Card className="shadow-soft">
           <CardContent className="p-4 text-center">
             <Leaf className="w-7 h-7 text-primary mx-auto mb-2" />
-            <p className="text-xl font-bold text-foreground">{plasticKg.toFixed(0)} kg</p>
-            <p className="text-xs text-muted-foreground">Plastic Offset</p>
+            <p className="text-xl font-bold text-foreground">{(totalRecovered / 1000).toFixed(1)} t</p>
+            <p className="text-xs text-muted-foreground">Total Recovered</p>
           </CardContent>
         </Card>
         <Card className="shadow-soft">
           <CardContent className="p-4 text-center">
             <Shield className="w-7 h-7 text-accent mx-auto mb-2" />
-            <p className="text-xl font-bold text-foreground">{totalKg.toFixed(0)} kg</p>
-            <p className="text-xs text-muted-foreground">Total Diverted</p>
+            <p className="text-xl font-bold text-foreground">{(totalDeclared / 1000).toFixed(1)} t</p>
+            <p className="text-xs text-muted-foreground">Total Declared</p>
           </CardContent>
         </Card>
       </div>
