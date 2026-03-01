@@ -94,6 +94,151 @@ export type Database = {
         }
         Relationships: []
       }
+      ngo_program_documents: {
+        Row: {
+          created_at: string
+          file_type: string | null
+          file_url: string
+          id: string
+          name: string
+          ngo_user_id: string
+          program_id: string
+        }
+        Insert: {
+          created_at?: string
+          file_type?: string | null
+          file_url: string
+          id?: string
+          name: string
+          ngo_user_id: string
+          program_id: string
+        }
+        Update: {
+          created_at?: string
+          file_type?: string | null
+          file_url?: string
+          id?: string
+          name?: string
+          ngo_user_id?: string
+          program_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ngo_program_documents_program_id_fkey"
+            columns: ["program_id"]
+            isOneToOne: false
+            referencedRelation: "ngo_programs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ngo_programs: {
+        Row: {
+          budget: number
+          county: string | null
+          created_at: string
+          description: string | null
+          end_date: string
+          funder: string | null
+          id: string
+          name: string
+          ngo_user_id: string
+          recovered_kg: number
+          spent: number
+          start_date: string
+          status: string
+          target_kg: number
+          updated_at: string
+        }
+        Insert: {
+          budget?: number
+          county?: string | null
+          created_at?: string
+          description?: string | null
+          end_date: string
+          funder?: string | null
+          id?: string
+          name: string
+          ngo_user_id: string
+          recovered_kg?: number
+          spent?: number
+          start_date: string
+          status?: string
+          target_kg?: number
+          updated_at?: string
+        }
+        Update: {
+          budget?: number
+          county?: string | null
+          created_at?: string
+          description?: string | null
+          end_date?: string
+          funder?: string | null
+          id?: string
+          name?: string
+          ngo_user_id?: string
+          recovered_kg?: number
+          spent?: number
+          start_date?: string
+          status?: string
+          target_kg?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      ngo_sponsorships: {
+        Row: {
+          amount_allocated: number
+          amount_disbursed: number
+          community: string | null
+          county: string | null
+          created_at: string
+          fund_type: string
+          id: string
+          ngo_user_id: string
+          notes: string | null
+          picker_profile_id: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          amount_allocated?: number
+          amount_disbursed?: number
+          community?: string | null
+          county?: string | null
+          created_at?: string
+          fund_type?: string
+          id?: string
+          ngo_user_id: string
+          notes?: string | null
+          picker_profile_id: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          amount_allocated?: number
+          amount_disbursed?: number
+          community?: string | null
+          county?: string | null
+          created_at?: string
+          fund_type?: string
+          id?: string
+          ngo_user_id?: string
+          notes?: string | null
+          picker_profile_id?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ngo_sponsorships_picker_profile_id_fkey"
+            columns: ["picker_profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       organizations: {
         Row: {
           created_at: string

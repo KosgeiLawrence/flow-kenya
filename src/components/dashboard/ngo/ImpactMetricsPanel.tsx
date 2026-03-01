@@ -1,19 +1,28 @@
+import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Leaf, Factory, Droplets, Zap, MapPin, Users } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Leaf, Factory, Droplets, Zap, MapPin, Users, UserCheck, Heart } from "lucide-react";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
-import { format, subDays } from "date-fns";
+import { format, subDays, differenceInYears } from "date-fns";
 
-const COLORS = ["hsl(152,45%,22%)", "hsl(40,55%,55%)", "hsl(195,60%,50%)", "hsl(25,30%,35%)", "hsl(0,84%,60%)"];
+const COLORS = ["hsl(152,45%,22%)", "hsl(40,55%,55%)", "hsl(195,60%,50%)", "hsl(25,30%,35%)", "hsl(0,84%,60%)", "hsl(280,50%,50%)"];
+
+const CO2_FACTORS: Record<string, number> = {
+  PET: 3.1, HDPE: 1.9, LDPE: 2.0, PP: 1.7, PS: 3.3, Aluminium: 9.1, Glass: 0.6,
+};
 
 const ImpactMetricsPanel = () => {
+  const [dateRange, setDateRange] = useState("all");
+  const [materialFilter, setMaterialFilter] = useState("all");
+
   const { data: collections } = useQuery({
     queryKey: ["ngo_impact_collections"],
     queryFn: async () => {
       const { data, error } = await supabase
         .from("collections")
-        .select("*, material_types(name, unit)")
+        .select("*, material_types(name, unit, price_per_unit)")
         .order("collected_at", { ascending: false });
       if (error) throw error;
       return data;
@@ -21,47 +30,104 @@ const ImpactMetricsPanel = () => {
   });
 
   const { data: pickers } = useQuery({
-    queryKey: ["ngo_impact_pickers"],
+    queryKey: ["ngo_impact_pickers_full"],
     queryFn: async () => {
       const { data, error } = await supabase
         .from("profiles")
-        .select("id, user_roles!inner(role)")
+        .select("id, full_name, gender, date_of_birth, approval_status, user_roles!inner(role)")
         .eq("user_roles.role", "waste_picker");
       if (error) throw error;
       return data;
     },
   });
 
-  const totalKg = collections?.reduce((s, c) => s + Number(c.quantity), 0) || 0;
-  const co2Saved = (totalKg * 2.5).toFixed(1);
-  const waterSaved = (totalKg * 18).toFixed(0);
-  const energySaved = (totalKg * 5.8).toFixed(1);
+  // Filter collections by date range
+  const filtered = (collections || []).filter(c => {
+    if (dateRange === "7d") return new Date(c.collected_at) >= subDays(new Date(), 7);
+    if (dateRange === "30d") return new Date(c.collected_at) >= subDays(new Date(), 30);
+    if (dateRange === "90d") return new Date(c.collected_at) >= subDays(new Date(), 90);
+    return true;
+  }).filter(c => {
+    if (materialFilter === "all") return true;
+    return (c as any).material_types?.name === materialFilter;
+  });
+
+  const totalKg = filtered.reduce((s, c) => s + Number(c.quantity), 0);
+  const totalIncome = filtered.reduce((s, c) => {
+    const mt = (c as any).material_types;
+    return s + Number(c.quantity) * Number(mt?.price_per_unit || 0);
+  }, 0);
+
+  // CO2 with material-specific factors
+  const co2Saved = filtered.reduce((s, c) => {
+    const name = (c as any).material_types?.name || "";
+    const factor = CO2_FACTORS[name] || 2.5;
+    return s + Number(c.quantity) * factor;
+  }, 0);
+
+  // Women & youth metrics
+  const women = pickers?.filter(p => p.gender?.toLowerCase() === "female") || [];
+  const youth = pickers?.filter(p => {
+    if (!p.date_of_birth) return false;
+    return differenceInYears(new Date(), new Date(p.date_of_birth)) < 35;
+  }) || [];
 
   // Unique locations
-  const locations = new Set(collections?.map((c) => c.location_name).filter(Boolean));
+  const locations = new Set(filtered.map(c => c.location_name).filter(Boolean));
+  const uniqueCollectorIds = new Set(filtered.map(c => c.user_id));
+
+  // Material names for filter
+  const materialNames = [...new Set(collections?.map(c => (c as any).material_types?.name).filter(Boolean) || [])];
 
   // 14-day trend
   const dailyData = Array.from({ length: 14 }, (_, i) => {
     const date = subDays(new Date(), 13 - i);
     const dateStr = format(date, "yyyy-MM-dd");
-    const qty = collections?.filter(
-      (c) => format(new Date(c.collected_at), "yyyy-MM-dd") === dateStr
-    ).reduce((s, c) => s + Number(c.quantity), 0) || 0;
+    const qty = filtered.filter(c => format(new Date(c.collected_at), "yyyy-MM-dd") === dateStr)
+      .reduce((s, c) => s + Number(c.quantity), 0);
     return { day: format(date, "dd"), qty: Math.round(qty) };
   });
 
   // Material breakdown
   const materialMap = new Map<string, number>();
-  collections?.forEach((c) => {
+  filtered.forEach(c => {
     const name = (c as any).material_types?.name || "Unknown";
     materialMap.set(name, (materialMap.get(name) || 0) + Number(c.quantity));
   });
   const pieData = Array.from(materialMap.entries()).map(([name, value]) => ({ name, value: Math.round(value) }));
 
+  // Geo breakdown
+  const geoMap = new Map<string, number>();
+  filtered.forEach(c => {
+    const loc = c.location_name || "Unknown";
+    geoMap.set(loc, (geoMap.get(loc) || 0) + Number(c.quantity));
+  });
+  const geoData = Array.from(geoMap.entries()).map(([name, value]) => ({ name, kg: Math.round(value) })).sort((a, b) => b.kg - a.kg).slice(0, 10);
+
   return (
     <div className="space-y-6">
+      {/* Filters */}
+      <div className="flex flex-wrap gap-3">
+        <Select value={dateRange} onValueChange={setDateRange}>
+          <SelectTrigger className="w-[150px]"><SelectValue /></SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All Time</SelectItem>
+            <SelectItem value="7d">Last 7 Days</SelectItem>
+            <SelectItem value="30d">Last 30 Days</SelectItem>
+            <SelectItem value="90d">Last 90 Days</SelectItem>
+          </SelectContent>
+        </Select>
+        <Select value={materialFilter} onValueChange={setMaterialFilter}>
+          <SelectTrigger className="w-[150px]"><SelectValue /></SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All Materials</SelectItem>
+            {materialNames.map(m => <SelectItem key={m} value={m}>{m}</SelectItem>)}
+          </SelectContent>
+        </Select>
+      </div>
+
       {/* KPIs */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
         <Card className="shadow-soft">
           <CardContent className="p-4 text-center">
             <Leaf className="w-6 h-6 text-primary mx-auto mb-1" />
@@ -72,29 +138,47 @@ const ImpactMetricsPanel = () => {
         <Card className="shadow-soft">
           <CardContent className="p-4 text-center">
             <Factory className="w-6 h-6 text-primary mx-auto mb-1" />
-            <p className="text-lg font-bold text-foreground">{co2Saved}</p>
-            <p className="text-[10px] text-muted-foreground">kg CO₂ Offset</p>
-          </CardContent>
-        </Card>
-        <Card className="shadow-soft">
-          <CardContent className="p-4 text-center">
-            <Droplets className="w-6 h-6 text-sky mx-auto mb-1" />
-            <p className="text-lg font-bold text-foreground">{Number(waterSaved).toLocaleString()}</p>
-            <p className="text-[10px] text-muted-foreground">Liters Water Saved</p>
+            <p className="text-lg font-bold text-foreground">{co2Saved.toFixed(0)} kg</p>
+            <p className="text-[10px] text-muted-foreground">CO₂ Avoided</p>
           </CardContent>
         </Card>
         <Card className="shadow-soft">
           <CardContent className="p-4 text-center">
             <Zap className="w-6 h-6 text-accent mx-auto mb-1" />
-            <p className="text-lg font-bold text-foreground">{energySaved}</p>
-            <p className="text-[10px] text-muted-foreground">kWh Saved</p>
+            <p className="text-lg font-bold text-foreground">KES {totalIncome.toLocaleString()}</p>
+            <p className="text-[10px] text-muted-foreground">Income Generated</p>
           </CardContent>
         </Card>
         <Card className="shadow-soft">
           <CardContent className="p-4 text-center">
             <Users className="w-6 h-6 text-primary mx-auto mb-1" />
-            <p className="text-lg font-bold text-foreground">{pickers?.length || 0}</p>
-            <p className="text-[10px] text-muted-foreground">Pickers Supported</p>
+            <p className="text-lg font-bold text-foreground">{uniqueCollectorIds.size}</p>
+            <p className="text-[10px] text-muted-foreground">Livelihoods Supported</p>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Women & Youth */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+        <Card className="shadow-soft">
+          <CardContent className="p-4 text-center">
+            <Heart className="w-6 h-6 text-accent mx-auto mb-1" />
+            <p className="text-lg font-bold text-foreground">{women.length}</p>
+            <p className="text-[10px] text-muted-foreground">Women Participants</p>
+          </CardContent>
+        </Card>
+        <Card className="shadow-soft">
+          <CardContent className="p-4 text-center">
+            <UserCheck className="w-6 h-6 text-primary mx-auto mb-1" />
+            <p className="text-lg font-bold text-foreground">{youth.length}</p>
+            <p className="text-[10px] text-muted-foreground">Youth (&lt;35 yrs)</p>
+          </CardContent>
+        </Card>
+        <Card className="shadow-soft">
+          <CardContent className="p-4 text-center">
+            <Droplets className="w-6 h-6 text-sky mx-auto mb-1" />
+            <p className="text-lg font-bold text-foreground">{(totalKg * 18).toLocaleString()}</p>
+            <p className="text-[10px] text-muted-foreground">Liters Water Saved</p>
           </CardContent>
         </Card>
         <Card className="shadow-soft">
@@ -140,28 +224,21 @@ const ImpactMetricsPanel = () => {
         </Card>
       </div>
 
-      {/* Geo-mapping placeholder */}
+      {/* Geographic Distribution */}
       <Card className="shadow-soft">
-        <CardHeader><CardTitle className="text-lg">Collection Locations</CardTitle></CardHeader>
+        <CardHeader><CardTitle className="text-lg">Geographic Impact Distribution</CardTitle></CardHeader>
         <CardContent>
-          {!locations.size ? (
+          {!geoData.length ? (
             <p className="text-sm text-muted-foreground">No location data recorded.</p>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-              {Array.from(locations).map((loc, i) => {
-                const locCollections = collections?.filter((c) => c.location_name === loc) || [];
-                const locQty = locCollections.reduce((s, c) => s + Number(c.quantity), 0);
-                return (
-                  <div key={i} className="flex items-center gap-3 p-3 rounded-lg bg-muted/30 border border-border">
-                    <MapPin className="w-4 h-4 text-primary shrink-0" />
-                    <div>
-                      <p className="text-sm font-medium text-foreground">{loc}</p>
-                      <p className="text-xs text-muted-foreground">{locQty.toFixed(1)} kg · {locCollections.length} entries</p>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
+            <ResponsiveContainer width="100%" height={Math.max(200, geoData.length * 35)}>
+              <BarChart data={geoData} layout="vertical" margin={{ left: 80 }}>
+                <XAxis type="number" tick={{ fontSize: 11 }} />
+                <YAxis type="category" dataKey="name" tick={{ fontSize: 11 }} width={75} />
+                <Tooltip formatter={(v: number) => `${v} kg`} />
+                <Bar dataKey="kg" fill="hsl(40,55%,55%)" radius={[0, 4, 4, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
           )}
         </CardContent>
       </Card>
