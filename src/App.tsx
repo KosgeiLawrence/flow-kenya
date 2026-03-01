@@ -11,6 +11,7 @@ import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
 import Dashboard from "./pages/Dashboard";
 import WastePickerDashboard from "./pages/WastePickerDashboard";
+import AggregatorDashboard from "./pages/AggregatorDashboard";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
 import NotFound from "./pages/NotFound";
 
@@ -34,6 +35,14 @@ const App = () => (
               element={
                 <ProtectedRoute allowedRoles={["waste_picker"]}>
                   <WastePickerDashboard />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/dashboard/aggregator/*"
+              element={
+                <ProtectedRoute allowedRoles={["aggregator"]}>
+                  <AggregatorDashboard />
                 </ProtectedRoute>
               }
             />
