@@ -13,6 +13,7 @@ import Dashboard from "./pages/Dashboard";
 import WastePickerDashboard from "./pages/WastePickerDashboard";
 import AggregatorDashboard from "./pages/AggregatorDashboard";
 import RecyclerDashboard from "./pages/RecyclerDashboard";
+import NGODashboard from "./pages/NGODashboard";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
 import NotFound from "./pages/NotFound";
 
@@ -52,6 +53,14 @@ const App = () => (
               element={
                 <ProtectedRoute allowedRoles={["recycler"]}>
                   <RecyclerDashboard />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/dashboard/ngo/*"
+              element={
+                <ProtectedRoute allowedRoles={["ngo"]}>
+                  <NGODashboard />
                 </ProtectedRoute>
               }
             />
