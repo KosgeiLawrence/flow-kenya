@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import {
   LogOut, Shield, Recycle, Award, Leaf, Factory, BookOpen,
   Clock, CheckCircle2, AlertTriangle, Menu, X, ChevronRight,
-  Package, HandCoins, BarChart3
+  Package, HandCoins, BarChart3, Settings
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
@@ -17,6 +17,7 @@ import ImpactCertificatesPanel from "@/components/dashboard/corporate/ImpactCert
 import ESGAnalyticsPanel from "@/components/dashboard/corporate/ESGAnalyticsPanel";
 import CarbonTrackerPanel from "@/components/dashboard/corporate/CarbonTrackerPanel";
 import SustainabilityReportPanel from "@/components/dashboard/corporate/SustainabilityReportPanel";
+import CorporateSettingsPanel from "@/components/dashboard/corporate/CorporateSettingsPanel";
 
 const navItems = [
   { id: "footprint", label: "Plastic Footprint", icon: Package },
@@ -28,6 +29,7 @@ const navItems = [
   { id: "esg", label: "ESG Analytics", icon: Leaf },
   { id: "carbon", label: "Carbon Tracker", icon: Factory },
   { id: "report", label: "Sustainability Report", icon: BookOpen },
+  { id: "settings", label: "Settings", icon: Settings },
 ];
 
 const statusConfig: Record<string, { icon: React.ElementType; label: string; color: string }> = {
@@ -61,6 +63,7 @@ const CorporateDashboard = () => {
       case "esg": return <ESGAnalyticsPanel />;
       case "carbon": return <CarbonTrackerPanel />;
       case "report": return <SustainabilityReportPanel />;
+      case "settings": return <CorporateSettingsPanel />;
       default: return <PlasticFootprintPanel />;
     }
   };
