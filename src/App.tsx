@@ -15,6 +15,8 @@ import AggregatorDashboard from "./pages/AggregatorDashboard";
 import RecyclerDashboard from "./pages/RecyclerDashboard";
 import NGODashboard from "./pages/NGODashboard";
 import CorporateDashboard from "./pages/CorporateDashboard";
+import AdminDashboard from "./pages/AdminDashboard";
+import CountyGovernmentDashboard from "./pages/CountyGovernmentDashboard";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
 import NotFound from "./pages/NotFound";
 
@@ -70,6 +72,22 @@ const App = () => (
               element={
                 <ProtectedRoute allowedRoles={["corporate"]}>
                   <CorporateDashboard />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/dashboard/admin/*"
+              element={
+                <ProtectedRoute allowedRoles={["admin"]}>
+                  <AdminDashboard />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/dashboard/county-government/*"
+              element={
+                <ProtectedRoute allowedRoles={["county_government"]}>
+                  <CountyGovernmentDashboard />
                 </ProtectedRoute>
               }
             />
