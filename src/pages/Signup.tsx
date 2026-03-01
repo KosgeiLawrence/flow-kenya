@@ -58,59 +58,27 @@ const Signup = () => {
     setLoading(true);
 
     try {
-      // 1. Sign up
-      const { data: authData, error: authError } = await supabase.auth.signUp({
+      // Sign up with metadata — trigger handles profile, role, org creation
+      const { error: authError } = await supabase.auth.signUp({
         email,
         password,
         options: {
           emailRedirectTo: window.location.origin,
+          data: {
+            full_name: fullName,
+            phone_number: phone || null,
+            national_id: nationalId || null,
+            company_registration: companyReg || null,
+            is_independent: isIndependent,
+            role,
+            org_name: isIndependent ? null : orgName || null,
+            org_type: isIndependent ? null : orgType || "private_company",
+            org_description: isIndependent ? null : orgDescription || null,
+          },
         },
       });
 
       if (authError) throw authError;
-      if (!authData.user) throw new Error("Signup failed");
-
-      const userId = authData.user.id;
-
-      // 2. Create organization if not independent
-      let organizationId: string | null = null;
-      if (!isIndependent && orgName.trim()) {
-        const { data: orgData, error: orgError } = await supabase
-          .from("organizations")
-          .insert({
-            name: orgName,
-            type: orgType || "private_company",
-            description: orgDescription || null,
-          })
-          .select("id")
-          .single();
-
-        if (orgError) throw orgError;
-        organizationId = orgData.id;
-      }
-
-      // 3. Create profile
-      const { error: profileError } = await supabase.from("profiles").insert({
-        user_id: userId,
-        full_name: fullName,
-        phone_number: phone || null,
-        email,
-        national_id: nationalId || null,
-        company_registration: companyReg || null,
-        organization_id: organizationId,
-        is_independent: isIndependent,
-        approval_status: role === "waste_picker" ? "pending" : "pending",
-      });
-
-      if (profileError) throw profileError;
-
-      // 4. Assign role
-      const { error: roleError } = await supabase.from("user_roles").insert({
-        user_id: userId,
-        role,
-      });
-
-      if (roleError) throw roleError;
 
       toast({
         title: "Account created!",
