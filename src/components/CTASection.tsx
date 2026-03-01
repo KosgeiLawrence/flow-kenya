@@ -44,111 +44,27 @@ const CTA = () => {
   );
 };
 
-const footerLinks = {
-  platform: [
-    { label: "Waste Pickers", href: "/signup" },
-    { label: "Aggregators", href: "/signup" },
-    { label: "Recyclers", href: "/signup" },
-    { label: "Corporates", href: "/signup" },
-  ],
-  resources: [
-    { label: "Impact Dashboard", href: "/impact" },
-    { label: "Documentation", href: "#" },
-    { label: "API Reference", href: "#" },
-    { label: "Blog", href: "#" },
-  ],
-  company: [
-    { label: "About Us", href: "#about" },
-    { label: "Careers", href: "#" },
-    { label: "Contact", href: "/contact" },
-    { label: "Partners", href: "#" },
-  ],
-  legal: [
-    { label: "Privacy Policy", href: "/privacy" },
-    { label: "Terms of Service", href: "/terms" },
-    { label: "Cookie Policy", href: "/privacy" },
-  ],
-};
-
 const Footer = () => (
-  <footer className="bg-forest-deep text-primary-foreground">
-    {/* Main footer */}
-    <div className="container py-16 md:py-20">
-      <div className="grid grid-cols-2 gap-10 md:grid-cols-5 lg:gap-16">
-        {/* Brand column */}
-        <div className="col-span-2 md:col-span-1 lg:col-span-2">
-          <Link to="/" className="inline-flex items-center gap-2.5 mb-5">
-            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-gold">
-              <Recycle className="h-5 w-5 text-forest-deep" />
-            </div>
-            <span className="font-display text-lg font-bold tracking-tight">
-              Duara Flow
-            </span>
-          </Link>
-          <p className="text-sm leading-relaxed text-primary-foreground/60 max-w-xs mb-6">
-            Digitizing Kenya's circular economy — connecting waste pickers, aggregators, recyclers, and corporates on one transparent platform.
-          </p>
-          <div className="flex gap-3">
-            {["X", "LinkedIn", "GitHub"].map((social) => (
-              <a
-                key={social}
-                href="#"
-                className="flex h-9 w-9 items-center justify-center rounded-lg border border-primary-foreground/10 text-xs font-bold text-primary-foreground/50 transition-all hover:border-gold/40 hover:text-gold"
-              >
-                {social[0]}
-              </a>
-            ))}
+  <footer className="border-t border-border bg-muted py-12">
+    <div className="container">
+      <div className="flex flex-col items-center justify-between gap-6 md:flex-row">
+        <div className="flex items-center gap-2">
+          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary">
+            <Recycle className="h-5 w-5 text-primary-foreground" />
           </div>
+          <span className="font-display text-lg font-bold text-foreground">
+            Duara Flow
+          </span>
         </div>
-
-        {/* Link columns */}
-        {Object.entries(footerLinks).map(([title, links]) => (
-          <div key={title}>
-            <h4 className="font-display text-sm font-semibold uppercase tracking-wider text-gold mb-4">
-              {title}
-            </h4>
-            <ul className="space-y-2.5">
-              {links.map((link) => (
-                <li key={link.label}>
-                  {link.href.startsWith("/") ? (
-                    <Link
-                      to={link.href}
-                      className="text-sm text-primary-foreground/50 transition-colors hover:text-gold-light"
-                    >
-                      {link.label}
-                    </Link>
-                  ) : (
-                    <a
-                      href={link.href}
-                      className="text-sm text-primary-foreground/50 transition-colors hover:text-gold-light"
-                    >
-                      {link.label}
-                    </a>
-                  )}
-                </li>
-              ))}
-            </ul>
-          </div>
-        ))}
-      </div>
-    </div>
-
-    {/* Bottom bar */}
-    <div className="border-t border-primary-foreground/10">
-      <div className="container flex flex-col items-center justify-between gap-4 py-6 md:flex-row">
-        <p className="text-xs text-primary-foreground/40">
+        <p className="text-sm text-muted-foreground">
           © 2026 Duara Intelligence. Building Kenya's circular economy infrastructure.
         </p>
         <div className="flex gap-6">
-          <Link to="/privacy" className="text-xs text-primary-foreground/40 transition-colors hover:text-gold-light">
-            Privacy
-          </Link>
-          <Link to="/terms" className="text-xs text-primary-foreground/40 transition-colors hover:text-gold-light">
-            Terms
-          </Link>
-          <Link to="/contact" className="text-xs text-primary-foreground/40 transition-colors hover:text-gold-light">
-            Contact
-          </Link>
+          {["Privacy", "Terms", "Contact"].map((link) => (
+            <a key={link} href="#" className="text-sm text-muted-foreground transition-colors hover:text-foreground">
+              {link}
+            </a>
+          ))}
         </div>
       </div>
     </div>
