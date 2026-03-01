@@ -9,7 +9,7 @@ import { QRCodeSVG } from "qrcode.react";
 import jsPDF from "jspdf";
 import { format } from "date-fns";
 import { useAuth } from "@/hooks/useAuth";
-import { loadImageAsBase64, DUARA_LOGO_SRC } from "@/lib/pdfLogoUtils";
+import { loadImageAsBase64, renderDuaraFlowLogo } from "@/lib/pdfLogoUtils";
 
 const EPRCompliancePanel = () => {
   const { profile } = useAuth();
@@ -83,7 +83,7 @@ const EPRCompliancePanel = () => {
     const today = format(new Date(), "MMM d, yyyy");
 
     const [duaraLogo, orgLogo] = await Promise.all([
-      loadImageAsBase64(DUARA_LOGO_SRC),
+      renderDuaraFlowLogo(200),
       org?.logo_url ? loadImageAsBase64(org.logo_url) : Promise.resolve(null),
     ]);
 
