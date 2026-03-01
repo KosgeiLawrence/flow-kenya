@@ -7,7 +7,7 @@ import { Download, Award } from "lucide-react";
 import { QRCodeSVG } from "qrcode.react";
 import jsPDF from "jspdf";
 import { format } from "date-fns";
-import { loadImageAsBase64, DUARA_LOGO_SRC } from "@/lib/pdfLogoUtils";
+import { loadImageAsBase64, renderDuaraFlowLogo } from "@/lib/pdfLogoUtils";
 
 const ImpactCertificatesPanel = () => {
   const { profile } = useAuth();
@@ -49,7 +49,7 @@ const ImpactCertificatesPanel = () => {
 
     // Load logos
     const [duaraLogo, orgLogo] = await Promise.all([
-      loadImageAsBase64(DUARA_LOGO_SRC),
+      renderDuaraFlowLogo(200),
       org?.logo_url ? loadImageAsBase64(org.logo_url) : Promise.resolve(null),
     ]);
 
