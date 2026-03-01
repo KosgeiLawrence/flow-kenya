@@ -14,6 +14,86 @@ export type Database = {
   }
   public: {
     Tables: {
+      collections: {
+        Row: {
+          batch_id: string
+          collected_at: string
+          created_at: string
+          id: string
+          location_lat: number | null
+          location_lng: number | null
+          location_name: string | null
+          material_type_id: string
+          notes: string | null
+          quantity: number
+          user_id: string
+        }
+        Insert: {
+          batch_id?: string
+          collected_at?: string
+          created_at?: string
+          id?: string
+          location_lat?: number | null
+          location_lng?: number | null
+          location_name?: string | null
+          material_type_id: string
+          notes?: string | null
+          quantity: number
+          user_id: string
+        }
+        Update: {
+          batch_id?: string
+          collected_at?: string
+          created_at?: string
+          id?: string
+          location_lat?: number | null
+          location_lng?: number | null
+          location_name?: string | null
+          material_type_id?: string
+          notes?: string | null
+          quantity?: number
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "collections_material_type_id_fkey"
+            columns: ["material_type_id"]
+            isOneToOne: false
+            referencedRelation: "material_types"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      material_types: {
+        Row: {
+          created_at: string
+          icon: string | null
+          id: string
+          name: string
+          price_per_unit: number
+          unit: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          icon?: string | null
+          id?: string
+          name: string
+          price_per_unit?: number
+          unit?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          icon?: string | null
+          id?: string
+          name?: string
+          price_per_unit?: number
+          unit?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       organizations: {
         Row: {
           created_at: string
@@ -41,6 +121,90 @@ export type Database = {
           name?: string
           type?: string
           updated_at?: string
+        }
+        Relationships: []
+      }
+      payments: {
+        Row: {
+          amount: number
+          checkout_request_id: string | null
+          completed_at: string | null
+          created_at: string
+          description: string | null
+          id: string
+          merchant_request_id: string | null
+          mpesa_receipt_number: string | null
+          phone_number: string
+          result_description: string | null
+          status: string
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          checkout_request_id?: string | null
+          completed_at?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          merchant_request_id?: string | null
+          mpesa_receipt_number?: string | null
+          phone_number: string
+          result_description?: string | null
+          status?: string
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          checkout_request_id?: string | null
+          completed_at?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          merchant_request_id?: string | null
+          mpesa_receipt_number?: string | null
+          phone_number?: string
+          result_description?: string | null
+          status?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      pickup_schedules: {
+        Row: {
+          created_at: string
+          id: string
+          location_lat: number | null
+          location_lng: number | null
+          location_name: string
+          notes: string | null
+          scheduled_at: string
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          location_lat?: number | null
+          location_lng?: number | null
+          location_name: string
+          notes?: string | null
+          scheduled_at: string
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          location_lat?: number | null
+          location_lng?: number | null
+          location_name?: string
+          notes?: string | null
+          scheduled_at?: string
+          status?: string
+          updated_at?: string
+          user_id?: string
         }
         Relationships: []
       }
@@ -99,6 +263,39 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      training_resources: {
+        Row: {
+          category: string
+          content_url: string | null
+          created_at: string
+          description: string | null
+          duration_minutes: number | null
+          id: string
+          thumbnail_url: string | null
+          title: string
+        }
+        Insert: {
+          category?: string
+          content_url?: string | null
+          created_at?: string
+          description?: string | null
+          duration_minutes?: number | null
+          id?: string
+          thumbnail_url?: string | null
+          title: string
+        }
+        Update: {
+          category?: string
+          content_url?: string | null
+          created_at?: string
+          description?: string | null
+          duration_minutes?: number | null
+          id?: string
+          thumbnail_url?: string | null
+          title?: string
+        }
+        Relationships: []
       }
       user_roles: {
         Row: {
