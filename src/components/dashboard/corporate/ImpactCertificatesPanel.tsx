@@ -1,12 +1,13 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Download, Award, QrCode, Shield } from "lucide-react";
+import { Download, Award } from "lucide-react";
 import { QRCodeSVG } from "qrcode.react";
 import jsPDF from "jspdf";
 import { format } from "date-fns";
+import { loadImageAsBase64, DUARA_LOGO_SRC } from "@/lib/pdfLogoUtils";
 
 const ImpactCertificatesPanel = () => {
   const { profile } = useAuth();
@@ -23,14 +24,34 @@ const ImpactCertificatesPanel = () => {
     },
   });
 
+  const { data: org } = useQuery({
+    queryKey: ["corp_org", profile?.organization_id],
+    enabled: !!profile?.organization_id,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("organizations")
+        .select("name, logo_url")
+        .eq("id", profile!.organization_id!)
+        .single();
+      if (error) throw error;
+      return data;
+    },
+  });
+
   const totalKg = collections?.reduce((s, c) => s + Number(c.quantity), 0) || 0;
   const co2Saved = (totalKg * 2.5).toFixed(1);
   const certId = `CERT-${(profile?.id || "").slice(0, 8).toUpperCase()}-${format(new Date(), "yyyyMM")}`;
   const verifyUrl = `https://duaraflow.com/verify/${certId}`;
 
-  const downloadCertificate = () => {
+  const downloadCertificate = async () => {
     const doc = new jsPDF();
     const today = format(new Date(), "MMM d, yyyy");
+
+    // Load logos
+    const [duaraLogo, orgLogo] = await Promise.all([
+      loadImageAsBase64(DUARA_LOGO_SRC),
+      org?.logo_url ? loadImageAsBase64(org.logo_url) : Promise.resolve(null),
+    ]);
 
     // Border
     doc.setDrawColor(34, 87, 62);
@@ -39,25 +60,36 @@ const ImpactCertificatesPanel = () => {
     doc.setLineWidth(0.5);
     doc.rect(14, 14, 182, 269);
 
+    // Logos row
+    let logoY = 22;
+    if (duaraLogo) {
+      doc.addImage(duaraLogo, "PNG", 22, logoY, 28, 28);
+    }
+    if (orgLogo) {
+      doc.addImage(orgLogo, "PNG", 160, logoY, 28, 28);
+    }
+
+    const contentStart = 60;
+
     doc.setFontSize(28);
     doc.setTextColor(34, 87, 62);
-    doc.text("IMPACT CERTIFICATE", 105, 45, { align: "center" });
+    doc.text("IMPACT CERTIFICATE", 105, contentStart, { align: "center" });
 
     doc.setFontSize(12);
     doc.setTextColor(100);
-    doc.text("Duara Flow — Verified Environmental Impact", 105, 57, { align: "center" });
+    doc.text("Duara Flow — Verified Environmental Impact", 105, contentStart + 12, { align: "center" });
 
     doc.setTextColor(0);
     doc.setFontSize(11);
-    doc.text("This certifies that", 105, 80, { align: "center" });
+    doc.text("This certifies that", 105, contentStart + 30, { align: "center" });
 
     doc.setFontSize(18);
     doc.setTextColor(34, 87, 62);
-    doc.text(profile?.full_name || "Corporate Entity", 105, 95, { align: "center" });
+    doc.text(org?.name || profile?.full_name || "Corporate Entity", 105, contentStart + 45, { align: "center" });
 
     doc.setTextColor(0);
     doc.setFontSize(11);
-    doc.text("has achieved the following verified environmental impact:", 105, 112, { align: "center" });
+    doc.text("has achieved the following verified environmental impact:", 105, contentStart + 60, { align: "center" });
 
     // Impact metrics
     doc.setFontSize(13);
@@ -67,7 +99,7 @@ const ImpactCertificatesPanel = () => {
       `Water Saved: ${(totalKg * 18).toLocaleString()} liters`,
       `Energy Conserved: ${(totalKg * 5.8).toFixed(0)} kWh`,
     ];
-    let y = 130;
+    let y = contentStart + 80;
     metrics.forEach((m) => {
       doc.text(`• ${m}`, 45, y);
       y += 12;
@@ -94,9 +126,10 @@ const ImpactCertificatesPanel = () => {
     doc.save(`impact-certificate-${certId}.pdf`);
   };
 
+  const orgName = org?.name || profile?.full_name || "Corporate Entity";
+
   return (
     <div className="space-y-6">
-      {/* Certificate preview */}
       <Card className="shadow-elevated">
         <CardContent className="p-8 text-center space-y-6">
           <Award className="w-16 h-16 text-primary mx-auto" />
@@ -107,7 +140,7 @@ const ImpactCertificatesPanel = () => {
 
           <div className="inline-block border-2 border-primary/20 rounded-lg p-6 bg-muted/20">
             <p className="text-sm text-muted-foreground mb-1">Certified to</p>
-            <p className="text-lg font-bold text-foreground">{profile?.full_name || "Corporate Entity"}</p>
+            <p className="text-lg font-bold text-foreground">{orgName}</p>
           </div>
 
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 max-w-lg mx-auto">
@@ -129,7 +162,6 @@ const ImpactCertificatesPanel = () => {
             </div>
           </div>
 
-          {/* QR Code */}
           <div className="flex flex-col items-center gap-2">
             <QRCodeSVG value={verifyUrl} size={120} fgColor="hsl(152,45%,22%)" />
             <p className="text-xs text-muted-foreground font-mono">{certId}</p>
