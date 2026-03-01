@@ -208,6 +208,48 @@ export type Database = {
         }
         Relationships: []
       }
+      plastic_declarations: {
+        Row: {
+          created_at: string
+          id: string
+          material_type: string
+          notes: string | null
+          period_end: string
+          period_start: string
+          period_type: string
+          quantity_kg: number
+          recovery_obligation_kg: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          material_type: string
+          notes?: string | null
+          period_end: string
+          period_start: string
+          period_type?: string
+          quantity_kg?: number
+          recovery_obligation_kg?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          material_type?: string
+          notes?: string | null
+          period_end?: string
+          period_start?: string
+          period_type?: string
+          quantity_kg?: number
+          recovery_obligation_kg?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           approval_status: Database["public"]["Enums"]["approval_status"]
@@ -266,6 +308,104 @@ export type Database = {
             columns: ["organization_id"]
             isOneToOne: false
             referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      recovery_commitments: {
+        Row: {
+          created_at: string
+          funded_amount: number
+          id: string
+          notes: string | null
+          recovered_kg: number
+          status: string
+          target_aggregator_id: string | null
+          target_county: string | null
+          target_kg: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          funded_amount?: number
+          id?: string
+          notes?: string | null
+          recovered_kg?: number
+          status?: string
+          target_aggregator_id?: string | null
+          target_county?: string | null
+          target_kg?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          funded_amount?: number
+          id?: string
+          notes?: string | null
+          recovered_kg?: number
+          status?: string
+          target_aggregator_id?: string | null
+          target_county?: string | null
+          target_kg?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "recovery_commitments_target_aggregator_id_fkey"
+            columns: ["target_aggregator_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      recovery_tracking: {
+        Row: {
+          collection_id: string
+          commitment_id: string
+          created_at: string
+          id: string
+          recycled: boolean
+          recycled_at: string | null
+          verified: boolean
+          verified_at: string | null
+        }
+        Insert: {
+          collection_id: string
+          commitment_id: string
+          created_at?: string
+          id?: string
+          recycled?: boolean
+          recycled_at?: string | null
+          verified?: boolean
+          verified_at?: string | null
+        }
+        Update: {
+          collection_id?: string
+          commitment_id?: string
+          created_at?: string
+          id?: string
+          recycled?: boolean
+          recycled_at?: string | null
+          verified?: boolean
+          verified_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "recovery_tracking_collection_id_fkey"
+            columns: ["collection_id"]
+            isOneToOne: false
+            referencedRelation: "collections"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "recovery_tracking_commitment_id_fkey"
+            columns: ["commitment_id"]
+            isOneToOne: false
+            referencedRelation: "recovery_commitments"
             referencedColumns: ["id"]
           },
         ]
