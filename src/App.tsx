@@ -10,6 +10,7 @@ import Signup from "./pages/Signup";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
 import Dashboard from "./pages/Dashboard";
+import WastePickerDashboard from "./pages/WastePickerDashboard";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
 import NotFound from "./pages/NotFound";
 
@@ -28,6 +29,14 @@ const App = () => (
             <Route path="/signup" element={<Signup />} />
             <Route path="/forgot-password" element={<ForgotPassword />} />
             <Route path="/reset-password" element={<ResetPassword />} />
+            <Route
+              path="/dashboard/waste-picker/*"
+              element={
+                <ProtectedRoute allowedRoles={["waste_picker"]}>
+                  <WastePickerDashboard />
+                </ProtectedRoute>
+              }
+            />
             <Route
               path="/dashboard/*"
               element={

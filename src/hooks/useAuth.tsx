@@ -14,6 +14,9 @@ interface Profile {
   approval_status: ApprovalStatus;
   organization_id: string | null;
   is_independent: boolean;
+  national_id: string | null;
+  company_registration: string | null;
+  avatar_url: string | null;
 }
 
 interface AuthContextType {
