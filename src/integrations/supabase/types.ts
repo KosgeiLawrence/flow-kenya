@@ -214,8 +214,10 @@ export type Database = {
           avatar_url: string | null
           company_registration: string | null
           created_at: string
+          date_of_birth: string | null
           email: string | null
           full_name: string
+          gender: string | null
           id: string
           is_independent: boolean | null
           national_id: string | null
@@ -229,8 +231,10 @@ export type Database = {
           avatar_url?: string | null
           company_registration?: string | null
           created_at?: string
+          date_of_birth?: string | null
           email?: string | null
           full_name: string
+          gender?: string | null
           id?: string
           is_independent?: boolean | null
           national_id?: string | null
@@ -244,8 +248,10 @@ export type Database = {
           avatar_url?: string | null
           company_registration?: string | null
           created_at?: string
+          date_of_birth?: string | null
           email?: string | null
           full_name?: string
+          gender?: string | null
           id?: string
           is_independent?: boolean | null
           national_id?: string | null
