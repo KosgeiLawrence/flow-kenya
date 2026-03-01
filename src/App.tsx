@@ -14,6 +14,7 @@ import WastePickerDashboard from "./pages/WastePickerDashboard";
 import AggregatorDashboard from "./pages/AggregatorDashboard";
 import RecyclerDashboard from "./pages/RecyclerDashboard";
 import NGODashboard from "./pages/NGODashboard";
+import CorporateDashboard from "./pages/CorporateDashboard";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
 import NotFound from "./pages/NotFound";
 
@@ -61,6 +62,14 @@ const App = () => (
               element={
                 <ProtectedRoute allowedRoles={["ngo"]}>
                   <NGODashboard />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/dashboard/corporate/*"
+              element={
+                <ProtectedRoute allowedRoles={["corporate"]}>
+                  <CorporateDashboard />
                 </ProtectedRoute>
               }
             />

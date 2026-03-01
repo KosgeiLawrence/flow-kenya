@@ -1,0 +1,147 @@
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/useAuth";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Download, Award, QrCode, Shield } from "lucide-react";
+import { QRCodeSVG } from "qrcode.react";
+import jsPDF from "jspdf";
+import { format } from "date-fns";
+
+const ImpactCertificatesPanel = () => {
+  const { profile } = useAuth();
+
+  const { data: collections } = useQuery({
+    queryKey: ["corp_cert_collections"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("collections")
+        .select("*, material_types(name, unit)")
+        .order("collected_at", { ascending: false });
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  const totalKg = collections?.reduce((s, c) => s + Number(c.quantity), 0) || 0;
+  const co2Saved = (totalKg * 2.5).toFixed(1);
+  const certId = `CERT-${(profile?.id || "").slice(0, 8).toUpperCase()}-${format(new Date(), "yyyyMM")}`;
+  const verifyUrl = `https://duaraflow.com/verify/${certId}`;
+
+  const downloadCertificate = () => {
+    const doc = new jsPDF();
+    const today = format(new Date(), "MMM d, yyyy");
+
+    // Border
+    doc.setDrawColor(34, 87, 62);
+    doc.setLineWidth(2);
+    doc.rect(10, 10, 190, 277);
+    doc.setLineWidth(0.5);
+    doc.rect(14, 14, 182, 269);
+
+    doc.setFontSize(28);
+    doc.setTextColor(34, 87, 62);
+    doc.text("IMPACT CERTIFICATE", 105, 45, { align: "center" });
+
+    doc.setFontSize(12);
+    doc.setTextColor(100);
+    doc.text("Duara Flow — Verified Environmental Impact", 105, 57, { align: "center" });
+
+    doc.setTextColor(0);
+    doc.setFontSize(11);
+    doc.text("This certifies that", 105, 80, { align: "center" });
+
+    doc.setFontSize(18);
+    doc.setTextColor(34, 87, 62);
+    doc.text(profile?.full_name || "Corporate Entity", 105, 95, { align: "center" });
+
+    doc.setTextColor(0);
+    doc.setFontSize(11);
+    doc.text("has achieved the following verified environmental impact:", 105, 112, { align: "center" });
+
+    // Impact metrics
+    doc.setFontSize(13);
+    const metrics = [
+      `Total Waste Diverted: ${totalKg.toFixed(0)} kg`,
+      `CO₂ Emissions Offset: ${co2Saved} kg`,
+      `Water Saved: ${(totalKg * 18).toLocaleString()} liters`,
+      `Energy Conserved: ${(totalKg * 5.8).toFixed(0)} kWh`,
+    ];
+    let y = 130;
+    metrics.forEach((m) => {
+      doc.text(`• ${m}`, 45, y);
+      y += 12;
+    });
+
+    // Certificate details
+    doc.setFontSize(10);
+    doc.setTextColor(100);
+    y += 10;
+    doc.text(`Certificate ID: ${certId}`, 105, y, { align: "center" });
+    doc.text(`Issue Date: ${today}`, 105, y + 8, { align: "center" });
+    doc.text(`Verification: ${verifyUrl}`, 105, y + 16, { align: "center" });
+
+    // Signature line
+    doc.setTextColor(0);
+    doc.setFontSize(10);
+    doc.text("____________________________", 105, 240, { align: "center" });
+    doc.text("Duara Flow Platform", 105, 248, { align: "center" });
+
+    doc.setFontSize(7);
+    doc.setTextColor(130);
+    doc.text("This certificate is digitally generated and verifiable via QR code.", 105, 270, { align: "center" });
+
+    doc.save(`impact-certificate-${certId}.pdf`);
+  };
+
+  return (
+    <div className="space-y-6">
+      {/* Certificate preview */}
+      <Card className="shadow-elevated">
+        <CardContent className="p-8 text-center space-y-6">
+          <Award className="w-16 h-16 text-primary mx-auto" />
+          <div>
+            <h3 className="text-xl font-display font-bold text-foreground">Impact Certificate</h3>
+            <p className="text-sm text-muted-foreground mt-1">Verified Environmental Impact — Duara Flow</p>
+          </div>
+
+          <div className="inline-block border-2 border-primary/20 rounded-lg p-6 bg-muted/20">
+            <p className="text-sm text-muted-foreground mb-1">Certified to</p>
+            <p className="text-lg font-bold text-foreground">{profile?.full_name || "Corporate Entity"}</p>
+          </div>
+
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 max-w-lg mx-auto">
+            <div>
+              <p className="text-lg font-bold text-foreground">{totalKg.toFixed(0)} kg</p>
+              <p className="text-[10px] text-muted-foreground">Waste Diverted</p>
+            </div>
+            <div>
+              <p className="text-lg font-bold text-foreground">{co2Saved} kg</p>
+              <p className="text-[10px] text-muted-foreground">CO₂ Offset</p>
+            </div>
+            <div>
+              <p className="text-lg font-bold text-foreground">{(totalKg * 18).toLocaleString()}</p>
+              <p className="text-[10px] text-muted-foreground">Liters Saved</p>
+            </div>
+            <div>
+              <p className="text-lg font-bold text-foreground">{(totalKg * 5.8).toFixed(0)}</p>
+              <p className="text-[10px] text-muted-foreground">kWh Saved</p>
+            </div>
+          </div>
+
+          {/* QR Code */}
+          <div className="flex flex-col items-center gap-2">
+            <QRCodeSVG value={verifyUrl} size={120} fgColor="hsl(152,45%,22%)" />
+            <p className="text-xs text-muted-foreground font-mono">{certId}</p>
+          </div>
+
+          <Button onClick={downloadCertificate} size="lg">
+            <Download className="w-4 h-4 mr-2" /> Download Certificate PDF
+          </Button>
+        </CardContent>
+      </Card>
+    </div>
+  );
+};
+
+export default ImpactCertificatesPanel;
