@@ -3,10 +3,14 @@ import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import {
   LogOut, Shield, Recycle, Award, Leaf, Factory, BookOpen,
-  Clock, CheckCircle2, AlertTriangle, Menu, X, ChevronRight
+  Clock, CheckCircle2, AlertTriangle, Menu, X, ChevronRight,
+  Package, HandCoins, BarChart3
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
+import PlasticFootprintPanel from "@/components/dashboard/corporate/PlasticFootprintPanel";
+import RecoveryCommitmentPanel from "@/components/dashboard/corporate/RecoveryCommitmentPanel";
+import RecoveryTrackingPanel from "@/components/dashboard/corporate/RecoveryTrackingPanel";
 import EPRCompliancePanel from "@/components/dashboard/corporate/EPRCompliancePanel";
 import PlasticOffsetPanel from "@/components/dashboard/corporate/PlasticOffsetPanel";
 import ImpactCertificatesPanel from "@/components/dashboard/corporate/ImpactCertificatesPanel";
@@ -15,6 +19,9 @@ import CarbonTrackerPanel from "@/components/dashboard/corporate/CarbonTrackerPa
 import SustainabilityReportPanel from "@/components/dashboard/corporate/SustainabilityReportPanel";
 
 const navItems = [
+  { id: "footprint", label: "Plastic Footprint", icon: Package },
+  { id: "commitment", label: "Recovery & Funding", icon: HandCoins },
+  { id: "tracking", label: "Recovery Tracking", icon: BarChart3 },
   { id: "epr", label: "EPR Compliance", icon: Shield },
   { id: "offset", label: "Plastic Offset", icon: Recycle },
   { id: "certificates", label: "Impact Certificates", icon: Award },
@@ -32,7 +39,7 @@ const statusConfig: Record<string, { icon: React.ElementType; label: string; col
 const CorporateDashboard = () => {
   const { profile, signOut } = useAuth();
   const navigate = useNavigate();
-  const [activePanel, setActivePanel] = useState("epr");
+  const [activePanel, setActivePanel] = useState("footprint");
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const status = statusConfig[profile?.approval_status || "pending"];
@@ -45,13 +52,16 @@ const CorporateDashboard = () => {
 
   const renderPanel = () => {
     switch (activePanel) {
+      case "footprint": return <PlasticFootprintPanel />;
+      case "commitment": return <RecoveryCommitmentPanel />;
+      case "tracking": return <RecoveryTrackingPanel />;
       case "epr": return <EPRCompliancePanel />;
       case "offset": return <PlasticOffsetPanel />;
       case "certificates": return <ImpactCertificatesPanel />;
       case "esg": return <ESGAnalyticsPanel />;
       case "carbon": return <CarbonTrackerPanel />;
       case "report": return <SustainabilityReportPanel />;
-      default: return <EPRCompliancePanel />;
+      default: return <PlasticFootprintPanel />;
     }
   };
 
