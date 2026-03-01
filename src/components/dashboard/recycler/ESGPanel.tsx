@@ -2,14 +2,18 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
-import { Leaf, Factory, Droplets, Zap, TrendingUp } from "lucide-react";
+import { Leaf, Factory, Droplets, Zap, TrendingUp, Download } from "lucide-react";
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from "recharts";
+import { toast } from "sonner";
+import jsPDF from "jspdf";
+import { format } from "date-fns";
 
 const COLORS = ["hsl(152,45%,22%)", "hsl(40,55%,55%)", "hsl(195,60%,50%)", "hsl(25,30%,35%)"];
 
 const ESGPanel = () => {
-  const { user } = useAuth();
+  const { user, profile } = useAuth();
 
   const { data: collections } = useQuery({
     queryKey: ["recycler_esg", user?.id],
@@ -25,26 +29,150 @@ const ESGPanel = () => {
   });
 
   const totalKg = collections?.reduce((s, c) => s + Number(c.quantity), 0) || 0;
+  const co2Saved = totalKg * 2.5;
+  const waterSaved = totalKg * 18;
+  const energySaved = totalKg * 5.8;
+  const landfillDiverted = totalKg;
 
-  // Estimates
-  const co2Saved = (totalKg * 2.5).toFixed(1);       // kg CO2 per kg recycled
-  const waterSaved = (totalKg * 18).toFixed(0);       // liters water saved
-  const energySaved = (totalKg * 5.8).toFixed(1);     // kWh saved
-  const landfillDiverted = totalKg.toFixed(1);
-
-  // Material breakdown for pie
   const materialMap = new Map<string, number>();
   collections?.forEach((c) => {
     const name = (c as any).material_types?.name || "Unknown";
     materialMap.set(name, (materialMap.get(name) || 0) + Number(c.quantity));
   });
   const pieData = Array.from(materialMap.entries()).map(([name, value]) => ({ name, value: Math.round(value) }));
-
-  // ESG score (simplified)
   const esgScore = Math.min(Math.round((totalKg / 1000) * 25 + 40), 100);
+
+  const downloadESGReport = () => {
+    const doc = new jsPDF();
+    const today = format(new Date(), "MMM d, yyyy");
+
+    doc.setFontSize(22);
+    doc.text("Duara Flow", 20, 22);
+    doc.setFontSize(12);
+    doc.setTextColor(100);
+    doc.text("ESG & Sustainability Impact Report", 20, 32);
+    doc.setTextColor(0);
+
+    doc.setFontSize(10);
+    doc.text(`Generated: ${today}`, 20, 44);
+    doc.text(`Recycler: ${profile?.full_name || "—"}`, 20, 51);
+    doc.text(`ESG Score: ${esgScore}/100`, 20, 58);
+
+    doc.setFontSize(14);
+    doc.text("Environmental Impact Summary", 20, 74);
+    doc.setFontSize(10);
+    let y = 84;
+    const metrics = [
+      { label: "Total Material Recycled", value: `${totalKg.toFixed(1)} kg` },
+      { label: "CO₂ Emissions Saved", value: `${co2Saved.toFixed(1)} kg` },
+      { label: "Water Saved", value: `${waterSaved.toLocaleString()} liters` },
+      { label: "Energy Saved", value: `${energySaved.toFixed(1)} kWh` },
+      { label: "Landfill Diversion", value: `${landfillDiverted.toFixed(1)} kg` },
+    ];
+    metrics.forEach((m) => {
+      doc.text(`• ${m.label}: ${m.value}`, 24, y);
+      y += 8;
+    });
+
+    y += 8;
+    doc.setFontSize(14);
+    doc.text("Material Recovery Breakdown", 20, y);
+    y += 10;
+    doc.setFontSize(10);
+    if (pieData.length) {
+      pieData.forEach((d) => {
+        doc.text(`• ${d.name}: ${d.value} kg`, 24, y);
+        y += 8;
+      });
+    } else {
+      doc.text("No material data available.", 24, y);
+    }
+
+    y += 12;
+    doc.setFontSize(14);
+    doc.text("Methodology", 20, y);
+    y += 10;
+    doc.setFontSize(8);
+    doc.setTextColor(80);
+    doc.text("CO₂ savings estimated at 2.5 kg CO₂/kg recycled (EPA/IPCC factors).", 24, y);
+    y += 6;
+    doc.text("Water savings estimated at 18 liters/kg recycled material.", 24, y);
+    y += 6;
+    doc.text("Energy savings estimated at 5.8 kWh/kg recycled material.", 24, y);
+
+    doc.setFontSize(7);
+    doc.setTextColor(130);
+    doc.text("System-generated ESG report — Duara Flow", 20, 280);
+    doc.save(`esg-report-${format(new Date(), "yyyy-MM-dd")}.pdf`);
+    toast.success("ESG Report downloaded");
+  };
+
+  const downloadSustainabilityReport = () => {
+    const doc = new jsPDF();
+    const today = format(new Date(), "MMM d, yyyy");
+
+    doc.setFontSize(22);
+    doc.text("Duara Flow", 20, 22);
+    doc.setFontSize(12);
+    doc.setTextColor(100);
+    doc.text("Sustainability Impact Certificate", 20, 32);
+    doc.setTextColor(0);
+
+    doc.setFontSize(10);
+    doc.text(`Certificate Date: ${today}`, 20, 48);
+    doc.text(`Certified To: ${profile?.full_name || "—"}`, 20, 55);
+
+    doc.setFontSize(11);
+    let y = 72;
+    doc.text("This certifies that the above-named recycler has contributed", 20, y);
+    y += 8;
+    doc.text("to the following sustainability outcomes through the Duara Flow platform:", 20, y);
+
+    y += 16;
+    doc.setFontSize(18);
+    doc.setTextColor(34, 87, 62);
+    doc.text(`${totalKg.toFixed(0)} kg`, 90, y, { align: "center" });
+    doc.setFontSize(10);
+    doc.setTextColor(0);
+    y += 8;
+    doc.text("of waste material diverted from landfill and recycled", 90, y, { align: "center" });
+
+    y += 20;
+    doc.setFontSize(10);
+    const impacts = [
+      `Prevented ${co2Saved.toFixed(0)} kg of CO₂ equivalent greenhouse gas emissions`,
+      `Conserved approximately ${waterSaved.toLocaleString()} liters of water`,
+      `Saved approximately ${energySaved.toFixed(0)} kWh of energy`,
+      `Contributed to ${materialMap.size} distinct material recovery streams`,
+    ];
+    impacts.forEach((imp) => {
+      doc.text(`✓  ${imp}`, 24, y);
+      y += 10;
+    });
+
+    y += 10;
+    doc.setFontSize(9);
+    doc.text("This certificate is system-generated based on verified collection data.", 20, y);
+
+    doc.setFontSize(7);
+    doc.setTextColor(130);
+    doc.text("Duara Flow Sustainability Certificate — Verified by Platform Data", 20, 280);
+    doc.save(`sustainability-certificate-${format(new Date(), "yyyy-MM-dd")}.pdf`);
+    toast.success("Sustainability certificate downloaded");
+  };
 
   return (
     <div className="space-y-6">
+      {/* Download buttons */}
+      <div className="flex flex-wrap gap-3">
+        <Button onClick={downloadESGReport} variant="outline">
+          <Download className="w-4 h-4 mr-2" /> Download ESG Report
+        </Button>
+        <Button onClick={downloadSustainabilityReport} variant="outline">
+          <Download className="w-4 h-4 mr-2" /> Sustainability Certificate
+        </Button>
+      </div>
+
       {/* ESG Score */}
       <Card className="shadow-soft">
         <CardContent className="p-5">
@@ -67,28 +195,28 @@ const ESGPanel = () => {
         <Card className="shadow-soft">
           <CardContent className="p-4 text-center">
             <Factory className="w-7 h-7 text-primary mx-auto mb-2" />
-            <p className="text-xl font-bold text-foreground">{co2Saved}</p>
+            <p className="text-xl font-bold text-foreground">{co2Saved.toFixed(1)}</p>
             <p className="text-xs text-muted-foreground">kg CO₂ Saved</p>
           </CardContent>
         </Card>
         <Card className="shadow-soft">
           <CardContent className="p-4 text-center">
             <Droplets className="w-7 h-7 text-sky mx-auto mb-2" />
-            <p className="text-xl font-bold text-foreground">{Number(waterSaved).toLocaleString()}</p>
+            <p className="text-xl font-bold text-foreground">{waterSaved.toLocaleString()}</p>
             <p className="text-xs text-muted-foreground">Liters Water Saved</p>
           </CardContent>
         </Card>
         <Card className="shadow-soft">
           <CardContent className="p-4 text-center">
             <Zap className="w-7 h-7 text-accent mx-auto mb-2" />
-            <p className="text-xl font-bold text-foreground">{energySaved}</p>
+            <p className="text-xl font-bold text-foreground">{energySaved.toFixed(1)}</p>
             <p className="text-xs text-muted-foreground">kWh Energy Saved</p>
           </CardContent>
         </Card>
         <Card className="shadow-soft">
           <CardContent className="p-4 text-center">
             <TrendingUp className="w-7 h-7 text-primary mx-auto mb-2" />
-            <p className="text-xl font-bold text-foreground">{landfillDiverted}</p>
+            <p className="text-xl font-bold text-foreground">{landfillDiverted.toFixed(1)}</p>
             <p className="text-xs text-muted-foreground">kg Landfill Diverted</p>
           </CardContent>
         </Card>
