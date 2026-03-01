@@ -9,6 +9,7 @@ import { QRCodeSVG } from "qrcode.react";
 import jsPDF from "jspdf";
 import { format } from "date-fns";
 import { useAuth } from "@/hooks/useAuth";
+import { loadImageAsBase64, DUARA_LOGO_SRC } from "@/lib/pdfLogoUtils";
 
 const EPRCompliancePanel = () => {
   const { profile } = useAuth();
@@ -43,6 +44,20 @@ const EPRCompliancePanel = () => {
     },
   });
 
+  const { data: org } = useQuery({
+    queryKey: ["corp_org_epr", profile?.organization_id],
+    enabled: !!profile?.organization_id,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("organizations")
+        .select("name, logo_url")
+        .eq("id", profile!.organization_id!)
+        .single();
+      if (error) throw error;
+      return data;
+    },
+  });
+
   const totalRecovered = collections?.reduce((s, c) => s + Number(c.quantity), 0) || 0;
   const totalObligation = declarations?.reduce((s, d) => s + Number(d.recovery_obligation_kg), 0) || 0;
   const totalDeclared = declarations?.reduce((s, d) => s + Number(d.quantity_kg), 0) || 0;
@@ -63,9 +78,14 @@ const EPRCompliancePanel = () => {
 
   const score = (checks.filter((c) => c.pass).length / checks.length) * 100;
 
-  const downloadEPRReceipt = () => {
+  const downloadEPRReceipt = async () => {
     const doc = new jsPDF();
     const today = format(new Date(), "MMM d, yyyy");
+
+    const [duaraLogo, orgLogo] = await Promise.all([
+      loadImageAsBase64(DUARA_LOGO_SRC),
+      org?.logo_url ? loadImageAsBase64(org.logo_url) : Promise.resolve(null),
+    ]);
 
     // Border
     doc.setDrawColor(34, 87, 62);
@@ -74,24 +94,28 @@ const EPRCompliancePanel = () => {
     doc.setLineWidth(0.5);
     doc.rect(14, 14, 182, 269);
 
+    // Logos
+    if (duaraLogo) doc.addImage(duaraLogo, "PNG", 22, 18, 26, 26);
+    if (orgLogo) doc.addImage(orgLogo, "PNG", 162, 18, 26, 26);
+
     doc.setFontSize(22);
     doc.setTextColor(34, 87, 62);
-    doc.text("EPR COMPLIANCE RECEIPT", 105, 40, { align: "center" });
+    doc.text("EPR COMPLIANCE RECEIPT", 105, 52, { align: "center" });
 
     doc.setFontSize(10);
     doc.setTextColor(100);
-    doc.text("Duara Flow — Extended Producer Responsibility", 105, 50, { align: "center" });
+    doc.text("Duara Flow — Extended Producer Responsibility", 105, 62, { align: "center" });
 
     doc.setTextColor(0);
     doc.setFontSize(11);
-    doc.text(`Receipt ID: ${receiptId}`, 25, 70);
-    doc.text(`Date: ${today}`, 25, 78);
-    doc.text(`Company: ${profile?.full_name || "Corporate Entity"}`, 25, 86);
-    if (profile?.company_registration) doc.text(`Registration: ${profile.company_registration}`, 25, 94);
+    doc.text(`Receipt ID: ${receiptId}`, 25, 78);
+    doc.text(`Date: ${today}`, 25, 86);
+    doc.text(`Company: ${org?.name || profile?.full_name || "Corporate Entity"}`, 25, 94);
+    if (profile?.company_registration) doc.text(`Registration: ${profile.company_registration}`, 25, 102);
 
     doc.setFontSize(14);
     doc.setTextColor(34, 87, 62);
-    doc.text("Compliance Summary", 25, 112);
+    doc.text("Compliance Summary", 25, 118);
 
     doc.setFontSize(11);
     doc.setTextColor(0);
@@ -103,7 +127,7 @@ const EPRCompliancePanel = () => {
       `Funds Allocated: KES ${totalFunded.toLocaleString()}`,
       `Compliance Score: ${score.toFixed(0)}%`,
     ];
-    let y = 125;
+    let y = 131;
     metrics.forEach((m) => { doc.text(`• ${m}`, 30, y); y += 10; });
 
     y += 8;
