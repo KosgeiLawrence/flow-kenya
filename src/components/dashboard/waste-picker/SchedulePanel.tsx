@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
-import { Plus, Calendar, Loader2, MapPin } from "lucide-react";
+import { Plus, Calendar, Loader2, MapPin, Leaf } from "lucide-react";
 import { format } from "date-fns";
 
 const SchedulePanel = () => {
@@ -45,23 +45,32 @@ const SchedulePanel = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["pickup_schedules"] });
       toast.success("Pickup scheduled!");
-      setLocation("");
-      setScheduledAt("");
-      setNotes("");
-      setShowForm(false);
+      setLocation(""); setScheduledAt(""); setNotes(""); setShowForm(false);
     },
     onError: (err: Error) => toast.error(err.message),
   });
 
   const statusColors: Record<string, "default" | "secondary" | "destructive"> = {
-    scheduled: "secondary",
-    confirmed: "default",
-    completed: "default",
-    cancelled: "destructive",
+    scheduled: "secondary", confirmed: "default", completed: "default", cancelled: "destructive",
   };
+
+  const completedCount = schedules?.filter(s => s.status === "completed").length || 0;
 
   return (
     <div className="space-y-6">
+      {/* Impact context */}
+      <Card className="shadow-soft bg-primary/5 border-primary/20">
+        <CardContent className="flex items-center gap-3 p-4">
+          <Leaf className="w-5 h-5 text-primary shrink-0" />
+          <div>
+            <p className="text-sm font-medium text-foreground">Community Waste Diversion</p>
+            <p className="text-xs text-muted-foreground">
+              You've completed {completedCount} scheduled pickups, contributing to efficient waste collection and community-level diversion goals.
+            </p>
+          </div>
+        </CardContent>
+      </Card>
+
       {!showForm && (
         <Button onClick={() => setShowForm(true)} className="gap-2">
           <Plus className="w-4 h-4" /> Schedule Pickup

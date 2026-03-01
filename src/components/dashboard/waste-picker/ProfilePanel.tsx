@@ -1,10 +1,30 @@
 import { useAuth } from "@/hooks/useAuth";
+import { supabase } from "@/integrations/supabase/client";
+import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { CheckCircle2, Clock, AlertTriangle, Phone, Mail, Building2, Shield } from "lucide-react";
+import { CheckCircle2, Clock, AlertTriangle, Phone, Mail, Building2, Shield, Leaf, Droplets, Trash2 } from "lucide-react";
+import { calculateImpact } from "@/lib/impactUtils";
 
 const ProfilePanel = () => {
   const { user, profile } = useAuth();
+
+  const { data: collections } = useQuery({
+    queryKey: ["collections_profile", user?.id],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("collections")
+        .select("*, material_types(name, unit, price_per_unit)")
+        .eq("user_id", user!.id);
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!user?.id,
+  });
+
+  const impact = calculateImpact(
+    (collections || []).map(c => ({ quantity: c.quantity, material_types: (c as any).material_types }))
+  );
 
   const statusMap: Record<string, { icon: React.ElementType; label: string; variant: "default" | "secondary" | "destructive" }> = {
     pending: { icon: Clock, label: "Pending Verification", variant: "secondary" },
@@ -62,6 +82,33 @@ const ProfilePanel = () => {
                 <span>Organization Member</span>
               </div>
             )}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Cumulative Impact */}
+      <Card className="shadow-soft border-primary/20">
+        <CardHeader className="pb-2">
+          <CardTitle className="text-base flex items-center gap-2"><Leaf className="w-4 h-4 text-primary" /> Your Cumulative Impact</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+            <div>
+              <p className="text-xs text-muted-foreground uppercase">Collected</p>
+              <p className="text-lg font-display font-bold">{impact.totalKg.toFixed(0)} kg</p>
+            </div>
+            <div>
+              <p className="text-xs text-muted-foreground uppercase flex items-center gap-1"><Leaf className="w-3 h-3" /> CO₂ Avoided</p>
+              <p className="text-lg font-display font-bold text-primary">{impact.co2Avoided.toFixed(0)} kg</p>
+            </div>
+            <div>
+              <p className="text-xs text-muted-foreground uppercase flex items-center gap-1"><Droplets className="w-3 h-3" /> Water Saved</p>
+              <p className="text-lg font-display font-bold">{impact.waterSaved.toFixed(0)} L</p>
+            </div>
+            <div>
+              <p className="text-xs text-muted-foreground uppercase flex items-center gap-1"><Trash2 className="w-3 h-3" /> Landfill</p>
+              <p className="text-lg font-display font-bold">{impact.landfillReduced.toFixed(2)} m³</p>
+            </div>
           </div>
         </CardContent>
       </Card>

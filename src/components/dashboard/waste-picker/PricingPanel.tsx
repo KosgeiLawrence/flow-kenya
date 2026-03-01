@@ -3,8 +3,14 @@ import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { Loader2, TrendingUp } from "lucide-react";
+import { Loader2, TrendingUp, Leaf } from "lucide-react";
 import { format } from "date-fns";
+
+const CO2_FACTORS: Record<string, number> = {
+  PET: 3.1, HDPE: 1.8, LDPE: 2.0, PP: 1.7, PS: 3.0,
+  Aluminium: 9.1, Glass: 0.6, Paper: 1.1, Cardboard: 0.9,
+  Metal: 4.5, "Mixed Plastic": 2.5,
+};
 
 const PricingPanel = () => {
   const { data: materialTypes, isLoading } = useQuery({
@@ -35,7 +41,7 @@ const PricingPanel = () => {
       </Card>
 
       <Card className="shadow-soft">
-        <CardHeader><CardTitle className="text-base">Material Pricing</CardTitle></CardHeader>
+        <CardHeader><CardTitle className="text-base">Material Pricing & Environmental Value</CardTitle></CardHeader>
         <CardContent>
           <Table>
             <TableHeader>
@@ -43,22 +49,34 @@ const PricingPanel = () => {
                 <TableHead>Material</TableHead>
                 <TableHead>Unit</TableHead>
                 <TableHead className="text-right">Price (KES)</TableHead>
+                <TableHead className="text-right">
+                  <span className="flex items-center gap-1 justify-end"><Leaf className="w-3.5 h-3.5" /> CO₂/kg</span>
+                </TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {materialTypes?.map(mt => (
                 <TableRow key={mt.id}>
                   <TableCell className="font-medium">{mt.name}</TableCell>
-                  <TableCell>
-                    <Badge variant="outline">{mt.unit}</Badge>
-                  </TableCell>
+                  <TableCell><Badge variant="outline">{mt.unit}</Badge></TableCell>
                   <TableCell className="text-right font-semibold text-primary">
                     KES {Number(mt.price_per_unit).toFixed(2)}
+                  </TableCell>
+                  <TableCell className="text-right text-muted-foreground">
+                    {(CO2_FACTORS[mt.name] || 2.0).toFixed(1)} kg
                   </TableCell>
                 </TableRow>
               ))}
             </TableBody>
           </Table>
+        </CardContent>
+      </Card>
+
+      <Card className="shadow-soft bg-muted/30">
+        <CardContent className="p-4">
+          <p className="text-xs text-muted-foreground">
+            <strong>Impact note:</strong> The CO₂/kg column shows how much carbon dioxide is avoided per kg of this material recycled instead of produced from raw resources. Higher values mean greater environmental benefit.
+          </p>
         </CardContent>
       </Card>
     </div>

@@ -8,8 +8,9 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
-import { Plus, Package, Loader2 } from "lucide-react";
+import { Plus, Package, Loader2, Leaf, Droplets, Trash2 } from "lucide-react";
 import { format } from "date-fns";
+import { calculateImpact } from "@/lib/impactUtils";
 
 const CollectionPanel = () => {
   const { user } = useAuth();
@@ -35,8 +36,7 @@ const CollectionPanel = () => {
         .from("collections")
         .select("*, material_types(name, unit, price_per_unit)")
         .eq("user_id", user!.id)
-        .order("collected_at", { ascending: false })
-        .limit(50);
+        .order("collected_at", { ascending: false });
       if (error) throw error;
       return data;
     },
@@ -64,27 +64,73 @@ const CollectionPanel = () => {
     onError: (err: Error) => toast.error(err.message),
   });
 
-  const todayTotal = collections
-    ?.filter(c => format(new Date(c.collected_at), "yyyy-MM-dd") === format(new Date(), "yyyy-MM-dd"))
-    .reduce((sum, c) => sum + Number(c.quantity), 0) || 0;
+  const todayCollections = collections?.filter(
+    c => format(new Date(c.collected_at), "yyyy-MM-dd") === format(new Date(), "yyyy-MM-dd")
+  ) || [];
+  const todayTotal = todayCollections.reduce((sum, c) => sum + Number(c.quantity), 0);
+
+  const impact = calculateImpact(
+    (collections || []).map(c => ({
+      quantity: c.quantity,
+      material_types: (c as any).material_types,
+    }))
+  );
 
   return (
     <div className="space-y-6">
-      {/* Quick stats */}
-      <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+      {/* Impact summary */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <Card className="shadow-soft">
           <CardContent className="p-4">
             <p className="text-xs text-muted-foreground uppercase tracking-wider">Today</p>
             <p className="text-2xl font-display font-bold text-foreground">{todayTotal.toFixed(1)} kg</p>
           </CardContent>
         </Card>
+        <Card className="shadow-soft border-primary/20">
+          <CardContent className="p-4">
+            <div className="flex items-center gap-1.5 mb-1">
+              <Leaf className="w-3.5 h-3.5 text-primary" />
+              <p className="text-xs text-muted-foreground uppercase tracking-wider">CO₂ Avoided</p>
+            </div>
+            <p className="text-2xl font-display font-bold text-primary">{impact.co2Avoided.toFixed(0)} kg</p>
+          </CardContent>
+        </Card>
         <Card className="shadow-soft">
           <CardContent className="p-4">
-            <p className="text-xs text-muted-foreground uppercase tracking-wider">Total Entries</p>
-            <p className="text-2xl font-display font-bold text-foreground">{collections?.length || 0}</p>
+            <div className="flex items-center gap-1.5 mb-1">
+              <Droplets className="w-3.5 h-3.5 text-blue-500" />
+              <p className="text-xs text-muted-foreground uppercase tracking-wider">Water Saved</p>
+            </div>
+            <p className="text-2xl font-display font-bold text-foreground">{impact.waterSaved.toFixed(0)} L</p>
+          </CardContent>
+        </Card>
+        <Card className="shadow-soft">
+          <CardContent className="p-4">
+            <div className="flex items-center gap-1.5 mb-1">
+              <Trash2 className="w-3.5 h-3.5 text-muted-foreground" />
+              <p className="text-xs text-muted-foreground uppercase tracking-wider">Landfill Saved</p>
+            </div>
+            <p className="text-2xl font-display font-bold text-foreground">{impact.landfillReduced.toFixed(2)} m³</p>
           </CardContent>
         </Card>
       </div>
+
+      {/* Material breakdown impact */}
+      {impact.materialBreakdown.length > 0 && (
+        <Card className="shadow-soft bg-primary/5 border-primary/20">
+          <CardContent className="p-4">
+            <p className="text-sm font-medium text-foreground mb-2">Environmental Impact by Material</p>
+            <div className="space-y-2">
+              {impact.materialBreakdown.slice(0, 5).map(m => (
+                <div key={m.name} className="flex items-center justify-between text-sm">
+                  <span className="text-muted-foreground">{m.name}</span>
+                  <span className="font-medium">{m.kg.toFixed(1)} kg → <span className="text-primary">{m.co2.toFixed(1)} kg CO₂ avoided</span></span>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Add button */}
       {!showForm && (
@@ -106,24 +152,10 @@ const CollectionPanel = () => {
                 ))}
               </SelectContent>
             </Select>
-            <Input
-              type="number"
-              placeholder="Quantity (kg)"
-              value={quantity}
-              onChange={e => setQuantity(e.target.value)}
-              min="0.1"
-              step="0.1"
-            />
-            <Input
-              placeholder="Location (optional)"
-              value={locationName}
-              onChange={e => setLocationName(e.target.value)}
-            />
+            <Input type="number" placeholder="Quantity (kg)" value={quantity} onChange={e => setQuantity(e.target.value)} min="0.1" step="0.1" />
+            <Input placeholder="Location (optional)" value={locationName} onChange={e => setLocationName(e.target.value)} />
             <div className="flex gap-2">
-              <Button
-                onClick={() => addCollection.mutate()}
-                disabled={!materialTypeId || !quantity || addCollection.isPending}
-              >
+              <Button onClick={() => addCollection.mutate()} disabled={!materialTypeId || !quantity || addCollection.isPending}>
                 {addCollection.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : "Save"}
               </Button>
               <Button variant="ghost" onClick={() => setShowForm(false)}>Cancel</Button>
@@ -145,7 +177,7 @@ const CollectionPanel = () => {
             </div>
           ) : (
             <div className="space-y-3">
-              {collections.map(c => (
+              {collections.slice(0, 50).map(c => (
                 <div key={c.id} className="flex items-center justify-between p-3 rounded-lg bg-muted/50">
                   <div>
                     <p className="text-sm font-medium">{(c as any).material_types?.name}</p>
