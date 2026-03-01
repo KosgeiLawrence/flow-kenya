@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { ArrowRight, Recycle } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import heroBg from "@/assets/hero-bg.jpg";
@@ -21,43 +21,8 @@ const Hero = () => {
 
       {/* Content */}
       <div className="relative z-10 flex min-h-screen flex-col">
-        {/* Nav */}
-        <nav className="container flex items-center justify-between py-6">
-          <motion.div
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            className="flex items-center gap-2"
-          >
-            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gold">
-              <Recycle className="h-6 w-6 text-forest-deep" />
-            </div>
-            <span className="font-display text-xl font-bold text-primary-foreground">
-              Duara Flow
-            </span>
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            className="hidden items-center gap-8 md:flex"
-          >
-            {["Platform", "Impact", "Stakeholders", "About"].map((item) => (
-              <a
-                key={item}
-                href={`#${item.toLowerCase()}`}
-                className="text-sm font-medium text-primary-foreground/80 transition-colors hover:text-gold-light"
-              >
-                {item}
-              </a>
-            ))}
-            <Link to="/login" className="text-sm font-medium text-primary-foreground/80 transition-colors hover:text-gold-light">
-              Sign In
-            </Link>
-            <Button variant="hero" size="sm" asChild>
-              <Link to="/signup">Get Started</Link>
-            </Button>
-          </motion.div>
-        </nav>
+        {/* Spacer for fixed navbar */}
+        <div className="h-20" />
 
         {/* Hero Content */}
         <div className="container flex flex-1 flex-col items-center justify-center pb-20 text-center">
