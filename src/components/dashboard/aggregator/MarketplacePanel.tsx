@@ -1,12 +1,17 @@
+import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Store, Recycle, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Store, Recycle, ArrowRight, Search, Mail, Phone } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
 const MarketplacePanel = () => {
-  // Fetch recyclers from profiles
+  const [selectedRecycler, setSelectedRecycler] = useState<any>(null);
+  const [search, setSearch] = useState("");
+
   const { data: recyclers } = useQuery({
     queryKey: ["recycler_profiles"],
     queryFn: async () => {
@@ -27,6 +32,24 @@ const MarketplacePanel = () => {
       return data;
     },
   });
+
+  // Fetch available recycler products
+  const { data: products } = useQuery({
+    queryKey: ["recycler_products_marketplace"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("recycler_products")
+        .select("*, profiles!recycler_products_user_id_fkey(full_name)")
+        .eq("status", "available");
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  const filteredRecyclers = recyclers?.filter(r =>
+    !search || r.full_name?.toLowerCase().includes(search.toLowerCase()) ||
+    (r as any).organizations?.name?.toLowerCase().includes(search.toLowerCase())
+  ) || [];
 
   return (
     <div className="space-y-6">
@@ -66,16 +89,19 @@ const MarketplacePanel = () => {
             <Recycle className="w-5 h-5 text-primary" /> Recycler Directory
           </CardTitle>
         </CardHeader>
-        <CardContent>
-          {!recyclers?.length ? (
+        <CardContent className="space-y-3">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+            <Input placeholder="Search recyclers..." value={search} onChange={(e) => setSearch(e.target.value)} className="pl-9" />
+          </div>
+          {!filteredRecyclers.length ? (
             <div className="text-center py-8">
               <Recycle className="w-10 h-10 text-muted-foreground mx-auto mb-3" />
-              <p className="text-sm text-muted-foreground">No recyclers registered yet.</p>
-              <p className="text-xs text-muted-foreground mt-1">Recyclers will appear here once they join the platform.</p>
+              <p className="text-sm text-muted-foreground">No recyclers found.</p>
             </div>
           ) : (
             <div className="divide-y divide-border">
-              {recyclers.map((r) => (
+              {filteredRecyclers.map((r) => (
                 <div key={r.id} className="flex items-center justify-between py-3">
                   <div className="flex items-center gap-3">
                     <div className="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center text-sm font-bold text-primary">
@@ -92,7 +118,7 @@ const MarketplacePanel = () => {
                     <Badge variant={r.approval_status === "approved" ? "default" : "secondary"}>
                       {r.approval_status === "approved" ? "Active" : "Pending"}
                     </Badge>
-                    <Button variant="ghost" size="icon" className="h-8 w-8">
+                    <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setSelectedRecycler(r)}>
                       <ArrowRight className="w-4 h-4" />
                     </Button>
                   </div>
@@ -102,6 +128,25 @@ const MarketplacePanel = () => {
           )}
         </CardContent>
       </Card>
+
+      {/* Recycler detail dialog */}
+      <Dialog open={!!selectedRecycler} onOpenChange={() => setSelectedRecycler(null)}>
+        <DialogContent>
+          <DialogHeader><DialogTitle>{selectedRecycler?.full_name}</DialogTitle></DialogHeader>
+          <div className="space-y-3">
+            <p className="text-sm text-muted-foreground">
+              {(selectedRecycler as any)?.organizations?.name || "Independent Recycler"}
+            </p>
+            {selectedRecycler?.phone_number && (
+              <div className="flex items-center gap-2 text-sm"><Phone className="w-4 h-4 text-muted-foreground" /> {selectedRecycler.phone_number}</div>
+            )}
+            {selectedRecycler?.email && (
+              <div className="flex items-center gap-2 text-sm"><Mail className="w-4 h-4 text-muted-foreground" /> {selectedRecycler.email}</div>
+            )}
+            <p className="text-xs text-muted-foreground mt-2">Contact this recycler directly to arrange material sales and negotiate pricing.</p>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
