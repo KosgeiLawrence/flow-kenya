@@ -29,7 +29,7 @@ const Navbar = () => {
           : "bg-transparent"
       }`}
     >
-      <div className="container flex items-center justify-between min-h-20 md:min-h-24 py-2 pb-4 -mt-1">
+      <div className="container flex items-center justify-between min-h-20 md:min-h-24 py-2 pb-4 -mt-2">
         {/* Logo */}
         <Link to="/" className="flex items-center gap-2.5 group">
           <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-gold transition-transform duration-300 group-hover:scale-110">
