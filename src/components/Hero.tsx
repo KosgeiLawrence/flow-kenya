@@ -22,7 +22,7 @@ const Hero = () => {
       {/* Content */}
       <div className="relative z-10 flex min-h-screen flex-col">
         {/* Spacer for fixed navbar */}
-        <div className="h-28 md:h-32" />
+        <div className="h-20" />
 
         {/* Hero Content */}
         <div className="container flex flex-1 flex-col items-center justify-center pb-20 text-center">
