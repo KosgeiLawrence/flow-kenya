@@ -493,6 +493,50 @@ export type Database = {
           },
         ]
       }
+      program_applications: {
+        Row: {
+          applicant_name: string
+          applicant_role: string
+          created_at: string
+          id: string
+          message: string | null
+          program_id: string
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          applicant_name: string
+          applicant_role: string
+          created_at?: string
+          id?: string
+          message?: string | null
+          program_id: string
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          applicant_name?: string
+          applicant_role?: string
+          created_at?: string
+          id?: string
+          message?: string | null
+          program_id?: string
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "program_applications_program_id_fkey"
+            columns: ["program_id"]
+            isOneToOne: false
+            referencedRelation: "ngo_programs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       recovery_commitments: {
         Row: {
           created_at: string

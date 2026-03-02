@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import {
   LogOut, Users, Package, Store, Truck, DollarSign, Printer,
   FileText, BarChart3, Shield, Clock, CheckCircle2, AlertTriangle,
-  Menu, X, ChevronRight
+  Menu, X, ChevronRight, Briefcase
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
@@ -17,6 +17,7 @@ import BulkReceiptsPanel from "@/components/dashboard/aggregator/BulkReceiptsPan
 import InvoicesPanel from "@/components/dashboard/aggregator/InvoicesPanel";
 import ProfitAnalyticsPanel from "@/components/dashboard/aggregator/ProfitAnalyticsPanel";
 import CompliancePanel from "@/components/dashboard/aggregator/CompliancePanel";
+import GrantsDiscoveryPanel from "@/components/dashboard/shared/GrantsDiscoveryPanel";
 
 const navItems = [
   { id: "pickers", label: "Waste Pickers", icon: Users },
@@ -28,6 +29,7 @@ const navItems = [
   { id: "invoices", label: "Invoices & Notes", icon: FileText },
   { id: "analytics", label: "Profit & Analytics", icon: BarChart3 },
   { id: "compliance", label: "Compliance", icon: Shield },
+  { id: "grants", label: "Grants & Programs", icon: Briefcase },
 ];
 
 const statusConfig: Record<string, { icon: React.ElementType; label: string; color: string }> = {
@@ -61,6 +63,7 @@ const AggregatorDashboard = () => {
       case "invoices": return <InvoicesPanel />;
       case "analytics": return <ProfitAnalyticsPanel />;
       case "compliance": return <CompliancePanel />;
+      case "grants": return <GrantsDiscoveryPanel />;
       default: return <WastePickerMgmtPanel />;
     }
   };
