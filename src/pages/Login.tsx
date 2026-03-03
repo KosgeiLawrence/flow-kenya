@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { Loader2, Eye, EyeOff, X } from "lucide-react";
 import loginIllustration from "@/assets/login-illustration.png";
-import duaraLogo from "@/assets/duara-flow-logo.png";
+import duaraLogo from "@/assets/duara-flow-logo.svg";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
