@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { ArrowLeft, Recycle, ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Footer } from "@/components/CTASection";
 
 const Privacy = () => (
   <div className="min-h-screen bg-background">
@@ -80,6 +81,7 @@ const Privacy = () => (
         </section>
       </div>
     </main>
+    <Footer />
   </div>
 );
 

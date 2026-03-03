@@ -82,4 +82,5 @@ const CTASection = () => (
   </>
 );
 
+export { Footer };
 export default CTASection;

@@ -6,6 +6,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent } from "@/components/ui/card";
 import { useState } from "react";
+import { Footer } from "@/components/CTASection";
 import { toast } from "sonner";
 
 const contactInfo = [
@@ -105,6 +106,7 @@ const Contact = () => {
           </Card>
         </div>
       </main>
+      <Footer />
     </div>
   );
 };

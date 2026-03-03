@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { ArrowLeft, Recycle, FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Footer } from "@/components/CTASection";
 
 const Terms = () => (
   <div className="min-h-screen bg-background">
@@ -86,6 +87,7 @@ const Terms = () => (
         </section>
       </div>
     </main>
+    <Footer />
   </div>
 );
 
