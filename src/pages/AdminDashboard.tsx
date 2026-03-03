@@ -1,8 +1,9 @@
 import { useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
-import { LogOut, Users, BarChart3, DollarSign, ShieldAlert, FileText, Settings, MapPin } from "lucide-react";
+import { LogOut, Users, BarChart3, DollarSign, ShieldAlert, FileText, Settings, MapPin, Menu, X, ChevronRight } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { cn } from "@/lib/utils";
 import UserVerificationPanel from "@/components/dashboard/admin/UserVerificationPanel";
 import PlatformAnalyticsPanel from "@/components/dashboard/admin/PlatformAnalyticsPanel";
 import TransactionTrackingPanel from "@/components/dashboard/admin/TransactionTrackingPanel";
@@ -11,7 +12,7 @@ import AuditLogsPanel from "@/components/dashboard/admin/AuditLogsPanel";
 import SystemSettingsPanel from "@/components/dashboard/admin/SystemSettingsPanel";
 import CountyWasteFlowPanel from "@/components/dashboard/admin/CountyWasteFlowPanel";
 
-const tabs = [
+const navItems = [
   { id: "users", label: "User Verification", icon: Users },
   { id: "analytics", label: "Platform Analytics", icon: BarChart3 },
   { id: "transactions", label: "Transactions", icon: DollarSign },
@@ -25,6 +26,7 @@ const AdminDashboard = () => {
   const { profile, signOut } = useAuth();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("users");
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const handleSignOut = async () => {
     await signOut();
@@ -46,38 +48,71 @@ const AdminDashboard = () => {
 
   return (
     <div className="min-h-screen bg-background flex">
-      <aside className="w-64 bg-sidebar-background text-sidebar-foreground flex flex-col">
-        <div className="p-6 border-b border-sidebar-border">
-          <h1 className="text-lg font-display font-bold">Duara Flow</h1>
-          <span className="text-xs text-sidebar-primary font-medium">Admin Panel</span>
+      {sidebarOpen && (
+        <div className="fixed inset-0 bg-foreground/30 z-40 lg:hidden" onClick={() => setSidebarOpen(false)} />
+      )}
+
+      <aside className={cn(
+        "fixed inset-y-0 left-0 z-50 w-64 bg-sidebar text-sidebar-foreground flex flex-col transition-transform duration-300 lg:relative lg:translate-x-0",
+        sidebarOpen ? "translate-x-0" : "-translate-x-full"
+      )}>
+        <div className="p-4 border-b border-sidebar-border">
+          <div className="flex items-center justify-between">
+            <h1 className="text-lg font-display font-bold">Duara Flow</h1>
+            <Button variant="ghost" size="icon" className="lg:hidden text-sidebar-foreground" onClick={() => setSidebarOpen(false)}>
+              <X className="w-5 h-5" />
+            </Button>
+          </div>
+          <div className="mt-3 flex items-center gap-2">
+            <div className="w-8 h-8 rounded-full bg-sidebar-accent flex items-center justify-center text-sm font-bold">
+              {profile?.full_name?.charAt(0) || "A"}
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-medium truncate">{profile?.full_name || "Administrator"}</p>
+              <span className="text-xs text-sidebar-primary font-medium">Admin Panel</span>
+            </div>
+          </div>
         </div>
-        <nav className="flex-1 p-3 space-y-1">
-          {tabs.map((tab) => {
-            const Icon = tab.icon;
-            return (
-              <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
-                className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
-                  activeTab === tab.id
-                    ? "bg-sidebar-accent text-sidebar-accent-foreground"
-                    : "text-sidebar-foreground/70 hover:bg-sidebar-accent/50 hover:text-sidebar-foreground"
-                }`}
-              >
-                <Icon className="w-4 h-4" />
-                {tab.label}
-              </button>
-            );
-          })}
+
+        <nav className="flex-1 p-2 space-y-1 overflow-y-auto">
+          {navItems.map((item) => (
+            <button
+              key={item.id}
+              onClick={() => { setActiveTab(item.id); setSidebarOpen(false); }}
+              className={cn(
+                "w-full flex items-center gap-3 px-3 py-2.5 rounded-md text-sm font-medium transition-colors",
+                activeTab === item.id
+                  ? "bg-sidebar-accent text-sidebar-accent-foreground"
+                  : "text-sidebar-foreground/70 hover:bg-sidebar-accent/50 hover:text-sidebar-foreground"
+              )}
+            >
+              <item.icon className="w-4 h-4 shrink-0" />
+              {item.label}
+              {activeTab === item.id && <ChevronRight className="w-4 h-4 ml-auto" />}
+            </button>
+          ))}
         </nav>
-        <div className="p-4 border-t border-sidebar-border">
-          <p className="text-xs text-sidebar-foreground/60 mb-2 truncate">{profile?.full_name}</p>
-          <Button variant="ghost" size="sm" onClick={handleSignOut} className="w-full gap-2 text-sidebar-foreground/70 hover:text-sidebar-foreground">
+
+        <div className="p-3 border-t border-sidebar-border">
+          <Button variant="ghost" size="sm" onClick={handleSignOut} className="w-full justify-start gap-2 text-sidebar-foreground/70 hover:text-sidebar-foreground hover:bg-sidebar-accent/50">
             <LogOut className="w-4 h-4" /> Sign Out
           </Button>
         </div>
       </aside>
-      <main className="flex-1 p-6 overflow-auto">{renderPanel()}</main>
+
+      <div className="flex-1 flex flex-col min-w-0">
+        <header className="sticky top-0 z-30 bg-card border-b border-border h-14 flex items-center px-4 gap-3">
+          <Button variant="ghost" size="icon" className="lg:hidden" onClick={() => setSidebarOpen(true)}>
+            <Menu className="w-5 h-5" />
+          </Button>
+          <h2 className="text-lg font-display font-semibold text-foreground">
+            {navItems.find(n => n.id === activeTab)?.label}
+          </h2>
+        </header>
+        <main className="flex-1 p-4 md:p-6 overflow-y-auto">
+          {renderPanel()}
+        </main>
+      </div>
     </div>
   );
 };
