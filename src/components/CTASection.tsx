@@ -60,10 +60,14 @@ const Footer = () => (
           © 2026 Duara Intelligence. Building Kenya's circular economy infrastructure.
         </p>
         <div className="flex gap-6">
-          {["Privacy", "Terms", "Contact"].map((link) => (
-            <a key={link} href="#" className="text-sm text-muted-foreground transition-colors hover:text-foreground">
-              {link}
-            </a>
+          {[
+            { label: "Privacy", to: "/privacy" },
+            { label: "Terms", to: "/terms" },
+            { label: "Contact", to: "/contact" },
+          ].map((link) => (
+            <Link key={link.label} to={link.to} className="text-sm text-muted-foreground transition-colors hover:text-foreground">
+              {link.label}
+            </Link>
           ))}
         </div>
       </div>
