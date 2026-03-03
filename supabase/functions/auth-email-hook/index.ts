@@ -35,7 +35,7 @@ const EMAIL_TEMPLATES: Record<string, React.ComponentType<any>> = {
 }
 
 // Configuration
-const SITE_NAME = "Flow Kenya"
+const SITE_NAME = "Duara Flow"
 const SENDER_DOMAIN = "notify.duaraflow.co.ke"
 const ROOT_DOMAIN = "duaraflow.co.ke"
 const FROM_DOMAIN = "duaraflow.co.ke" // Domain shown in From address (may be root or sender subdomain)
