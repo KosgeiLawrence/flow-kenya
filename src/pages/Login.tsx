@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { Loader2, Eye, EyeOff, X } from "lucide-react";
 import loginIllustration from "@/assets/login-illustration.png";
+import duaraLogo from "@/assets/duara-flow-logo.png";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -59,9 +60,9 @@ const Login = () => {
         />
         <div className="text-primary-foreground max-w-md relative z-10 text-center">
           <img
-            src={loginIllustration}
-            alt="Waste picker illustration"
-            className="w-56 h-56 object-contain mx-auto mb-6 rounded-2xl shadow-lg"
+            src={duaraLogo}
+            alt="Duara Flow Logo"
+            className="w-40 h-40 object-contain mx-auto mb-6"
           />
           <h1 className="text-4xl font-display font-bold mb-4">Welcome Back</h1>
           <p className="text-lg opacity-90 font-body">

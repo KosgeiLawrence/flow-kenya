@@ -3,6 +3,7 @@ import { useNavigate, Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowLeft, ArrowRight, Loader2, Upload, Eye, EyeOff, X } from "lucide-react";
 import signupIllustration from "@/assets/signup-illustration.png";
+import duaraLogo from "@/assets/duara-flow-logo.png";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -109,9 +110,9 @@ const Signup = () => {
         />
         <div className="text-primary-foreground max-w-md relative z-10 text-center">
           <img
-            src={signupIllustration}
-            alt="Community waste workers illustration"
-            className="w-56 h-56 object-contain mx-auto mb-6 rounded-2xl shadow-lg"
+            src={duaraLogo}
+            alt="Duara Flow Logo"
+            className="w-40 h-40 object-contain mx-auto mb-6"
           />
           <h1 className="text-4xl font-display font-bold mb-4">Join Duara Flow</h1>
           <p className="text-lg opacity-90 font-body">
