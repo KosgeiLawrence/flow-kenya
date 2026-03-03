@@ -7,6 +7,7 @@ import { Progress } from "@/components/ui/progress";
 import jsPDF from "jspdf";
 import { format } from "date-fns";
 import ComplianceDocUpload from "@/components/dashboard/shared/ComplianceDocUpload";
+import { addBrandedHeader, addDocMeta, addSectionTitle, finalizePdf } from "@/lib/pdfBranding";
 
 const RECYCLER_DOC_TYPES = [
   { value: "nema_license", label: "NEMA License" },
@@ -35,35 +36,30 @@ const ComplianceDocsPanel = () => {
 
   const score = (checks.filter((c) => c.pass).length / checks.length) * 100;
 
-  const downloadComplianceReport = () => {
+  const downloadComplianceReport = async () => {
     const doc = new jsPDF();
-    const today = format(new Date(), "MMM d, yyyy");
 
-    doc.setFontSize(20);
-    doc.text("Duara Flow", 20, 22);
-    doc.setFontSize(10);
-    doc.setTextColor(100);
-    doc.text("Compliance Report", 20, 30);
-    doc.setTextColor(0);
+    let y = await addBrandedHeader(doc, "Compliance Report", "Regulatory requirements for recycling operations");
 
-    doc.text(`Date: ${today}`, 20, 44);
-    doc.text(`Entity: ${profile?.full_name || "Recycler"}`, 20, 51);
-    doc.text(`Compliance Score: ${score.toFixed(0)}%`, 20, 58);
+    y = addDocMeta(doc, [
+      { label: "Date", value: format(new Date(), "MMM d, yyyy") },
+      { label: "Entity", value: profile?.full_name || "Recycler" },
+      { label: "Score", value: `${score.toFixed(0)}%` },
+    ], y);
 
-    let y = 72;
+    y = addSectionTitle(doc, "Compliance Checklist", y);
+
     checks.forEach((c) => {
       doc.setFontSize(10);
-      doc.text(`${c.pass ? "✓" : "✗"} ${c.label}`, 22, y);
+      doc.text(`${c.pass ? "✓" : "✗"} ${c.label}`, 17, y);
       doc.setFontSize(8);
-      doc.setTextColor(100);
-      doc.text(c.detail, 30, y + 6);
-      doc.setTextColor(0);
+      doc.setTextColor(120, 120, 120);
+      doc.text(c.detail, 25, y + 6);
+      doc.setTextColor(30, 30, 30);
       y += 16;
     });
 
-    doc.setFontSize(7);
-    doc.setTextColor(130);
-    doc.text("System-generated compliance report — Duara Flow", 20, 280);
+    await finalizePdf(doc);
     doc.save(`compliance-report-${format(new Date(), "yyyy-MM-dd")}.pdf`);
   };
 
@@ -95,18 +91,12 @@ const ComplianceDocsPanel = () => {
         <CardContent className="space-y-3">
           {checks.map((c, i) => (
             <div key={i} className="flex items-start gap-3 p-3 rounded-lg bg-muted/30 border border-border">
-              {c.pass ? (
-                <CheckCircle2 className="w-5 h-5 text-primary shrink-0 mt-0.5" />
-              ) : (
-                <AlertTriangle className="w-5 h-5 text-accent shrink-0 mt-0.5" />
-              )}
+              {c.pass ? <CheckCircle2 className="w-5 h-5 text-primary shrink-0 mt-0.5" /> : <AlertTriangle className="w-5 h-5 text-accent shrink-0 mt-0.5" />}
               <div className="flex-1">
                 <p className="text-sm font-medium text-foreground">{c.label}</p>
                 <p className="text-xs text-muted-foreground">{c.detail}</p>
               </div>
-              <Badge variant={c.pass ? "default" : "secondary"} className="shrink-0">
-                {c.pass ? "Complete" : "Required"}
-              </Badge>
+              <Badge variant={c.pass ? "default" : "secondary"} className="shrink-0">{c.pass ? "Complete" : "Required"}</Badge>
             </div>
           ))}
         </CardContent>

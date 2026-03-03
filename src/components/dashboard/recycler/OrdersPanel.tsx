@@ -14,6 +14,7 @@ import { ClipboardList, Plus, FileText, CheckCircle2, Clock, XCircle, Truck, Dow
 import { toast } from "sonner";
 import { format } from "date-fns";
 import jsPDF from "jspdf";
+import { addBrandedHeader, addDocMeta, drawTableHeader, drawTableRow, drawTotalLine, finalizePdf } from "@/lib/pdfBranding";
 
 const statusMap: Record<string, { icon: React.ElementType; variant: "default" | "secondary" | "destructive"; label: string }> = {
   pending: { icon: Clock, variant: "secondary", label: "Pending" },
@@ -31,11 +32,7 @@ const OrdersPanel = () => {
   const { data: orders } = useQuery({
     queryKey: ["recycler_orders", user?.id],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from("recycler_orders")
-        .select("*")
-        .eq("user_id", user!.id)
-        .order("created_at", { ascending: false });
+      const { data, error } = await supabase.from("recycler_orders").select("*").eq("user_id", user!.id).order("created_at", { ascending: false });
       if (error) throw error;
       return data;
     },
@@ -44,86 +41,52 @@ const OrdersPanel = () => {
 
   const createOrder = useMutation({
     mutationFn: async () => {
-      const qty = Number(form.quantity);
-      const price = Number(form.unit_price);
+      const qty = Number(form.quantity); const price = Number(form.unit_price);
       const { error } = await supabase.from("recycler_orders").insert({
-        user_id: user!.id,
-        supplier_name: form.supplier_name,
-        material_type: form.material_type,
-        quantity: qty,
-        unit: form.unit,
-        unit_price: price,
-        total_amount: qty * price,
-        delivery_date: form.delivery_date || null,
-        notes: form.notes || null,
+        user_id: user!.id, supplier_name: form.supplier_name, material_type: form.material_type,
+        quantity: qty, unit: form.unit, unit_price: price, total_amount: qty * price,
+        delivery_date: form.delivery_date || null, notes: form.notes || null,
       });
       if (error) throw error;
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["recycler_orders"] });
-      toast.success("Order created successfully");
-      setDialogOpen(false);
-      setForm({ supplier_name: "", material_type: "", quantity: "", unit: "kg", unit_price: "", delivery_date: "", notes: "" });
-    },
+    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ["recycler_orders"] }); toast.success("Order created"); setDialogOpen(false); setForm({ supplier_name: "", material_type: "", quantity: "", unit: "kg", unit_price: "", delivery_date: "", notes: "" }); },
     onError: () => toast.error("Failed to create order"),
   });
 
   const updateStatus = useMutation({
-    mutationFn: async ({ id, status }: { id: string; status: string }) => {
-      const { error } = await supabase.from("recycler_orders").update({ status }).eq("id", id);
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["recycler_orders"] });
-      toast.success("Status updated");
-    },
+    mutationFn: async ({ id, status }: { id: string; status: string }) => { const { error } = await supabase.from("recycler_orders").update({ status }).eq("id", id); if (error) throw error; },
+    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ["recycler_orders"] }); toast.success("Status updated"); },
   });
 
-  const generateOrderPDF = (o: any) => {
+  const generateOrderPDF = async (o: any) => {
     const doc = new jsPDF();
-    doc.setFontSize(20);
-    doc.text("Duara Flow", 20, 22);
-    doc.setFontSize(10);
-    doc.setTextColor(100);
-    doc.text("Purchase Order / Contract", 20, 30);
-    doc.setTextColor(0);
 
-    doc.text(`Order Date: ${format(new Date(o.order_date), "MMM d, yyyy")}`, 20, 44);
-    doc.text(`Buyer: ${profile?.full_name || "Recycler"}`, 20, 51);
-    if (profile?.phone_number) doc.text(`Phone: ${profile.phone_number}`, 20, 58);
-    doc.text(`Supplier: ${o.supplier_name}`, 20, 68);
+    let y = await addBrandedHeader(doc, "Purchase Order / Contract");
+    y = addDocMeta(doc, [
+      { label: "Order Date", value: format(new Date(o.order_date), "MMM d, yyyy") },
+      { label: "Buyer", value: profile?.full_name || "Recycler" },
+      ...(profile?.phone_number ? [{ label: "Phone", value: profile.phone_number }] : []),
+      { label: "Supplier", value: o.supplier_name },
+    ], y);
 
-    let y = 84;
-    doc.setFillColor(34, 87, 62);
-    doc.rect(20, y - 5, 170, 8, "F");
-    doc.setTextColor(255);
-    doc.setFontSize(9);
-    doc.text("Material", 22, y);
-    doc.text("Quantity", 85, y);
-    doc.text("Unit Price", 120, y);
-    doc.text("Total (KES)", 155, y);
-    doc.setTextColor(0);
-    y += 10;
-    doc.text(o.material_type, 22, y);
+    y = drawTableHeader(doc, [
+      { label: "Material", x: 17 }, { label: "Quantity", x: 85 }, { label: "Unit Price", x: 120 }, { label: "Total (KES)", x: 155 },
+    ], y, 180);
+
+    drawTableRow(doc, y, 0, 180);
+    doc.setFontSize(8);
+    doc.text(o.material_type, 17, y);
     doc.text(`${Number(o.quantity).toFixed(1)} ${o.unit}`, 85, y);
     doc.text(Number(o.unit_price).toFixed(2), 120, y);
     doc.text(Number(o.total_amount).toLocaleString(), 155, y);
-    y += 14;
-    doc.line(20, y - 3, 190, y - 3);
-    doc.setFontSize(12);
-    doc.text(`Total: KES ${Number(o.total_amount).toLocaleString()}`, 110, y + 5);
-    if (o.delivery_date) {
-      y += 16;
-      doc.setFontSize(9);
-      doc.text(`Expected Delivery: ${format(new Date(o.delivery_date), "MMM d, yyyy")}`, 20, y);
-    }
-    if (o.notes) {
-      y += 10;
-      doc.text(`Notes: ${o.notes}`, 20, y);
-    }
-    doc.setFontSize(7);
-    doc.setTextColor(130);
-    doc.text("System-generated order document — Duara Flow", 20, 280);
+    y += 10;
+
+    drawTotalLine(doc, `Total: KES ${Number(o.total_amount).toLocaleString()}`, y);
+
+    if (o.delivery_date) { y += 10; doc.setFontSize(9); doc.text(`Expected Delivery: ${format(new Date(o.delivery_date), "MMM d, yyyy")}`, 15, y); }
+    if (o.notes) { y += 8; doc.setFontSize(9); doc.text(`Notes: ${o.notes}`, 15, y); }
+
+    await finalizePdf(doc);
     doc.save(`order-${o.id.slice(0, 8)}.pdf`);
   };
 
@@ -133,42 +96,16 @@ const OrdersPanel = () => {
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <Card className="shadow-soft">
-          <CardContent className="flex items-center gap-3 p-4">
-            <ClipboardList className="w-7 h-7 text-primary" />
-            <div>
-              <p className="text-xl font-bold text-foreground">{orders?.length || 0}</p>
-              <p className="text-xs text-muted-foreground">Total Orders</p>
-            </div>
-          </CardContent>
-        </Card>
-        <Card className="shadow-soft">
-          <CardContent className="flex items-center gap-3 p-4">
-            <Clock className="w-7 h-7 text-accent" />
-            <div>
-              <p className="text-xl font-bold text-foreground">{active.length}</p>
-              <p className="text-xs text-muted-foreground">Active</p>
-            </div>
-          </CardContent>
-        </Card>
-        <Card className="shadow-soft">
-          <CardContent className="flex items-center gap-3 p-4">
-            <CheckCircle2 className="w-7 h-7 text-primary" />
-            <div>
-              <p className="text-xl font-bold text-foreground">{completed.length}</p>
-              <p className="text-xs text-muted-foreground">Completed</p>
-            </div>
-          </CardContent>
-        </Card>
+        <Card className="shadow-soft"><CardContent className="flex items-center gap-3 p-4"><ClipboardList className="w-7 h-7 text-primary" /><div><p className="text-xl font-bold text-foreground">{orders?.length || 0}</p><p className="text-xs text-muted-foreground">Total Orders</p></div></CardContent></Card>
+        <Card className="shadow-soft"><CardContent className="flex items-center gap-3 p-4"><Clock className="w-7 h-7 text-accent" /><div><p className="text-xl font-bold text-foreground">{active.length}</p><p className="text-xs text-muted-foreground">Active</p></div></CardContent></Card>
+        <Card className="shadow-soft"><CardContent className="flex items-center gap-3 p-4"><CheckCircle2 className="w-7 h-7 text-primary" /><div><p className="text-xl font-bold text-foreground">{completed.length}</p><p className="text-xs text-muted-foreground">Completed</p></div></CardContent></Card>
       </div>
 
       <Card className="shadow-soft">
         <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle className="text-lg">Orders & Contracts</CardTitle>
           <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-            <DialogTrigger asChild>
-              <Button size="sm"><Plus className="w-4 h-4 mr-1" /> New Order</Button>
-            </DialogTrigger>
+            <DialogTrigger asChild><Button size="sm"><Plus className="w-4 h-4 mr-1" /> New Order</Button></DialogTrigger>
             <DialogContent className="max-w-md">
               <DialogHeader><DialogTitle>Create New Order</DialogTitle></DialogHeader>
               <div className="space-y-3">
@@ -176,21 +113,11 @@ const OrdersPanel = () => {
                 <div><Label>Material Type</Label><Input value={form.material_type} onChange={(e) => setForm({ ...form, material_type: e.target.value })} placeholder="e.g. PET Bottles" /></div>
                 <div className="grid grid-cols-2 gap-3">
                   <div><Label>Quantity</Label><Input type="number" value={form.quantity} onChange={(e) => setForm({ ...form, quantity: e.target.value })} /></div>
-                  <div>
-                    <Label>Unit</Label>
-                    <Select value={form.unit} onValueChange={(v) => setForm({ ...form, unit: v })}>
-                      <SelectTrigger><SelectValue /></SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="kg">kg</SelectItem>
-                        <SelectItem value="tonnes">tonnes</SelectItem>
-                        <SelectItem value="pieces">pieces</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
+                  <div><Label>Unit</Label><Select value={form.unit} onValueChange={(v) => setForm({ ...form, unit: v })}><SelectTrigger><SelectValue /></SelectTrigger><SelectContent><SelectItem value="kg">kg</SelectItem><SelectItem value="tonnes">tonnes</SelectItem><SelectItem value="pieces">pieces</SelectItem></SelectContent></Select></div>
                 </div>
                 <div><Label>Unit Price (KES)</Label><Input type="number" value={form.unit_price} onChange={(e) => setForm({ ...form, unit_price: e.target.value })} /></div>
                 <div><Label>Expected Delivery Date</Label><Input type="date" value={form.delivery_date} onChange={(e) => setForm({ ...form, delivery_date: e.target.value })} /></div>
-                <div><Label>Notes</Label><Textarea value={form.notes} onChange={(e) => setForm({ ...form, notes: e.target.value })} placeholder="Contract terms, special conditions..." rows={2} /></div>
+                <div><Label>Notes</Label><Textarea value={form.notes} onChange={(e) => setForm({ ...form, notes: e.target.value })} placeholder="Contract terms..." rows={2} /></div>
                 <Button className="w-full" onClick={() => createOrder.mutate()} disabled={!form.supplier_name || !form.material_type || !form.quantity || !form.unit_price || createOrder.isPending}>
                   {createOrder.isPending ? "Creating..." : "Create Order"}
                 </Button>
@@ -200,7 +127,7 @@ const OrdersPanel = () => {
         </CardHeader>
         <CardContent>
           {!orders?.length ? (
-            <p className="text-sm text-muted-foreground">No orders yet. Create your first order above.</p>
+            <p className="text-sm text-muted-foreground">No orders yet.</p>
           ) : (
             <div className="divide-y divide-border">
               {orders.map((o) => {
@@ -217,18 +144,10 @@ const OrdersPanel = () => {
                       </div>
                     </div>
                     <div className="flex items-center gap-2 shrink-0">
-                      {o.status === "pending" && (
-                        <Button variant="ghost" size="sm" onClick={() => updateStatus.mutate({ id: o.id, status: "confirmed" })} className="text-xs">Confirm</Button>
-                      )}
-                      {o.status === "confirmed" && (
-                        <Button variant="ghost" size="sm" onClick={() => updateStatus.mutate({ id: o.id, status: "delivered" })} className="text-xs">Delivered</Button>
-                      )}
-                      <Button variant="ghost" size="icon" onClick={() => generateOrderPDF(o)} title="Download PDF">
-                        <Download className="w-4 h-4" />
-                      </Button>
-                      <Badge variant={s.variant} className="flex items-center gap-1">
-                        <SIcon className="w-3 h-3" /> {s.label}
-                      </Badge>
+                      {o.status === "pending" && <Button variant="ghost" size="sm" onClick={() => updateStatus.mutate({ id: o.id, status: "confirmed" })} className="text-xs">Confirm</Button>}
+                      {o.status === "confirmed" && <Button variant="ghost" size="sm" onClick={() => updateStatus.mutate({ id: o.id, status: "delivered" })} className="text-xs">Delivered</Button>}
+                      <Button variant="ghost" size="icon" onClick={() => generateOrderPDF(o)} title="Download PDF"><Download className="w-4 h-4" /></Button>
+                      <Badge variant={s.variant} className="flex items-center gap-1"><SIcon className="w-3 h-3" /> {s.label}</Badge>
                     </div>
                   </div>
                 );

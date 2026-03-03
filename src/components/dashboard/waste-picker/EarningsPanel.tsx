@@ -8,6 +8,7 @@ import { Loader2, DollarSign, Download, Smartphone, FileText, Leaf } from "lucid
 import { format } from "date-fns";
 import jsPDF from "jspdf";
 import { calculateImpact, formatImpactMessage } from "@/lib/impactUtils";
+import { addBrandedHeader, addDocMeta, addSectionTitle, drawTableHeader, drawTableRow, drawTotalLine, finalizePdf } from "@/lib/pdfBranding";
 
 const EarningsPanel = () => {
   const { user, profile } = useAuth();
@@ -15,11 +16,7 @@ const EarningsPanel = () => {
   const { data: collections } = useQuery({
     queryKey: ["collections_earnings", user?.id],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from("collections")
-        .select("*, material_types(name, unit, price_per_unit)")
-        .eq("user_id", user!.id)
-        .order("collected_at", { ascending: false });
+      const { data, error } = await supabase.from("collections").select("*, material_types(name, unit, price_per_unit)").eq("user_id", user!.id).order("collected_at", { ascending: false });
       if (error) throw error;
       return data;
     },
@@ -29,137 +26,87 @@ const EarningsPanel = () => {
   const { data: payments, isLoading: paymentsLoading } = useQuery({
     queryKey: ["payments", user?.id],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from("payments")
-        .select("*")
-        .eq("user_id", user!.id)
-        .order("created_at", { ascending: false });
+      const { data, error } = await supabase.from("payments").select("*").eq("user_id", user!.id).order("created_at", { ascending: false });
       if (error) throw error;
       return data;
     },
     enabled: !!user?.id,
   });
 
-  const impact = calculateImpact(
-    (collections || []).map(c => ({ quantity: c.quantity, material_types: (c as any).material_types }))
-  );
-
+  const impact = calculateImpact((collections || []).map(c => ({ quantity: c.quantity, material_types: (c as any).material_types })));
   const totalPaid = payments?.filter(p => p.status === "completed").reduce((sum, p) => sum + Number(p.amount), 0) || 0;
 
-  const downloadReceipt = (payment: any) => {
+  const downloadReceipt = async (payment: any) => {
     const doc = new jsPDF();
-    doc.setFontSize(18);
-    doc.text("Duara Flow - Payment Receipt", 20, 25);
-    doc.setFontSize(11);
-    doc.text(`Receipt #: ${payment.mpesa_receipt_number || payment.id.slice(0, 8)}`, 20, 40);
-    doc.text(`Date: ${format(new Date(payment.created_at), "MMM d, yyyy h:mm a")}`, 20, 48);
-    doc.text(`Amount: KES ${Number(payment.amount).toFixed(2)}`, 20, 56);
-    doc.text(`Phone: ${payment.phone_number}`, 20, 64);
-    doc.text(`Status: ${payment.status}`, 20, 72);
-    if (payment.description) doc.text(`Description: ${payment.description}`, 20, 80);
-    doc.setFontSize(9);
-    doc.text("This is a system-generated receipt from Duara Flow.", 20, 100);
+    let y = await addBrandedHeader(doc, "Payment Receipt");
+    y = addDocMeta(doc, [
+      { label: "Receipt #", value: payment.mpesa_receipt_number || payment.id.slice(0, 8) },
+      { label: "Date", value: format(new Date(payment.created_at), "MMM d, yyyy h:mm a") },
+      { label: "Amount", value: `KES ${Number(payment.amount).toFixed(2)}` },
+      { label: "Phone", value: payment.phone_number },
+      { label: "Status", value: payment.status },
+      ...(payment.description ? [{ label: "Description", value: payment.description }] : []),
+    ], y);
+    await finalizePdf(doc);
     doc.save(`receipt-${payment.id.slice(0, 8)}.pdf`);
   };
 
-  const downloadImpactReport = () => {
+  const downloadImpactReport = async () => {
     if (!collections?.length) return;
     const doc = new jsPDF();
-    const today = format(new Date(), "MMM d, yyyy");
 
-    // Header
-    doc.setFontSize(22);
-    doc.setTextColor(34, 87, 62);
-    doc.text("Duara Flow", 20, 22);
-    doc.setFontSize(14);
-    doc.text("Personal Sustainability Impact Report", 20, 32);
-    doc.setTextColor(0);
+    let y = await addBrandedHeader(doc, "Personal Sustainability Impact Report");
+    y = addDocMeta(doc, [
+      { label: "Name", value: profile?.full_name || "Waste Picker" },
+      { label: "Date", value: format(new Date(), "MMM d, yyyy") },
+      ...(profile?.phone_number ? [{ label: "Phone", value: profile.phone_number }] : []),
+    ], y);
 
-    // Picker info
+    y = addSectionTitle(doc, "Environmental Impact Summary", y);
     doc.setFontSize(10);
-    doc.text(`Name: ${profile?.full_name || "Waste Picker"}`, 20, 46);
-    doc.text(`Date: ${today}`, 20, 53);
-    if (profile?.phone_number) doc.text(`Phone: ${profile.phone_number}`, 20, 60);
+    const impactLines = [
+      `Total Materials Collected: ${impact.totalKg.toFixed(1)} kg`,
+      `Carbon Emissions Avoided: ${impact.co2Avoided.toFixed(1)} kg CO₂`,
+      `Water Saved: ${impact.waterSaved.toFixed(0)} liters`,
+      `Landfill Space Reduced: ${impact.landfillReduced.toFixed(3)} m³`,
+      `Total Earnings: KES ${impact.totalEarnings.toFixed(2)}`,
+    ];
+    impactLines.forEach(l => { doc.text(l, 17, y); y += 8; });
 
-    // Impact summary
-    let y = 76;
-    doc.setFontSize(13);
-    doc.setTextColor(34, 87, 62);
-    doc.text("Environmental Impact Summary", 20, y);
-    doc.setTextColor(0);
-    doc.setFontSize(10);
-    y += 12;
-    doc.text(`Total Materials Collected: ${impact.totalKg.toFixed(1)} kg`, 20, y);
-    y += 8;
-    doc.text(`Carbon Emissions Avoided: ${impact.co2Avoided.toFixed(1)} kg CO\u2082`, 20, y);
-    y += 8;
-    doc.text(`Water Saved: ${impact.waterSaved.toFixed(0)} liters`, 20, y);
-    y += 8;
-    doc.text(`Landfill Space Reduced: ${impact.landfillReduced.toFixed(3)} m\u00B3`, 20, y);
-    y += 8;
-    doc.text(`Total Earnings: KES ${impact.totalEarnings.toFixed(2)}`, 20, y);
+    y += 6;
+    y = addSectionTitle(doc, "Material Breakdown", y);
 
-    // Material breakdown
-    y += 16;
-    doc.setFontSize(13);
-    doc.setTextColor(34, 87, 62);
-    doc.text("Material Breakdown", 20, y);
-    doc.setTextColor(0);
-    y += 10;
+    y = drawTableHeader(doc, [
+      { label: "Material", x: 17 }, { label: "Quantity (kg)", x: 90 }, { label: "CO₂ Avoided (kg)", x: 140 },
+    ], y, 180);
 
-    doc.setFillColor(34, 87, 62);
-    doc.rect(20, y - 5, 170, 8, "F");
-    doc.setTextColor(255);
-    doc.setFontSize(9);
-    doc.text("Material", 22, y);
-    doc.text("Quantity (kg)", 90, y);
-    doc.text("CO\u2082 Avoided (kg)", 140, y);
-    doc.setTextColor(0);
-    y += 10;
-
-    impact.materialBreakdown.forEach(m => {
-      doc.text(m.name, 22, y);
-      doc.text(m.kg.toFixed(1), 90, y);
-      doc.text(m.co2.toFixed(1), 140, y);
+    impact.materialBreakdown.forEach((m, i) => {
+      drawTableRow(doc, y, i, 180);
+      doc.setFontSize(8);
+      doc.text(m.name, 17, y); doc.text(m.kg.toFixed(1), 90, y); doc.text(m.co2.toFixed(1), 140, y);
       y += 8;
     });
 
-    // Footer
-    doc.setFontSize(8);
-    doc.setTextColor(130);
-    doc.text("This report is system-generated by Duara Flow. Impact calculations use EPA/IPCC factors.", 20, 270);
-    doc.text(`Generated on ${today}`, 20, 276);
-
+    await finalizePdf(doc);
     doc.save(`impact-report-${format(new Date(), "yyyy-MM-dd")}.pdf`);
   };
 
-  const downloadQuotation = () => {
+  const downloadQuotation = async () => {
     if (!collections?.length) return;
     const doc = new jsPDF();
-    const today = format(new Date(), "MMM d, yyyy");
     const quoteId = `Q-${Date.now().toString(36).toUpperCase()}`;
 
-    doc.setFontSize(20);
-    doc.text("Duara Flow", 20, 22);
-    doc.setFontSize(10);
-    doc.setTextColor(100);
-    doc.text("Waste Collection Quotation", 20, 30);
-    doc.setTextColor(0);
-    doc.text(`Quotation #: ${quoteId}`, 20, 44);
-    doc.text(`Date: ${today}`, 20, 51);
-    doc.text(`Prepared for: ${profile?.full_name || "Waste Picker"}`, 20, 58);
-    if (profile?.phone_number) doc.text(`Phone: ${profile.phone_number}`, 20, 65);
+    let y = await addBrandedHeader(doc, "Waste Collection Quotation");
+    y = addDocMeta(doc, [
+      { label: "Quotation #", value: quoteId },
+      { label: "Date", value: format(new Date(), "MMM d, yyyy") },
+      { label: "Prepared for", value: profile?.full_name || "Waste Picker" },
+      ...(profile?.phone_number ? [{ label: "Phone", value: profile.phone_number }] : []),
+    ], y);
 
-    let y = 80;
-    doc.setFillColor(34, 87, 62);
-    doc.rect(20, y - 5, 170, 8, "F");
-    doc.setTextColor(255);
-    doc.setFontSize(9);
-    doc.text("Material", 22, y);
-    doc.text("Qty", 90, y);
-    doc.text("Unit Price (KES)", 115, y);
-    doc.text("Total (KES)", 160, y);
-    doc.setTextColor(0);
+    y = drawTableHeader(doc, [
+      { label: "Material", x: 17 }, { label: "Qty", x: 90 }, { label: "Unit Price (KES)", x: 115 }, { label: "Total (KES)", x: 160 },
+    ], y, 180);
 
     const materialMap = new Map<string, { name: string; qty: number; price: number; unit: string }>();
     collections.forEach((c) => {
@@ -170,146 +117,71 @@ const EarningsPanel = () => {
       else { materialMap.set(key, { name: mt?.name || "Unknown", qty: Number(c.quantity), price: Number(mt?.price_per_unit || 0), unit: mt?.unit || "kg" }); }
     });
 
-    let grandTotal = 0;
-    y += 10;
-    doc.setFontSize(9);
+    let grandTotal = 0; let i = 0;
     materialMap.forEach((m) => {
-      const lineTotal = m.qty * m.price;
-      grandTotal += lineTotal;
-      doc.text(m.name, 22, y);
-      doc.text(`${m.qty.toFixed(1)} ${m.unit}`, 90, y);
-      doc.text(m.price.toFixed(2), 115, y);
-      doc.text(lineTotal.toFixed(2), 160, y);
-      y += 8;
+      const lineTotal = m.qty * m.price; grandTotal += lineTotal;
+      drawTableRow(doc, y, i, 180);
+      doc.setFontSize(8);
+      doc.text(m.name, 17, y); doc.text(`${m.qty.toFixed(1)} ${m.unit}`, 90, y);
+      doc.text(m.price.toFixed(2), 115, y); doc.text(lineTotal.toFixed(2), 160, y);
+      y += 8; i++;
     });
 
     y += 4;
-    doc.line(20, y - 3, 190, y - 3);
-    doc.setFontSize(11);
-    doc.text(`Grand Total: KES ${grandTotal.toFixed(2)}`, 120, y + 4);
-
+    drawTotalLine(doc, `Grand Total: KES ${grandTotal.toFixed(2)}`, y);
+    y += 10;
     doc.setFontSize(8);
-    doc.setTextColor(130);
-    doc.text("This quotation is system-generated by Duara Flow and is valid for 7 days.", 20, 270);
+    doc.text("This quotation is valid for 7 days from the date of issue.", 15, y);
+
+    await finalizePdf(doc);
     doc.save(`quotation-${quoteId}.pdf`);
   };
 
   return (
     <div className="space-y-6">
-      {/* Summary cards */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-        <Card className="shadow-soft">
-          <CardContent className="p-4">
-            <p className="text-xs text-muted-foreground uppercase tracking-wider">Total Earned</p>
-            <p className="text-2xl font-display font-bold text-primary">KES {impact.totalEarnings.toFixed(0)}</p>
-          </CardContent>
-        </Card>
-        <Card className="shadow-soft">
-          <CardContent className="p-4">
-            <p className="text-xs text-muted-foreground uppercase tracking-wider">Total Paid Out</p>
-            <p className="text-2xl font-display font-bold text-foreground">KES {totalPaid.toFixed(0)}</p>
-          </CardContent>
-        </Card>
-        <Card className="shadow-soft">
-          <CardContent className="p-4">
-            <p className="text-xs text-muted-foreground uppercase tracking-wider">Balance</p>
-            <p className="text-2xl font-display font-bold text-gold">KES {(impact.totalEarnings - totalPaid).toFixed(0)}</p>
-          </CardContent>
-        </Card>
-        <Card className="shadow-soft border-primary/20">
-          <CardContent className="p-4">
-            <div className="flex items-center gap-1.5 mb-1">
-              <Leaf className="w-3.5 h-3.5 text-primary" />
-              <p className="text-xs text-muted-foreground uppercase tracking-wider">CO₂ Avoided</p>
-            </div>
-            <p className="text-2xl font-display font-bold text-primary">{impact.co2Avoided.toFixed(0)} kg</p>
-          </CardContent>
-        </Card>
+        <Card className="shadow-soft"><CardContent className="p-4"><p className="text-xs text-muted-foreground uppercase tracking-wider">Total Earned</p><p className="text-2xl font-display font-bold text-primary">KES {impact.totalEarnings.toFixed(0)}</p></CardContent></Card>
+        <Card className="shadow-soft"><CardContent className="p-4"><p className="text-xs text-muted-foreground uppercase tracking-wider">Total Paid Out</p><p className="text-2xl font-display font-bold text-foreground">KES {totalPaid.toFixed(0)}</p></CardContent></Card>
+        <Card className="shadow-soft"><CardContent className="p-4"><p className="text-xs text-muted-foreground uppercase tracking-wider">Balance</p><p className="text-2xl font-display font-bold text-gold">KES {(impact.totalEarnings - totalPaid).toFixed(0)}</p></CardContent></Card>
+        <Card className="shadow-soft border-primary/20"><CardContent className="p-4"><div className="flex items-center gap-1.5 mb-1"><Leaf className="w-3.5 h-3.5 text-primary" /><p className="text-xs text-muted-foreground uppercase tracking-wider">CO₂ Avoided</p></div><p className="text-2xl font-display font-bold text-primary">{impact.co2Avoided.toFixed(0)} kg</p></CardContent></Card>
       </div>
 
-      {/* Impact context */}
       {collections && collections.length > 0 && (
         <Card className="shadow-soft bg-primary/5 border-primary/20">
           <CardContent className="flex items-start gap-3 p-4">
             <Leaf className="w-5 h-5 text-primary mt-0.5 shrink-0" />
             <div>
               <p className="text-sm font-medium text-foreground">Your Sustainability Impact</p>
-              <p className="text-sm text-muted-foreground">
-                {formatImpactMessage(impact.totalKg)} You've also saved {impact.waterSaved.toFixed(0)} liters of water and diverted {impact.landfillReduced.toFixed(3)} m³ from landfills.
-              </p>
+              <p className="text-sm text-muted-foreground">{formatImpactMessage(impact.totalKg)} You've also saved {impact.waterSaved.toFixed(0)} liters of water and diverted {impact.landfillReduced.toFixed(3)} m³ from landfills.</p>
             </div>
           </CardContent>
         </Card>
       )}
 
-      {/* Report downloads */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <Card className="shadow-soft">
-          <CardContent className="flex items-center justify-between p-4">
-            <div className="flex items-center gap-3">
-              <FileText className="w-5 h-5 text-primary" />
-              <div>
-                <p className="text-sm font-medium text-foreground">Collection Quotation</p>
-                <p className="text-xs text-muted-foreground">Materials & value summary</p>
-              </div>
-            </div>
-            <Button size="sm" variant="outline" onClick={downloadQuotation} disabled={!collections?.length}>
-              <Download className="w-4 h-4 mr-1" /> PDF
-            </Button>
-          </CardContent>
-        </Card>
-        <Card className="shadow-soft border-primary/20">
-          <CardContent className="flex items-center justify-between p-4">
-            <div className="flex items-center gap-3">
-              <Leaf className="w-5 h-5 text-primary" />
-              <div>
-                <p className="text-sm font-medium text-foreground">Impact Report</p>
-                <p className="text-xs text-muted-foreground">CO₂, water, landfill metrics</p>
-              </div>
-            </div>
-            <Button size="sm" variant="outline" onClick={downloadImpactReport} disabled={!collections?.length}>
-              <Download className="w-4 h-4 mr-1" /> PDF
-            </Button>
-          </CardContent>
-        </Card>
+        <Card className="shadow-soft"><CardContent className="flex items-center justify-between p-4"><div className="flex items-center gap-3"><FileText className="w-5 h-5 text-primary" /><div><p className="text-sm font-medium text-foreground">Collection Quotation</p><p className="text-xs text-muted-foreground">Materials & value summary</p></div></div><Button size="sm" variant="outline" onClick={downloadQuotation} disabled={!collections?.length}><Download className="w-4 h-4 mr-1" /> PDF</Button></CardContent></Card>
+        <Card className="shadow-soft border-primary/20"><CardContent className="flex items-center justify-between p-4"><div className="flex items-center gap-3"><Leaf className="w-5 h-5 text-primary" /><div><p className="text-sm font-medium text-foreground">Impact Report</p><p className="text-xs text-muted-foreground">CO₂, water, landfill metrics</p></div></div><Button size="sm" variant="outline" onClick={downloadImpactReport} disabled={!collections?.length}><Download className="w-4 h-4 mr-1" /> PDF</Button></CardContent></Card>
       </div>
 
-      {/* Payment history */}
       <Card className="shadow-soft">
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <CardTitle className="text-base">M-Pesa Payment History</CardTitle>
-            <Smartphone className="w-5 h-5 text-primary" />
-          </div>
-        </CardHeader>
+        <CardHeader><div className="flex items-center justify-between"><CardTitle className="text-base">M-Pesa Payment History</CardTitle><Smartphone className="w-5 h-5 text-primary" /></div></CardHeader>
         <CardContent>
           {paymentsLoading ? (
             <div className="flex justify-center py-8"><Loader2 className="w-6 h-6 animate-spin text-muted-foreground" /></div>
           ) : !payments?.length ? (
-            <div className="text-center py-8 text-muted-foreground">
-              <DollarSign className="w-10 h-10 mx-auto mb-2 opacity-40" />
-              <p className="text-sm">No payments yet.</p>
-            </div>
+            <div className="text-center py-8 text-muted-foreground"><DollarSign className="w-10 h-10 mx-auto mb-2 opacity-40" /><p className="text-sm">No payments yet.</p></div>
           ) : (
             <div className="space-y-3">
               {payments.map(p => (
                 <div key={p.id} className="flex items-center justify-between p-3 rounded-lg bg-muted/50">
                   <div>
                     <p className="text-sm font-medium">KES {Number(p.amount).toFixed(2)}</p>
-                    <p className="text-xs text-muted-foreground">
-                      {format(new Date(p.created_at), "MMM d, yyyy • h:mm a")} • {p.phone_number}
-                    </p>
-                    {p.mpesa_receipt_number && (
-                      <p className="text-xs text-muted-foreground">Ref: {p.mpesa_receipt_number}</p>
-                    )}
+                    <p className="text-xs text-muted-foreground">{format(new Date(p.created_at), "MMM d, yyyy • h:mm a")} • {p.phone_number}</p>
+                    {p.mpesa_receipt_number && <p className="text-xs text-muted-foreground">Ref: {p.mpesa_receipt_number}</p>}
                   </div>
                   <div className="flex items-center gap-2">
-                    <Badge variant={p.status === "completed" ? "default" : p.status === "failed" ? "destructive" : "secondary"}>
-                      {p.status}
-                    </Badge>
-                    <Button variant="ghost" size="icon" onClick={() => downloadReceipt(p)} title="Download receipt">
-                      <Download className="w-4 h-4" />
-                    </Button>
+                    <Badge variant={p.status === "completed" ? "default" : p.status === "failed" ? "destructive" : "secondary"}>{p.status}</Badge>
+                    <Button variant="ghost" size="icon" onClick={() => downloadReceipt(p)} title="Download receipt"><Download className="w-4 h-4" /></Button>
                   </div>
                 </div>
               ))}

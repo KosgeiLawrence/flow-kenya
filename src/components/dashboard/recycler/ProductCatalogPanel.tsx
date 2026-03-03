@@ -10,10 +10,11 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Package, Plus, Download, Edit2, Trash2, ShoppingBag } from "lucide-react";
+import { Package, Plus, Download, Trash2, ShoppingBag } from "lucide-react";
 import { toast } from "sonner";
 import jsPDF from "jspdf";
 import { format } from "date-fns";
+import { addBrandedHeader, addDocMeta, drawTableHeader, drawTableRow, drawTotalLine, finalizePdf } from "@/lib/pdfBranding";
 
 const ProductCatalogPanel = () => {
   const { user, profile } = useAuth();
@@ -26,11 +27,7 @@ const ProductCatalogPanel = () => {
   const { data: products } = useQuery({
     queryKey: ["recycler_products", user?.id],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from("recycler_products")
-        .select("*")
-        .eq("user_id", user!.id)
-        .order("created_at", { ascending: false });
+      const { data, error } = await supabase.from("recycler_products").select("*").eq("user_id", user!.id).order("created_at", { ascending: false });
       if (error) throw error;
       return data;
     },
@@ -40,149 +37,95 @@ const ProductCatalogPanel = () => {
   const createProduct = useMutation({
     mutationFn: async () => {
       const { error } = await supabase.from("recycler_products").insert({
-        user_id: user!.id,
-        name: form.name,
-        description: form.description || null,
-        material_source: form.material_source || null,
-        stock_quantity: Number(form.stock_quantity),
-        unit: form.unit,
-        price_per_unit: Number(form.price_per_unit),
+        user_id: user!.id, name: form.name, description: form.description || null, material_source: form.material_source || null,
+        stock_quantity: Number(form.stock_quantity), unit: form.unit, price_per_unit: Number(form.price_per_unit),
       });
       if (error) throw error;
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["recycler_products"] });
-      toast.success("Product added");
-      setDialogOpen(false);
-      setForm({ name: "", description: "", material_source: "", stock_quantity: "", unit: "kg", price_per_unit: "" });
-    },
+    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ["recycler_products"] }); toast.success("Product added"); setDialogOpen(false); setForm({ name: "", description: "", material_source: "", stock_quantity: "", unit: "kg", price_per_unit: "" }); },
     onError: () => toast.error("Failed to add product"),
   });
 
   const deleteProduct = useMutation({
-    mutationFn: async (id: string) => {
-      const { error } = await supabase.from("recycler_products").delete().eq("id", id);
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["recycler_products"] });
-      toast.success("Product removed");
-    },
+    mutationFn: async (id: string) => { const { error } = await supabase.from("recycler_products").delete().eq("id", id); if (error) throw error; },
+    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ["recycler_products"] }); toast.success("Product removed"); },
   });
 
-  const generateInvoice = (product: any) => {
+  const generateInvoice = async (product: any) => {
     const qty = Number(quoteForm.quantity) || 1;
     const total = qty * Number(product.price_per_unit);
     const doc = new jsPDF();
     const invNo = `INV-${Date.now().toString(36).toUpperCase()}`;
-    const today = format(new Date(), "MMM d, yyyy");
 
-    doc.setFontSize(20);
-    doc.text("Duara Flow", 20, 22);
-    doc.setFontSize(10);
-    doc.setTextColor(100);
-    doc.text("Sales Invoice", 20, 30);
-    doc.setTextColor(0);
+    let y = await addBrandedHeader(doc, "Sales Invoice");
+    y = addDocMeta(doc, [
+      { label: "Invoice #", value: invNo },
+      { label: "Date", value: format(new Date(), "MMM d, yyyy") },
+      { label: "Seller", value: profile?.full_name || "Recycler" },
+      ...(profile?.phone_number ? [{ label: "Phone", value: profile.phone_number }] : []),
+      { label: "Client", value: quoteForm.client_name || "—" },
+      ...(quoteForm.client_phone ? [{ label: "Client Phone", value: quoteForm.client_phone }] : []),
+    ], y);
 
-    doc.text(`Invoice #: ${invNo}`, 20, 44);
-    doc.text(`Date: ${today}`, 20, 51);
-    doc.text(`Seller: ${profile?.full_name || "Recycler"}`, 20, 58);
-    if (profile?.phone_number) doc.text(`Phone: ${profile.phone_number}`, 20, 65);
-    doc.text(`Client: ${quoteForm.client_name || "—"}`, 20, 75);
-    if (quoteForm.client_phone) doc.text(`Client Phone: ${quoteForm.client_phone}`, 20, 82);
+    y = drawTableHeader(doc, [
+      { label: "Product", x: 17 }, { label: "Quantity", x: 95 }, { label: "Unit Price (KES)", x: 125 }, { label: "Total (KES)", x: 165 },
+    ], y, 180);
 
-    let y = 96;
-    doc.setFillColor(34, 87, 62);
-    doc.rect(20, y - 5, 170, 8, "F");
-    doc.setTextColor(255);
-    doc.setFontSize(9);
-    doc.text("Product", 22, y);
-    doc.text("Quantity", 95, y);
-    doc.text("Unit Price (KES)", 125, y);
-    doc.text("Total (KES)", 165, y);
-    doc.setTextColor(0);
+    drawTableRow(doc, y, 0, 180);
+    doc.setFontSize(8);
+    doc.text(product.name, 17, y); doc.text(`${qty} ${product.unit}`, 95, y);
+    doc.text(Number(product.price_per_unit).toFixed(2), 125, y); doc.text(total.toLocaleString(), 165, y);
     y += 10;
-    doc.text(product.name, 22, y);
-    doc.text(`${qty} ${product.unit}`, 95, y);
-    doc.text(Number(product.price_per_unit).toFixed(2), 125, y);
-    doc.text(total.toLocaleString(), 165, y);
-    y += 14;
-    doc.line(20, y - 3, 190, y - 3);
-    doc.setFontSize(12);
-    doc.text(`Total: KES ${total.toLocaleString()}`, 120, y + 5);
-    if (quoteForm.notes) {
-      y += 16;
-      doc.setFontSize(9);
-      doc.text(`Notes: ${quoteForm.notes}`, 20, y);
-    }
-    doc.setFontSize(7);
-    doc.setTextColor(130);
-    doc.text("System-generated invoice — Duara Flow", 20, 280);
+
+    drawTotalLine(doc, `Total: KES ${total.toLocaleString()}`, y);
+    if (quoteForm.notes) { y += 10; doc.setFontSize(9); doc.text(`Notes: ${quoteForm.notes}`, 15, y); }
+
+    await finalizePdf(doc);
     doc.save(`invoice-${invNo}.pdf`);
     toast.success("Invoice downloaded");
-    setQuoteDialog(null);
-    setQuoteForm({ client_name: "", client_phone: "", quantity: "", notes: "" });
+    setQuoteDialog(null); setQuoteForm({ client_name: "", client_phone: "", quantity: "", notes: "" });
   };
 
-  const generateQuotation = (product: any) => {
+  const generateQuotation = async (product: any) => {
     const qty = Number(quoteForm.quantity) || 1;
     const total = qty * Number(product.price_per_unit);
     const doc = new jsPDF();
     const qNo = `QT-${Date.now().toString(36).toUpperCase()}`;
-    const today = format(new Date(), "MMM d, yyyy");
 
-    doc.setFontSize(20);
-    doc.text("Duara Flow", 20, 22);
-    doc.setFontSize(10);
-    doc.setTextColor(100);
-    doc.text("Quotation", 20, 30);
-    doc.setTextColor(0);
+    let y = await addBrandedHeader(doc, "Quotation");
+    y = addDocMeta(doc, [
+      { label: "Quotation #", value: qNo },
+      { label: "Date", value: format(new Date(), "MMM d, yyyy") },
+      { label: "From", value: profile?.full_name || "Recycler" },
+      ...(profile?.phone_number ? [{ label: "Phone", value: profile.phone_number }] : []),
+      { label: "To", value: quoteForm.client_name || "—" },
+      ...(quoteForm.client_phone ? [{ label: "Client Phone", value: quoteForm.client_phone }] : []),
+    ], y);
 
-    doc.text(`Quotation #: ${qNo}`, 20, 44);
-    doc.text(`Date: ${today}`, 20, 51);
-    doc.text(`From: ${profile?.full_name || "Recycler"}`, 20, 58);
-    if (profile?.phone_number) doc.text(`Phone: ${profile.phone_number}`, 20, 65);
-    doc.text(`To: ${quoteForm.client_name || "—"}`, 20, 75);
-    if (quoteForm.client_phone) doc.text(`Client Phone: ${quoteForm.client_phone}`, 20, 82);
+    y = drawTableHeader(doc, [
+      { label: "Product", x: 17 }, { label: "Quantity", x: 95 }, { label: "Unit Price (KES)", x: 125 }, { label: "Total (KES)", x: 165 },
+    ], y, 180);
 
-    let y = 96;
-    doc.setFillColor(34, 87, 62);
-    doc.rect(20, y - 5, 170, 8, "F");
-    doc.setTextColor(255);
-    doc.setFontSize(9);
-    doc.text("Product", 22, y);
-    doc.text("Quantity", 95, y);
-    doc.text("Unit Price (KES)", 125, y);
-    doc.text("Total (KES)", 165, y);
-    doc.setTextColor(0);
+    drawTableRow(doc, y, 0, 180);
+    doc.setFontSize(8);
+    doc.text(product.name, 17, y); doc.text(`${qty} ${product.unit}`, 95, y);
+    doc.text(Number(product.price_per_unit).toFixed(2), 125, y); doc.text(total.toLocaleString(), 165, y);
     y += 10;
-    doc.text(product.name, 22, y);
-    doc.text(`${qty} ${product.unit}`, 95, y);
-    doc.text(Number(product.price_per_unit).toFixed(2), 125, y);
-    doc.text(total.toLocaleString(), 165, y);
-    y += 14;
-    doc.line(20, y - 3, 190, y - 3);
-    doc.setFontSize(12);
-    doc.text(`Total: KES ${total.toLocaleString()}`, 120, y + 5);
-    y += 16;
+
+    drawTotalLine(doc, `Total: KES ${total.toLocaleString()}`, y);
+    y += 10;
     doc.setFontSize(9);
-    doc.text("This quotation is valid for 30 days from the date of issue.", 20, y);
-    if (quoteForm.notes) {
-      y += 8;
-      doc.text(`Notes: ${quoteForm.notes}`, 20, y);
-    }
-    doc.setFontSize(7);
-    doc.setTextColor(130);
-    doc.text("System-generated quotation — Duara Flow", 20, 280);
+    doc.text("This quotation is valid for 30 days from the date of issue.", 15, y);
+    if (quoteForm.notes) { y += 8; doc.text(`Notes: ${quoteForm.notes}`, 15, y); }
+
+    await finalizePdf(doc);
     doc.save(`quotation-${qNo}.pdf`);
     toast.success("Quotation downloaded");
-    setQuoteDialog(null);
-    setQuoteForm({ client_name: "", client_phone: "", quantity: "", notes: "" });
+    setQuoteDialog(null); setQuoteForm({ client_name: "", client_phone: "", quantity: "", notes: "" });
   };
 
   const totalStock = products?.reduce((s, p) => s + Number(p.stock_quantity), 0) || 0;
   const totalValue = products?.reduce((s, p) => s + Number(p.stock_quantity) * Number(p.price_per_unit), 0) || 0;
-
   const selectedProduct = products?.find((p) => p.id === quoteDialog);
 
   return (
@@ -191,28 +134,19 @@ const ProductCatalogPanel = () => {
         <Card className="shadow-soft">
           <CardContent className="flex items-center gap-3 p-4">
             <ShoppingBag className="w-7 h-7 text-primary" />
-            <div>
-              <p className="text-xl font-bold text-foreground">{products?.length || 0}</p>
-              <p className="text-xs text-muted-foreground">Products</p>
-            </div>
+            <div><p className="text-xl font-bold text-foreground">{products?.length || 0}</p><p className="text-xs text-muted-foreground">Products</p></div>
           </CardContent>
         </Card>
         <Card className="shadow-soft">
           <CardContent className="flex items-center gap-3 p-4">
             <Package className="w-7 h-7 text-accent" />
-            <div>
-              <p className="text-xl font-bold text-foreground">{totalStock.toFixed(0)}</p>
-              <p className="text-xs text-muted-foreground">Total Stock</p>
-            </div>
+            <div><p className="text-xl font-bold text-foreground">{totalStock.toFixed(0)}</p><p className="text-xs text-muted-foreground">Total Stock</p></div>
           </CardContent>
         </Card>
         <Card className="shadow-soft">
           <CardContent className="flex items-center gap-3 p-4">
             <Package className="w-7 h-7 text-primary" />
-            <div>
-              <p className="text-xl font-bold text-foreground">KES {totalValue.toLocaleString()}</p>
-              <p className="text-xs text-muted-foreground">Stock Value</p>
-            </div>
+            <div><p className="text-xl font-bold text-foreground">KES {totalValue.toLocaleString()}</p><p className="text-xs text-muted-foreground">Stock Value</p></div>
           </CardContent>
         </Card>
       </div>
@@ -221,9 +155,7 @@ const ProductCatalogPanel = () => {
         <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle className="text-lg">Product Catalog & Pricing</CardTitle>
           <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-            <DialogTrigger asChild>
-              <Button size="sm"><Plus className="w-4 h-4 mr-1" /> Add Product</Button>
-            </DialogTrigger>
+            <DialogTrigger asChild><Button size="sm"><Plus className="w-4 h-4 mr-1" /> Add Product</Button></DialogTrigger>
             <DialogContent className="max-w-md">
               <DialogHeader><DialogTitle>Add Product</DialogTitle></DialogHeader>
               <div className="space-y-3">
@@ -237,10 +169,8 @@ const ProductCatalogPanel = () => {
                     <Select value={form.unit} onValueChange={(v) => setForm({ ...form, unit: v })}>
                       <SelectTrigger><SelectValue /></SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="kg">kg</SelectItem>
-                        <SelectItem value="tonnes">tonnes</SelectItem>
-                        <SelectItem value="pieces">pieces</SelectItem>
-                        <SelectItem value="bags">bags</SelectItem>
+                        <SelectItem value="kg">kg</SelectItem><SelectItem value="tonnes">tonnes</SelectItem>
+                        <SelectItem value="pieces">pieces</SelectItem><SelectItem value="bags">bags</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
@@ -286,7 +216,6 @@ const ProductCatalogPanel = () => {
         </CardContent>
       </Card>
 
-      {/* Invoice / Quotation Dialog */}
       <Dialog open={!!quoteDialog} onOpenChange={(open) => { if (!open) setQuoteDialog(null); }}>
         <DialogContent className="max-w-md">
           <DialogHeader><DialogTitle>Generate Invoice / Quotation</DialogTitle></DialogHeader>
