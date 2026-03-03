@@ -7,7 +7,7 @@ import { Download, FileText } from "lucide-react";
 import { format } from "date-fns";
 import jsPDF from "jspdf";
 import { toast } from "sonner";
-import { addBrandedHeader, addDocMeta, drawTableHeader, drawTableRow, drawTotalLine, finalizePdf } from "@/lib/pdfBranding";
+import { addCleanHeader, addDocMeta, drawTableHeader, drawTableRow, drawTotalLine, finalizeCleanPdf } from "@/lib/pdfBranding";
 
 const PurchaseInvoicesPanel = () => {
   const { user, profile } = useAuth();
@@ -44,7 +44,7 @@ const PurchaseInvoicesPanel = () => {
     const doc = new jsPDF();
     const invNo = `PI-${Date.now().toString(36).toUpperCase()}`;
 
-    let y = await addBrandedHeader(doc, "Purchase Invoice");
+    let y = addCleanHeader(doc, "Purchase Invoice");
     y = addDocMeta(doc, [
       { label: "Invoice #", value: invNo },
       { label: "Date", value: format(new Date(), "MMM d, yyyy") },
@@ -84,7 +84,7 @@ const PurchaseInvoicesPanel = () => {
     y += 4;
     drawTotalLine(doc, `Total: KES ${grandTotal.toLocaleString()}`, y);
 
-    await finalizePdf(doc);
+    finalizeCleanPdf(doc);
     doc.save(`purchase-invoice-${invNo}.pdf`);
     toast.success("Purchase invoice downloaded");
   };
@@ -93,7 +93,7 @@ const PurchaseInvoicesPanel = () => {
     const doc = new jsPDF();
     const invNo = `PI-${payment.id.slice(0, 8).toUpperCase()}`;
 
-    let y = await addBrandedHeader(doc, "Purchase Invoice");
+    let y = addCleanHeader(doc, "Purchase Invoice");
     y = addDocMeta(doc, [
       { label: "Invoice #", value: invNo },
       { label: "Date", value: format(new Date(payment.created_at), "MMM d, yyyy") },
@@ -121,7 +121,7 @@ const PurchaseInvoicesPanel = () => {
       doc.text(`M-Pesa Receipt: ${payment.mpesa_receipt_number}`, 15, y);
     }
 
-    await finalizePdf(doc);
+    finalizeCleanPdf(doc);
     doc.save(`purchase-invoice-${invNo}.pdf`);
     toast.success("Invoice downloaded");
   };

@@ -14,7 +14,7 @@ import { Package, Plus, Download, Trash2, ShoppingBag } from "lucide-react";
 import { toast } from "sonner";
 import jsPDF from "jspdf";
 import { format } from "date-fns";
-import { addBrandedHeader, addDocMeta, drawTableHeader, drawTableRow, drawTotalLine, finalizePdf } from "@/lib/pdfBranding";
+import { addCleanHeader, addDocMeta, drawTableHeader, drawTableRow, drawTotalLine, finalizeCleanPdf } from "@/lib/pdfBranding";
 
 const ProductCatalogPanel = () => {
   const { user, profile } = useAuth();
@@ -57,7 +57,7 @@ const ProductCatalogPanel = () => {
     const doc = new jsPDF();
     const invNo = `INV-${Date.now().toString(36).toUpperCase()}`;
 
-    let y = await addBrandedHeader(doc, "Sales Invoice");
+    let y = addCleanHeader(doc, "Sales Invoice");
     y = addDocMeta(doc, [
       { label: "Invoice #", value: invNo },
       { label: "Date", value: format(new Date(), "MMM d, yyyy") },
@@ -80,7 +80,7 @@ const ProductCatalogPanel = () => {
     drawTotalLine(doc, `Total: KES ${total.toLocaleString()}`, y);
     if (quoteForm.notes) { y += 10; doc.setFontSize(9); doc.text(`Notes: ${quoteForm.notes}`, 15, y); }
 
-    await finalizePdf(doc);
+    finalizeCleanPdf(doc);
     doc.save(`invoice-${invNo}.pdf`);
     toast.success("Invoice downloaded");
     setQuoteDialog(null); setQuoteForm({ client_name: "", client_phone: "", quantity: "", notes: "" });
@@ -92,7 +92,7 @@ const ProductCatalogPanel = () => {
     const doc = new jsPDF();
     const qNo = `QT-${Date.now().toString(36).toUpperCase()}`;
 
-    let y = await addBrandedHeader(doc, "Quotation");
+    let y = addCleanHeader(doc, "Quotation");
     y = addDocMeta(doc, [
       { label: "Quotation #", value: qNo },
       { label: "Date", value: format(new Date(), "MMM d, yyyy") },
@@ -118,7 +118,7 @@ const ProductCatalogPanel = () => {
     doc.text("This quotation is valid for 30 days from the date of issue.", 15, y);
     if (quoteForm.notes) { y += 8; doc.text(`Notes: ${quoteForm.notes}`, 15, y); }
 
-    await finalizePdf(doc);
+    finalizeCleanPdf(doc);
     doc.save(`quotation-${qNo}.pdf`);
     toast.success("Quotation downloaded");
     setQuoteDialog(null); setQuoteForm({ client_name: "", client_phone: "", quantity: "", notes: "" });

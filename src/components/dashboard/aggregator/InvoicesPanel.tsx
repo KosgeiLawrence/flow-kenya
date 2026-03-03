@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Download, FileText, Truck } from "lucide-react";
 import { format } from "date-fns";
 import jsPDF from "jspdf";
-import { addBrandedHeader, addDocMeta, drawTableHeader, drawTableRow, drawTotalLine, finalizePdf, addSectionTitle } from "@/lib/pdfBranding";
+import { addCleanHeader, addDocMeta, drawTableHeader, drawTableRow, drawTotalLine, finalizeCleanPdf, addSectionTitle } from "@/lib/pdfBranding";
 
 const InvoicesPanel = () => {
   const { user, profile } = useAuth();
@@ -41,7 +41,7 @@ const InvoicesPanel = () => {
     const doc = new jsPDF();
     const invoiceNo = `INV-${Date.now().toString(36).toUpperCase()}`;
 
-    let y = await addBrandedHeader(doc, "Sales Invoice", "Combined invoice for all materials");
+    let y = addCleanHeader(doc, "Sales Invoice", "Combined invoice for all materials");
     y = addDocMeta(doc, [
       { label: "Invoice #", value: invoiceNo },
       { label: "Date", value: format(new Date(), "MMM d, yyyy") },
@@ -72,7 +72,7 @@ const InvoicesPanel = () => {
     y += 4;
     drawTotalLine(doc, `Grand Total: KES ${grandTotal.toLocaleString()}`, y);
 
-    await finalizePdf(doc);
+    finalizeCleanPdf(doc);
     doc.save(`invoice-${invoiceNo}.pdf`);
   };
 
@@ -81,7 +81,7 @@ const InvoicesPanel = () => {
     const doc = new jsPDF();
     const noteNo = `DN-${Date.now().toString(36).toUpperCase()}`;
 
-    let y = await addBrandedHeader(doc, "Delivery Note", "Batch details with signature block");
+    let y = addCleanHeader(doc, "Delivery Note", "Batch details with signature block");
     y = addDocMeta(doc, [
       { label: "Note #", value: noteNo },
       { label: "Date", value: format(new Date(), "MMM d, yyyy") },
@@ -113,7 +113,7 @@ const InvoicesPanel = () => {
     doc.text("Signature: ____________________________", 15, y); y += 12;
     doc.text("Date: ____________________________", 15, y);
 
-    await finalizePdf(doc);
+    finalizeCleanPdf(doc);
     doc.save(`delivery-note-${noteNo}.pdf`);
   };
 
@@ -126,7 +126,7 @@ const InvoicesPanel = () => {
     const totalQty = items.reduce((s, c) => s + Number(c.quantity), 0);
     const totalVal = totalQty * Number(mt?.price_per_unit || 0);
 
-    let y = await addBrandedHeader(doc, `Material Invoice — ${mt?.name}`, "Single-material invoice with batch details");
+    let y = addCleanHeader(doc, `Material Invoice — ${mt?.name}`, "Single-material invoice with batch details");
     y = addDocMeta(doc, [
       { label: "Invoice #", value: invoiceNo },
       { label: "Date", value: format(new Date(), "MMM d, yyyy") },
@@ -154,7 +154,7 @@ const InvoicesPanel = () => {
     y += 4;
     drawTotalLine(doc, `Total: ${totalQty.toFixed(1)} ${mt?.unit || "kg"}  •  KES ${totalVal.toLocaleString()}`, y);
 
-    await finalizePdf(doc);
+    finalizeCleanPdf(doc);
     doc.save(`invoice-${mt?.name?.replace(/\s/g, "-")}-${invoiceNo}.pdf`);
   };
 

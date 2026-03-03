@@ -14,7 +14,7 @@ import { ClipboardList, Plus, FileText, CheckCircle2, Clock, XCircle, Truck, Dow
 import { toast } from "sonner";
 import { format } from "date-fns";
 import jsPDF from "jspdf";
-import { addBrandedHeader, addDocMeta, drawTableHeader, drawTableRow, drawTotalLine, finalizePdf } from "@/lib/pdfBranding";
+import { addCleanHeader, addDocMeta, drawTableHeader, drawTableRow, drawTotalLine, finalizeCleanPdf } from "@/lib/pdfBranding";
 
 const statusMap: Record<string, { icon: React.ElementType; variant: "default" | "secondary" | "destructive"; label: string }> = {
   pending: { icon: Clock, variant: "secondary", label: "Pending" },
@@ -61,7 +61,7 @@ const OrdersPanel = () => {
   const generateOrderPDF = async (o: any) => {
     const doc = new jsPDF();
 
-    let y = await addBrandedHeader(doc, "Purchase Order / Contract");
+    let y = addCleanHeader(doc, "Purchase Order / Contract");
     y = addDocMeta(doc, [
       { label: "Order Date", value: format(new Date(o.order_date), "MMM d, yyyy") },
       { label: "Buyer", value: profile?.full_name || "Recycler" },
@@ -86,7 +86,7 @@ const OrdersPanel = () => {
     if (o.delivery_date) { y += 10; doc.setFontSize(9); doc.text(`Expected Delivery: ${format(new Date(o.delivery_date), "MMM d, yyyy")}`, 15, y); }
     if (o.notes) { y += 8; doc.setFontSize(9); doc.text(`Notes: ${o.notes}`, 15, y); }
 
-    await finalizePdf(doc);
+    finalizeCleanPdf(doc);
     doc.save(`order-${o.id.slice(0, 8)}.pdf`);
   };
 

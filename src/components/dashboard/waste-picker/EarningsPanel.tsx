@@ -8,7 +8,7 @@ import { Loader2, DollarSign, Download, Smartphone, FileText, Leaf } from "lucid
 import { format } from "date-fns";
 import jsPDF from "jspdf";
 import { calculateImpact, formatImpactMessage } from "@/lib/impactUtils";
-import { addBrandedHeader, addDocMeta, addSectionTitle, drawTableHeader, drawTableRow, drawTotalLine, finalizePdf } from "@/lib/pdfBranding";
+import { addBrandedHeader, addCleanHeader, addDocMeta, addSectionTitle, drawTableHeader, drawTableRow, drawTotalLine, finalizePdf, finalizeCleanPdf } from "@/lib/pdfBranding";
 
 const EarningsPanel = () => {
   const { user, profile } = useAuth();
@@ -38,7 +38,7 @@ const EarningsPanel = () => {
 
   const downloadReceipt = async (payment: any) => {
     const doc = new jsPDF();
-    let y = await addBrandedHeader(doc, "Payment Receipt");
+    let y = addCleanHeader(doc, "Payment Receipt");
     y = addDocMeta(doc, [
       { label: "Receipt #", value: payment.mpesa_receipt_number || payment.id.slice(0, 8) },
       { label: "Date", value: format(new Date(payment.created_at), "MMM d, yyyy h:mm a") },
@@ -47,7 +47,7 @@ const EarningsPanel = () => {
       { label: "Status", value: payment.status },
       ...(payment.description ? [{ label: "Description", value: payment.description }] : []),
     ], y);
-    await finalizePdf(doc);
+    finalizeCleanPdf(doc);
     doc.save(`receipt-${payment.id.slice(0, 8)}.pdf`);
   };
 
@@ -96,7 +96,7 @@ const EarningsPanel = () => {
     const doc = new jsPDF();
     const quoteId = `Q-${Date.now().toString(36).toUpperCase()}`;
 
-    let y = await addBrandedHeader(doc, "Waste Collection Quotation");
+    let y = addCleanHeader(doc, "Waste Collection Quotation");
     y = addDocMeta(doc, [
       { label: "Quotation #", value: quoteId },
       { label: "Date", value: format(new Date(), "MMM d, yyyy") },
@@ -133,7 +133,7 @@ const EarningsPanel = () => {
     doc.setFontSize(8);
     doc.text("This quotation is valid for 7 days from the date of issue.", 15, y);
 
-    await finalizePdf(doc);
+    finalizeCleanPdf(doc);
     doc.save(`quotation-${quoteId}.pdf`);
   };
 
