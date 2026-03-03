@@ -4,6 +4,7 @@ import Features from "@/components/Features";
 import TraceabilityFlow from "@/components/TraceabilityFlow";
 import Dashboards from "@/components/Dashboards";
 import ImpactMetrics from "@/components/ImpactMetrics";
+import AboutSection from "@/components/AboutSection";
 import CTASection from "@/components/CTASection";
 
 const Index = () => {
@@ -15,6 +16,7 @@ const Index = () => {
       <TraceabilityFlow />
       <Dashboards />
       <ImpactMetrics />
+      <AboutSection />
       <CTASection />
     </div>
   );
