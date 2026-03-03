@@ -17,6 +17,23 @@ interface Profile {
   national_id: string | null;
   company_registration: string | null;
   avatar_url: string | null;
+  kra_pin: string | null;
+  physical_address: string | null;
+  county: string | null;
+  sub_county: string | null;
+  website: string | null;
+  social_media_links: Record<string, string> | null;
+  area_of_operation: string | null;
+  waste_categories: string[] | null;
+  daily_capacity_kg: number | null;
+  monthly_capacity_kg: number | null;
+  payment_method: string | null;
+  mpesa_number: string | null;
+  bank_name: string | null;
+  bank_account_number: string | null;
+  industry_sector: string | null;
+  date_of_birth: string | null;
+  gender: string | null;
 }
 
 interface AuthContextType {

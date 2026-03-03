@@ -4,12 +4,13 @@ import { Button } from "@/components/ui/button";
 import {
   LogOut, User, Package, DollarSign, Calendar, BarChart3,
   QrCode, BookOpen, Clock, CheckCircle2, AlertTriangle, Menu, X,
-  ChevronRight, Briefcase
+  ChevronRight, Briefcase, Settings
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import ProfilePanel from "@/components/dashboard/waste-picker/ProfilePanel";
 import CollectionPanel from "@/components/dashboard/waste-picker/CollectionPanel";
+import ProfileSettingsPanel from "@/components/dashboard/shared/ProfileSettingsPanel";
 import PricingPanel from "@/components/dashboard/waste-picker/PricingPanel";
 import EarningsPanel from "@/components/dashboard/waste-picker/EarningsPanel";
 import SchedulePanel from "@/components/dashboard/waste-picker/SchedulePanel";
@@ -28,6 +29,7 @@ const navItems = [
   { id: "qr-id", label: "QR ID", icon: QrCode },
   { id: "training", label: "Training", icon: BookOpen },
   { id: "grants", label: "Grants & Programs", icon: Briefcase },
+  { id: "settings", label: "Profile Settings", icon: Settings },
 ];
 
 const statusConfig: Record<string, { icon: React.ElementType; label: string; color: string }> = {
@@ -61,6 +63,7 @@ const WastePickerDashboard = () => {
       case "qr-id": return <QRIDPanel />;
       case "training": return <TrainingPanel />;
       case "grants": return <GrantsDiscoveryPanel />;
+      case "settings": return <ProfileSettingsPanel role="waste_picker" />;
       default: return <ProfilePanel />;
     }
   };

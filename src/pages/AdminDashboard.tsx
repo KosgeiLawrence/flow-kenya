@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
-import { LogOut, Users, BarChart3, DollarSign, ShieldAlert, FileText, Settings, MapPin, Menu, X, ChevronRight } from "lucide-react";
+import { LogOut, Users, BarChart3, DollarSign, ShieldAlert, FileText, Settings, MapPin, Menu, X, ChevronRight, User } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import UserVerificationPanel from "@/components/dashboard/admin/UserVerificationPanel";
@@ -11,6 +11,7 @@ import FraudDetectionPanel from "@/components/dashboard/admin/FraudDetectionPane
 import AuditLogsPanel from "@/components/dashboard/admin/AuditLogsPanel";
 import SystemSettingsPanel from "@/components/dashboard/admin/SystemSettingsPanel";
 import CountyWasteFlowPanel from "@/components/dashboard/admin/CountyWasteFlowPanel";
+import ProfileSettingsPanel from "@/components/dashboard/shared/ProfileSettingsPanel";
 
 const navItems = [
   { id: "users", label: "User Verification", icon: Users },
@@ -20,6 +21,7 @@ const navItems = [
   { id: "audit", label: "Audit Logs", icon: FileText },
   { id: "county-flow", label: "County Waste Flow", icon: MapPin },
   { id: "settings", label: "System Settings", icon: Settings },
+  { id: "profile-settings", label: "Profile Settings", icon: User },
 ];
 
 const AdminDashboard = () => {
@@ -42,6 +44,7 @@ const AdminDashboard = () => {
       case "audit": return <AuditLogsPanel />;
       case "county-flow": return <CountyWasteFlowPanel />;
       case "settings": return <SystemSettingsPanel />;
+      case "profile-settings": return <ProfileSettingsPanel role="admin" />;
       default: return <UserVerificationPanel />;
     }
   };
