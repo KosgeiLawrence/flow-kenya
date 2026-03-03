@@ -247,3 +247,73 @@ export const addDocMeta = (
 export const finalizePdf = async (doc: jsPDF) => {
   await addBrandedFooter(doc);
 };
+
+// ── Clean (unbranded) header for user-to-client documents ──
+
+/**
+ * Adds a simple, clean header without Duara Flow logos or contact info.
+ * Suitable for invoices, receipts, quotations, and delivery notes
+ * that are between the platform user and their client.
+ * Returns the Y position after the header.
+ */
+export const addCleanHeader = (
+  doc: jsPDF,
+  documentTitle: string,
+  documentSubtitle?: string
+): number => {
+  const pageWidth = doc.internal.pageSize.getWidth();
+
+  // ── Thin accent line at top ──
+  doc.setDrawColor(...PDF_COLORS.forest);
+  doc.setLineWidth(1);
+  doc.line(15, 12, pageWidth - 15, 12);
+
+  // ── Document Title ──
+  doc.setFontSize(18);
+  doc.setTextColor(...PDF_COLORS.forestDeep);
+  doc.text(documentTitle.toUpperCase(), 15, 24);
+
+  let y = 28;
+  if (documentSubtitle) {
+    doc.setFontSize(9);
+    doc.setTextColor(...PDF_COLORS.mutedText);
+    doc.text(documentSubtitle, 15, y);
+    y += 6;
+  }
+
+  // ── Thin accent under title ──
+  doc.setDrawColor(...PDF_COLORS.gold);
+  doc.setLineWidth(0.5);
+  doc.line(15, y, 60, y);
+  y += 8;
+
+  doc.setTextColor(...PDF_COLORS.darkText);
+  return y;
+};
+
+/**
+ * Adds a clean footer with only page numbers (no logos or contact info).
+ */
+export const addCleanFooter = (doc: jsPDF) => {
+  const totalPages = doc.getNumberOfPages();
+  const pageWidth = doc.internal.pageSize.getWidth();
+  const pageHeight = doc.internal.pageSize.getHeight();
+
+  for (let i = 1; i <= totalPages; i++) {
+    doc.setPage(i);
+    const footerY = pageHeight - 14;
+    doc.setDrawColor(...PDF_COLORS.lightGray);
+    doc.setLineWidth(0.3);
+    doc.line(15, footerY, pageWidth - 15, footerY);
+    doc.setFontSize(7);
+    doc.setTextColor(...PDF_COLORS.mutedText);
+    doc.text(`Page ${i} of ${totalPages}`, pageWidth - 15, footerY + 6, { align: "right" });
+  }
+};
+
+/**
+ * Finalize a clean (unbranded) PDF — only page numbers in footer.
+ */
+export const finalizeCleanPdf = (doc: jsPDF) => {
+  addCleanFooter(doc);
+};

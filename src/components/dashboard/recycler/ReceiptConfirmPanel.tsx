@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Download, ClipboardCheck, Truck } from "lucide-react";
 import { format } from "date-fns";
 import jsPDF from "jspdf";
-import { addBrandedHeader, addDocMeta, drawTableHeader, drawTableRow, finalizePdf } from "@/lib/pdfBranding";
+import { addCleanHeader, addDocMeta, drawTableHeader, drawTableRow, finalizeCleanPdf } from "@/lib/pdfBranding";
 
 const ReceiptConfirmPanel = () => {
   const { user, profile } = useAuth();
@@ -30,7 +30,7 @@ const ReceiptConfirmPanel = () => {
     const doc = new jsPDF();
     const rcNo = `RC-${Date.now().toString(36).toUpperCase()}`;
 
-    let y = await addBrandedHeader(doc, "Material Receipt Confirmation");
+    let y = addCleanHeader(doc, "Material Receipt Confirmation");
 
     y = addDocMeta(doc, [
       { label: "Document #", value: rcNo },
@@ -74,7 +74,7 @@ const ReceiptConfirmPanel = () => {
     y += 12;
     doc.text("Date: ____________________________", 15, y);
 
-    await finalizePdf(doc);
+    finalizeCleanPdf(doc);
     doc.save(`receipt-confirmation-${rcNo}.pdf`);
   };
 

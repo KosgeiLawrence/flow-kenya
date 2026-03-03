@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Download, FileText, Printer } from "lucide-react";
 import { format } from "date-fns";
 import jsPDF from "jspdf";
-import { addBrandedHeader, addDocMeta, drawTableHeader, drawTableRow, drawTotalLine, finalizePdf } from "@/lib/pdfBranding";
+import { addCleanHeader, addDocMeta, drawTableHeader, drawTableRow, drawTotalLine, finalizeCleanPdf } from "@/lib/pdfBranding";
 
 const BulkReceiptsPanel = () => {
   const { user, profile } = useAuth();
@@ -30,7 +30,7 @@ const BulkReceiptsPanel = () => {
     const doc = new jsPDF();
     const today = format(new Date(), "MMM d, yyyy");
 
-    let y = await addBrandedHeader(doc, "Bulk Payment Receipt", "Combined receipt for all completed payments");
+    let y = addCleanHeader(doc, "Bulk Payment Receipt", "Combined receipt for all completed payments");
 
     y = addDocMeta(doc, [
       { label: "Date", value: today },
@@ -61,14 +61,14 @@ const BulkReceiptsPanel = () => {
     y += 4;
     drawTotalLine(doc, `Total: KES ${totalAmount.toLocaleString()}`, y);
 
-    await finalizePdf(doc);
+    finalizeCleanPdf(doc);
     doc.save(`bulk-receipt-${format(new Date(), "yyyy-MM-dd")}.pdf`);
   };
 
   const downloadSingleReceipt = async (payment: any) => {
     const doc = new jsPDF();
 
-    let y = await addBrandedHeader(doc, "Payment Receipt");
+    let y = addCleanHeader(doc, "Payment Receipt");
 
     y = addDocMeta(doc, [
       { label: "Date", value: format(new Date(payment.created_at), "MMM d, yyyy") },
@@ -79,7 +79,7 @@ const BulkReceiptsPanel = () => {
       ...(payment.description ? [{ label: "Description", value: payment.description }] : []),
     ], y);
 
-    await finalizePdf(doc);
+    finalizeCleanPdf(doc);
     doc.save(`receipt-${payment.id.slice(0, 8)}.pdf`);
   };
 
