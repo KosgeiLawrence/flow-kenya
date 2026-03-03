@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Download, ClipboardCheck, Truck } from "lucide-react";
 import { format } from "date-fns";
 import jsPDF from "jspdf";
+import { addBrandedHeader, addDocMeta, drawTableHeader, drawTableRow, finalizePdf } from "@/lib/pdfBranding";
 
 const ReceiptConfirmPanel = () => {
   const { user, profile } = useAuth();
@@ -24,70 +25,59 @@ const ReceiptConfirmPanel = () => {
     enabled: !!user,
   });
 
-  const generateReceiptConfirmation = (batch: typeof collections) => {
+  const generateReceiptConfirmation = async (batch: typeof collections) => {
     if (!batch?.length) return;
     const doc = new jsPDF();
-    const today = format(new Date(), "MMM d, yyyy");
     const rcNo = `RC-${Date.now().toString(36).toUpperCase()}`;
 
-    doc.setFontSize(20);
-    doc.text("Duara Flow", 20, 22);
-    doc.setFontSize(10);
-    doc.setTextColor(100);
-    doc.text("Material Receipt Confirmation", 20, 30);
-    doc.setTextColor(0);
+    let y = await addBrandedHeader(doc, "Material Receipt Confirmation");
 
-    doc.text(`Document #: ${rcNo}`, 20, 44);
-    doc.text(`Date: ${today}`, 20, 51);
-    doc.text(`Received by: ${profile?.full_name || "Recycler"}`, 20, 58);
+    y = addDocMeta(doc, [
+      { label: "Document #", value: rcNo },
+      { label: "Date", value: format(new Date(), "MMM d, yyyy") },
+      { label: "Received by", value: profile?.full_name || "Recycler" },
+    ], y);
 
-    let y = 74;
-    doc.setFillColor(34, 87, 62);
-    doc.rect(20, y - 5, 170, 8, "F");
-    doc.setTextColor(255);
-    doc.setFontSize(9);
-    doc.text("Batch ID", 22, y);
-    doc.text("Material", 65, y);
-    doc.text("Quantity", 115, y);
-    doc.text("Date Collected", 150, y);
-    doc.setTextColor(0);
+    y = drawTableHeader(doc, [
+      { label: "Batch ID", x: 17 },
+      { label: "Material", x: 60 },
+      { label: "Quantity", x: 110 },
+      { label: "Date", x: 150 },
+    ], y, 180);
 
-    y += 10;
     let totalQty = 0;
-    batch.forEach((c) => {
-      if (y > 260) { doc.addPage(); y = 20; }
+    batch.forEach((c, i) => {
+      if (y > 240) { doc.addPage(); y = 20; }
       const mt = (c as any).material_types;
+      drawTableRow(doc, y, i, 180);
       doc.setFontSize(8);
-      doc.text(c.batch_id, 22, y);
-      doc.text(mt?.name || "—", 65, y);
+      doc.text(c.batch_id, 17, y);
+      doc.text(mt?.name || "—", 60, y);
       const qty = Number(c.quantity);
       totalQty += qty;
-      doc.text(`${qty.toFixed(1)} ${mt?.unit || "kg"}`, 115, y);
+      doc.text(`${qty.toFixed(1)} ${mt?.unit || "kg"}`, 110, y);
       doc.text(format(new Date(c.collected_at), "MMM d, yy"), 150, y);
       y += 7;
     });
 
-    y += 8;
+    y += 10;
     doc.setFontSize(10);
-    doc.text(`Total received: ${totalQty.toFixed(1)} kg`, 20, y);
+    doc.text(`Total received: ${totalQty.toFixed(1)} kg`, 15, y);
 
-    y += 16;
+    y += 14;
     doc.setFontSize(9);
-    doc.text("Condition: ☐ Good  ☐ Acceptable  ☐ Poor", 20, y);
+    doc.text("Condition: ☐ Good  ☐ Acceptable  ☐ Poor", 15, y);
     y += 12;
-    doc.text("Received by: ____________________________", 20, y);
+    doc.text("Received by: ____________________________", 15, y);
     y += 12;
-    doc.text("Signature: ____________________________", 20, y);
+    doc.text("Signature: ____________________________", 15, y);
     y += 12;
-    doc.text("Date: ____________________________", 20, y);
+    doc.text("Date: ____________________________", 15, y);
 
-    doc.setFontSize(7);
-    doc.setTextColor(130);
-    doc.text("System-generated receipt confirmation — Duara Flow", 20, 285);
+    await finalizePdf(doc);
     doc.save(`receipt-confirmation-${rcNo}.pdf`);
   };
 
-  // Group by batch
   const batchMap = new Map<string, typeof collections>();
   collections?.forEach((c) => {
     const arr = batchMap.get(c.batch_id) || [];

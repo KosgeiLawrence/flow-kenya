@@ -7,6 +7,7 @@ import { Download, FileText } from "lucide-react";
 import { format } from "date-fns";
 import jsPDF from "jspdf";
 import { toast } from "sonner";
+import { addBrandedHeader, addDocMeta, drawTableHeader, drawTableRow, drawTotalLine, finalizePdf } from "@/lib/pdfBranding";
 
 const PurchaseInvoicesPanel = () => {
   const { user, profile } = useAuth();
@@ -38,116 +39,89 @@ const PurchaseInvoicesPanel = () => {
     enabled: !!user,
   });
 
-  const generatePurchaseInvoice = () => {
+  const generatePurchaseInvoice = async () => {
     if (!collections?.length) return;
     const doc = new jsPDF();
-    const today = format(new Date(), "MMM d, yyyy");
     const invNo = `PI-${Date.now().toString(36).toUpperCase()}`;
 
-    doc.setFontSize(20);
-    doc.text("Duara Flow", 20, 22);
-    doc.setFontSize(10);
-    doc.setTextColor(100);
-    doc.text("Purchase Invoice", 20, 30);
-    doc.setTextColor(0);
-
-    doc.text(`Invoice #: ${invNo}`, 20, 44);
-    doc.text(`Date: ${today}`, 20, 51);
-    doc.text(`Buyer: ${profile?.full_name || "Recycler"}`, 20, 58);
-    if (profile?.phone_number) doc.text(`Phone: ${profile.phone_number}`, 20, 65);
+    let y = await addBrandedHeader(doc, "Purchase Invoice");
+    y = addDocMeta(doc, [
+      { label: "Invoice #", value: invNo },
+      { label: "Date", value: format(new Date(), "MMM d, yyyy") },
+      { label: "Buyer", value: profile?.full_name || "Recycler" },
+      ...(profile?.phone_number ? [{ label: "Phone", value: profile.phone_number }] : []),
+    ], y);
 
     const materialMap = new Map<string, { name: string; qty: number; price: number; unit: string }>();
     collections.forEach((c) => {
       const mt = (c as any).material_types;
       const key = c.material_type_id;
       const existing = materialMap.get(key);
-      if (existing) {
-        existing.qty += Number(c.quantity);
-      } else {
-        materialMap.set(key, {
-          name: mt?.name || "Unknown",
-          qty: Number(c.quantity),
-          price: Number(mt?.price_per_unit || 0),
-          unit: mt?.unit || "kg",
-        });
-      }
+      if (existing) { existing.qty += Number(c.quantity); }
+      else { materialMap.set(key, { name: mt?.name || "Unknown", qty: Number(c.quantity), price: Number(mt?.price_per_unit || 0), unit: mt?.unit || "kg" }); }
     });
 
-    let y = 80;
-    doc.setFillColor(34, 87, 62);
-    doc.rect(20, y - 5, 170, 8, "F");
-    doc.setTextColor(255);
-    doc.setFontSize(9);
-    doc.text("Material", 22, y);
-    doc.text("Quantity", 85, y);
-    doc.text("Unit Price", 120, y);
-    doc.text("Total (KES)", 155, y);
-    doc.setTextColor(0);
+    y = drawTableHeader(doc, [
+      { label: "Material", x: 17 },
+      { label: "Quantity", x: 85 },
+      { label: "Unit Price", x: 120 },
+      { label: "Total (KES)", x: 155 },
+    ], y, 180);
 
     let grandTotal = 0;
-    y += 10;
+    let i = 0;
     materialMap.forEach((m) => {
-      const total = m.qty * m.price;
-      grandTotal += total;
-      doc.text(m.name, 22, y);
+      const total = m.qty * m.price; grandTotal += total;
+      drawTableRow(doc, y, i, 180);
+      doc.setFontSize(8);
+      doc.text(m.name, 17, y);
       doc.text(`${m.qty.toFixed(1)} ${m.unit}`, 85, y);
       doc.text(m.price.toFixed(2), 120, y);
       doc.text(total.toLocaleString(), 155, y);
-      y += 8;
+      y += 8; i++;
     });
 
     y += 4;
-    doc.line(20, y - 3, 190, y - 3);
-    doc.setFontSize(12);
-    doc.text(`Total: KES ${grandTotal.toLocaleString()}`, 110, y + 5);
+    drawTotalLine(doc, `Total: KES ${grandTotal.toLocaleString()}`, y);
 
-    doc.setFontSize(7);
-    doc.setTextColor(130);
-    doc.text("System-generated purchase invoice — Duara Flow", 20, 280);
+    await finalizePdf(doc);
     doc.save(`purchase-invoice-${invNo}.pdf`);
     toast.success("Purchase invoice downloaded");
   };
 
-  const generateIndividualInvoice = (payment: any) => {
+  const generateIndividualInvoice = async (payment: any) => {
     const doc = new jsPDF();
     const invNo = `PI-${payment.id.slice(0, 8).toUpperCase()}`;
 
-    doc.setFontSize(20);
-    doc.text("Duara Flow", 20, 22);
-    doc.setFontSize(10);
-    doc.setTextColor(100);
-    doc.text("Purchase Invoice", 20, 30);
-    doc.setTextColor(0);
+    let y = await addBrandedHeader(doc, "Purchase Invoice");
+    y = addDocMeta(doc, [
+      { label: "Invoice #", value: invNo },
+      { label: "Date", value: format(new Date(payment.created_at), "MMM d, yyyy") },
+      { label: "Buyer", value: profile?.full_name || "Recycler" },
+      ...(profile?.phone_number ? [{ label: "Phone", value: profile.phone_number }] : []),
+      { label: "Payment Phone", value: payment.phone_number },
+    ], y);
 
-    doc.text(`Invoice #: ${invNo}`, 20, 44);
-    doc.text(`Date: ${format(new Date(payment.created_at), "MMM d, yyyy")}`, 20, 51);
-    doc.text(`Buyer: ${profile?.full_name || "Recycler"}`, 20, 58);
-    if (profile?.phone_number) doc.text(`Phone: ${profile.phone_number}`, 20, 65);
-    doc.text(`Payment Phone: ${payment.phone_number}`, 20, 72);
+    y = drawTableHeader(doc, [
+      { label: "Description", x: 17 },
+      { label: "Amount (KES)", x: 150 },
+    ], y, 180);
 
-    let y = 88;
-    doc.setFillColor(34, 87, 62);
-    doc.rect(20, y - 5, 170, 8, "F");
-    doc.setTextColor(255);
-    doc.setFontSize(9);
-    doc.text("Description", 22, y);
-    doc.text("Amount (KES)", 150, y);
-    doc.setTextColor(0);
-    y += 10;
-    doc.text(payment.description || "Material Purchase", 22, y);
+    drawTableRow(doc, y, 0, 180);
+    doc.setFontSize(8);
+    doc.text(payment.description || "Material Purchase", 17, y);
     doc.text(Number(payment.amount).toLocaleString(), 150, y);
-    y += 14;
-    doc.line(20, y - 3, 190, y - 3);
-    doc.setFontSize(12);
-    doc.text(`Total: KES ${Number(payment.amount).toLocaleString()}`, 110, y + 5);
+    y += 10;
+
+    drawTotalLine(doc, `Total: KES ${Number(payment.amount).toLocaleString()}`, y);
+
     if (payment.mpesa_receipt_number) {
       y += 16;
       doc.setFontSize(9);
-      doc.text(`M-Pesa Receipt: ${payment.mpesa_receipt_number}`, 20, y);
+      doc.text(`M-Pesa Receipt: ${payment.mpesa_receipt_number}`, 15, y);
     }
-    doc.setFontSize(7);
-    doc.setTextColor(130);
-    doc.text("System-generated purchase invoice — Duara Flow", 20, 280);
+
+    await finalizePdf(doc);
     doc.save(`purchase-invoice-${invNo}.pdf`);
     toast.success("Invoice downloaded");
   };

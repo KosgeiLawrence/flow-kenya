@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Download, FileText, Printer } from "lucide-react";
 import { format } from "date-fns";
 import jsPDF from "jspdf";
+import { addBrandedHeader, addDocMeta, drawTableHeader, drawTableRow, drawTotalLine, finalizePdf } from "@/lib/pdfBranding";
 
 const BulkReceiptsPanel = () => {
   const { user, profile } = useAuth();
@@ -24,43 +25,32 @@ const BulkReceiptsPanel = () => {
     enabled: !!user,
   });
 
-  const downloadBulkReceipt = () => {
+  const downloadBulkReceipt = async () => {
     if (!payments?.length) return;
     const doc = new jsPDF();
     const today = format(new Date(), "MMM d, yyyy");
 
-    doc.setFontSize(20);
-    doc.text("Duara Flow", 20, 22);
-    doc.setFontSize(10);
-    doc.setTextColor(100);
-    doc.text("Bulk Payment Receipt", 20, 30);
-    doc.setTextColor(0);
+    let y = await addBrandedHeader(doc, "Bulk Payment Receipt", "Combined receipt for all completed payments");
 
-    doc.text(`Date: ${today}`, 20, 44);
-    doc.text(`Aggregator: ${profile?.full_name || "Aggregator"}`, 20, 51);
-    if (profile?.phone_number) doc.text(`Phone: ${profile.phone_number}`, 20, 58);
+    y = addDocMeta(doc, [
+      { label: "Date", value: today },
+      { label: "Aggregator", value: profile?.full_name || "Aggregator" },
+      ...(profile?.phone_number ? [{ label: "Phone", value: profile.phone_number }] : []),
+    ], y);
 
-    // Table header
-    let y = 72;
-    doc.setFillColor(34, 87, 62);
-    doc.rect(20, y - 5, 170, 8, "F");
-    doc.setTextColor(255);
-    doc.setFontSize(8);
-    doc.text("Date", 22, y);
-    doc.text("Phone", 55, y);
-    doc.text("Receipt #", 95, y);
-    doc.text("Amount (KES)", 145, y);
-    doc.setTextColor(0);
+    y = drawTableHeader(doc, [
+      { label: "Date", x: 17 },
+      { label: "Phone", x: 55 },
+      { label: "Receipt #", x: 95 },
+      { label: "Amount (KES)", x: 145 },
+    ], y, 180);
 
     let totalAmount = 0;
-    y += 8;
-    payments.forEach((p) => {
-      if (y > 270) {
-        doc.addPage();
-        y = 20;
-      }
+    payments.forEach((p, i) => {
+      if (y > 260) { doc.addPage(); y = 20; }
+      drawTableRow(doc, y, i, 180);
       doc.setFontSize(8);
-      doc.text(format(new Date(p.created_at), "MMM d, yy"), 22, y);
+      doc.text(format(new Date(p.created_at), "MMM d, yy"), 17, y);
       doc.text(p.phone_number, 55, y);
       doc.text(p.mpesa_receipt_number || "—", 95, y);
       doc.text(Number(p.amount).toLocaleString(), 145, y);
@@ -69,42 +59,32 @@ const BulkReceiptsPanel = () => {
     });
 
     y += 4;
-    doc.setDrawColor(200);
-    doc.line(20, y - 3, 190, y - 3);
-    doc.setFontSize(11);
-    doc.text(`Total: KES ${totalAmount.toLocaleString()}`, 120, y + 4);
+    drawTotalLine(doc, `Total: KES ${totalAmount.toLocaleString()}`, y);
 
-    doc.setFontSize(7);
-    doc.setTextColor(130);
-    doc.text("System-generated bulk receipt — Duara Flow", 20, 285);
-
+    await finalizePdf(doc);
     doc.save(`bulk-receipt-${format(new Date(), "yyyy-MM-dd")}.pdf`);
   };
 
-  const downloadSingleReceipt = (payment: any) => {
+  const downloadSingleReceipt = async (payment: any) => {
     const doc = new jsPDF();
-    doc.setFontSize(18);
-    doc.text("Duara Flow", 20, 22);
-    doc.setFontSize(10);
-    doc.setTextColor(100);
-    doc.text("Payment Receipt", 20, 30);
-    doc.setTextColor(0);
-    doc.setFontSize(10);
-    doc.text(`Date: ${format(new Date(payment.created_at), "MMM d, yyyy")}`, 20, 44);
-    doc.text(`Amount: KES ${Number(payment.amount).toLocaleString()}`, 20, 52);
-    doc.text(`Phone: ${payment.phone_number}`, 20, 60);
-    doc.text(`Receipt #: ${payment.mpesa_receipt_number || "N/A"}`, 20, 68);
-    doc.text(`Status: ${payment.status}`, 20, 76);
-    if (payment.description) doc.text(`Description: ${payment.description}`, 20, 84);
-    doc.setFontSize(8);
-    doc.setTextColor(130);
-    doc.text("System-generated receipt — Duara Flow", 20, 100);
+
+    let y = await addBrandedHeader(doc, "Payment Receipt");
+
+    y = addDocMeta(doc, [
+      { label: "Date", value: format(new Date(payment.created_at), "MMM d, yyyy") },
+      { label: "Amount", value: `KES ${Number(payment.amount).toLocaleString()}` },
+      { label: "Phone", value: payment.phone_number },
+      { label: "Receipt #", value: payment.mpesa_receipt_number || "N/A" },
+      { label: "Status", value: payment.status },
+      ...(payment.description ? [{ label: "Description", value: payment.description }] : []),
+    ], y);
+
+    await finalizePdf(doc);
     doc.save(`receipt-${payment.id.slice(0, 8)}.pdf`);
   };
 
   return (
     <div className="space-y-6">
-      {/* Bulk download */}
       <Card className="shadow-soft">
         <CardContent className="flex items-center justify-between p-5">
           <div className="flex items-center gap-3">
@@ -122,7 +102,6 @@ const BulkReceiptsPanel = () => {
         </CardContent>
       </Card>
 
-      {/* Individual receipts */}
       <Card className="shadow-soft">
         <CardHeader><CardTitle className="text-lg">Individual Receipts</CardTitle></CardHeader>
         <CardContent>
