@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import {
   LogOut, Package, ClipboardList, FileText, ClipboardCheck, TrendingUp,
   BarChart3, Leaf, Shield, Clock, CheckCircle2, AlertTriangle,
-  Menu, X, ChevronRight, ShoppingBag, Briefcase
+  Menu, X, ChevronRight, ShoppingBag, Briefcase, Settings
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
@@ -18,6 +18,7 @@ import ESGPanel from "@/components/dashboard/recycler/ESGPanel";
 import ComplianceDocsPanel from "@/components/dashboard/recycler/ComplianceDocsPanel";
 import ProductCatalogPanel from "@/components/dashboard/recycler/ProductCatalogPanel";
 import GrantsDiscoveryPanel from "@/components/dashboard/shared/GrantsDiscoveryPanel";
+import ProfileSettingsPanel from "@/components/dashboard/shared/ProfileSettingsPanel";
 
 const navItems = [
   { id: "inventory", label: "Inventory", icon: Package },
@@ -30,6 +31,7 @@ const navItems = [
   { id: "esg", label: "ESG & Carbon", icon: Leaf },
   { id: "compliance", label: "Compliance", icon: Shield },
   { id: "grants", label: "Grants & Programs", icon: Briefcase },
+  { id: "settings", label: "Profile Settings", icon: Settings },
 ];
 
 const statusConfig: Record<string, { icon: React.ElementType; label: string; color: string }> = {
@@ -64,6 +66,7 @@ const RecyclerDashboard = () => {
       case "esg": return <ESGPanel />;
       case "compliance": return <ComplianceDocsPanel />;
       case "grants": return <GrantsDiscoveryPanel />;
+      case "settings": return <ProfileSettingsPanel role="recycler" />;
       default: return <InventoryAccessPanel />;
     }
   };

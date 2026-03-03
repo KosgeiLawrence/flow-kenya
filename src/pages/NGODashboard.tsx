@@ -3,7 +3,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import {
   LogOut, Heart, BarChart3, Briefcase, FileText,
-  Clock, CheckCircle2, AlertTriangle, Menu, X, ChevronRight
+  Clock, CheckCircle2, AlertTriangle, Menu, X, ChevronRight, Settings
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
@@ -11,12 +11,14 @@ import SponsorshipPanel from "@/components/dashboard/ngo/SponsorshipPanel";
 import ImpactMetricsPanel from "@/components/dashboard/ngo/ImpactMetricsPanel";
 import GrantsPanel from "@/components/dashboard/ngo/GrantsPanel";
 import ReportsPanel from "@/components/dashboard/ngo/ReportsPanel";
+import ProfileSettingsPanel from "@/components/dashboard/shared/ProfileSettingsPanel";
 
 const navItems = [
   { id: "sponsorship", label: "Community & Pickers", icon: Heart },
   { id: "impact", label: "Impact & Mapping", icon: BarChart3 },
   { id: "grants", label: "Grants & Programs", icon: Briefcase },
   { id: "reports", label: "Reports", icon: FileText },
+  { id: "settings", label: "Profile Settings", icon: Settings },
 ];
 
 const statusConfig: Record<string, { icon: React.ElementType; label: string; color: string }> = {
@@ -45,6 +47,7 @@ const NGODashboard = () => {
       case "impact": return <ImpactMetricsPanel />;
       case "grants": return <GrantsPanel />;
       case "reports": return <ReportsPanel />;
+      case "settings": return <ProfileSettingsPanel role="ngo" />;
       default: return <SponsorshipPanel />;
     }
   };

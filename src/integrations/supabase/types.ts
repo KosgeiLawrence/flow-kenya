@@ -434,54 +434,99 @@ export type Database = {
       profiles: {
         Row: {
           approval_status: Database["public"]["Enums"]["approval_status"]
+          area_of_operation: string | null
           avatar_url: string | null
+          bank_account_number: string | null
+          bank_name: string | null
           company_registration: string | null
+          county: string | null
           created_at: string
+          daily_capacity_kg: number | null
           date_of_birth: string | null
           email: string | null
           full_name: string
           gender: string | null
           id: string
+          industry_sector: string | null
           is_independent: boolean | null
+          kra_pin: string | null
+          monthly_capacity_kg: number | null
+          mpesa_number: string | null
           national_id: string | null
           organization_id: string | null
+          payment_method: string | null
           phone_number: string | null
+          physical_address: string | null
+          social_media_links: Json | null
+          sub_county: string | null
           updated_at: string
           user_id: string
+          waste_categories: string[] | null
+          website: string | null
         }
         Insert: {
           approval_status?: Database["public"]["Enums"]["approval_status"]
+          area_of_operation?: string | null
           avatar_url?: string | null
+          bank_account_number?: string | null
+          bank_name?: string | null
           company_registration?: string | null
+          county?: string | null
           created_at?: string
+          daily_capacity_kg?: number | null
           date_of_birth?: string | null
           email?: string | null
           full_name: string
           gender?: string | null
           id?: string
+          industry_sector?: string | null
           is_independent?: boolean | null
+          kra_pin?: string | null
+          monthly_capacity_kg?: number | null
+          mpesa_number?: string | null
           national_id?: string | null
           organization_id?: string | null
+          payment_method?: string | null
           phone_number?: string | null
+          physical_address?: string | null
+          social_media_links?: Json | null
+          sub_county?: string | null
           updated_at?: string
           user_id: string
+          waste_categories?: string[] | null
+          website?: string | null
         }
         Update: {
           approval_status?: Database["public"]["Enums"]["approval_status"]
+          area_of_operation?: string | null
           avatar_url?: string | null
+          bank_account_number?: string | null
+          bank_name?: string | null
           company_registration?: string | null
+          county?: string | null
           created_at?: string
+          daily_capacity_kg?: number | null
           date_of_birth?: string | null
           email?: string | null
           full_name?: string
           gender?: string | null
           id?: string
+          industry_sector?: string | null
           is_independent?: boolean | null
+          kra_pin?: string | null
+          monthly_capacity_kg?: number | null
+          mpesa_number?: string | null
           national_id?: string | null
           organization_id?: string | null
+          payment_method?: string | null
           phone_number?: string | null
+          physical_address?: string | null
+          social_media_links?: Json | null
+          sub_county?: string | null
           updated_at?: string
           user_id?: string
+          waste_categories?: string[] | null
+          website?: string | null
         }
         Relationships: [
           {
