@@ -1,0 +1,68 @@
+/// <reference types="npm:@types/react@18.3.1" />
+
+import * as React from 'npm:react@18.3.1'
+
+import {
+  Body,
+  Button,
+  Container,
+  Head,
+  Heading,
+  Html,
+  Img,
+  Preview,
+  Section,
+  Text,
+} from 'npm:@react-email/components@0.0.22'
+
+interface MagicLinkEmailProps {
+  siteName: string
+  confirmationUrl: string
+}
+
+export const MagicLinkEmail = ({
+  siteName,
+  confirmationUrl,
+}: MagicLinkEmailProps) => (
+  <Html lang="en" dir="ltr">
+    <Head />
+    <Preview>Your Duara Flow sign-in link</Preview>
+    <Body style={main}>
+      <Container style={container}>
+        <Section style={logoSection}>
+          <Img src={LOGO_URL} width="44" height="44" alt="Duara Flow" style={logoImg} />
+          <Text style={logoText}>Duara Flow</Text>
+        </Section>
+        <Heading style={h1}>Your sign-in link</Heading>
+        <Text style={text}>
+          Click the button below to sign in to Duara Flow. This link will expire shortly.
+        </Text>
+        <Section style={buttonSection}>
+          <Button style={button} href={confirmationUrl}>
+            Sign In
+          </Button>
+        </Section>
+        <Text style={footer}>
+          If you didn't request this link, you can safely ignore this email.
+        </Text>
+        <Text style={footerBrand}>© Duara Flow · Circular Economy Traceability</Text>
+      </Container>
+    </Body>
+  </Html>
+)
+
+export default MagicLinkEmail
+
+const LOGO_URL = 'https://gbchyukefjnqhvajlehl.supabase.co/storage/v1/object/public/email-assets/duara-flow-logo.png'
+
+const main = { backgroundColor: '#ffffff', fontFamily: "'DM Sans', 'Segoe UI', Arial, sans-serif" }
+const container = { padding: '40px 32px', maxWidth: '480px', margin: '0 auto' }
+const logoSection = { display: 'flex' as const, alignItems: 'center' as const, gap: '10px', marginBottom: '32px' }
+const logoImg = { borderRadius: '8px' }
+const logoText = { fontSize: '18px', fontWeight: 'bold' as const, color: '#12211A', fontFamily: "'Space Grotesk', 'Segoe UI', Arial, sans-serif", margin: '0' }
+const h1 = { fontSize: '24px', fontWeight: 'bold' as const, color: '#12211A', fontFamily: "'Space Grotesk', 'Segoe UI', Arial, sans-serif", margin: '0 0 20px' }
+const text = { fontSize: '15px', color: '#677A6F', lineHeight: '1.6', margin: '0 0 20px' }
+const buttonSection = { margin: '8px 0 32px' }
+const button = { backgroundColor: '#D4A843', color: '#12211A', fontSize: '15px', fontWeight: '600' as const, borderRadius: '12px', padding: '14px 28px', textDecoration: 'none', fontFamily: "'Space Grotesk', 'Segoe UI', Arial, sans-serif" }
+const footer = { fontSize: '13px', color: '#999999', margin: '24px 0 0', lineHeight: '1.5' }
+const footerBrand = { fontSize: '12px', color: '#BBBBBB', margin: '16px 0 0' }
