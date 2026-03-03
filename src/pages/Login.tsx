@@ -1,8 +1,6 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { Loader2, Eye, EyeOff, X } from "lucide-react";
-import loginIllustration from "@/assets/login-illustration.png";
-import duaraLogo from "@/assets/duara-flow-logo.svg";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -52,18 +50,8 @@ const Login = () => {
   return (
     <div className="min-h-screen bg-background flex">
       {/* Left panel */}
-      <div className="hidden lg:flex lg:w-2/5 bg-hero items-center justify-center p-12 relative overflow-hidden">
-        <img
-          src={loginIllustration}
-          alt="Waste picker carrying recyclables"
-          className="absolute inset-0 w-full h-full object-cover opacity-20"
-        />
-        <div className="text-primary-foreground max-w-md relative z-10 text-center">
-          <img
-            src={duaraLogo}
-            alt="Duara Flow Logo"
-            className="w-40 h-40 object-contain mx-auto mb-6"
-          />
+      <div className="hidden lg:flex lg:w-2/5 bg-hero items-center justify-center p-12">
+        <div className="text-primary-foreground max-w-md">
           <h1 className="text-4xl font-display font-bold mb-4">Welcome Back</h1>
           <p className="text-lg opacity-90 font-body">
             Sign in to access your Duara Flow dashboard and continue tracking your impact.

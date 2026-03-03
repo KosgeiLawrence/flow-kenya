@@ -2,8 +2,6 @@ import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowLeft, ArrowRight, Loader2, Upload, Eye, EyeOff, X } from "lucide-react";
-import signupIllustration from "@/assets/signup-illustration.png";
-import duaraLogo from "@/assets/duara-flow-logo.svg";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -102,18 +100,8 @@ const Signup = () => {
   return (
     <div className="min-h-screen bg-background flex">
       {/* Left panel */}
-      <div className="hidden lg:flex lg:w-2/5 bg-hero items-center justify-center p-12 relative overflow-hidden">
-        <img
-          src={signupIllustration}
-          alt="Waste value chain workers collaborating"
-          className="absolute inset-0 w-full h-full object-cover opacity-20"
-        />
-        <div className="text-primary-foreground max-w-md relative z-10 text-center">
-          <img
-            src={duaraLogo}
-            alt="Duara Flow Logo"
-            className="w-40 h-40 object-contain mx-auto mb-6"
-          />
+      <div className="hidden lg:flex lg:w-2/5 bg-hero items-center justify-center p-12">
+        <div className="text-primary-foreground max-w-md">
           <h1 className="text-4xl font-display font-bold mb-4">Join Duara Flow</h1>
           <p className="text-lg opacity-90 font-body">
             Kenya's digital infrastructure for circular economy traceability. Connect with the waste value chain ecosystem.
