@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowLeft, ArrowRight, Loader2, Upload, Eye, EyeOff } from "lucide-react";
+import { ArrowLeft, ArrowRight, Loader2, Upload, Eye, EyeOff, X } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -124,7 +124,14 @@ const Signup = () => {
       </div>
 
       {/* Right panel */}
-      <div className="flex-1 flex items-center justify-center p-6 sm:p-12">
+      <div className="relative flex-1 flex items-center justify-center p-6 sm:p-12">
+        <button
+          onClick={() => navigate("/")}
+          className="absolute top-6 right-6 p-2 rounded-full hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
+          aria-label="Back to home"
+        >
+          <X className="w-5 h-5" />
+        </button>
         <div className="w-full max-w-lg">
           {/* Progress */}
           <div className="flex items-center gap-2 mb-8">
