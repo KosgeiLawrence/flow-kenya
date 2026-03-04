@@ -19,6 +19,7 @@ import ProfitAnalyticsPanel from "@/components/dashboard/aggregator/ProfitAnalyt
 import CompliancePanel from "@/components/dashboard/aggregator/CompliancePanel";
 import GrantsDiscoveryPanel from "@/components/dashboard/shared/GrantsDiscoveryPanel";
 import ProfileSettingsPanel from "@/components/dashboard/shared/ProfileSettingsPanel";
+import RequestedPickupsPanel from "@/components/dashboard/shared/RequestedPickupsPanel";
 
 const navItems = [
   { id: "pickers", label: "Waste Pickers", icon: Users },
@@ -30,6 +31,7 @@ const navItems = [
   { id: "invoices", label: "Invoices & Notes", icon: FileText },
   { id: "analytics", label: "Profit & Analytics", icon: BarChart3 },
   { id: "compliance", label: "Compliance", icon: Shield },
+  { id: "pickup-requests", label: "Pickup Requests", icon: Truck },
   { id: "grants", label: "Grants & Programs", icon: Briefcase },
   { id: "settings", label: "Profile Settings", icon: Settings },
 ];
@@ -65,6 +67,7 @@ const AggregatorDashboard = () => {
       case "invoices": return <InvoicesPanel />;
       case "analytics": return <ProfitAnalyticsPanel />;
       case "compliance": return <CompliancePanel />;
+      case "pickup-requests": return <RequestedPickupsPanel />;
       case "grants": return <GrantsDiscoveryPanel />;
       case "settings": return <ProfileSettingsPanel role="aggregator" />;
       default: return <WastePickerMgmtPanel />;
