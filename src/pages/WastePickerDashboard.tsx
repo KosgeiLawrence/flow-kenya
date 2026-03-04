@@ -20,7 +20,6 @@ import TrainingPanel from "@/components/dashboard/waste-picker/TrainingPanel";
 import GrantsDiscoveryPanel from "@/components/dashboard/shared/GrantsDiscoveryPanel";
 
 const navItems = [
-  { id: "profile", label: "Profile", icon: User },
   { id: "collection", label: "Collections", icon: Package },
   { id: "pricing", label: "Live Pricing", icon: DollarSign },
   { id: "earnings", label: "Earnings", icon: BarChart3 },
@@ -41,7 +40,7 @@ const statusConfig: Record<string, { icon: React.ElementType; label: string; col
 const WastePickerDashboard = () => {
   const { user, profile, signOut } = useAuth();
   const navigate = useNavigate();
-  const [activePanel, setActivePanel] = useState("profile");
+  const [activePanel, setActivePanel] = useState("collection");
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const status = statusConfig[profile?.approval_status || "pending"];
@@ -54,7 +53,6 @@ const WastePickerDashboard = () => {
 
   const renderPanel = () => {
     switch (activePanel) {
-      case "profile": return <ProfilePanel />;
       case "collection": return <CollectionPanel />;
       case "pricing": return <PricingPanel />;
       case "earnings": return <EarningsPanel />;
@@ -64,7 +62,7 @@ const WastePickerDashboard = () => {
       case "training": return <TrainingPanel />;
       case "grants": return <GrantsDiscoveryPanel />;
       case "settings": return <ProfileSettingsPanel role="waste_picker" />;
-      default: return <ProfilePanel />;
+      default: return <CollectionPanel />;
     }
   };
 
