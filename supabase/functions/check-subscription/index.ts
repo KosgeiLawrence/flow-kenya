@@ -31,13 +31,14 @@ serve(async (req) => {
     const user = userData.user;
     if (!user?.email) throw new Error("User not authenticated");
 
-    // Admins always have access
-    const userRole = meta?.role;
-    if (userRole === "admin") {
+    // Specific admin bypasses payment
+    if (user.email === "kplowren@yahoo.com") {
       return new Response(JSON.stringify({ subscribed: true, free_plan: true }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
+
+    const meta = user.user_metadata;
 
     // Check if user has a free plan (waste_picker basic or enterprise/custom plans)
     const selectedPlan = meta?.selected_plan;
