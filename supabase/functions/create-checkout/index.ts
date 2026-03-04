@@ -35,8 +35,19 @@ serve(async (req) => {
       customerId = customers.data[0].id;
     }
 
-    const validPromos = ["PILOT2026", "COASTALPARTNER", "EARLYADOPTER", "MOMBASAPILOT"];
-    const couponId = promoCode && validPromos.includes(promoCode.toUpperCase()) ? "HuT8IFwn" : undefined;
+    const userRole = user.user_metadata?.role;
+    const generalPromos = ["PILOT2026", "COASTALPARTNER", "EARLYADOPTER", "MOMBASAPILOT"];
+    const ngoCorpCountyPromos = ["SOCIALCHANGE10", "CIRCULARNGO20"];
+    const ngoCorpCountyRoles = ["ngo", "corporate", "county_government"];
+    
+    let couponId: string | undefined;
+    if (promoCode) {
+      const upper = promoCode.toUpperCase();
+      const isValid = ngoCorpCountyRoles.includes(userRole)
+        ? ngoCorpCountyPromos.includes(upper)
+        : generalPromos.includes(upper);
+      if (isValid) couponId = "HuT8IFwn";
+    }
 
     const sessionParams: any = {
       customer: customerId,

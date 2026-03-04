@@ -166,7 +166,20 @@ const pricingData: Record<AppRole, Plan[]> = {
   ],
 };
 
-const VALID_PROMOS = ["PILOT2026", "COASTALPARTNER", "EARLYADOPTER", "MOMBASAPILOT"];
+const GENERAL_PROMOS = ["PILOT2026", "COASTALPARTNER", "EARLYADOPTER", "MOMBASAPILOT"];
+const NGO_CORP_COUNTY_PROMOS = ["SOCIALCHANGE10", "CIRCULARNGO20"];
+const NGO_CORP_COUNTY_ROLES: AppRole[] = ["ngo", "corporate", "county_government"];
+
+const VALID_PROMOS = [...GENERAL_PROMOS, ...NGO_CORP_COUNTY_PROMOS];
+
+const isPromoValidForRole = (code: string, role: AppRole | null): boolean => {
+  if (!code || !role) return false;
+  const upper = code.toUpperCase();
+  if (NGO_CORP_COUNTY_ROLES.includes(role)) {
+    return NGO_CORP_COUNTY_PROMOS.includes(upper);
+  }
+  return GENERAL_PROMOS.includes(upper);
+};
 
 const roleColors: Record<AppRole, string> = {
   waste_picker: "border-emerald-500/30 bg-emerald-500/5",
@@ -281,5 +294,5 @@ const PricingPlans = ({ role, selectedPlan, onSelectPlan, promoCode, onPromoCode
   );
 };
 
-export { pricingData, VALID_PROMOS };
+export { pricingData, VALID_PROMOS, isPromoValidForRole };
 export default PricingPlans;
