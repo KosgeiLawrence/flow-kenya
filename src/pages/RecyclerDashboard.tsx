@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import {
   LogOut, Package, ClipboardList, FileText, ClipboardCheck, TrendingUp,
   BarChart3, Leaf, Shield, Clock, CheckCircle2, AlertTriangle,
-  Menu, X, ChevronRight, ShoppingBag, Briefcase, Settings
+  Menu, X, ChevronRight, ShoppingBag, Briefcase, Settings, Truck
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
@@ -19,6 +19,7 @@ import ComplianceDocsPanel from "@/components/dashboard/recycler/ComplianceDocsP
 import ProductCatalogPanel from "@/components/dashboard/recycler/ProductCatalogPanel";
 import GrantsDiscoveryPanel from "@/components/dashboard/shared/GrantsDiscoveryPanel";
 import ProfileSettingsPanel from "@/components/dashboard/shared/ProfileSettingsPanel";
+import RequestedPickupsPanel from "@/components/dashboard/shared/RequestedPickupsPanel";
 
 const navItems = [
   { id: "inventory", label: "Inventory", icon: Package },
@@ -30,6 +31,7 @@ const navItems = [
   { id: "forecast", label: "Supply Forecast", icon: BarChart3 },
   { id: "esg", label: "ESG & Carbon", icon: Leaf },
   { id: "compliance", label: "Compliance", icon: Shield },
+  { id: "pickup-requests", label: "Pickup Requests", icon: Truck },
   { id: "grants", label: "Grants & Programs", icon: Briefcase },
   { id: "settings", label: "Profile Settings", icon: Settings },
 ];
@@ -65,6 +67,7 @@ const RecyclerDashboard = () => {
       case "forecast": return <SupplyForecastPanel />;
       case "esg": return <ESGPanel />;
       case "compliance": return <ComplianceDocsPanel />;
+      case "pickup-requests": return <RequestedPickupsPanel />;
       case "grants": return <GrantsDiscoveryPanel />;
       case "settings": return <ProfileSettingsPanel role="recycler" />;
       default: return <InventoryAccessPanel />;

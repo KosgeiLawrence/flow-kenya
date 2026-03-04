@@ -14,6 +14,60 @@ export type Database = {
   }
   public: {
     Tables: {
+      client_collections: {
+        Row: {
+          client_email: string | null
+          client_name: string
+          client_phone: string | null
+          collection_date: string
+          created_at: string
+          id: string
+          location_name: string | null
+          material_type: string
+          notes: string | null
+          quantity_kg: number
+          status: string
+          total_amount: number
+          unit_price: number
+          updated_at: string
+          waste_picker_id: string
+        }
+        Insert: {
+          client_email?: string | null
+          client_name: string
+          client_phone?: string | null
+          collection_date?: string
+          created_at?: string
+          id?: string
+          location_name?: string | null
+          material_type: string
+          notes?: string | null
+          quantity_kg?: number
+          status?: string
+          total_amount?: number
+          unit_price?: number
+          updated_at?: string
+          waste_picker_id: string
+        }
+        Update: {
+          client_email?: string | null
+          client_name?: string
+          client_phone?: string | null
+          collection_date?: string
+          created_at?: string
+          id?: string
+          location_name?: string | null
+          material_type?: string
+          notes?: string | null
+          quantity_kg?: number
+          status?: string
+          total_amount?: number
+          unit_price?: number
+          updated_at?: string
+          waste_picker_id?: string
+        }
+        Relationships: []
+      }
       collections: {
         Row: {
           batch_id: string
@@ -347,6 +401,63 @@ export type Database = {
           result_description?: string | null
           status?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      pickup_requests: {
+        Row: {
+          created_at: string
+          id: string
+          location_name: string | null
+          material_type: string
+          notes: string | null
+          proposed_price_per_kg: number | null
+          quantity_kg: number
+          responded_at: string | null
+          response_notes: string | null
+          scheduled_date: string | null
+          status: string
+          target_role: string
+          target_user_id: string
+          total_amount: number | null
+          updated_at: string
+          waste_picker_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          location_name?: string | null
+          material_type: string
+          notes?: string | null
+          proposed_price_per_kg?: number | null
+          quantity_kg?: number
+          responded_at?: string | null
+          response_notes?: string | null
+          scheduled_date?: string | null
+          status?: string
+          target_role?: string
+          target_user_id: string
+          total_amount?: number | null
+          updated_at?: string
+          waste_picker_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          location_name?: string | null
+          material_type?: string
+          notes?: string | null
+          proposed_price_per_kg?: number | null
+          quantity_kg?: number
+          responded_at?: string | null
+          response_notes?: string | null
+          scheduled_date?: string | null
+          status?: string
+          target_role?: string
+          target_user_id?: string
+          total_amount?: number | null
+          updated_at?: string
+          waste_picker_id?: string
         }
         Relationships: []
       }
