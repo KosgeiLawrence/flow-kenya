@@ -934,31 +934,58 @@ export type Database = {
           category: string
           content_url: string | null
           created_at: string
+          created_by_user_id: string | null
+          creator_role: string
           description: string | null
           duration_minutes: number | null
           id: string
+          status: string
+          target_roles: string[]
           thumbnail_url: string | null
           title: string
+          training_date: string | null
+          training_time: string | null
+          training_type: string
+          updated_at: string
+          venue: string | null
         }
         Insert: {
           category?: string
           content_url?: string | null
           created_at?: string
+          created_by_user_id?: string | null
+          creator_role?: string
           description?: string | null
           duration_minutes?: number | null
           id?: string
+          status?: string
+          target_roles?: string[]
           thumbnail_url?: string | null
           title: string
+          training_date?: string | null
+          training_time?: string | null
+          training_type?: string
+          updated_at?: string
+          venue?: string | null
         }
         Update: {
           category?: string
           content_url?: string | null
           created_at?: string
+          created_by_user_id?: string | null
+          creator_role?: string
           description?: string | null
           duration_minutes?: number | null
           id?: string
+          status?: string
+          target_roles?: string[]
           thumbnail_url?: string | null
           title?: string
+          training_date?: string | null
+          training_time?: string | null
+          training_type?: string
+          updated_at?: string
+          venue?: string | null
         }
         Relationships: []
       }

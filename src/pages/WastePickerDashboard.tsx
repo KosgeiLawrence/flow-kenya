@@ -59,7 +59,7 @@ const WastePickerDashboard = () => {
       case "schedule": return <SchedulePanel />;
       case "analytics": return <AnalyticsPanel />;
       case "qr-id": return <QRIDPanel />;
-      case "training": return <TrainingPanel />;
+      case "training": return <TrainingPanel viewerRole="waste_picker" />;
       case "grants": return <GrantsDiscoveryPanel />;
       case "settings": return <ProfileSettingsPanel role="waste_picker" />;
       default: return <CollectionPanel />;
