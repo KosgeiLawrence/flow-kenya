@@ -29,19 +29,19 @@ const RequestedPickupsPanel = () => {
     enabled: !!user?.id,
   });
 
-  // Fetch waste picker names
-  const pickerIds = [...new Set(requests?.map(r => r.waste_picker_id) || [])];
+  // Fetch requester names (waste pickers and aggregators)
+  const requesterIds = [...new Set(requests?.map(r => r.waste_picker_id) || [])];
   const { data: pickerProfiles } = useQuery({
-    queryKey: ["picker_profiles", pickerIds],
+    queryKey: ["requester_profiles", requesterIds],
     queryFn: async () => {
-      if (!pickerIds.length) return [];
+      if (!requesterIds.length) return [];
       const { data } = await supabase
         .from("profiles")
         .select("user_id, full_name, phone_number, email, county")
-        .in("user_id", pickerIds);
+        .in("user_id", requesterIds);
       return data || [];
     },
-    enabled: pickerIds.length > 0,
+    enabled: requesterIds.length > 0,
   });
 
   // Realtime subscription
@@ -84,7 +84,7 @@ const RequestedPickupsPanel = () => {
   });
 
   const getPickerName = (pickerId: string) => {
-    return pickerProfiles?.find(p => p.user_id === pickerId)?.full_name || "Unknown Picker";
+    return pickerProfiles?.find(p => p.user_id === pickerId)?.full_name || "Unknown Requester";
   };
 
   const getPickerContact = (pickerId: string) => {
