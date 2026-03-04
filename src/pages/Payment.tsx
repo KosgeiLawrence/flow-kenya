@@ -6,7 +6,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { PLAN_PRICE_MAP, isFreePlan } from "@/lib/stripePlans";
-import { pricingData, VALID_PROMOS } from "@/components/auth/PricingPlans";
+import { pricingData, isPromoValidForRole } from "@/components/auth/PricingPlans";
 
 const Payment = () => {
   const navigate = useNavigate();
@@ -19,7 +19,8 @@ const Payment = () => {
 
   const selectedPlan = user?.user_metadata?.selected_plan || "";
   const promoCode = user?.user_metadata?.promo_code || "";
-  const promoValid = promoCode && VALID_PROMOS.includes(promoCode.toUpperCase());
+  const roleStr = role as "waste_picker" | "aggregator" | "recycler" | "ngo" | "corporate" | "county_government" | null;
+  const promoValid = promoCode ? isPromoValidForRole(promoCode, roleStr) : false;
   const freePlan = isFreePlan(selectedPlan);
 
   // Find plan details

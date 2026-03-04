@@ -11,7 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/hooks/use-toast";
 import RoleSelector from "@/components/auth/RoleSelector";
-import PricingPlans, { VALID_PROMOS } from "@/components/auth/PricingPlans";
+import PricingPlans, { isPromoValidForRole } from "@/components/auth/PricingPlans";
 
 type AppRole = "waste_picker" | "aggregator" | "recycler" | "ngo" | "corporate" | "county_government";
 
@@ -37,7 +37,7 @@ const Signup = () => {
   // Step 2: Plan
   const [selectedPlan, setSelectedPlan] = useState<string | null>(null);
   const [promoCode, setPromoCode] = useState("");
-  const promoValid = VALID_PROMOS.includes(promoCode);
+  const promoValid = isPromoValidForRole(promoCode, role);
 
   // Step 3: Personal info
   const [fullName, setFullName] = useState("");

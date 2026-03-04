@@ -41,13 +41,24 @@ serve(async (req) => {
       });
     }
 
-    // Check promo code in user metadata
+    // Check promo code in user metadata (role-aware)
     const promoCode = meta?.promo_code;
-    const validPromos = ["PILOT2026", "COASTALPARTNER", "EARLYADOPTER", "MOMBASAPILOT"];
-    if (promoCode && validPromos.includes(promoCode.toUpperCase())) {
-      return new Response(JSON.stringify({ subscribed: true, promo: true }), {
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
+    const userRole = meta?.role;
+    const generalPromos = ["PILOT2026", "COASTALPARTNER", "EARLYADOPTER", "MOMBASAPILOT"];
+    const ngoCorpCountyPromos = ["SOCIALCHANGE10", "CIRCULARNGO20"];
+    const ngoCorpCountyRoles = ["ngo", "corporate", "county_government"];
+
+    if (promoCode) {
+      const upper = promoCode.toUpperCase();
+      const isValid = ngoCorpCountyRoles.includes(userRole)
+        ? ngoCorpCountyPromos.includes(upper)
+        : generalPromos.includes(upper);
+
+      if (isValid) {
+        return new Response(JSON.stringify({ subscribed: true, promo: true }), {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
     }
 
     const stripe = new Stripe(stripeKey, { apiVersion: "2025-08-27.basil" });
