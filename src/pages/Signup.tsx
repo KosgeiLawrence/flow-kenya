@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowLeft, ArrowRight, Loader2, Upload, Eye, EyeOff, X } from "lucide-react";
+import { ArrowLeft, ArrowRight, Loader2, Eye, EyeOff, X } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -11,6 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/hooks/use-toast";
 import RoleSelector from "@/components/auth/RoleSelector";
+import PricingPlans, { VALID_PROMOS } from "@/components/auth/PricingPlans";
 
 type AppRole = "waste_picker" | "aggregator" | "recycler" | "ngo" | "corporate" | "county_government";
 
@@ -33,7 +34,12 @@ const Signup = () => {
   // Step 1: Role
   const [role, setRole] = useState<AppRole | null>(null);
 
-  // Step 2: Personal info
+  // Step 2: Plan
+  const [selectedPlan, setSelectedPlan] = useState<string | null>(null);
+  const [promoCode, setPromoCode] = useState("");
+  const promoValid = VALID_PROMOS.includes(promoCode);
+
+  // Step 3: Personal info
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
@@ -41,24 +47,30 @@ const Signup = () => {
   const [nationalId, setNationalId] = useState("");
   const [companyReg, setCompanyReg] = useState("");
 
-  // Step 3: Organization
+  // Step 4: Organization
   const [isIndependent, setIsIndependent] = useState(false);
   const [orgName, setOrgName] = useState("");
   const [orgType, setOrgType] = useState("");
   const [orgDescription, setOrgDescription] = useState("");
 
-  const totalSteps = 3;
+  const totalSteps = 4;
+
+  // Reset plan when role changes
+  const handleRoleSelect = (r: AppRole) => {
+    setRole(r);
+    setSelectedPlan(null);
+  };
 
   const canProceedStep1 = role !== null;
-  const canProceedStep2 = fullName.trim() && email.trim() && password.length >= 8;
-  const canProceedStep3 = role === "waste_picker" ? (isIndependent || orgName.trim()) : orgName.trim();
+  const canProceedStep2 = selectedPlan !== null;
+  const canProceedStep3 = fullName.trim() && email.trim() && password.length >= 8;
+  const canProceedStep4 = role === "waste_picker" ? (isIndependent || orgName.trim()) : orgName.trim();
 
   const handleSubmit = async () => {
-    if (!role) return;
+    if (!role || !selectedPlan) return;
     setLoading(true);
 
     try {
-      // Sign up with metadata — trigger handles profile, role, org creation
       const { error: authError } = await supabase.auth.signUp({
         email,
         password,
@@ -74,6 +86,8 @@ const Signup = () => {
             org_name: isIndependent ? null : orgName || null,
             org_type: isIndependent ? null : orgType || "private_company",
             org_description: isIndependent ? null : orgDescription || null,
+            selected_plan: selectedPlan,
+            promo_code: promoCode || null,
           },
         },
       });
@@ -124,18 +138,18 @@ const Signup = () => {
       </div>
 
       {/* Right panel */}
-      <div className="relative flex-1 flex items-center justify-center p-6 sm:p-12">
+      <div className="relative flex-1 flex items-center justify-center p-6 sm:p-12 overflow-y-auto">
         <button
           onClick={() => navigate("/")}
-          className="absolute top-6 right-6 p-2 rounded-full hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
+          className="absolute top-6 right-6 p-2 rounded-full hover:bg-muted text-muted-foreground hover:text-foreground transition-colors z-10"
           aria-label="Back to home"
         >
           <X className="w-5 h-5" />
         </button>
-        <div className="w-full max-w-lg">
+        <div className="w-full max-w-2xl">
           {/* Progress */}
           <div className="flex items-center gap-2 mb-8">
-            {[1, 2, 3].map((s) => (
+            {[1, 2, 3, 4].map((s) => (
               <div
                 key={s}
                 className={`h-1.5 flex-1 rounded-full transition-colors ${
@@ -146,11 +160,12 @@ const Signup = () => {
           </div>
 
           <AnimatePresence mode="wait">
+            {/* Step 1: Role Selection */}
             {step === 1 && (
               <motion.div key="step1" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
                 <h2 className="text-2xl font-display font-bold text-foreground mb-2">Select Your Role</h2>
                 <p className="text-muted-foreground mb-6">Choose the role that best describes your position in the waste value chain.</p>
-                <RoleSelector selected={role} onSelect={setRole} />
+                <RoleSelector selected={role} onSelect={handleRoleSelect} />
                 <div className="flex justify-end mt-6">
                   <Button onClick={() => setStep(2)} disabled={!canProceedStep1} className="gap-2">
                     Continue <ArrowRight className="w-4 h-4" />
@@ -159,8 +174,33 @@ const Signup = () => {
               </motion.div>
             )}
 
-            {step === 2 && (
+            {/* Step 2: Pricing Plan */}
+            {step === 2 && role && (
               <motion.div key="step2" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
+                <h2 className="text-2xl font-display font-bold text-foreground mb-2">Choose Your Plan</h2>
+                <p className="text-muted-foreground mb-6">Select the plan that fits your needs. You can upgrade anytime.</p>
+                <PricingPlans
+                  role={role}
+                  selectedPlan={selectedPlan}
+                  onSelectPlan={setSelectedPlan}
+                  promoCode={promoCode}
+                  onPromoCodeChange={setPromoCode}
+                  promoValid={promoValid}
+                />
+                <div className="flex justify-between mt-6">
+                  <Button variant="outline" onClick={() => setStep(1)} className="gap-2">
+                    <ArrowLeft className="w-4 h-4" /> Back
+                  </Button>
+                  <Button onClick={() => setStep(3)} disabled={!canProceedStep2} className="gap-2">
+                    Continue <ArrowRight className="w-4 h-4" />
+                  </Button>
+                </div>
+              </motion.div>
+            )}
+
+            {/* Step 3: Personal Info */}
+            {step === 3 && (
+              <motion.div key="step3" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
                 <h2 className="text-2xl font-display font-bold text-foreground mb-2">Personal Information</h2>
                 <p className="text-muted-foreground mb-6">Provide your details to create your account.</p>
                 <div className="space-y-4">
@@ -212,18 +252,19 @@ const Signup = () => {
                   )}
                 </div>
                 <div className="flex justify-between mt-6">
-                  <Button variant="outline" onClick={() => setStep(1)} className="gap-2">
+                  <Button variant="outline" onClick={() => setStep(2)} className="gap-2">
                     <ArrowLeft className="w-4 h-4" /> Back
                   </Button>
-                  <Button onClick={() => setStep(3)} disabled={!canProceedStep2} className="gap-2">
+                  <Button onClick={() => setStep(4)} disabled={!canProceedStep3} className="gap-2">
                     Continue <ArrowRight className="w-4 h-4" />
                   </Button>
                 </div>
               </motion.div>
             )}
 
-            {step === 3 && (
-              <motion.div key="step3" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
+            {/* Step 4: Organization */}
+            {step === 4 && (
+              <motion.div key="step4" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
                 <h2 className="text-2xl font-display font-bold text-foreground mb-2">Organization Information</h2>
                 <p className="text-muted-foreground mb-6">Link your account to an organization or register as independent.</p>
 
@@ -270,10 +311,10 @@ const Signup = () => {
                 )}
 
                 <div className="flex justify-between mt-6">
-                  <Button variant="outline" onClick={() => setStep(2)} className="gap-2">
+                  <Button variant="outline" onClick={() => setStep(3)} className="gap-2">
                     <ArrowLeft className="w-4 h-4" /> Back
                   </Button>
-                  <Button onClick={handleSubmit} disabled={loading || !canProceedStep3} className="gap-2">
+                  <Button onClick={handleSubmit} disabled={loading || !canProceedStep4} className="gap-2">
                     {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
                     Create Account
                   </Button>

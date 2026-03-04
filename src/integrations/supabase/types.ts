@@ -884,6 +884,51 @@ export type Database = {
         }
         Relationships: []
       }
+      subscriptions: {
+        Row: {
+          created_at: string
+          discount_percent: number
+          expires_at: string | null
+          id: string
+          plan_name: string
+          plan_tier: string
+          price_kes: number
+          promo_code: string | null
+          started_at: string
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          discount_percent?: number
+          expires_at?: string | null
+          id?: string
+          plan_name: string
+          plan_tier?: string
+          price_kes?: number
+          promo_code?: string | null
+          started_at?: string
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          discount_percent?: number
+          expires_at?: string | null
+          id?: string
+          plan_name?: string
+          plan_tier?: string
+          price_kes?: number
+          promo_code?: string | null
+          started_at?: string
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       training_resources: {
         Row: {
           category: string
