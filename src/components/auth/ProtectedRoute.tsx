@@ -22,8 +22,8 @@ const ProtectedRoute = ({ children, allowedRoles }: ProtectedRouteProps) => {
     return <Navigate to="/login" replace />;
   }
 
-  // Admins bypass payment; others redirect if not subscribed
-  if (subscribed === false && role !== "admin") {
+  // Specific admin bypasses payment; others redirect if not subscribed
+  if (subscribed === false && user?.email !== "kplowren@yahoo.com") {
     return <Navigate to="/payment" replace />;
   }
 
