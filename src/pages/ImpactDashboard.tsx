@@ -1,5 +1,3 @@
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
@@ -9,47 +7,53 @@ import { useNavigate } from "react-router-dom";
 import jsPDF from "jspdf";
 import { motion } from "framer-motion";
 import { addBrandedHeader, addDocMeta, addSectionTitle, drawTableHeader, drawTableRow, finalizePdf } from "@/lib/pdfBranding";
+import { usePlatformStats } from "@/hooks/usePlatformStats";
 
 const COLORS = ["hsl(152,45%,22%)", "hsl(40,55%,55%)", "hsl(195,60%,50%)", "hsl(25,30%,35%)", "hsl(0,84%,60%)", "hsl(280,45%,50%)"];
-const CO2_FACTORS: Record<string, number> = { "PET Plastic": 3.1, "HDPE Plastic": 2.8, "Glass": 0.6, "Aluminium": 9.1, "Paper/Cardboard": 1.1, "Organic Waste": 0.5 };
-const DEFAULT_CO2_FACTOR = 2.5;
 
 const ImpactDashboard = () => {
   const navigate = useNavigate();
+  const { derived } = usePlatformStats();
 
-  const { data: collections } = useQuery({ queryKey: ["impact-collections"], queryFn: async () => { const { data, error } = await supabase.from("collections").select("*, material_types(name, price_per_unit)"); if (error) throw error; return data; } });
-  const { data: payments } = useQuery({ queryKey: ["impact-payments"], queryFn: async () => { const { data, error } = await supabase.from("payments").select("*").eq("status", "completed"); if (error) throw error; return data; } });
-  const { data: profiles } = useQuery({ queryKey: ["impact-profiles"], queryFn: async () => { const { data, error } = await supabase.from("profiles").select("*"); if (error) throw error; return data; } });
-  const { data: roles } = useQuery({ queryKey: ["impact-roles"], queryFn: async () => { const { data, error } = await supabase.from("user_roles").select("*"); if (error) throw error; return data; } });
+  const d = derived ?? {
+    totalKg: 0, totalTons: 0, co2Avoided: 0, co2Tons: 0, waterSaved: 0,
+    landfillReduced: 0, energySaved: 0, incomeGenerated: 0, paymentsKes: 0,
+    totalCollections: 0, wastePickers: 0, aggregators: 0, recyclers: 0,
+    totalJobs: 0, totalUsers: 0, totalProfiles: 1, womenCount: 0, youthCount: 0,
+    womenRate: 0, youthRate: 0, collectionSites: 0, materials: [], monthlyTrend: [],
+  };
 
-  const totalKg = collections?.reduce((s, c) => s + Number(c.quantity), 0) || 0;
-  const totalTons = totalKg / 1000;
-  const incomeFromPayments = payments?.reduce((s, p) => s + Number(p.amount), 0) || 0;
-  const estimatedIncome = incomeFromPayments || collections?.reduce((s, c) => s + Number(c.quantity) * Number((c as any).material_types?.price_per_unit || 0), 0) || 0;
-  const co2Avoided = collections?.reduce((s, c) => { const name = (c as any).material_types?.name || ""; return s + Number(c.quantity) * (CO2_FACTORS[name] || DEFAULT_CO2_FACTOR); }, 0) || 0;
-  const wastePickers = roles?.filter((r) => r.role === "waste_picker").length || 0;
-  const aggregators = roles?.filter((r) => r.role === "aggregator").length || 0;
-  const recyclers = roles?.filter((r) => r.role === "recycler").length || 0;
-  const totalJobs = wastePickers + aggregators + recyclers;
-  const womenCount = profiles?.filter((p) => (p as any).gender === "female").length || 0;
-  const youthCount = profiles?.filter((p) => { const dob = (p as any).date_of_birth; if (!dob) return false; return (Date.now() - new Date(dob).getTime()) / (365.25 * 24 * 60 * 60 * 1000) < 35; }).length || 0;
-  const totalProfiles = profiles?.length || 1;
-  const womenRate = ((womenCount / totalProfiles) * 100).toFixed(1);
-  const youthRate = ((youthCount / totalProfiles) * 100).toFixed(1);
-
-  const materialMap: Record<string, { kg: number; co2: number }> = {};
-  collections?.forEach((c) => { const name = (c as any).material_types?.name || "Other"; const qty = Number(c.quantity); const factor = CO2_FACTORS[name] || DEFAULT_CO2_FACTOR; if (!materialMap[name]) materialMap[name] = { kg: 0, co2: 0 }; materialMap[name].kg += qty; materialMap[name].co2 += qty * factor; });
-  const materialData = Object.entries(materialMap).map(([name, v]) => ({ name, kg: Math.round(v.kg), co2: Math.round(v.co2) }));
+  const estimatedIncome = d.paymentsKes || d.incomeGenerated;
+  const materialData = d.materials.map((m) => ({ name: m.name, kg: Math.round(m.kg), co2: Math.round(m.co2) }));
 
   const monthlyTrend = (() => {
-    const months: Record<string, { kg: number; income: number; co2: number }> = {};
-    for (let i = 11; i >= 0; i--) { const d = new Date(); d.setMonth(d.getMonth() - i); months[`${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`] = { kg: 0, income: 0, co2: 0 }; }
-    collections?.forEach((c) => { const key = c.collected_at.slice(0, 7); if (months[key]) { const qty = Number(c.quantity); months[key].kg += qty; months[key].co2 += qty * (CO2_FACTORS[(c as any).material_types?.name || ""] || DEFAULT_CO2_FACTOR); months[key].income += qty * Number((c as any).material_types?.price_per_unit || 0); } });
-    return Object.entries(months).map(([month, v]) => ({ month: month.slice(5), kg: Math.round(v.kg), co2: Math.round(v.co2), income: Math.round(v.income) }));
+    const months: Record<string, { kg: number; co2: number; income: number }> = {};
+    for (let i = 11; i >= 0; i--) {
+      const dt = new Date();
+      dt.setMonth(dt.getMonth() - i);
+      months[`${dt.getFullYear()}-${String(dt.getMonth() + 1).padStart(2, "0")}`] = { kg: 0, co2: 0, income: 0 };
+    }
+    d.monthlyTrend.forEach((m) => {
+      if (months[m.month]) {
+        months[m.month].kg = Math.round(m.kg);
+        months[m.month].co2 = Math.round(m.co2);
+      }
+    });
+    return Object.entries(months).map(([month, v]) => ({ month: month.slice(5), ...v }));
   })();
 
-  const jobsData = [{ name: "Waste Pickers", value: wastePickers }, { name: "Aggregators", value: aggregators }, { name: "Recyclers", value: recyclers }].filter((d) => d.value > 0);
-  const chartConfig = { kg: { label: "Kg Collected", color: "hsl(152,45%,22%)" }, co2: { label: "CO₂ Avoided (kg)", color: "hsl(40,55%,55%)" }, income: { label: "Income (KES)", color: "hsl(195,60%,50%)" }, value: { label: "People", color: "hsl(152,45%,22%)" } };
+  const jobsData = [
+    { name: "Waste Pickers", value: d.wastePickers },
+    { name: "Aggregators", value: d.aggregators },
+    { name: "Recyclers", value: d.recyclers },
+  ].filter((x) => x.value > 0);
+
+  const chartConfig = {
+    kg: { label: "Kg Collected", color: "hsl(152,45%,22%)" },
+    co2: { label: "CO₂ Avoided (kg)", color: "hsl(40,55%,55%)" },
+    income: { label: "Income (KES)", color: "hsl(195,60%,50%)" },
+    value: { label: "People", color: "hsl(152,45%,22%)" },
+  };
 
   const exportReport = async () => {
     const doc = new jsPDF();
@@ -58,8 +62,14 @@ const ImpactDashboard = () => {
 
     y = addSectionTitle(doc, "Key Impact Metrics", y);
     doc.setFontSize(10);
-    [`Total Collected: ${totalTons.toFixed(1)} tonnes (${totalKg.toLocaleString()} kg)`, `Income Generated: KES ${estimatedIncome.toLocaleString()}`, `CO₂ Emissions Avoided: ${(co2Avoided / 1000).toFixed(2)} tonnes CO₂e`, `Jobs Created: ${totalJobs} (${wastePickers} pickers, ${aggregators} aggregators, ${recyclers} recyclers)`, `Women Participation: ${womenRate}% (${womenCount} participants)`, `Youth Participation (<35): ${youthRate}% (${youthCount} participants)`]
-      .forEach((m) => { doc.text(m, 20, y); y += 8; });
+    [
+      `Total Collected: ${d.totalTons.toFixed(1)} tonnes (${d.totalKg.toLocaleString()} kg)`,
+      `Income Generated: KES ${estimatedIncome.toLocaleString()}`,
+      `CO₂ Emissions Avoided: ${d.co2Tons.toFixed(2)} tonnes CO₂e`,
+      `Jobs Created: ${d.totalJobs} (${d.wastePickers} pickers, ${d.aggregators} aggregators, ${d.recyclers} recyclers)`,
+      `Women Participation: ${d.womenRate.toFixed(1)}% (${d.womenCount} participants)`,
+      `Youth Participation (<35): ${d.youthRate.toFixed(1)}% (${d.youthCount} participants)`,
+    ].forEach((m) => { doc.text(m, 20, y); y += 8; });
     y += 6;
 
     y = addSectionTitle(doc, "Material Breakdown", y);
@@ -96,7 +106,14 @@ const ImpactDashboard = () => {
 
       <main className="container mx-auto p-6 space-y-8">
         <motion.div {...fadeIn} className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
-          {[{ label: "Total Collected", value: `${totalTons.toFixed(1)}t`, sub: `${totalKg.toLocaleString()} kg`, icon: Recycle, color: "text-primary" }, { label: "Income Generated", value: `KES ${(estimatedIncome / 1000).toFixed(0)}K`, sub: `${estimatedIncome.toLocaleString()} total`, icon: DollarSign, color: "text-secondary" }, { label: "CO₂ Avoided", value: `${(co2Avoided / 1000).toFixed(1)}t`, sub: `${co2Avoided.toLocaleString()} kg CO₂e`, icon: Leaf, color: "text-primary" }, { label: "Jobs Created", value: totalJobs, sub: `${wastePickers} pickers`, icon: Users, color: "text-foreground" }, { label: "Women Rate", value: `${womenRate}%`, sub: `${womenCount} participants`, icon: Heart, color: "text-destructive" }, { label: "Youth Rate", value: `${youthRate}%`, sub: `${youthCount} under 35`, icon: TrendingUp, color: "text-secondary" }].map((kpi) => (
+          {[
+            { label: "Total Collected", value: `${d.totalTons.toFixed(1)}t`, sub: `${d.totalKg.toLocaleString()} kg`, icon: Recycle, color: "text-primary" },
+            { label: "Income Generated", value: `KES ${(estimatedIncome / 1000).toFixed(0)}K`, sub: `${estimatedIncome.toLocaleString()} total`, icon: DollarSign, color: "text-secondary" },
+            { label: "CO₂ Avoided", value: `${d.co2Tons.toFixed(1)}t`, sub: `${d.co2Avoided.toLocaleString()} kg CO₂e`, icon: Leaf, color: "text-primary" },
+            { label: "Jobs Created", value: d.totalJobs, sub: `${d.wastePickers} pickers`, icon: Users, color: "text-foreground" },
+            { label: "Women Rate", value: `${d.womenRate.toFixed(1)}%`, sub: `${d.womenCount} participants`, icon: Heart, color: "text-destructive" },
+            { label: "Youth Rate", value: `${d.youthRate.toFixed(1)}%`, sub: `${d.youthCount} under 35`, icon: TrendingUp, color: "text-secondary" },
+          ].map((kpi) => (
             <Card key={kpi.label} className="hover:shadow-soft transition-shadow"><CardContent className="p-5 text-center"><kpi.icon className={`w-7 h-7 mx-auto mb-2 ${kpi.color}`} /><p className="text-2xl font-display font-bold text-foreground">{kpi.value}</p><p className="text-xs text-muted-foreground mt-1">{kpi.label}</p><p className="text-[10px] text-muted-foreground/60">{kpi.sub}</p></CardContent></Card>
           ))}
         </motion.div>
