@@ -1,65 +1,42 @@
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
-import { Leaf, Factory, Droplets, Zap, TrendingUp, Users } from "lucide-react";
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, LineChart, Line } from "recharts";
-import { format, subMonths } from "date-fns";
+import { Leaf, Factory, Droplets, Zap, Users } from "lucide-react";
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
+import { usePlatformStats } from "@/hooks/usePlatformStats";
 
 const COLORS = ["hsl(152,45%,22%)", "hsl(40,55%,55%)", "hsl(195,60%,50%)", "hsl(25,30%,35%)", "hsl(0,84%,60%)"];
 
 const ESGAnalyticsPanel = () => {
-  const { data: collections } = useQuery({
-    queryKey: ["corp_esg_collections"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("collections")
-        .select("*, material_types(name, unit)")
-        .order("collected_at", { ascending: false });
-      if (error) throw error;
-      return data;
-    },
-  });
+  const { derived } = usePlatformStats();
 
-  const { data: pickers } = useQuery({
-    queryKey: ["corp_esg_pickers"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("profiles")
-        .select("id, user_roles!inner(role)")
-        .eq("user_roles.role", "waste_picker");
-      if (error) throw error;
-      return data;
-    },
-  });
-
-  const totalKg = collections?.reduce((s, c) => s + Number(c.quantity), 0) || 0;
-  const co2Saved = totalKg * 2.5;
-  const waterSaved = totalKg * 18;
-  const energySaved = totalKg * 5.8;
+  const d = derived ?? {
+    totalKg: 0, co2Avoided: 0, waterSaved: 0, energySaved: 0,
+    wastePickers: 0, materials: [], monthlyTrend: [],
+  };
 
   // ESG pillars
-  const envScore = Math.min(Math.round((totalKg / 5000) * 50 + 30), 100);
-  const socScore = Math.min(Math.round(((pickers?.length || 0) / 50) * 40 + 40), 100);
-  const govScore = 75; // baseline
+  const envScore = Math.min(Math.round((d.totalKg / 5000) * 50 + 30), 100);
+  const socScore = Math.min(Math.round((d.wastePickers / 50) * 40 + 40), 100);
+  const govScore = 75;
   const overallESG = Math.round((envScore + socScore + govScore) / 3);
 
-  // Monthly trend
-  const monthlyData = Array.from({ length: 12 }, (_, i) => {
-    const month = subMonths(new Date(), 11 - i);
-    const monthStr = format(month, "yyyy-MM");
-    const qty = collections?.filter((c) => format(new Date(c.collected_at), "yyyy-MM") === monthStr)
-      .reduce((s, c) => s + Number(c.quantity), 0) || 0;
-    return { month: format(month, "MMM"), kg: Math.round(qty), co2: Math.round(qty * 2.5) };
-  });
+  const monthlyData = (() => {
+    const months: Record<string, { kg: number; co2: number }> = {};
+    for (let i = 11; i >= 0; i--) {
+      const dt = new Date();
+      dt.setMonth(dt.getMonth() - i);
+      const key = `${dt.getFullYear()}-${String(dt.getMonth() + 1).padStart(2, "0")}`;
+      months[key] = { kg: 0, co2: 0 };
+    }
+    d.monthlyTrend.forEach((m) => {
+      if (months[m.month]) {
+        months[m.month] = { kg: Math.round(m.kg), co2: Math.round(m.co2) };
+      }
+    });
+    return Object.entries(months).map(([month, v]) => ({ month: month.slice(5), ...v }));
+  })();
 
-  // Material pie
-  const materialMap = new Map<string, number>();
-  collections?.forEach((c) => {
-    const name = (c as any).material_types?.name || "Unknown";
-    materialMap.set(name, (materialMap.get(name) || 0) + Number(c.quantity));
-  });
-  const pieData = Array.from(materialMap.entries()).map(([name, value]) => ({ name, value: Math.round(value) }));
+  const pieData = d.materials.map((m) => ({ name: m.name, value: Math.round(m.kg) }));
 
   return (
     <div className="space-y-6">
@@ -74,61 +51,29 @@ const ESGAnalyticsPanel = () => {
             </div>
           </div>
           <div className="grid grid-cols-3 gap-4">
-            <div>
-              <div className="flex items-center justify-between text-xs mb-1">
-                <span className="text-muted-foreground">Environmental</span>
-                <span className="font-medium text-foreground">{envScore}</span>
+            {[
+              { label: "Environmental", value: envScore },
+              { label: "Social", value: socScore },
+              { label: "Governance", value: govScore },
+            ].map((p) => (
+              <div key={p.label}>
+                <div className="flex items-center justify-between text-xs mb-1">
+                  <span className="text-muted-foreground">{p.label}</span>
+                  <span className="font-medium text-foreground">{p.value}</span>
+                </div>
+                <Progress value={p.value} className="h-2" />
               </div>
-              <Progress value={envScore} className="h-2" />
-            </div>
-            <div>
-              <div className="flex items-center justify-between text-xs mb-1">
-                <span className="text-muted-foreground">Social</span>
-                <span className="font-medium text-foreground">{socScore}</span>
-              </div>
-              <Progress value={socScore} className="h-2" />
-            </div>
-            <div>
-              <div className="flex items-center justify-between text-xs mb-1">
-                <span className="text-muted-foreground">Governance</span>
-                <span className="font-medium text-foreground">{govScore}</span>
-              </div>
-              <Progress value={govScore} className="h-2" />
-            </div>
+            ))}
           </div>
         </CardContent>
       </Card>
 
       {/* KPIs */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-        <Card className="shadow-soft">
-          <CardContent className="p-4 text-center">
-            <Factory className="w-6 h-6 text-primary mx-auto mb-1" />
-            <p className="text-lg font-bold text-foreground">{co2Saved.toFixed(0)}</p>
-            <p className="text-[10px] text-muted-foreground">kg CO₂ Offset</p>
-          </CardContent>
-        </Card>
-        <Card className="shadow-soft">
-          <CardContent className="p-4 text-center">
-            <Droplets className="w-6 h-6 text-sky mx-auto mb-1" />
-            <p className="text-lg font-bold text-foreground">{waterSaved.toLocaleString()}</p>
-            <p className="text-[10px] text-muted-foreground">Liters Water</p>
-          </CardContent>
-        </Card>
-        <Card className="shadow-soft">
-          <CardContent className="p-4 text-center">
-            <Zap className="w-6 h-6 text-accent mx-auto mb-1" />
-            <p className="text-lg font-bold text-foreground">{energySaved.toFixed(0)}</p>
-            <p className="text-[10px] text-muted-foreground">kWh Energy</p>
-          </CardContent>
-        </Card>
-        <Card className="shadow-soft">
-          <CardContent className="p-4 text-center">
-            <Users className="w-6 h-6 text-primary mx-auto mb-1" />
-            <p className="text-lg font-bold text-foreground">{pickers?.length || 0}</p>
-            <p className="text-[10px] text-muted-foreground">Livelihoods</p>
-          </CardContent>
-        </Card>
+        <Card className="shadow-soft"><CardContent className="p-4 text-center"><Factory className="w-6 h-6 text-primary mx-auto mb-1" /><p className="text-lg font-bold text-foreground">{d.co2Avoided.toFixed(0)}</p><p className="text-[10px] text-muted-foreground">kg CO₂ Offset</p></CardContent></Card>
+        <Card className="shadow-soft"><CardContent className="p-4 text-center"><Droplets className="w-6 h-6 text-sky mx-auto mb-1" /><p className="text-lg font-bold text-foreground">{d.waterSaved.toLocaleString()}</p><p className="text-[10px] text-muted-foreground">Liters Water</p></CardContent></Card>
+        <Card className="shadow-soft"><CardContent className="p-4 text-center"><Zap className="w-6 h-6 text-accent mx-auto mb-1" /><p className="text-lg font-bold text-foreground">{d.energySaved.toFixed(0)}</p><p className="text-[10px] text-muted-foreground">kWh Energy</p></CardContent></Card>
+        <Card className="shadow-soft"><CardContent className="p-4 text-center"><Users className="w-6 h-6 text-primary mx-auto mb-1" /><p className="text-lg font-bold text-foreground">{d.wastePickers}</p><p className="text-[10px] text-muted-foreground">Livelihoods</p></CardContent></Card>
       </div>
 
       {/* Charts */}

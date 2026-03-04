@@ -5,18 +5,18 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Leaf, Factory, Droplets, Zap, MapPin, Users, UserCheck, Heart } from "lucide-react";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
-import { format, subDays, differenceInYears } from "date-fns";
+import { format, subDays } from "date-fns";
+import { usePlatformStats } from "@/hooks/usePlatformStats";
+import { getCO2Avoided } from "@/lib/impactFactors";
 
 const COLORS = ["hsl(152,45%,22%)", "hsl(40,55%,55%)", "hsl(195,60%,50%)", "hsl(25,30%,35%)", "hsl(0,84%,60%)", "hsl(280,50%,50%)"];
-
-const CO2_FACTORS: Record<string, number> = {
-  PET: 3.1, HDPE: 1.9, LDPE: 2.0, PP: 1.7, PS: 3.3, Aluminium: 9.1, Glass: 0.6,
-};
 
 const ImpactMetricsPanel = () => {
   const [dateRange, setDateRange] = useState("all");
   const [materialFilter, setMaterialFilter] = useState("all");
+  const { derived } = usePlatformStats();
 
+  // NGO still needs detailed collection-level data for date/material filtering
   const { data: collections } = useQuery({
     queryKey: ["ngo_impact_collections"],
     queryFn: async () => {
@@ -24,18 +24,6 @@ const ImpactMetricsPanel = () => {
         .from("collections")
         .select("*, material_types(name, unit, price_per_unit)")
         .order("collected_at", { ascending: false });
-      if (error) throw error;
-      return data;
-    },
-  });
-
-  const { data: pickers } = useQuery({
-    queryKey: ["ngo_impact_pickers_full"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("profiles")
-        .select("id, full_name, gender, date_of_birth, approval_status, user_roles!inner(role)")
-        .eq("user_roles.role", "waste_picker");
       if (error) throw error;
       return data;
     },
@@ -58,25 +46,15 @@ const ImpactMetricsPanel = () => {
     return s + Number(c.quantity) * Number(mt?.price_per_unit || 0);
   }, 0);
 
-  // CO2 with material-specific factors
   const co2Saved = filtered.reduce((s, c) => {
     const name = (c as any).material_types?.name || "";
-    const factor = CO2_FACTORS[name] || 2.5;
-    return s + Number(c.quantity) * factor;
+    return s + getCO2Avoided(name, Number(c.quantity));
   }, 0);
 
-  // Women & youth metrics
-  const women = pickers?.filter(p => p.gender?.toLowerCase() === "female") || [];
-  const youth = pickers?.filter(p => {
-    if (!p.date_of_birth) return false;
-    return differenceInYears(new Date(), new Date(p.date_of_birth)) < 35;
-  }) || [];
+  // Use centralized stats for demographics
+  const d = derived ?? { womenCount: 0, youthCount: 0, waterSaved: 0, collectionSites: 0 };
 
-  // Unique locations
-  const locations = new Set(filtered.map(c => c.location_name).filter(Boolean));
   const uniqueCollectorIds = new Set(filtered.map(c => c.user_id));
-
-  // Material names for filter
   const materialNames = [...new Set(collections?.map(c => (c as any).material_types?.name).filter(Boolean) || [])];
 
   // 14-day trend
@@ -88,7 +66,6 @@ const ImpactMetricsPanel = () => {
     return { day: format(date, "dd"), qty: Math.round(qty) };
   });
 
-  // Material breakdown
   const materialMap = new Map<string, number>();
   filtered.forEach(c => {
     const name = (c as any).material_types?.name || "Unknown";
@@ -96,7 +73,7 @@ const ImpactMetricsPanel = () => {
   });
   const pieData = Array.from(materialMap.entries()).map(([name, value]) => ({ name, value: Math.round(value) }));
 
-  // Geo breakdown
+  const locations = new Set(filtered.map(c => c.location_name).filter(Boolean));
   const geoMap = new Map<string, number>();
   filtered.forEach(c => {
     const loc = c.location_name || "Unknown";
@@ -128,66 +105,18 @@ const ImpactMetricsPanel = () => {
 
       {/* KPIs */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-        <Card className="shadow-soft">
-          <CardContent className="p-4 text-center">
-            <Leaf className="w-6 h-6 text-primary mx-auto mb-1" />
-            <p className="text-lg font-bold text-foreground">{totalKg.toFixed(0)} kg</p>
-            <p className="text-[10px] text-muted-foreground">Total Collected</p>
-          </CardContent>
-        </Card>
-        <Card className="shadow-soft">
-          <CardContent className="p-4 text-center">
-            <Factory className="w-6 h-6 text-primary mx-auto mb-1" />
-            <p className="text-lg font-bold text-foreground">{co2Saved.toFixed(0)} kg</p>
-            <p className="text-[10px] text-muted-foreground">CO₂ Avoided</p>
-          </CardContent>
-        </Card>
-        <Card className="shadow-soft">
-          <CardContent className="p-4 text-center">
-            <Zap className="w-6 h-6 text-accent mx-auto mb-1" />
-            <p className="text-lg font-bold text-foreground">KES {totalIncome.toLocaleString()}</p>
-            <p className="text-[10px] text-muted-foreground">Income Generated</p>
-          </CardContent>
-        </Card>
-        <Card className="shadow-soft">
-          <CardContent className="p-4 text-center">
-            <Users className="w-6 h-6 text-primary mx-auto mb-1" />
-            <p className="text-lg font-bold text-foreground">{uniqueCollectorIds.size}</p>
-            <p className="text-[10px] text-muted-foreground">Livelihoods Supported</p>
-          </CardContent>
-        </Card>
+        <Card className="shadow-soft"><CardContent className="p-4 text-center"><Leaf className="w-6 h-6 text-primary mx-auto mb-1" /><p className="text-lg font-bold text-foreground">{totalKg.toFixed(0)} kg</p><p className="text-[10px] text-muted-foreground">Total Collected</p></CardContent></Card>
+        <Card className="shadow-soft"><CardContent className="p-4 text-center"><Factory className="w-6 h-6 text-primary mx-auto mb-1" /><p className="text-lg font-bold text-foreground">{co2Saved.toFixed(0)} kg</p><p className="text-[10px] text-muted-foreground">CO₂ Avoided</p></CardContent></Card>
+        <Card className="shadow-soft"><CardContent className="p-4 text-center"><Zap className="w-6 h-6 text-accent mx-auto mb-1" /><p className="text-lg font-bold text-foreground">KES {totalIncome.toLocaleString()}</p><p className="text-[10px] text-muted-foreground">Income Generated</p></CardContent></Card>
+        <Card className="shadow-soft"><CardContent className="p-4 text-center"><Users className="w-6 h-6 text-primary mx-auto mb-1" /><p className="text-lg font-bold text-foreground">{uniqueCollectorIds.size}</p><p className="text-[10px] text-muted-foreground">Livelihoods Supported</p></CardContent></Card>
       </div>
 
       {/* Women & Youth */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-        <Card className="shadow-soft">
-          <CardContent className="p-4 text-center">
-            <Heart className="w-6 h-6 text-accent mx-auto mb-1" />
-            <p className="text-lg font-bold text-foreground">{women.length}</p>
-            <p className="text-[10px] text-muted-foreground">Women Participants</p>
-          </CardContent>
-        </Card>
-        <Card className="shadow-soft">
-          <CardContent className="p-4 text-center">
-            <UserCheck className="w-6 h-6 text-primary mx-auto mb-1" />
-            <p className="text-lg font-bold text-foreground">{youth.length}</p>
-            <p className="text-[10px] text-muted-foreground">Youth (&lt;35 yrs)</p>
-          </CardContent>
-        </Card>
-        <Card className="shadow-soft">
-          <CardContent className="p-4 text-center">
-            <Droplets className="w-6 h-6 text-sky mx-auto mb-1" />
-            <p className="text-lg font-bold text-foreground">{(totalKg * 18).toLocaleString()}</p>
-            <p className="text-[10px] text-muted-foreground">Liters Water Saved</p>
-          </CardContent>
-        </Card>
-        <Card className="shadow-soft">
-          <CardContent className="p-4 text-center">
-            <MapPin className="w-6 h-6 text-muted-foreground mx-auto mb-1" />
-            <p className="text-lg font-bold text-foreground">{locations.size}</p>
-            <p className="text-[10px] text-muted-foreground">Collection Sites</p>
-          </CardContent>
-        </Card>
+        <Card className="shadow-soft"><CardContent className="p-4 text-center"><Heart className="w-6 h-6 text-accent mx-auto mb-1" /><p className="text-lg font-bold text-foreground">{d.womenCount}</p><p className="text-[10px] text-muted-foreground">Women Participants</p></CardContent></Card>
+        <Card className="shadow-soft"><CardContent className="p-4 text-center"><UserCheck className="w-6 h-6 text-primary mx-auto mb-1" /><p className="text-lg font-bold text-foreground">{d.youthCount}</p><p className="text-[10px] text-muted-foreground">Youth (&lt;35 yrs)</p></CardContent></Card>
+        <Card className="shadow-soft"><CardContent className="p-4 text-center"><Droplets className="w-6 h-6 text-sky mx-auto mb-1" /><p className="text-lg font-bold text-foreground">{(totalKg * 18).toLocaleString()}</p><p className="text-[10px] text-muted-foreground">Liters Water Saved</p></CardContent></Card>
+        <Card className="shadow-soft"><CardContent className="p-4 text-center"><MapPin className="w-6 h-6 text-muted-foreground mx-auto mb-1" /><p className="text-lg font-bold text-foreground">{locations.size}</p><p className="text-[10px] text-muted-foreground">Collection Sites</p></CardContent></Card>
       </div>
 
       {/* Charts */}

@@ -1,85 +1,45 @@
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, PieChart, Pie, Cell, LineChart, Line } from "recharts";
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, PieChart, Pie, Cell } from "recharts";
 import { Package, Users, DollarSign, Recycle } from "lucide-react";
+import { usePlatformStats } from "@/hooks/usePlatformStats";
 
 const COLORS = ["hsl(152,45%,22%)", "hsl(40,55%,55%)", "hsl(195,60%,50%)", "hsl(25,30%,35%)", "hsl(0,84%,60%)"];
 
 const PlatformAnalyticsPanel = () => {
-  const { data: collections } = useQuery({
-    queryKey: ["admin-collections"],
-    queryFn: async () => {
-      const { data, error } = await supabase.from("collections").select("*, material_types(name)");
-      if (error) throw error;
-      return data;
-    },
-  });
+  const { derived, stats } = usePlatformStats();
 
-  const { data: profiles } = useQuery({
-    queryKey: ["admin-profiles-analytics"],
-    queryFn: async () => {
-      const { data, error } = await supabase.from("profiles").select("*");
-      if (error) throw error;
-      return data;
-    },
-  });
+  const d = derived ?? {
+    totalKg: 0, totalTons: 0, totalCollections: 0, paymentsKes: 0,
+    totalUsers: 0, wastePickers: 0, aggregators: 0, recyclers: 0,
+    materials: [], monthlyTrend: [],
+  };
 
-  const { data: roles } = useQuery({
-    queryKey: ["admin-roles-analytics"],
-    queryFn: async () => {
-      const { data, error } = await supabase.from("user_roles").select("*");
-      if (error) throw error;
-      return data;
-    },
-  });
+  // Role distribution from centralized stats
+  const roleData = [
+    { name: "waste picker", value: Number(stats?.total_waste_pickers) || 0 },
+    { name: "aggregator", value: Number(stats?.total_aggregators) || 0 },
+    { name: "recycler", value: Number(stats?.total_recyclers) || 0 },
+    { name: "ngo", value: Number(stats?.total_ngos) || 0 },
+    { name: "corporate", value: Number(stats?.total_corporates) || 0 },
+    { name: "county gov", value: Number(stats?.total_county_gov) || 0 },
+  ].filter((r) => r.value > 0);
 
-  const { data: payments } = useQuery({
-    queryKey: ["admin-payments-analytics"],
-    queryFn: async () => {
-      const { data, error } = await supabase.from("payments").select("*");
-      if (error) throw error;
-      return data;
-    },
-  });
-
-  const totalWeight = collections?.reduce((s, c) => s + Number(c.quantity), 0) || 0;
-  const totalPayments = payments?.reduce((s, p) => s + Number(p.amount), 0) || 0;
-
-  // Role distribution
-  const roleCounts = roles?.reduce((acc, r) => {
-    acc[r.role] = (acc[r.role] || 0) + 1;
-    return acc;
-  }, {} as Record<string, number>) || {};
-
-  const roleData = Object.entries(roleCounts).map(([name, value]) => ({ name: name.replace("_", " "), value }));
-
-  // Daily collections (last 14 days)
-  const dailyData = (() => {
-    const days: Record<string, number> = {};
-    for (let i = 13; i >= 0; i--) {
-      const d = new Date();
-      d.setDate(d.getDate() - i);
-      days[d.toISOString().split("T")[0]] = 0;
+  // Monthly trend for chart (last 12 months)
+  const monthlyData = (() => {
+    const months: Record<string, number> = {};
+    for (let i = 11; i >= 0; i--) {
+      const dt = new Date();
+      dt.setMonth(dt.getMonth() - i);
+      months[`${dt.getFullYear()}-${String(dt.getMonth() + 1).padStart(2, "0")}`] = 0;
     }
-    collections?.forEach((c) => {
-      const day = c.collected_at.split("T")[0];
-      if (days[day] !== undefined) days[day] += Number(c.quantity);
+    d.monthlyTrend.forEach((m) => {
+      if (months[m.month] !== undefined) months[m.month] = Math.round(m.kg);
     });
-    return Object.entries(days).map(([date, kg]) => ({ date: date.slice(5), kg: Math.round(kg) }));
+    return Object.entries(months).map(([date, kg]) => ({ date: date.slice(5), kg }));
   })();
 
-  // Material breakdown
-  const materialBreakdown = (() => {
-    const map: Record<string, number> = {};
-    collections?.forEach((c) => {
-      const name = (c as any).material_types?.name || "Unknown";
-      map[name] = (map[name] || 0) + Number(c.quantity);
-    });
-    return Object.entries(map).map(([name, value]) => ({ name, value: Math.round(value) }));
-  })();
-
+  const materialBreakdown = d.materials.map((m) => ({ name: m.name, value: Math.round(m.kg) }));
   const chartConfig = { kg: { label: "Kg Collected", color: "hsl(152,45%,22%)" } };
 
   return (
@@ -91,10 +51,10 @@ const PlatformAnalyticsPanel = () => {
 
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         {[
-          { label: "Total Users", value: profiles?.length || 0, icon: Users, suffix: "" },
-          { label: "Total Collections", value: collections?.length || 0, icon: Package, suffix: "" },
-          { label: "Weight Collected", value: `${(totalWeight / 1000).toFixed(1)}`, icon: Recycle, suffix: " tons" },
-          { label: "Total Payments", value: `KES ${totalPayments.toLocaleString()}`, icon: DollarSign, suffix: "" },
+          { label: "Total Users", value: d.totalUsers, icon: Users, suffix: "" },
+          { label: "Total Collections", value: d.totalCollections, icon: Package, suffix: "" },
+          { label: "Weight Collected", value: `${d.totalTons.toFixed(1)}`, icon: Recycle, suffix: " tons" },
+          { label: "Total Payments", value: `KES ${d.paymentsKes.toLocaleString()}`, icon: DollarSign, suffix: "" },
         ].map((s) => (
           <Card key={s.label}>
             <CardContent className="p-4 flex items-center gap-3">
@@ -110,10 +70,10 @@ const PlatformAnalyticsPanel = () => {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <Card>
-          <CardHeader><CardTitle className="text-base">Daily Collections (14 days)</CardTitle></CardHeader>
+          <CardHeader><CardTitle className="text-base">Monthly Collections (12 months)</CardTitle></CardHeader>
           <CardContent>
             <ChartContainer config={chartConfig} className="h-[250px]">
-              <BarChart data={dailyData}>
+              <BarChart data={monthlyData}>
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey="date" fontSize={11} />
                 <YAxis fontSize={11} />

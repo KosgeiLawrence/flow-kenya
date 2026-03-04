@@ -1,21 +1,14 @@
 // Environmental impact factors per kg of material
-// Sources: EPA, IPCC, industry averages
-const CO2_FACTORS: Record<string, number> = {
-  PET: 3.1,
-  HDPE: 1.8,
-  LDPE: 2.0,
-  PP: 1.7,
-  PS: 3.0,
-  Aluminium: 9.1,
-  Glass: 0.6,
-  Paper: 1.1,
-  Cardboard: 0.9,
-  Metal: 4.5,
-  "Mixed Plastic": 2.5,
-};
+// DEPRECATED: Import from @/lib/impactFactors instead for new code.
+// This file is kept for backward compatibility with existing waste picker panels.
 
-const WATER_FACTOR = 17; // liters saved per kg recycled (average)
-const LANDFILL_FACTOR = 0.0012; // cubic meters per kg
+import {
+  CO2_FACTORS as FACTORS,
+  DEFAULT_CO2_FACTOR,
+  WATER_FACTOR,
+  LANDFILL_FACTOR,
+  getCO2Avoided,
+} from "@/lib/impactFactors";
 
 export interface ImpactMetrics {
   totalKg: number;
@@ -53,8 +46,7 @@ export function calculateImpact(
   const materialBreakdown: ImpactMetrics["materialBreakdown"] = [];
 
   materialMap.forEach((val, name) => {
-    const factor = CO2_FACTORS[name] || 2.0; // default factor
-    const co2 = val.kg * factor;
+    const co2 = getCO2Avoided(name, val.kg);
     co2Avoided += co2;
     materialBreakdown.push({ name, kg: val.kg, co2 });
   });
@@ -72,7 +64,6 @@ export function calculateImpact(
 }
 
 export function formatImpactMessage(kg: number, materialName?: string): string {
-  const factor = materialName ? (CO2_FACTORS[materialName] || 2.0) : 2.0;
-  const co2 = kg * factor;
+  const co2 = getCO2Avoided(materialName || "Unknown", kg);
   return `Your ${kg.toFixed(1)} kg saved ${co2.toFixed(1)} kg CO₂ from entering the atmosphere.`;
 }

@@ -1,15 +1,9 @@
 import { motion, useInView } from "framer-motion";
 import { useRef, useEffect, useState } from "react";
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
-
-const CO2_FACTORS: Record<string, number> = {
-  "PET Plastic": 3.1, "HDPE Plastic": 2.8, "Glass": 0.6,
-  "Aluminium": 9.1, "Paper/Cardboard": 1.1, "Organic Waste": 0.5,
-};
+import { usePlatformStats } from "@/hooks/usePlatformStats";
 
 const Counter = ({ target, suffix, inView }: { target: number; suffix: string; inView: boolean }) => {
   const [count, setCount] = useState(0);
@@ -38,38 +32,33 @@ const ImpactMetrics = () => {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: "-100px" });
   const navigate = useNavigate();
-
-  const { data: collections } = useQuery({
-    queryKey: ["landing-collections"],
-    queryFn: async () => {
-      const { data, error } = await supabase.from("collections").select("quantity, material_types(name)");
-      if (error) throw error;
-      return data;
-    },
-  });
-
-  const { data: roles } = useQuery({
-    queryKey: ["landing-roles"],
-    queryFn: async () => {
-      const { data, error } = await supabase.from("user_roles").select("role");
-      if (error) throw error;
-      return data;
-    },
-  });
-
-  const totalKg = collections?.reduce((s, c) => s + Number(c.quantity), 0) || 0;
-  const totalTons = totalKg / 1000;
-  const co2Tons = (collections?.reduce((s, c) => {
-    const name = (c as any).material_types?.name || "";
-    return s + Number(c.quantity) * (CO2_FACTORS[name] || 2.5);
-  }, 0) || 0) / 1000;
-  const wastePickers = roles?.filter((r) => r.role === "waste_picker").length || 0;
+  const { derived } = usePlatformStats();
 
   const metrics = [
-    { target: Math.max(Math.round(totalTons), 1), suffix: "+", label: "Tonnes Collected", unit: "tonnes" },
-    { target: Math.max(wastePickers, 1), suffix: "+", label: "Waste Pickers Empowered", unit: "people" },
-    { target: Math.max(Math.round(co2Tons), 1), suffix: "", label: "CO₂ Tonnes Avoided", unit: "tCO₂e" },
-    { target: roles?.length || 1, suffix: "+", label: "Platform Participants", unit: "users" },
+    {
+      target: Math.max(Math.round(derived?.totalTons ?? 0), 1),
+      suffix: "+",
+      label: "Tonnes Collected",
+      unit: "tonnes",
+    },
+    {
+      target: Math.max(derived?.wastePickers ?? 0, 1),
+      suffix: "+",
+      label: "Waste Pickers Empowered",
+      unit: "people",
+    },
+    {
+      target: Math.max(Math.round(derived?.co2Tons ?? 0), 1),
+      suffix: "",
+      label: "CO₂ Tonnes Avoided",
+      unit: "tCO₂e",
+    },
+    {
+      target: Math.max(derived?.totalUsers ?? 0, 1),
+      suffix: "+",
+      label: "Platform Participants",
+      unit: "users",
+    },
   ];
 
   return (
