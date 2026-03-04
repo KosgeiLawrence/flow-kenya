@@ -72,6 +72,18 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const checkSubscription = async () => {
     try {
       const { data, error } = await supabase.functions.invoke("check-subscription");
+      // If the user no longer exists (deleted), sign them out
+      if (data?.error === "user_not_found" || (error && String(error).includes("user_not_found"))) {
+        console.warn("User no longer exists, signing out...");
+        await supabase.auth.signOut();
+        setUser(null);
+        setSession(null);
+        setRole(null);
+        setProfile(null);
+        setSubscribed(null);
+        setCheckingSubscription(false);
+        return;
+      }
       if (!error && data) {
         setSubscribed(data.subscribed || data.free_plan || data.promo || false);
       } else {
@@ -90,6 +102,19 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         supabase.from("user_roles").select("role").eq("user_id", userId).single(),
         supabase.from("profiles").select("*").eq("user_id", userId).single(),
       ]);
+
+      // If both return no rows, user was likely deleted — sign out
+      if (roleRes.error && profileRes.error) {
+        console.warn("No profile/role found for user, signing out...");
+        await supabase.auth.signOut();
+        setUser(null);
+        setSession(null);
+        setRole(null);
+        setProfile(null);
+        setSubscribed(null);
+        setCheckingSubscription(false);
+        return;
+      }
 
       if (roleRes.data) setRole(roleRes.data.role as AppRole);
       if (profileRes.data) setProfile(profileRes.data as Profile);
