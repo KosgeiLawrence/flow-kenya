@@ -3,3 +3,7 @@ project_id = "gbchyukefjnqhvajlehl"
 [functions]
   [functions.auth-email-hook]
     verify_jwt = false
+  [functions.create-checkout]
+    verify_jwt = false
+  [functions.check-subscription]
+    verify_jwt = false

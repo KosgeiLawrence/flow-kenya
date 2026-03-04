@@ -19,6 +19,7 @@ import CorporateDashboard from "./pages/CorporateDashboard";
 import AdminDashboard from "./pages/AdminDashboard";
 import CountyGovernmentDashboard from "./pages/CountyGovernmentDashboard";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
+import Payment from "./pages/Payment";
 import NotFound from "./pages/NotFound";
 import Privacy from "./pages/Privacy";
 import Terms from "./pages/Terms";
@@ -39,6 +40,7 @@ const App = () => (
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<Signup />} />
             <Route path="/forgot-password" element={<ForgotPassword />} />
+            <Route path="/payment" element={<Payment />} />
             <Route path="/reset-password" element={<ResetPassword />} />
             <Route
               path="/dashboard/waste-picker/*"

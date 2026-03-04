@@ -8,9 +8,9 @@ interface ProtectedRouteProps {
 }
 
 const ProtectedRoute = ({ children, allowedRoles }: ProtectedRouteProps) => {
-  const { user, role, loading } = useAuth();
+  const { user, role, loading, subscribed, checkingSubscription } = useAuth();
 
-  if (loading) {
+  if (loading || checkingSubscription) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
         <Loader2 className="w-8 h-8 animate-spin text-primary" />
@@ -20,6 +20,11 @@ const ProtectedRoute = ({ children, allowedRoles }: ProtectedRouteProps) => {
 
   if (!user) {
     return <Navigate to="/login" replace />;
+  }
+
+  // If not subscribed (and not free/promo), redirect to payment
+  if (subscribed === false) {
+    return <Navigate to="/payment" replace />;
   }
 
   if (allowedRoles && role && !allowedRoles.includes(role)) {

@@ -42,6 +42,8 @@ interface AuthContextType {
   role: AppRole | null;
   profile: Profile | null;
   loading: boolean;
+  subscribed: boolean | null;
+  checkingSubscription: boolean;
   signOut: () => Promise<void>;
 }
 
@@ -51,6 +53,8 @@ const AuthContext = createContext<AuthContextType>({
   role: null,
   profile: null,
   loading: true,
+  subscribed: null,
+  checkingSubscription: true,
   signOut: async () => {},
 });
 
@@ -62,6 +66,23 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [role, setRole] = useState<AppRole | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
+  const [subscribed, setSubscribed] = useState<boolean | null>(null);
+  const [checkingSubscription, setCheckingSubscription] = useState(true);
+
+  const checkSubscription = async () => {
+    try {
+      const { data, error } = await supabase.functions.invoke("check-subscription");
+      if (!error && data) {
+        setSubscribed(data.subscribed || data.free_plan || data.promo || false);
+      } else {
+        setSubscribed(false);
+      }
+    } catch {
+      setSubscribed(false);
+    } finally {
+      setCheckingSubscription(false);
+    }
+  };
 
   const fetchUserData = async (userId: string) => {
     try {
@@ -84,10 +105,15 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         setUser(session?.user ?? null);
 
         if (session?.user) {
-          setTimeout(() => fetchUserData(session.user.id), 0);
+          setTimeout(() => {
+            fetchUserData(session.user.id);
+            checkSubscription();
+          }, 0);
         } else {
           setRole(null);
           setProfile(null);
+          setSubscribed(null);
+          setCheckingSubscription(false);
         }
         setLoading(false);
       }
@@ -98,6 +124,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       setUser(session?.user ?? null);
       if (session?.user) {
         fetchUserData(session.user.id);
+        checkSubscription();
+      } else {
+        setCheckingSubscription(false);
       }
       setLoading(false);
     });
@@ -111,10 +140,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setSession(null);
     setRole(null);
     setProfile(null);
+    setSubscribed(null);
   };
 
   return (
-    <AuthContext.Provider value={{ user, session, role, profile, loading, signOut }}>
+    <AuthContext.Provider value={{ user, session, role, profile, loading, subscribed, checkingSubscription, signOut }}>
       {children}
     </AuthContext.Provider>
   );
