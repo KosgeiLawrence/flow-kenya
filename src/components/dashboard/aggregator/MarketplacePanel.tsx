@@ -15,10 +15,19 @@ const MarketplacePanel = () => {
   const { data: recyclers } = useQuery({
     queryKey: ["recycler_profiles"],
     queryFn: async () => {
+      const { data: roleData, error: roleError } = await supabase
+        .from("user_roles")
+        .select("user_id")
+        .eq("role", "recycler");
+      if (roleError) throw roleError;
+      if (!roleData?.length) return [];
+
+      const userIds = roleData.map(r => r.user_id);
       const { data, error } = await supabase
         .from("profiles")
-        .select("*, user_roles!inner(role), organizations(name, type)")
-        .eq("user_roles.role", "recycler");
+        .select("*, organizations(name, type)")
+        .in("user_id", userIds)
+        .eq("approval_status", "approved");
       if (error) throw error;
       return data;
     },
