@@ -27,18 +27,9 @@ const WastePickerMgmtPanel = () => {
     enabled: !!user,
   });
 
-  // Fetch collection stats per picker
-  const { data: pickerCollections } = useQuery({
-    queryKey: ["picker_collection_stats"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("collections")
-        .select("user_id, quantity, material_types(price_per_unit)");
-      if (error) throw error;
-      return data;
-    },
-    enabled: !!user,
-  });
+  // Collection stats are only visible to the picker themselves or admins
+  // Aggregators can see picker profiles but not their collection details
+  const pickerCollections: any[] = [];
 
   const getPickerStats = (userId: string) => {
     const cols = pickerCollections?.filter(c => c.user_id === userId) || [];
