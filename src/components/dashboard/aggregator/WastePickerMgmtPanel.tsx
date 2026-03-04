@@ -17,10 +17,19 @@ const WastePickerMgmtPanel = () => {
   const { data: pickers, isLoading } = useQuery({
     queryKey: ["aggregator_pickers", user?.id],
     queryFn: async () => {
+      const { data: roleData, error: roleError } = await supabase
+        .from("user_roles")
+        .select("user_id")
+        .eq("role", "waste_picker");
+      if (roleError) throw roleError;
+      if (!roleData?.length) return [];
+
+      const userIds = roleData.map(r => r.user_id);
       const { data, error } = await supabase
         .from("profiles")
-        .select("*, user_roles!inner(role)")
-        .eq("user_roles.role", "waste_picker");
+        .select("*")
+        .in("user_id", userIds)
+        .eq("approval_status", "approved");
       if (error) throw error;
       return data;
     },
