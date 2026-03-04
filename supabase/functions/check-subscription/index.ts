@@ -31,8 +31,15 @@ serve(async (req) => {
     const user = userData.user;
     if (!user?.email) throw new Error("User not authenticated");
 
+    // Admins always have access
+    const userRole = meta?.role;
+    if (userRole === "admin") {
+      return new Response(JSON.stringify({ subscribed: true, free_plan: true }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
     // Check if user has a free plan (waste_picker basic or enterprise/custom plans)
-    const meta = user.user_metadata;
     const selectedPlan = meta?.selected_plan;
     const freePlans = ["wp_basic", "agg_enterprise", "rec_enterprise", "county_smart"];
     if (freePlans.includes(selectedPlan)) {
