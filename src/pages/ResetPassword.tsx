@@ -16,10 +16,14 @@ const ResetPassword = () => {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    // Check for recovery type in URL hash
+    // Supabase appends tokens in the URL hash after recovery link click.
+    // The auth client auto-exchanges the token for a session.
+    // If there's no recovery hash and no active session, redirect away.
     const hash = window.location.hash;
     if (!hash.includes("type=recovery")) {
-      navigate("/login");
+      supabase.auth.getSession().then(({ data: { session } }) => {
+        if (!session) navigate("/login");
+      });
     }
   }, [navigate]);
 
