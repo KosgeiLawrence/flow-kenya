@@ -36,6 +36,32 @@ const EMAIL_TEMPLATES: Record<string, React.ComponentType<any>> = {
 
 const SITE_NAME = "Duara Flow"
 const ROOT_DOMAIN = "duaraflow.co.ke"
+const CUSTOM_DOMAIN_ORIGIN = "https://duaraflow.co.ke"
+
+// Rewrite the confirmation URL so the redirect_to always points to our custom domain
+function rewriteConfirmationUrl(originalUrl: string, emailType: string): string {
+  try {
+    const url = new URL(originalUrl)
+
+    // Map email types to their correct redirect paths on the custom domain
+    const REDIRECT_PATHS: Record<string, string> = {
+      recovery: '/reset-password',
+      signup: '/auth/confirm',
+      magiclink: '/auth/confirm',
+      invite: '/auth/confirm',
+      email_change: '/auth/confirm',
+    }
+
+    const redirectPath = REDIRECT_PATHS[emailType]
+    if (redirectPath) {
+      url.searchParams.set('redirect_to', `${CUSTOM_DOMAIN_ORIGIN}${redirectPath}`)
+    }
+
+    return url.toString()
+  } catch {
+    return originalUrl
+  }
+}
 
 // SMTP configuration
 function createTransporter() {
@@ -195,11 +221,14 @@ async function handleWebhook(req: Request): Promise<Response> {
     )
   }
 
+  // Rewrite the confirmation URL to redirect to our custom domain
+  const rewrittenUrl = rewriteConfirmationUrl(payload.data.url, emailType)
+
   const templateProps = {
     siteName: SITE_NAME,
     siteUrl: `https://${ROOT_DOMAIN}`,
     recipient: payload.data.email,
-    confirmationUrl: payload.data.url,
+    confirmationUrl: rewrittenUrl,
     token: payload.data.token,
     email: payload.data.email,
     newEmail: payload.data.new_email,
