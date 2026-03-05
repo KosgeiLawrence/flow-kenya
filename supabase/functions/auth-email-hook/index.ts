@@ -1,7 +1,8 @@
 import * as React from 'npm:react@18.3.1'
 import { renderAsync } from 'npm:@react-email/components@0.0.22'
-import { sendLovableEmail, parseEmailWebhookPayload } from 'npm:@lovable.dev/email-js'
 import { WebhookError, verifyWebhookRequest } from 'npm:@lovable.dev/webhooks-js'
+import { parseEmailWebhookPayload } from 'npm:@lovable.dev/email-js'
+import nodemailer from 'nodemailer'
 import { SignupEmail } from '../_shared/email-templates/signup.tsx'
 import { InviteEmail } from '../_shared/email-templates/invite.tsx'
 import { MagicLinkEmail } from '../_shared/email-templates/magic-link.tsx'
@@ -24,7 +25,6 @@ const EMAIL_SUBJECTS: Record<string, string> = {
   reauthentication: 'Your verification code',
 }
 
-// Template mapping
 const EMAIL_TEMPLATES: Record<string, React.ComponentType<any>> = {
   signup: SignupEmail,
   invite: InviteEmail,
@@ -34,51 +34,29 @@ const EMAIL_TEMPLATES: Record<string, React.ComponentType<any>> = {
   reauthentication: ReauthenticationEmail,
 }
 
-// Configuration
 const SITE_NAME = "Duara Flow"
-const SENDER_DOMAIN = "notify.duaraflow.co.ke"
 const ROOT_DOMAIN = "duaraflow.co.ke"
-const FROM_DOMAIN = "duaraflow.co.ke" // Domain shown in From address (may be root or sender subdomain)
 
-// Sample data for preview mode ONLY (not used in actual email sending).
-// URLs are baked in at scaffold time from the project's real data.
-// The sample email uses a fixed placeholder (RFC 6761 .test TLD) so the Go backend
-// can always find-and-replace it with the actual recipient when sending test emails,
-// even if the project's domain has changed since the template was scaffolded.
-const SAMPLE_PROJECT_URL = "https://d2feccff-e481-4969-8f1b-77334e02f476.lovableproject.com"
-const SAMPLE_EMAIL = "user@example.test"
-const SAMPLE_DATA: Record<string, object> = {
-  signup: {
-    siteName: SITE_NAME,
-    siteUrl: SAMPLE_PROJECT_URL,
-    recipient: SAMPLE_EMAIL,
-    confirmationUrl: SAMPLE_PROJECT_URL,
-  },
-  magiclink: {
-    siteName: SITE_NAME,
-    confirmationUrl: SAMPLE_PROJECT_URL,
-  },
-  recovery: {
-    siteName: SITE_NAME,
-    confirmationUrl: SAMPLE_PROJECT_URL,
-  },
-  invite: {
-    siteName: SITE_NAME,
-    siteUrl: SAMPLE_PROJECT_URL,
-    confirmationUrl: SAMPLE_PROJECT_URL,
-  },
-  email_change: {
-    siteName: SITE_NAME,
-    email: SAMPLE_EMAIL,
-    newEmail: SAMPLE_EMAIL,
-    confirmationUrl: SAMPLE_PROJECT_URL,
-  },
-  reauthentication: {
-    token: '123456',
-  },
+// SMTP configuration
+function createTransporter() {
+  const host = Deno.env.get('SMTP_HOST')
+  const port = parseInt(Deno.env.get('SMTP_PORT') || '465')
+  const user = Deno.env.get('SMTP_USER')
+  const pass = Deno.env.get('SMTP_PASS')
+
+  if (!host || !user || !pass) {
+    throw new Error('SMTP credentials not configured')
+  }
+
+  return nodemailer.createTransport({
+    host,
+    port,
+    secure: port === 465,
+    auth: { user, pass },
+  })
 }
 
-// Preview endpoint handler - returns rendered HTML without sending email
+// Preview endpoint handler
 async function handlePreview(req: Request): Promise<Response> {
   const previewCorsHeaders = {
     'Access-Control-Allow-Origin': '*',
@@ -103,15 +81,25 @@ async function handlePreview(req: Request): Promise<Response> {
   try {
     const body = await req.json()
     type = body.type
-  } catch (error) {
-    return new Response(JSON.stringify({ error: 'Invalid JSON in request body' }), {
+  } catch {
+    return new Response(JSON.stringify({ error: 'Invalid JSON' }), {
       status: 400,
       headers: { ...previewCorsHeaders, 'Content-Type': 'application/json' },
     })
   }
 
-  const EmailTemplate = EMAIL_TEMPLATES[type]
+  const SAMPLE_PROJECT_URL = "https://d2feccff-e481-4969-8f1b-77334e02f476.lovableproject.com"
+  const SAMPLE_EMAIL = "user@example.test"
+  const SAMPLE_DATA: Record<string, object> = {
+    signup: { siteName: SITE_NAME, siteUrl: SAMPLE_PROJECT_URL, recipient: SAMPLE_EMAIL, confirmationUrl: SAMPLE_PROJECT_URL },
+    magiclink: { siteName: SITE_NAME, confirmationUrl: SAMPLE_PROJECT_URL },
+    recovery: { siteName: SITE_NAME, confirmationUrl: SAMPLE_PROJECT_URL },
+    invite: { siteName: SITE_NAME, siteUrl: SAMPLE_PROJECT_URL, confirmationUrl: SAMPLE_PROJECT_URL },
+    email_change: { siteName: SITE_NAME, email: SAMPLE_EMAIL, newEmail: SAMPLE_EMAIL, confirmationUrl: SAMPLE_PROJECT_URL },
+    reauthentication: { token: '123456' },
+  }
 
+  const EmailTemplate = EMAIL_TEMPLATES[type]
   if (!EmailTemplate) {
     return new Response(JSON.stringify({ error: `Unknown email type: ${type}` }), {
       status: 400,
@@ -128,7 +116,7 @@ async function handlePreview(req: Request): Promise<Response> {
   })
 }
 
-// Webhook handler - verifies signature and sends email
+// Webhook handler - verifies signature and sends email via SMTP
 async function handleWebhook(req: Request): Promise<Response> {
   const apiKey = Deno.env.get('LOVABLE_API_KEY')
 
@@ -140,7 +128,6 @@ async function handleWebhook(req: Request): Promise<Response> {
     )
   }
 
-  // Verify signature + timestamp, then parse payload.
   let payload: any
   let run_id = ''
   try {
@@ -184,10 +171,7 @@ async function handleWebhook(req: Request): Promise<Response> {
     console.error('Webhook payload missing run_id')
     return new Response(
       JSON.stringify({ error: 'Invalid webhook payload' }),
-      {
-        status: 400,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      }
+      { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     )
   }
 
@@ -195,15 +179,10 @@ async function handleWebhook(req: Request): Promise<Response> {
     console.error('Unsupported payload version', { version: payload.version, run_id })
     return new Response(
       JSON.stringify({ error: `Unsupported payload version: ${payload.version}` }),
-      {
-        status: 400,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      }
+      { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     )
   }
 
-  // The email action type is in payload.data.action_type (e.g., "signup", "recovery")
-  // payload.type is the hook event type ("auth")
   const emailType = payload.data.action_type
   console.log('Received auth event', { emailType, email: payload.data.email, run_id })
 
@@ -216,7 +195,6 @@ async function handleWebhook(req: Request): Promise<Response> {
     )
   }
 
-  // Build template props from payload.data (HookData structure)
   const templateProps = {
     siteName: SITE_NAME,
     siteUrl: `https://${ROOT_DOMAIN}`,
@@ -227,70 +205,49 @@ async function handleWebhook(req: Request): Promise<Response> {
     newEmail: payload.data.new_email,
   }
 
-  // Render React Email to HTML and plain text
   const html = await renderAsync(React.createElement(EmailTemplate, templateProps))
   const text = await renderAsync(React.createElement(EmailTemplate, templateProps), {
     plainText: true,
   })
 
-  // Send email via Lovable Email API
-  // The callback URL is provided in the payload by Lovable, ensuring correct routing
-  // for both production and local development
-  const callbackUrl = payload.data.callback_url
-  if (!callbackUrl) {
-    console.error('No callback_url in payload', { run_id })
-    return new Response(JSON.stringify({ error: 'Missing callback_url in payload' }), {
-      status: 400,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-    })
-  }
-
-  let result: { message_id?: string }
+  // Send email via SMTP
   try {
-    result = await sendLovableEmail(
-      {
-        run_id,
-        to: payload.data.email,
-        from: `${SITE_NAME} <noreply@${FROM_DOMAIN}>`,
-        sender_domain: SENDER_DOMAIN,
-        subject: EMAIL_SUBJECTS[emailType] || 'Notification',
-        html,
-        text,
-        purpose: 'transactional',
-      },
-      { apiKey, sendUrl: callbackUrl }
+    const transporter = createTransporter()
+    const info = await transporter.sendMail({
+      from: `Duara Flow <info@duaraflow.co.ke>`,
+      to: payload.data.email,
+      subject: EMAIL_SUBJECTS[emailType] || 'Notification',
+      html,
+      text,
+    })
+
+    console.log('Email sent via SMTP', { messageId: info.messageId, run_id })
+
+    return new Response(
+      JSON.stringify({ success: true, message_id: info.messageId }),
+      { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     )
   } catch (error) {
-    const message = error instanceof Error ? error.message : 'Failed to send email'
-    console.error('Email API error', { error: message, run_id })
+    const message = error instanceof Error ? error.message : 'Failed to send email via SMTP'
+    console.error('SMTP error', { error: message, run_id })
     return new Response(JSON.stringify({ error: 'Failed to send email' }), {
       status: 500,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     })
   }
-
-  console.log('Email sent successfully', { message_id: result.message_id, run_id })
-
-  return new Response(
-    JSON.stringify({ success: true, message_id: result.message_id }),
-    { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-  )
 }
 
 Deno.serve(async (req) => {
   const url = new URL(req.url)
 
-  // Handle CORS preflight for main endpoint
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders })
   }
 
-  // Route to preview handler for /preview path
   if (url.pathname.endsWith('/preview')) {
     return handlePreview(req)
   }
 
-  // Main webhook handler
   try {
     return await handleWebhook(req)
   } catch (error) {
