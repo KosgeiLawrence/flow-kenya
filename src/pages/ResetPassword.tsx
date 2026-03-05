@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Loader2, Eye, EyeOff } from "lucide-react";
+import { Loader2, Eye, EyeOff, CheckCircle2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -14,18 +14,59 @@ const ResetPassword = () => {
   const [confirm, setConfirm] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [ready, setReady] = useState(false);
+  const [checking, setChecking] = useState(true);
 
   useEffect(() => {
-    // Supabase appends tokens in the URL hash after recovery link click.
-    // The auth client auto-exchanges the token for a session.
-    // If there's no recovery hash and no active session, redirect away.
-    const hash = window.location.hash;
-    if (!hash.includes("type=recovery")) {
-      supabase.auth.getSession().then(({ data: { session } }) => {
-        if (!session) navigate("/login");
-      });
-    }
-  }, [navigate]);
+    // Listen for PASSWORD_RECOVERY event which fires when
+    // Supabase processes the recovery token from the URL hash.
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (event, session) => {
+        if (event === "PASSWORD_RECOVERY") {
+          setReady(true);
+          setChecking(false);
+        } else if (event === "SIGNED_IN" && session) {
+          // User may already have a session from a previously exchanged token
+          setReady(true);
+          setChecking(false);
+        }
+      }
+    );
+
+    // Also check if there's already a valid session (e.g. page refresh after token exchange)
+    const checkSession = async () => {
+      const hash = window.location.hash;
+      // If the hash contains recovery params, the onAuthStateChange will handle it
+      if (hash && (hash.includes("type=recovery") || hash.includes("access_token"))) {
+        // Give Supabase client time to process the hash
+        return;
+      }
+
+      // No hash — check for existing session
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session) {
+        setReady(true);
+        setChecking(false);
+      } else {
+        // No session, no recovery hash — redirect to login
+        setChecking(false);
+        toast({
+          title: "Invalid or expired reset link",
+          description: "Please request a new password reset.",
+          variant: "destructive",
+        });
+        navigate("/forgot-password");
+      }
+    };
+
+    // Delay the session check to give onAuthStateChange time to fire first
+    const timer = setTimeout(checkSession, 2000);
+
+    return () => {
+      subscription.unsubscribe();
+      clearTimeout(timer);
+    };
+  }, [navigate, toast]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -42,7 +83,9 @@ const ResetPassword = () => {
     try {
       const { error } = await supabase.auth.updateUser({ password });
       if (error) throw error;
-      toast({ title: "Password updated successfully" });
+      toast({ title: "Password updated successfully!" });
+      // Sign out so user logs in fresh with new password
+      await supabase.auth.signOut();
       navigate("/login");
     } catch (error: any) {
       toast({ title: "Error", description: error.message, variant: "destructive" });
@@ -50,6 +93,21 @@ const ResetPassword = () => {
       setLoading(false);
     }
   };
+
+  if (checking) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center p-6">
+        <div className="text-center">
+          <Loader2 className="w-8 h-8 animate-spin text-primary mx-auto mb-4" />
+          <p className="text-muted-foreground">Verifying your reset link…</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!ready) {
+    return null; // Will redirect via useEffect
+  }
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-6">
