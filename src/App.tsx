@@ -10,6 +10,7 @@ import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
+import AuthConfirm from "./pages/AuthConfirm";
 import Dashboard from "./pages/Dashboard";
 import WastePickerDashboard from "./pages/WastePickerDashboard";
 import AggregatorDashboard from "./pages/AggregatorDashboard";
@@ -42,6 +43,7 @@ const App = () => (
             <Route path="/forgot-password" element={<ForgotPassword />} />
             <Route path="/payment" element={<Payment />} />
             <Route path="/reset-password" element={<ResetPassword />} />
+            <Route path="/auth/confirm" element={<AuthConfirm />} />
             <Route
               path="/dashboard/waste-picker/*"
               element={
