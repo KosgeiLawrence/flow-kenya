@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import { Loader2, Eye, EyeOff, CheckCircle2 } from "lucide-react";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import { Loader2, Eye, EyeOff } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -10,6 +10,7 @@ import { useToast } from "@/hooks/use-toast";
 const ResetPassword = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const [searchParams] = useSearchParams();
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -18,37 +19,84 @@ const ResetPassword = () => {
   const [checking, setChecking] = useState(true);
 
   useEffect(() => {
-    // Listen for PASSWORD_RECOVERY event which fires when
-    // Supabase processes the recovery token from the URL hash.
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, session) => {
-        if (event === "PASSWORD_RECOVERY") {
+    const verifyToken = async () => {
+      // Check for token_hash in URL query params (direct link from email)
+      const tokenHash = searchParams.get("token_hash");
+      const type = searchParams.get("type");
+
+      if (tokenHash && type === "recovery") {
+        try {
+          const { error } = await supabase.auth.verifyOtp({
+            token_hash: tokenHash,
+            type: "recovery",
+          });
+          if (error) {
+            console.error("Token verification failed:", error.message);
+            toast({
+              title: "Invalid or expired reset link",
+              description: "Please request a new password reset.",
+              variant: "destructive",
+            });
+            navigate("/forgot-password");
+            return;
+          }
           setReady(true);
           setChecking(false);
-        } else if (event === "SIGNED_IN" && session) {
-          // User may already have a session from a previously exchanged token
-          setReady(true);
-          setChecking(false);
+          return;
+        } catch (err) {
+          console.error("Token verification error:", err);
+          toast({
+            title: "Invalid or expired reset link",
+            description: "Please request a new password reset.",
+            variant: "destructive",
+          });
+          navigate("/forgot-password");
+          return;
         }
       }
-    );
 
-    // Also check if there's already a valid session (e.g. page refresh after token exchange)
-    const checkSession = async () => {
+      // Fallback: check for hash fragment (old Supabase redirect flow)
       const hash = window.location.hash;
-      // If the hash contains recovery params, the onAuthStateChange will handle it
       if (hash && (hash.includes("type=recovery") || hash.includes("access_token"))) {
-        // Give Supabase client time to process the hash
+        // Listen for PASSWORD_RECOVERY event
+        const { data: { subscription } } = supabase.auth.onAuthStateChange(
+          (event) => {
+            if (event === "PASSWORD_RECOVERY") {
+              setReady(true);
+              setChecking(false);
+              subscription.unsubscribe();
+            }
+          }
+        );
+        // Give it time to process
+        setTimeout(() => {
+          if (!ready) {
+            supabase.auth.getSession().then(({ data: { session } }) => {
+              if (session) {
+                setReady(true);
+                setChecking(false);
+              } else {
+                setChecking(false);
+                toast({
+                  title: "Invalid or expired reset link",
+                  description: "Please request a new password reset.",
+                  variant: "destructive",
+                });
+                navigate("/forgot-password");
+              }
+            });
+          }
+          subscription.unsubscribe();
+        }, 3000);
         return;
       }
 
-      // No hash — check for existing session
+      // No token_hash and no hash fragment — check for existing session
       const { data: { session } } = await supabase.auth.getSession();
       if (session) {
         setReady(true);
         setChecking(false);
       } else {
-        // No session, no recovery hash — redirect to login
         setChecking(false);
         toast({
           title: "Invalid or expired reset link",
@@ -59,14 +107,8 @@ const ResetPassword = () => {
       }
     };
 
-    // Delay the session check to give onAuthStateChange time to fire first
-    const timer = setTimeout(checkSession, 2000);
-
-    return () => {
-      subscription.unsubscribe();
-      clearTimeout(timer);
-    };
-  }, [navigate, toast]);
+    verifyToken();
+  }, [searchParams, navigate, toast]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -84,7 +126,6 @@ const ResetPassword = () => {
       const { error } = await supabase.auth.updateUser({ password });
       if (error) throw error;
       toast({ title: "Password updated successfully!" });
-      // Sign out so user logs in fresh with new password
       await supabase.auth.signOut();
       navigate("/login");
     } catch (error: any) {
@@ -105,9 +146,7 @@ const ResetPassword = () => {
     );
   }
 
-  if (!ready) {
-    return null; // Will redirect via useEffect
-  }
+  if (!ready) return null;
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-6">

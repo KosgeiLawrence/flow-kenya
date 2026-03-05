@@ -221,14 +221,27 @@ async function handleWebhook(req: Request): Promise<Response> {
     )
   }
 
-  // Rewrite the confirmation URL to redirect to our custom domain
-  const rewrittenUrl = rewriteConfirmationUrl(payload.data.url, emailType)
+  // For recovery emails, bypass Supabase's verify endpoint entirely
+  // and link directly to our custom domain with the token_hash
+  let finalConfirmationUrl: string
+  if (emailType === 'recovery') {
+    // Extract token_hash from the Supabase verify URL
+    try {
+      const verifyUrl = new URL(payload.data.url)
+      const tokenHash = verifyUrl.searchParams.get('token')
+      finalConfirmationUrl = `${CUSTOM_DOMAIN_ORIGIN}/reset-password?token_hash=${tokenHash}&type=recovery`
+    } catch {
+      finalConfirmationUrl = rewriteConfirmationUrl(payload.data.url, emailType)
+    }
+  } else {
+    finalConfirmationUrl = rewriteConfirmationUrl(payload.data.url, emailType)
+  }
 
   const templateProps = {
     siteName: SITE_NAME,
     siteUrl: `https://${ROOT_DOMAIN}`,
     recipient: payload.data.email,
-    confirmationUrl: rewrittenUrl,
+    confirmationUrl: finalConfirmationUrl,
     token: payload.data.token,
     email: payload.data.email,
     newEmail: payload.data.new_email,
