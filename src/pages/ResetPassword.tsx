@@ -1,116 +1,76 @@
-import { useState, useEffect } from "react";
-import { useNavigate, useSearchParams, Link } from "react-router-dom";
-import { Loader2, Eye, EyeOff } from "lucide-react";
+import { useState, useEffect, useRef } from "react";
+import { Link, useSearchParams } from "react-router-dom";
+import { Loader2, Eye, EyeOff, CheckCircle2, AlertCircle } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 
+type PageState = "verifying" | "ready" | "success" | "error";
+
 const ResetPassword = () => {
-  const navigate = useNavigate();
   const { toast } = useToast();
   const [searchParams] = useSearchParams();
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [ready, setReady] = useState(false);
-  const [checking, setChecking] = useState(true);
-  const [verified, setVerified] = useState(false);
-  const [linkError, setLinkError] = useState<string | null>(null);
+  const [submitting, setSubmitting] = useState(false);
+  const [pageState, setPageState] = useState<PageState>("verifying");
+  const [errorMessage, setErrorMessage] = useState("");
+  const didVerify = useRef(false);
 
   useEffect(() => {
-    // Only run once
-    if (verified) return;
+    if (didVerify.current) return;
+    didVerify.current = true;
 
-    let cancelled = false;
-
-    const verifyToken = async () => {
+    const verify = async () => {
       const tokenHash = searchParams.get("token_hash");
       const type = searchParams.get("type");
 
+      // Path 1: Direct token_hash link (our custom recovery URL)
       if (tokenHash && type === "recovery") {
-        try {
-          const { error } = await supabase.auth.verifyOtp({
-            token_hash: tokenHash,
-            type: "recovery",
-          });
-          if (cancelled) return;
-          if (error) {
-            console.error("Token verification failed:", error.message);
-            setLinkError("Invalid or expired reset link. Please request a new one.");
-            setReady(false);
-            setChecking(false);
-            return;
-          }
-          setVerified(true);
-          setReady(true);
-          setChecking(false);
-          return;
-        } catch (err) {
-          if (cancelled) return;
-          console.error("Token verification error:", err);
-          setLinkError("Invalid or expired reset link. Please request a new one.");
-          setReady(false);
-          setChecking(false);
-          return;
+        const { error } = await supabase.auth.verifyOtp({
+          token_hash: tokenHash,
+          type: "recovery",
+        });
+        if (error) {
+          console.error("Token verification failed:", error.message);
+          setErrorMessage("This reset link has expired or has already been used.");
+          setPageState("error");
+        } else {
+          setPageState("ready");
         }
-      }
-
-      // Fallback: check for hash fragment (old Supabase redirect flow)
-      const hash = window.location.hash;
-      if (hash && (hash.includes("type=recovery") || hash.includes("access_token"))) {
-        const { data: { subscription } } = supabase.auth.onAuthStateChange(
-          (event) => {
-            if (event === "PASSWORD_RECOVERY") {
-              setVerified(true);
-              setReady(true);
-              setChecking(false);
-              subscription.unsubscribe();
-            }
-          }
-        );
-        setTimeout(() => {
-          if (cancelled) { subscription.unsubscribe(); return; }
-          supabase.auth.getSession().then(({ data: { session } }) => {
-            if (cancelled) return;
-            if (session) {
-              setVerified(true);
-              setReady(true);
-              setChecking(false);
-            } else {
-              setChecking(false);
-              setLinkError("Invalid or expired reset link. Please request a new one.");
-              setReady(false);
-              setChecking(false);
-            }
-          });
-          subscription.unsubscribe();
-        }, 3000);
         return;
       }
 
-      // No token — check for existing session
+      // Path 2: Hash fragment (legacy Supabase redirect with access_token)
+      const hash = window.location.hash;
+      if (hash && (hash.includes("type=recovery") || hash.includes("access_token"))) {
+        // Give Supabase client a moment to parse the hash and establish the session
+        await new Promise((resolve) => setTimeout(resolve, 2000));
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session) {
+          setPageState("ready");
+        } else {
+          setErrorMessage("This reset link has expired or has already been used.");
+          setPageState("error");
+        }
+        return;
+      }
+
+      // Path 3: No token at all — check if there's an existing session (e.g. PASSWORD_RECOVERY event)
       const { data: { session } } = await supabase.auth.getSession();
-      if (cancelled) return;
       if (session) {
-        setVerified(true);
-        setReady(true);
-        setChecking(false);
+        setPageState("ready");
       } else {
-        setChecking(false);
-        setLinkError("Invalid or expired reset link. Please request a new one.");
-        setReady(false);
-        setChecking(false);
+        setErrorMessage("No valid reset token found. Please request a new password reset link.");
+        setPageState("error");
       }
     };
 
-    verifyToken();
-
-    return () => { cancelled = true; };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    verify();
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -123,21 +83,21 @@ const ResetPassword = () => {
       return;
     }
 
-    setLoading(true);
+    setSubmitting(true);
     try {
       const { error } = await supabase.auth.updateUser({ password });
       if (error) throw error;
-      toast({ title: "Password updated successfully!" });
       await supabase.auth.signOut();
-      navigate("/login");
+      setPageState("success");
     } catch (error: any) {
       toast({ title: "Error", description: error.message, variant: "destructive" });
     } finally {
-      setLoading(false);
+      setSubmitting(false);
     }
   };
 
-  if (checking) {
+  // --- Verifying state ---
+  if (pageState === "verifying") {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center p-6">
         <div className="text-center">
@@ -148,12 +108,16 @@ const ResetPassword = () => {
     );
   }
 
-  if (linkError) {
+  // --- Error state ---
+  if (pageState === "error") {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center p-6">
         <div className="w-full max-w-md text-center">
-          <h2 className="text-2xl font-display font-bold text-foreground mb-2">Reset link invalid</h2>
-          <p className="text-muted-foreground mb-6">{linkError}</p>
+          <AlertCircle className="w-12 h-12 text-destructive mx-auto mb-4" />
+          <h2 className="text-2xl font-display font-bold text-foreground mb-2">
+            Reset Link Invalid
+          </h2>
+          <p className="text-muted-foreground mb-6">{errorMessage}</p>
           <Button asChild className="w-full">
             <Link to="/forgot-password">Request New Reset Link</Link>
           </Button>
@@ -162,29 +126,68 @@ const ResetPassword = () => {
     );
   }
 
-  if (!ready) return null;
+  // --- Success state ---
+  if (pageState === "success") {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center p-6">
+        <div className="w-full max-w-md text-center">
+          <CheckCircle2 className="w-12 h-12 text-primary mx-auto mb-4" />
+          <h2 className="text-2xl font-display font-bold text-foreground mb-2">
+            Password Updated!
+          </h2>
+          <p className="text-muted-foreground mb-6">
+            Your password has been changed successfully. You can now sign in with your new password.
+          </p>
+          <Button asChild className="w-full">
+            <Link to="/login">Go to Login</Link>
+          </Button>
+        </div>
+      </div>
+    );
+  }
 
+  // --- Ready state: show the password form ---
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-6">
       <div className="w-full max-w-md">
-        <h2 className="text-2xl font-display font-bold text-foreground mb-2">Set New Password</h2>
+        <h2 className="text-2xl font-display font-bold text-foreground mb-2">
+          Set New Password
+        </h2>
         <p className="text-muted-foreground mb-6">Enter your new password below.</p>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <Label htmlFor="password">New Password</Label>
             <div className="relative">
-              <Input id="password" type={showPassword ? "text" : "password"} value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Min. 8 characters" required />
-              <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground">
+              <Input
+                id="password"
+                type={showPassword ? "text" : "password"}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Min. 8 characters"
+                required
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+              >
                 {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
               </button>
             </div>
           </div>
           <div>
             <Label htmlFor="confirm">Confirm Password</Label>
-            <Input id="confirm" type="password" value={confirm} onChange={(e) => setConfirm(e.target.value)} placeholder="Confirm your password" required />
+            <Input
+              id="confirm"
+              type="password"
+              value={confirm}
+              onChange={(e) => setConfirm(e.target.value)}
+              placeholder="Confirm your password"
+              required
+            />
           </div>
-          <Button type="submit" className="w-full" disabled={loading}>
-            {loading && <Loader2 className="w-4 h-4 animate-spin mr-2" />}
+          <Button type="submit" className="w-full" disabled={submitting}>
+            {submitting && <Loader2 className="w-4 h-4 animate-spin mr-2" />}
             Update Password
           </Button>
         </form>
