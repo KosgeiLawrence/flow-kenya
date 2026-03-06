@@ -17,10 +17,15 @@ const ResetPassword = () => {
   const [loading, setLoading] = useState(false);
   const [ready, setReady] = useState(false);
   const [checking, setChecking] = useState(true);
+  const [verified, setVerified] = useState(false);
 
   useEffect(() => {
+    // Only run once
+    if (verified) return;
+
+    let cancelled = false;
+
     const verifyToken = async () => {
-      // Check for token_hash in URL query params (direct link from email)
       const tokenHash = searchParams.get("token_hash");
       const type = searchParams.get("type");
 
@@ -30,6 +35,7 @@ const ResetPassword = () => {
             token_hash: tokenHash,
             type: "recovery",
           });
+          if (cancelled) return;
           if (error) {
             console.error("Token verification failed:", error.message);
             toast({
@@ -40,10 +46,12 @@ const ResetPassword = () => {
             navigate("/forgot-password");
             return;
           }
+          setVerified(true);
           setReady(true);
           setChecking(false);
           return;
         } catch (err) {
+          if (cancelled) return;
           console.error("Token verification error:", err);
           toast({
             title: "Invalid or expired reset link",
@@ -58,42 +66,44 @@ const ResetPassword = () => {
       // Fallback: check for hash fragment (old Supabase redirect flow)
       const hash = window.location.hash;
       if (hash && (hash.includes("type=recovery") || hash.includes("access_token"))) {
-        // Listen for PASSWORD_RECOVERY event
         const { data: { subscription } } = supabase.auth.onAuthStateChange(
           (event) => {
             if (event === "PASSWORD_RECOVERY") {
+              setVerified(true);
               setReady(true);
               setChecking(false);
               subscription.unsubscribe();
             }
           }
         );
-        // Give it time to process
         setTimeout(() => {
-          if (!ready) {
-            supabase.auth.getSession().then(({ data: { session } }) => {
-              if (session) {
-                setReady(true);
-                setChecking(false);
-              } else {
-                setChecking(false);
-                toast({
-                  title: "Invalid or expired reset link",
-                  description: "Please request a new password reset.",
-                  variant: "destructive",
-                });
-                navigate("/forgot-password");
-              }
-            });
-          }
+          if (cancelled) { subscription.unsubscribe(); return; }
+          supabase.auth.getSession().then(({ data: { session } }) => {
+            if (cancelled) return;
+            if (session) {
+              setVerified(true);
+              setReady(true);
+              setChecking(false);
+            } else {
+              setChecking(false);
+              toast({
+                title: "Invalid or expired reset link",
+                description: "Please request a new password reset.",
+                variant: "destructive",
+              });
+              navigate("/forgot-password");
+            }
+          });
           subscription.unsubscribe();
         }, 3000);
         return;
       }
 
-      // No token_hash and no hash fragment — check for existing session
+      // No token — check for existing session
       const { data: { session } } = await supabase.auth.getSession();
+      if (cancelled) return;
       if (session) {
+        setVerified(true);
         setReady(true);
         setChecking(false);
       } else {
@@ -108,7 +118,10 @@ const ResetPassword = () => {
     };
 
     verifyToken();
-  }, [searchParams, navigate, toast]);
+
+    return () => { cancelled = true; };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
