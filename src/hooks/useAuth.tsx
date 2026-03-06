@@ -97,6 +97,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const fetchUserData = async (userId: string) => {
+    // Never fetch user data on the password reset page — it can trigger sign-out
+    if (window.location.pathname === '/reset-password') return;
+
     try {
       const [roleRes, profileRes] = await Promise.all([
         supabase.from("user_roles").select("role").eq("user_id", userId).single(),
