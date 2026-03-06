@@ -156,7 +156,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
       setUser(session?.user ?? null);
+
+      const isPasswordResetPage = window.location.pathname === '/reset-password';
       if (session?.user) {
+        if (isPasswordResetPage) {
+          setCheckingSubscription(false);
+          setLoading(false);
+          return;
+        }
         fetchUserData(session.user.id);
         checkSubscription();
       } else {
