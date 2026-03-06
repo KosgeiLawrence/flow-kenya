@@ -7,6 +7,16 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 
+/**
+ * Password Reset Flow:
+ * 1. User clicks reset link in email → lands here with token_hash param
+ * 2. Page reads the token from URL
+ * 3. Token is verified via supabase.auth.verifyOtp()
+ * 4. Verification creates an authenticated session
+ * 5. Password form appears
+ * 6. User sets new password → success
+ */
+
 type PageState = "verifying" | "ready" | "success" | "error";
 
 const ResetPassword = () => {
@@ -24,33 +34,43 @@ const ResetPassword = () => {
     if (didVerify.current) return;
     didVerify.current = true;
 
-    const verify = async () => {
+    const verifyToken = async () => {
+      // Step 1: Read token from URL
       const tokenHash = searchParams.get("token_hash");
       const type = searchParams.get("type");
 
-      // Path 1: Direct token_hash link (our custom recovery URL)
+      // Path A: Direct token_hash link (custom recovery URL from email)
       if (tokenHash && type === "recovery") {
+        console.log("Reset: verifying token_hash...");
+
+        // Step 2 & 3: Verify token → this creates a session automatically
         const { error } = await supabase.auth.verifyOtp({
           token_hash: tokenHash,
           type: "recovery",
         });
+
         if (error) {
           console.error("Token verification failed:", error.message);
           setErrorMessage("This reset link has expired or has already been used.");
           setPageState("error");
-        } else {
-          setPageState("ready");
+          return;
         }
+
+        // Step 4: Session is now active, show password form
+        console.log("Reset: token verified, session created. Showing form.");
+        setPageState("ready");
         return;
       }
 
-      // Path 2: Hash fragment (legacy Supabase redirect with access_token)
+      // Path B: Hash fragment (legacy Supabase redirect with access_token)
       const hash = window.location.hash;
       if (hash && (hash.includes("type=recovery") || hash.includes("access_token"))) {
-        // Give Supabase client a moment to parse the hash and establish the session
+        console.log("Reset: parsing hash fragment...");
+        // Give Supabase client time to parse hash and establish session
         await new Promise((resolve) => setTimeout(resolve, 2000));
         const { data: { session } } = await supabase.auth.getSession();
         if (session) {
+          console.log("Reset: session found from hash. Showing form.");
           setPageState("ready");
         } else {
           setErrorMessage("This reset link has expired or has already been used.");
@@ -59,9 +79,10 @@ const ResetPassword = () => {
         return;
       }
 
-      // Path 3: No token at all — check if there's an existing session (e.g. PASSWORD_RECOVERY event)
+      // Path C: No token — check for existing recovery session
       const { data: { session } } = await supabase.auth.getSession();
       if (session) {
+        console.log("Reset: existing session found. Showing form.");
         setPageState("ready");
       } else {
         setErrorMessage("No valid reset token found. Please request a new password reset link.");
@@ -69,9 +90,10 @@ const ResetPassword = () => {
       }
     };
 
-    verify();
+    verifyToken();
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
+  // Step 5 & 6: User submits new password
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (password !== confirm) {
@@ -87,6 +109,8 @@ const ResetPassword = () => {
     try {
       const { error } = await supabase.auth.updateUser({ password });
       if (error) throw error;
+
+      // Sign out to force a clean login with new credentials
       await supabase.auth.signOut();
       setPageState("success");
     } catch (error: any) {
@@ -146,7 +170,7 @@ const ResetPassword = () => {
     );
   }
 
-  // --- Ready state: show the password form ---
+  // --- Ready state: password form (Step 5) ---
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-6">
       <div className="w-full max-w-md">
