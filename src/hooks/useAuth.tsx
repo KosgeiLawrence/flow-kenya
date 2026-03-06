@@ -60,6 +60,9 @@ const AuthContext = createContext<AuthContextType>({
 
 export const useAuth = () => useContext(AuthContext);
 
+// Helper: is the user currently on the password-reset page?
+const isOnResetPage = () => window.location.pathname === "/reset-password";
+
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
@@ -72,7 +75,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const checkSubscription = async () => {
     try {
       const { data, error } = await supabase.functions.invoke("check-subscription");
-      // If the user no longer exists (deleted), sign them out
       if (data?.error === "user_not_found" || (error && String(error).includes("user_not_found"))) {
         console.warn("User no longer exists, signing out...");
         await supabase.auth.signOut();
@@ -97,16 +99,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const fetchUserData = async (userId: string) => {
-    // Never fetch user data on the password reset page — it can trigger sign-out
-    if (window.location.pathname === '/reset-password') return;
-
     try {
       const [roleRes, profileRes] = await Promise.all([
         supabase.from("user_roles").select("role").eq("user_id", userId).single(),
         supabase.from("profiles").select("*").eq("user_id", userId).single(),
       ]);
 
-      // If both return no rows, user was likely deleted — sign out
       if (roleRes.error && profileRes.error) {
         console.warn("No profile/role found for user, signing out...");
         await supabase.auth.signOut();
@@ -127,23 +125,22 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   useEffect(() => {
+    // 1. Listen for auth state changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
-        // On password reset page, never run profile/subscription logic that may force redirects
-        const isPasswordResetPage = window.location.pathname === '/reset-password';
-        if (isPasswordResetPage) {
-          setSession(session);
-          setUser(session?.user ?? null);
+      async (_event, newSession) => {
+        setSession(newSession);
+        setUser(newSession?.user ?? null);
+
+        // On the reset-password page, NEVER run profile/subscription fetches.
+        // The ResetPassword page manages its own session lifecycle.
+        if (isOnResetPage()) {
           setLoading(false);
           return;
         }
 
-        setSession(session);
-        setUser(session?.user ?? null);
-
-        if (session?.user) {
+        if (newSession?.user) {
           setTimeout(() => {
-            fetchUserData(session.user.id);
+            fetchUserData(newSession.user.id);
             checkSubscription();
           }, 0);
         } else {
@@ -156,18 +153,20 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       }
     );
 
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      setUser(session?.user ?? null);
+    // 2. Check for existing session on mount
+    supabase.auth.getSession().then(({ data: { session: existingSession } }) => {
+      setSession(existingSession);
+      setUser(existingSession?.user ?? null);
 
-      const isPasswordResetPage = window.location.pathname === '/reset-password';
-      if (session?.user) {
-        if (isPasswordResetPage) {
-          setCheckingSubscription(false);
-          setLoading(false);
-          return;
-        }
-        fetchUserData(session.user.id);
+      if (isOnResetPage()) {
+        // Don't fetch profile/subscription on reset page
+        setCheckingSubscription(false);
+        setLoading(false);
+        return;
+      }
+
+      if (existingSession?.user) {
+        fetchUserData(existingSession.user.id);
         checkSubscription();
       } else {
         setCheckingSubscription(false);
