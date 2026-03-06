@@ -129,9 +129,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
-        // Skip redirect/processing when on the password reset page
+        // On password reset page, never run profile/subscription logic that may force redirects
         const isPasswordResetPage = window.location.pathname === '/reset-password';
-        if (isPasswordResetPage && (event === 'SIGNED_IN' || event === 'PASSWORD_RECOVERY')) {
+        if (isPasswordResetPage) {
           setSession(session);
           setUser(session?.user ?? null);
           setLoading(false);
