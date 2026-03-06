@@ -225,11 +225,20 @@ async function handleWebhook(req: Request): Promise<Response> {
   // and link directly to our custom domain with the token_hash
   let finalConfirmationUrl: string
   if (emailType === 'recovery') {
-    // Extract token_hash from the Supabase verify URL
+    // Extract token hash safely from any recovery URL variant
     try {
       const verifyUrl = new URL(payload.data.url)
-      const tokenHash = verifyUrl.searchParams.get('token')
-      finalConfirmationUrl = `${CUSTOM_DOMAIN_ORIGIN}/reset-password?token_hash=${tokenHash}&type=recovery`
+      const tokenHash =
+        verifyUrl.searchParams.get('token_hash') ??
+        verifyUrl.searchParams.get('token') ??
+        payload.data.token ??
+        ''
+
+      if (tokenHash) {
+        finalConfirmationUrl = `${CUSTOM_DOMAIN_ORIGIN}/reset-password?token_hash=${encodeURIComponent(tokenHash)}&type=recovery`
+      } else {
+        finalConfirmationUrl = rewriteConfirmationUrl(payload.data.url, emailType)
+      }
     } catch {
       finalConfirmationUrl = rewriteConfirmationUrl(payload.data.url, emailType)
     }
