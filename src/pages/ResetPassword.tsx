@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useNavigate, useSearchParams, Link } from "react-router-dom";
 import { Loader2, Eye, EyeOff } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -18,6 +18,7 @@ const ResetPassword = () => {
   const [ready, setReady] = useState(false);
   const [checking, setChecking] = useState(true);
   const [verified, setVerified] = useState(false);
+  const [linkError, setLinkError] = useState<string | null>(null);
 
   useEffect(() => {
     // Only run once
@@ -38,12 +39,9 @@ const ResetPassword = () => {
           if (cancelled) return;
           if (error) {
             console.error("Token verification failed:", error.message);
-            toast({
-              title: "Invalid or expired reset link",
-              description: "Please request a new password reset.",
-              variant: "destructive",
-            });
-            navigate("/forgot-password");
+            setLinkError("Invalid or expired reset link. Please request a new one.");
+            setReady(false);
+            setChecking(false);
             return;
           }
           setVerified(true);
@@ -53,12 +51,9 @@ const ResetPassword = () => {
         } catch (err) {
           if (cancelled) return;
           console.error("Token verification error:", err);
-          toast({
-            title: "Invalid or expired reset link",
-            description: "Please request a new password reset.",
-            variant: "destructive",
-          });
-          navigate("/forgot-password");
+          setLinkError("Invalid or expired reset link. Please request a new one.");
+          setReady(false);
+          setChecking(false);
           return;
         }
       }
@@ -86,12 +81,9 @@ const ResetPassword = () => {
               setChecking(false);
             } else {
               setChecking(false);
-              toast({
-                title: "Invalid or expired reset link",
-                description: "Please request a new password reset.",
-                variant: "destructive",
-              });
-              navigate("/forgot-password");
+              setLinkError("Invalid or expired reset link. Please request a new one.");
+              setReady(false);
+              setChecking(false);
             }
           });
           subscription.unsubscribe();
@@ -108,12 +100,9 @@ const ResetPassword = () => {
         setChecking(false);
       } else {
         setChecking(false);
-        toast({
-          title: "Invalid or expired reset link",
-          description: "Please request a new password reset.",
-          variant: "destructive",
-        });
-        navigate("/forgot-password");
+        setLinkError("Invalid or expired reset link. Please request a new one.");
+        setReady(false);
+        setChecking(false);
       }
     };
 
@@ -154,6 +143,20 @@ const ResetPassword = () => {
         <div className="text-center">
           <Loader2 className="w-8 h-8 animate-spin text-primary mx-auto mb-4" />
           <p className="text-muted-foreground">Verifying your reset link…</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (linkError) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center p-6">
+        <div className="w-full max-w-md text-center">
+          <h2 className="text-2xl font-display font-bold text-foreground mb-2">Reset link invalid</h2>
+          <p className="text-muted-foreground mb-6">{linkError}</p>
+          <Button asChild className="w-full">
+            <Link to="/forgot-password">Request New Reset Link</Link>
+          </Button>
         </div>
       </div>
     );
