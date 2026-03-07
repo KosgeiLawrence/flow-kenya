@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import {
-  LogOut, Heart, BarChart3, Briefcase, FileText,
+  LogOut, Heart, BarChart3, Briefcase, FileText, Package,
   Clock, CheckCircle2, AlertTriangle, Menu, X, ChevronRight, Settings, BookOpen
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
