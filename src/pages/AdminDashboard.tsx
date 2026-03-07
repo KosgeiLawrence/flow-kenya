@@ -13,6 +13,7 @@ import SystemSettingsPanel from "@/components/dashboard/admin/SystemSettingsPane
 import CountyWasteFlowPanel from "@/components/dashboard/admin/CountyWasteFlowPanel";
 import ProfileSettingsPanel from "@/components/dashboard/shared/ProfileSettingsPanel";
 import TrainingManagementPanel from "@/components/dashboard/shared/TrainingManagementPanel";
+import CleanupExercisePanel from "@/components/dashboard/shared/CleanupExercisePanel";
 
 const navItems = [
   { id: "users", label: "User Verification", icon: Users },
@@ -22,6 +23,7 @@ const navItems = [
   { id: "audit", label: "Audit Logs", icon: FileText },
   { id: "county-flow", label: "County Waste Flow", icon: MapPin },
   { id: "settings", label: "System Settings", icon: Settings },
+  { id: "cleanup", label: "All Cleanups", icon: MapPin },
   { id: "training-mgmt", label: "Training Management", icon: BookOpen },
   { id: "profile-settings", label: "Profile Settings", icon: User },
 ];
@@ -46,6 +48,7 @@ const AdminDashboard = () => {
       case "audit": return <AuditLogsPanel />;
       case "county-flow": return <CountyWasteFlowPanel />;
       case "settings": return <SystemSettingsPanel />;
+      case "cleanup": return <CleanupExercisePanel isAdmin />;
       case "training-mgmt": return <TrainingManagementPanel />;
       case "profile-settings": return <ProfileSettingsPanel role="admin" />;
       default: return <UserVerificationPanel />;

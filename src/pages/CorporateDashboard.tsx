@@ -20,6 +20,7 @@ import SustainabilityReportPanel from "@/components/dashboard/corporate/Sustaina
 import CorporateSettingsPanel from "@/components/dashboard/corporate/CorporateSettingsPanel";
 import ProfileSettingsPanel from "@/components/dashboard/shared/ProfileSettingsPanel";
 import TrainingManagementPanel from "@/components/dashboard/shared/TrainingManagementPanel";
+import CleanupExercisePanel from "@/components/dashboard/shared/CleanupExercisePanel";
 
 const navItems = [
   { id: "footprint", label: "Plastic Footprint", icon: Package },
@@ -32,6 +33,7 @@ const navItems = [
   { id: "carbon", label: "Carbon Tracker", icon: Factory },
   { id: "report", label: "Sustainability Report", icon: BookOpen },
   { id: "settings", label: "Settings", icon: Settings },
+  { id: "cleanup", label: "Cleanup Exercise", icon: Package },
   { id: "training-mgmt", label: "Training Management", icon: BookOpen },
   { id: "profile-settings", label: "Profile Settings", icon: User },
 ];
@@ -68,6 +70,7 @@ const CorporateDashboard = () => {
       case "carbon": return <CarbonTrackerPanel />;
       case "report": return <SustainabilityReportPanel />;
       case "settings": return <CorporateSettingsPanel />;
+      case "cleanup": return <CleanupExercisePanel />;
       case "training-mgmt": return <TrainingManagementPanel />;
       case "profile-settings": return <ProfileSettingsPanel role="corporate" />;
       default: return <PlasticFootprintPanel />;

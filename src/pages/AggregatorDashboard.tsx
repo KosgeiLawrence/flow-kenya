@@ -21,6 +21,7 @@ import GrantsDiscoveryPanel from "@/components/dashboard/shared/GrantsDiscoveryP
 import ProfileSettingsPanel from "@/components/dashboard/shared/ProfileSettingsPanel";
 import RequestedPickupsPanel from "@/components/dashboard/shared/RequestedPickupsPanel";
 import TrainingPanel from "@/components/dashboard/waste-picker/TrainingPanel";
+import CleanupExercisePanel from "@/components/dashboard/shared/CleanupExercisePanel";
 
 const navItems = [
   { id: "pickers", label: "Waste Pickers", icon: Users },
@@ -34,6 +35,7 @@ const navItems = [
   { id: "compliance", label: "Compliance", icon: Shield },
   { id: "pickup-requests", label: "Pickup Requests", icon: Truck },
   { id: "training", label: "Training", icon: BookOpen },
+  { id: "cleanup", label: "Cleanup Exercise", icon: Package },
   { id: "grants", label: "Grants & Programs", icon: Briefcase },
   { id: "settings", label: "Profile Settings", icon: Settings },
 ];
@@ -71,6 +73,7 @@ const AggregatorDashboard = () => {
       case "compliance": return <CompliancePanel />;
       case "pickup-requests": return <RequestedPickupsPanel />;
       case "training": return <TrainingPanel viewerRole="aggregator" />;
+      case "cleanup": return <CleanupExercisePanel />;
       case "grants": return <GrantsDiscoveryPanel />;
       case "settings": return <ProfileSettingsPanel role="aggregator" />;
       default: return <WastePickerMgmtPanel />;
