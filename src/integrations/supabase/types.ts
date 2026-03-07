@@ -14,6 +14,165 @@ export type Database = {
   }
   public: {
     Tables: {
+      cleanup_exercises: {
+        Row: {
+          after_photos: string[] | null
+          before_photos: string[] | null
+          cleanup_date: string
+          created_at: string
+          during_photos: string[] | null
+          end_time: string
+          environmental_issues: string | null
+          fishing_nets_kg: number | null
+          glass_kg: number | null
+          hdpe_kg: number | null
+          id: string
+          lead_organizer: string
+          location_lat: number | null
+          location_lng: number | null
+          location_name: string
+          location_type: string
+          metal_kg: number | null
+          non_recyclable_waste_kg: number
+          num_bags: number
+          num_partner_orgs: number
+          num_volunteers: number
+          num_waste_pickers: number
+          observations: string | null
+          other_materials_kg: number | null
+          pet_bottles_kg: number | null
+          plastic_waste_kg: number
+          recommendations: string | null
+          recyclable_waste_kg: number
+          sachets_kg: number | null
+          start_time: string
+          status: string
+          title: string
+          total_waste_kg: number
+          transport_method: string | null
+          updated_at: string
+          user_id: string
+          waste_destination: string | null
+          waste_sorted: boolean | null
+        }
+        Insert: {
+          after_photos?: string[] | null
+          before_photos?: string[] | null
+          cleanup_date: string
+          created_at?: string
+          during_photos?: string[] | null
+          end_time: string
+          environmental_issues?: string | null
+          fishing_nets_kg?: number | null
+          glass_kg?: number | null
+          hdpe_kg?: number | null
+          id?: string
+          lead_organizer: string
+          location_lat?: number | null
+          location_lng?: number | null
+          location_name: string
+          location_type?: string
+          metal_kg?: number | null
+          non_recyclable_waste_kg?: number
+          num_bags?: number
+          num_partner_orgs?: number
+          num_volunteers?: number
+          num_waste_pickers?: number
+          observations?: string | null
+          other_materials_kg?: number | null
+          pet_bottles_kg?: number | null
+          plastic_waste_kg?: number
+          recommendations?: string | null
+          recyclable_waste_kg?: number
+          sachets_kg?: number | null
+          start_time: string
+          status?: string
+          title: string
+          total_waste_kg?: number
+          transport_method?: string | null
+          updated_at?: string
+          user_id: string
+          waste_destination?: string | null
+          waste_sorted?: boolean | null
+        }
+        Update: {
+          after_photos?: string[] | null
+          before_photos?: string[] | null
+          cleanup_date?: string
+          created_at?: string
+          during_photos?: string[] | null
+          end_time?: string
+          environmental_issues?: string | null
+          fishing_nets_kg?: number | null
+          glass_kg?: number | null
+          hdpe_kg?: number | null
+          id?: string
+          lead_organizer?: string
+          location_lat?: number | null
+          location_lng?: number | null
+          location_name?: string
+          location_type?: string
+          metal_kg?: number | null
+          non_recyclable_waste_kg?: number
+          num_bags?: number
+          num_partner_orgs?: number
+          num_volunteers?: number
+          num_waste_pickers?: number
+          observations?: string | null
+          other_materials_kg?: number | null
+          pet_bottles_kg?: number | null
+          plastic_waste_kg?: number
+          recommendations?: string | null
+          recyclable_waste_kg?: number
+          sachets_kg?: number | null
+          start_time?: string
+          status?: string
+          title?: string
+          total_waste_kg?: number
+          transport_method?: string | null
+          updated_at?: string
+          user_id?: string
+          waste_destination?: string | null
+          waste_sorted?: boolean | null
+        }
+        Relationships: []
+      }
+      cleanup_partners: {
+        Row: {
+          cleanup_id: string
+          created_at: string
+          id: string
+          organization_id: string
+        }
+        Insert: {
+          cleanup_id: string
+          created_at?: string
+          id?: string
+          organization_id: string
+        }
+        Update: {
+          cleanup_id?: string
+          created_at?: string
+          id?: string
+          organization_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "cleanup_partners_cleanup_id_fkey"
+            columns: ["cleanup_id"]
+            isOneToOne: false
+            referencedRelation: "cleanup_exercises"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "cleanup_partners_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       client_collections: {
         Row: {
           client_email: string | null
