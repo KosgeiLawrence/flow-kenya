@@ -1171,6 +1171,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      can_view_cleanup: {
+        Args: { _cleanup_id: string; _user_id: string }
+        Returns: boolean
+      }
       get_platform_stats: { Args: never; Returns: Json }
       get_user_role: {
         Args: { _user_id: string }
@@ -1181,6 +1185,10 @@ export type Database = {
           _role: Database["public"]["Enums"]["app_role"]
           _user_id: string
         }
+        Returns: boolean
+      }
+      is_cleanup_owner: {
+        Args: { _cleanup_id: string; _user_id: string }
         Returns: boolean
       }
     }
