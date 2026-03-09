@@ -25,6 +25,7 @@ import NotFound from "./pages/NotFound";
 import Privacy from "./pages/Privacy";
 import Terms from "./pages/Terms";
 import Contact from "./pages/Contact";
+import PWAInstallPrompt from "./components/PWAInstallPrompt";
 
 const queryClient = new QueryClient();
 
@@ -35,6 +36,7 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <AuthProvider>
+          <PWAInstallPrompt />
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/impact" element={<ImpactDashboard />} />
