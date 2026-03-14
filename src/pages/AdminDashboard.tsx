@@ -18,6 +18,7 @@ import InviteUsersPanel from "@/components/dashboard/admin/InviteUsersPanel";
 
 const navItems = [
   { id: "users", label: "User Verification", icon: Users },
+  { id: "invite", label: "Invite Users", icon: Mail },
   { id: "analytics", label: "Platform Analytics", icon: BarChart3 },
   { id: "transactions", label: "Transactions", icon: DollarSign },
   { id: "fraud", label: "Fraud Detection", icon: ShieldAlert },
