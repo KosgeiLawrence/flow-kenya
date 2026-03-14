@@ -44,6 +44,7 @@ const AdminDashboard = () => {
   const renderPanel = () => {
     switch (activeTab) {
       case "users": return <UserVerificationPanel />;
+      case "invite": return <InviteUsersPanel />;
       case "analytics": return <PlatformAnalyticsPanel />;
       case "transactions": return <TransactionTrackingPanel />;
       case "fraud": return <FraudDetectionPanel />;
