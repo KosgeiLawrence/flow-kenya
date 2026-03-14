@@ -20,12 +20,14 @@ interface InviteEmailProps {
   siteName: string
   siteUrl: string
   confirmationUrl: string
+  couponCode?: string
 }
 
 export const InviteEmail = ({
   siteName,
   siteUrl,
   confirmationUrl,
+  couponCode,
 }: InviteEmailProps) => (
   <Html lang="en" dir="ltr">
     <Head />
@@ -41,11 +43,18 @@ export const InviteEmail = ({
           <Link href={siteUrl} style={link}>
             <strong>Duara Flow</strong>
           </Link>
-          — Kenya's circular economy traceability platform. Click below to accept and create your account.
+          — Kenya's circular economy traceability platform. Click below to create your account and get started.
         </Text>
+        {couponCode ? (
+          <Section style={couponSection}>
+            <Text style={couponLabel}>🎁 Your Coupon Code</Text>
+            <Text style={couponCodeStyle}>{couponCode}</Text>
+            <Text style={couponHint}>Apply this code during signup to unlock your discount.</Text>
+          </Section>
+        ) : null}
         <Section style={buttonSection}>
           <Button style={button} href={confirmationUrl}>
-            Accept Invitation
+            Create Your Account
           </Button>
         </Section>
         <Text style={footer}>
