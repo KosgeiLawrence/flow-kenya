@@ -20,12 +20,14 @@ interface InviteEmailProps {
   siteName: string
   siteUrl: string
   confirmationUrl: string
+  couponCode?: string
 }
 
 export const InviteEmail = ({
   siteName,
   siteUrl,
   confirmationUrl,
+  couponCode,
 }: InviteEmailProps) => (
   <Html lang="en" dir="ltr">
     <Head />
@@ -41,11 +43,18 @@ export const InviteEmail = ({
           <Link href={siteUrl} style={link}>
             <strong>Duara Flow</strong>
           </Link>
-          — Kenya's circular economy traceability platform. Click below to accept and create your account.
+          — Kenya's circular economy traceability platform. Click below to create your account and get started.
         </Text>
+        {couponCode ? (
+          <Section style={couponSection}>
+            <Text style={couponLabel}>🎁 Your Coupon Code</Text>
+            <Text style={couponCodeStyle}>{couponCode}</Text>
+            <Text style={couponHint}>Apply this code during signup to unlock your discount.</Text>
+          </Section>
+        ) : null}
         <Section style={buttonSection}>
           <Button style={button} href={confirmationUrl}>
-            Accept Invitation
+            Create Your Account
           </Button>
         </Section>
         <Text style={footer}>
@@ -70,5 +79,9 @@ const text = { fontSize: '15px', color: '#677A6F', lineHeight: '1.6', margin: '0
 const link = { color: '#1F6B45', textDecoration: 'underline' }
 const buttonSection = { margin: '8px 0 32px' }
 const button = { backgroundColor: '#D4A843', color: '#12211A', fontSize: '15px', fontWeight: '600' as const, borderRadius: '12px', padding: '14px 28px', textDecoration: 'none', fontFamily: "'Space Grotesk', 'Segoe UI', Arial, sans-serif" }
+const couponSection = { backgroundColor: '#F5F0E6', borderRadius: '12px', padding: '20px', margin: '0 0 24px', textAlign: 'center' as const }
+const couponLabel = { fontSize: '13px', color: '#677A6F', margin: '0 0 8px', fontWeight: '600' as const }
+const couponCodeStyle = { fontSize: '28px', fontWeight: 'bold' as const, color: '#1F6B45', letterSpacing: '3px', margin: '0 0 8px', fontFamily: "'Space Grotesk', 'Segoe UI', Arial, sans-serif" }
+const couponHint = { fontSize: '12px', color: '#999999', margin: '0' }
 const footer = { fontSize: '13px', color: '#999999', margin: '24px 0 0', lineHeight: '1.5' }
 const footerBrand = { fontSize: '12px', color: '#BBBBBB', margin: '16px 0 0' }
