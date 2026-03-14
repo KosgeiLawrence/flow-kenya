@@ -14,6 +14,7 @@ import CountyWasteFlowPanel from "@/components/dashboard/admin/CountyWasteFlowPa
 import ProfileSettingsPanel from "@/components/dashboard/shared/ProfileSettingsPanel";
 import TrainingManagementPanel from "@/components/dashboard/shared/TrainingManagementPanel";
 import CleanupExercisePanel from "@/components/dashboard/shared/CleanupExercisePanel";
+import InviteUsersPanel from "@/components/dashboard/admin/InviteUsersPanel";
 
 const navItems = [
   { id: "users", label: "User Verification", icon: Users },
