@@ -432,7 +432,7 @@ const CleanupExercisePanel = ({ isAdmin = false }: Props) => {
       {/* Action Bar */}
       {!isAdmin && (
         <div className="flex justify-end">
-          <Button onClick={() => setShowForm(!showForm)} className="gap-2">
+          <Button onClick={() => { if (showForm && editingId) { resetForm(); } else { setShowForm(!showForm); setEditingId(null); } }} className="gap-2">
             <Plus className="w-4 h-4" /> Log Cleanup Exercise
           </Button>
         </div>
