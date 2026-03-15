@@ -1,16 +1,18 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
+import { useOrgInfo } from "@/hooks/useOrgInfo";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Download, FileText } from "lucide-react";
 import { format } from "date-fns";
 import jsPDF from "jspdf";
 import { toast } from "sonner";
-import { addCleanHeader, addDocMeta, drawTableHeader, drawTableRow, drawTotalLine, finalizeCleanPdf } from "@/lib/pdfBranding";
+import { addCleanHeader, addDocMeta, drawTableHeader, drawTableRow, drawTotalLine, finalizeCleanPdf, loadImageAsBase64, buildPdfOrgInfo } from "@/lib/pdfBranding";
 
 const PurchaseInvoicesPanel = () => {
   const { user, profile } = useAuth();
+  const { orgInfo } = useOrgInfo();
 
   const { data: payments } = useQuery({
     queryKey: ["recycler_purchases", user?.id],
@@ -39,17 +41,27 @@ const PurchaseInvoicesPanel = () => {
     enabled: !!user,
   });
 
+  const getOrgPdfInfo = async () => {
+    if (!orgInfo) return null;
+    let logoBase64: string | null = null;
+    if (orgInfo.orgLogoUrl) logoBase64 = await loadImageAsBase64(orgInfo.orgLogoUrl);
+    return buildPdfOrgInfo(orgInfo, logoBase64);
+  };
+
+  const entityName = orgInfo?.orgName || profile?.full_name || "Recycler";
+
   const generatePurchaseInvoice = async () => {
     if (!collections?.length) return;
     const doc = new jsPDF();
     const invNo = `PI-${Date.now().toString(36).toUpperCase()}`;
+    const pdfOrg = await getOrgPdfInfo();
 
-    let y = addCleanHeader(doc, "Purchase Invoice");
+    let y = addCleanHeader(doc, "Purchase Invoice", undefined, pdfOrg);
     y = addDocMeta(doc, [
       { label: "Invoice #", value: invNo },
       { label: "Date", value: format(new Date(), "MMM d, yyyy") },
-      { label: "Buyer", value: profile?.full_name || "Recycler" },
-      ...(profile?.phone_number ? [{ label: "Phone", value: profile.phone_number }] : []),
+      { label: "Buyer", value: entityName },
+      ...(orgInfo?.contactPhone ? [{ label: "Phone", value: orgInfo.contactPhone }] : []),
     ], y);
 
     const materialMap = new Map<string, { name: string; qty: number; price: number; unit: string }>();
@@ -92,13 +104,14 @@ const PurchaseInvoicesPanel = () => {
   const generateIndividualInvoice = async (payment: any) => {
     const doc = new jsPDF();
     const invNo = `PI-${payment.id.slice(0, 8).toUpperCase()}`;
+    const pdfOrg = await getOrgPdfInfo();
 
-    let y = addCleanHeader(doc, "Purchase Invoice");
+    let y = addCleanHeader(doc, "Purchase Invoice", undefined, pdfOrg);
     y = addDocMeta(doc, [
       { label: "Invoice #", value: invNo },
       { label: "Date", value: format(new Date(payment.created_at), "MMM d, yyyy") },
-      { label: "Buyer", value: profile?.full_name || "Recycler" },
-      ...(profile?.phone_number ? [{ label: "Phone", value: profile.phone_number }] : []),
+      { label: "Buyer", value: entityName },
+      ...(orgInfo?.contactPhone ? [{ label: "Phone", value: orgInfo.contactPhone }] : []),
       { label: "Payment Phone", value: payment.phone_number },
     ], y);
 

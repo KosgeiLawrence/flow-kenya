@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
+import { useOrgInfo } from "@/hooks/useOrgInfo";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -12,7 +13,7 @@ import { format } from "date-fns";
 import jsPDF from "jspdf";
 import {
   PDF_COLORS, addCleanHeader, addDocMeta, drawTableHeader,
-  drawTableRow, drawTotalLine, finalizeCleanPdf,
+  drawTableRow, drawTotalLine, finalizeCleanPdf, loadImageAsBase64, buildPdfOrgInfo,
 } from "@/lib/pdfBranding";
 
 interface Props {
@@ -21,6 +22,7 @@ interface Props {
 
 const ClientCollectionFlow = ({ onBack }: Props) => {
   const { user, profile } = useAuth();
+  const { orgInfo } = useOrgInfo();
   const queryClient = useQueryClient();
   const [showForm, setShowForm] = useState(false);
   const [clientName, setClientName] = useState("");
@@ -74,16 +76,28 @@ const ClientCollectionFlow = ({ onBack }: Props) => {
     onError: (err: Error) => toast.error(err.message),
   });
 
-  const generateDocument = (type: "quotation" | "invoice" | "receipt", item: any) => {
+  const getOrgPdfInfo = async () => {
+    if (!orgInfo) return null;
+    let logoBase64: string | null = null;
+    if (orgInfo.orgLogoUrl) {
+      logoBase64 = await loadImageAsBase64(orgInfo.orgLogoUrl);
+    }
+    return buildPdfOrgInfo(orgInfo, logoBase64);
+  };
+
+  const generateDocument = async (type: "quotation" | "invoice" | "receipt", item: any) => {
     const doc = new jsPDF();
     const title = type === "quotation" ? "Quotation" : type === "invoice" ? "Invoice" : "Receipt";
-    let y = addCleanHeader(doc, title, `Ref: ${type.toUpperCase().slice(0, 3)}-${item.id.slice(0, 8).toUpperCase()}`);
+    const pdfOrg = await getOrgPdfInfo();
+    const entityName = orgInfo?.orgName || profile?.full_name || "Waste Picker";
 
-    // From (waste picker)
+    let y = addCleanHeader(doc, title, `Ref: ${type.toUpperCase().slice(0, 3)}-${item.id.slice(0, 8).toUpperCase()}`, pdfOrg);
+
+    // From (organization / waste picker)
     y = addDocMeta(doc, [
-      { label: "From", value: profile?.full_name || "Waste Picker" },
-      { label: "Phone", value: profile?.phone_number || "N/A" },
-      { label: "Email", value: profile?.email || "N/A" },
+      { label: "From", value: entityName },
+      { label: "Phone", value: orgInfo?.contactPhone || profile?.phone_number || "N/A" },
+      { label: "Email", value: orgInfo?.contactEmail || profile?.email || "N/A" },
     ], y);
 
     // To (client)

@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
+import { useOrgInfo } from "@/hooks/useOrgInfo";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -14,10 +15,11 @@ import { Package, Plus, Download, Trash2, ShoppingBag } from "lucide-react";
 import { toast } from "sonner";
 import jsPDF from "jspdf";
 import { format } from "date-fns";
-import { addCleanHeader, addDocMeta, drawTableHeader, drawTableRow, drawTotalLine, finalizeCleanPdf } from "@/lib/pdfBranding";
+import { addCleanHeader, addDocMeta, drawTableHeader, drawTableRow, drawTotalLine, finalizeCleanPdf, loadImageAsBase64, buildPdfOrgInfo } from "@/lib/pdfBranding";
 
 const ProductCatalogPanel = () => {
   const { user, profile } = useAuth();
+  const { orgInfo } = useOrgInfo();
   const queryClient = useQueryClient();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [quoteDialog, setQuoteDialog] = useState<string | null>(null);
@@ -51,18 +53,28 @@ const ProductCatalogPanel = () => {
     onSuccess: () => { queryClient.invalidateQueries({ queryKey: ["recycler_products"] }); toast.success("Product removed"); },
   });
 
+  const getOrgPdfInfo = async () => {
+    if (!orgInfo) return null;
+    let logoBase64: string | null = null;
+    if (orgInfo.orgLogoUrl) {
+      logoBase64 = await loadImageAsBase64(orgInfo.orgLogoUrl);
+    }
+    return buildPdfOrgInfo(orgInfo, logoBase64);
+  };
+
   const generateInvoice = async (product: any) => {
     const qty = Number(quoteForm.quantity) || 1;
     const total = qty * Number(product.price_per_unit);
     const doc = new jsPDF();
     const invNo = `INV-${Date.now().toString(36).toUpperCase()}`;
+    const pdfOrg = await getOrgPdfInfo();
 
-    let y = addCleanHeader(doc, "Sales Invoice");
+    let y = addCleanHeader(doc, "Sales Invoice", undefined, pdfOrg);
     y = addDocMeta(doc, [
       { label: "Invoice #", value: invNo },
       { label: "Date", value: format(new Date(), "MMM d, yyyy") },
-      { label: "Seller", value: profile?.full_name || "Recycler" },
-      ...(profile?.phone_number ? [{ label: "Phone", value: profile.phone_number }] : []),
+      { label: "Seller", value: orgInfo?.orgName || profile?.full_name || "Recycler" },
+      ...(orgInfo?.contactPhone ? [{ label: "Phone", value: orgInfo.contactPhone }] : []),
       { label: "Client", value: quoteForm.client_name || "—" },
       ...(quoteForm.client_phone ? [{ label: "Client Phone", value: quoteForm.client_phone }] : []),
     ], y);
@@ -91,13 +103,14 @@ const ProductCatalogPanel = () => {
     const total = qty * Number(product.price_per_unit);
     const doc = new jsPDF();
     const qNo = `QT-${Date.now().toString(36).toUpperCase()}`;
+    const pdfOrg = await getOrgPdfInfo();
 
-    let y = addCleanHeader(doc, "Quotation");
+    let y = addCleanHeader(doc, "Quotation", undefined, pdfOrg);
     y = addDocMeta(doc, [
       { label: "Quotation #", value: qNo },
       { label: "Date", value: format(new Date(), "MMM d, yyyy") },
-      { label: "From", value: profile?.full_name || "Recycler" },
-      ...(profile?.phone_number ? [{ label: "Phone", value: profile.phone_number }] : []),
+      { label: "From", value: orgInfo?.orgName || profile?.full_name || "Recycler" },
+      ...(orgInfo?.contactPhone ? [{ label: "Phone", value: orgInfo.contactPhone }] : []),
       { label: "To", value: quoteForm.client_name || "—" },
       ...(quoteForm.client_phone ? [{ label: "Client Phone", value: quoteForm.client_phone }] : []),
     ], y);
