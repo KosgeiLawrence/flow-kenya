@@ -513,28 +513,124 @@ const CleanupExercisePanel = ({ isAdmin = false }: Props) => {
 
             {/* Organizer */}
             <div>
-              <h4 className="text-sm font-semibold text-foreground mb-3">Organizer</h4>
+              <h4 className="text-sm font-semibold text-foreground mb-3">Organizer & Partners</h4>
               <div>
                 <Label>Lead Organizer</Label>
                 <Input value={form.lead_organizer || profile?.full_name || ""} onChange={(e) => setForm({ ...form, lead_organizer: e.target.value })} />
               </div>
-              {organizations.length > 0 && (
-                <div className="mt-3">
-                  <Label>Partner Organizations</Label>
-                  <div className="flex flex-wrap gap-2 mt-1 max-h-32 overflow-y-auto">
-                    {organizations.map((org) => (
-                      <Badge
-                        key={org.id}
-                        variant={form.partner_org_ids.includes(org.id) ? "default" : "outline"}
-                        className="cursor-pointer"
-                        onClick={() => togglePartnerOrg(org.id)}
-                      >
-                        {org.name}
+
+              {/* Existing Organizations */}
+              <div className="mt-4">
+                <Label>Partner Organizations (from platform)</Label>
+                <div className="flex flex-wrap gap-2 mt-1 max-h-32 overflow-y-auto">
+                  {organizations.map((org) => (
+                    <Badge
+                      key={org.id}
+                      variant={form.partner_org_ids.includes(org.id) ? "default" : "outline"}
+                      className="cursor-pointer"
+                      onClick={() => togglePartnerOrg(org.id)}
+                    >
+                      {org.name}
+                    </Badge>
+                  ))}
+                  {organizations.length === 0 && (
+                    <p className="text-xs text-muted-foreground">No organizations registered yet.</p>
+                  )}
+                </div>
+              </div>
+
+              {/* Add External Organization */}
+              <div className="mt-4">
+                <Label>Add External Organization</Label>
+                <div className="flex gap-2 mt-1">
+                  <Input
+                    placeholder="Organization name"
+                    value={externalOrgName}
+                    onChange={(e) => setExternalOrgName(e.target.value)}
+                    className="flex-1"
+                  />
+                  <Select value={externalOrgType} onValueChange={setExternalOrgType}>
+                    <SelectTrigger className="w-[140px]">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="ngo">NGO</SelectItem>
+                      <SelectItem value="private_company">Private Company</SelectItem>
+                      <SelectItem value="government">Government</SelectItem>
+                      <SelectItem value="community_group">Community Group</SelectItem>
+                      <SelectItem value="academic">Academic</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="icon"
+                    onClick={() => {
+                      if (!externalOrgName.trim()) {
+                        toast.error("Enter an organization name");
+                        return;
+                      }
+                      setForm((f) => ({
+                        ...f,
+                        external_orgs: [...f.external_orgs, { name: externalOrgName.trim(), type: externalOrgType }],
+                        num_partner_orgs: f.num_partner_orgs + 1,
+                      }));
+                      setExternalOrgName("");
+                      toast.success(`Added "${externalOrgName.trim()}"`);
+                    }}
+                  >
+                    <Plus className="w-4 h-4" />
+                  </Button>
+                </div>
+                {form.external_orgs.length > 0 && (
+                  <div className="flex flex-wrap gap-2 mt-2">
+                    {form.external_orgs.map((ext, i) => (
+                      <Badge key={i} variant="secondary" className="gap-1">
+                        {ext.name}
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setForm((f) => ({
+                              ...f,
+                              external_orgs: f.external_orgs.filter((_, idx) => idx !== i),
+                              num_partner_orgs: Math.max(0, f.num_partner_orgs - 1),
+                            }))
+                          }
+                          className="ml-1 hover:text-destructive"
+                        >
+                          <X className="w-3 h-3" />
+                        </button>
                       </Badge>
                     ))}
                   </div>
+                )}
+              </div>
+
+              {/* Invite Organization via Email */}
+              <div className="mt-4">
+                <Label>Invite Organization via Email</Label>
+                <div className="flex gap-2 mt-1">
+                  <Input
+                    type="email"
+                    placeholder="organization@example.com"
+                    value={inviteEmail}
+                    onChange={(e) => setInviteEmail(e.target.value)}
+                    className="flex-1"
+                    onKeyDown={(e) => e.key === "Enter" && inviteEmail.trim() && sendOrgInvite()}
+                  />
+                  <Button
+                    type="button"
+                    variant="outline"
+                    disabled={sendingInvite || !inviteEmail.trim()}
+                    onClick={sendOrgInvite}
+                    className="gap-1"
+                  >
+                    {sendingInvite ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
+                    Invite
+                  </Button>
                 </div>
-              )}
+                <p className="text-xs text-muted-foreground mt-1">Send an invitation to join the platform to an external organization.</p>
+              </div>
             </div>
 
             <Separator />
