@@ -694,6 +694,18 @@ const CleanupExercisePanel = ({ isAdmin = false }: Props) => {
                 <div className="flex gap-2 pt-3">
                   <Button size="sm" onClick={() => generatePDF(viewCleanup)} className="gap-1"><Download className="w-3 h-3" /> PDF</Button>
                   <Button size="sm" variant="outline" onClick={() => exportCSV(viewCleanup)} className="gap-1"><FileText className="w-3 h-3" /> CSV</Button>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="gap-1"
+                    onClick={() => {
+                      const shareUrl = `${window.location.origin}/report/${viewCleanup.id}`;
+                      navigator.clipboard.writeText(shareUrl);
+                      toast.success("Share link copied to clipboard!");
+                    }}
+                  >
+                    <Share2 className="w-3 h-3" /> Share
+                  </Button>
                 </div>
               </div>
             </>
