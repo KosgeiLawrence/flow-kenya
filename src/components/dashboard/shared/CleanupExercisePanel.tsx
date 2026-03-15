@@ -171,6 +171,7 @@ const CleanupExercisePanel = ({ isAdmin = false }: Props) => {
       environmental_issues: c.environmental_issues || "",
       recommendations: c.recommendations || "",
       partner_org_ids: [],
+      external_orgs: [],
     });
     setBeforePhotos(c.before_photos || []);
     setDuringPhotos(c.during_photos || []);
