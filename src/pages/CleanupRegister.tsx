@@ -61,7 +61,7 @@ const CleanupRegister = () => {
       <div className="min-h-screen bg-background flex flex-col items-center justify-center p-4">
         <div className="w-full max-w-md space-y-6 text-center">
           <div className="flex items-center justify-center gap-2 mb-4">
-            <img src={duaraFlowIcon} alt="Duara Flow" className="w-8 h-8" />
+            <img src="/pwa-icon-192.png" alt="Duara Flow" className="w-8 h-8" />
             <span className="text-2xl font-bold font-display text-foreground">Duara Flow</span>
           </div>
           <Card>
