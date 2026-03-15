@@ -15,7 +15,7 @@ import { ClipboardList, Plus, FileText, CheckCircle2, Clock, XCircle, Truck, Dow
 import { toast } from "sonner";
 import { format } from "date-fns";
 import jsPDF from "jspdf";
-import { addCleanHeader, addDocMeta, drawTableHeader, drawTableRow, drawTotalLine, finalizeCleanPdf } from "@/lib/pdfBranding";
+import { addCleanHeader, addDocMeta, drawTableHeader, drawTableRow, drawTotalLine, finalizeCleanPdf, loadImageAsBase64, buildPdfOrgInfo } from "@/lib/pdfBranding";
 
 const statusMap: Record<string, { icon: React.ElementType; variant: "default" | "secondary" | "destructive"; label: string }> = {
   pending: { icon: Clock, variant: "secondary", label: "Pending" },
