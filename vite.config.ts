@@ -23,8 +23,8 @@ export default defineConfig(({ mode }) => ({
         navigateFallbackDenylist: [/^\/~oauth/],
       },
       manifest: {
-        name: "Duara Intelligence — Circular Economy Platform",
-        short_name: "Duara Intelligence",
+        name: "Duara Flow — Circular Economy Platform",
+        short_name: "Duara Flow",
         description: "Kenya's end-to-end digital traceability and compliance infrastructure for the circular economy.",
         theme_color: "#2b5e3f",
         background_color: "#f7f3ee",
