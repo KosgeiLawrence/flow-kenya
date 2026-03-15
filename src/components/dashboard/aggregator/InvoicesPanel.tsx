@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
@@ -7,11 +8,13 @@ import { Button } from "@/components/ui/button";
 import { Download, FileText, Truck } from "lucide-react";
 import { format } from "date-fns";
 import jsPDF from "jspdf";
-import { addCleanHeader, addDocMeta, drawTableHeader, drawTableRow, drawTotalLine, finalizeCleanPdf, loadImageAsBase64, buildPdfOrgInfo } from "@/lib/pdfBranding";
+import { addCleanHeader, addDocMeta, drawTableHeader, drawTableRow, drawVatTotalBlock, drawTotalLine, finalizeCleanPdf, loadImageAsBase64, buildPdfOrgInfo } from "@/lib/pdfBranding";
+import VatOptions, { DEFAULT_VAT, type VatConfig } from "@/components/dashboard/shared/VatOptions";
 
 const InvoicesPanel = () => {
   const { user, profile } = useAuth();
   const { orgInfo } = useOrgInfo();
+  const [vat, setVat] = useState<VatConfig>(DEFAULT_VAT);
 
   const { data: collections } = useQuery({
     queryKey: ["aggregator_invoice_data", user?.id],
@@ -62,10 +65,7 @@ const InvoicesPanel = () => {
     ], y);
 
     y = drawTableHeader(doc, [
-      { label: "Material", x: 17 },
-      { label: "Quantity", x: 85 },
-      { label: "Unit Price", x: 120 },
-      { label: "Total (KES)", x: 155 },
+      { label: "Material", x: 17 }, { label: "Quantity", x: 85 }, { label: "Unit Price", x: 120 }, { label: "Total (KES)", x: 155 },
     ], y, 180);
 
     let grandTotal = 0;
@@ -74,15 +74,13 @@ const InvoicesPanel = () => {
       const total = m.qty * m.price; grandTotal += total;
       drawTableRow(doc, y, i, 180);
       doc.setFontSize(8);
-      doc.text(m.name, 17, y);
-      doc.text(`${m.qty.toFixed(1)} ${m.unit}`, 85, y);
-      doc.text(m.price.toFixed(2), 120, y);
-      doc.text(total.toLocaleString(), 155, y);
+      doc.text(m.name, 17, y); doc.text(`${m.qty.toFixed(1)} ${m.unit}`, 85, y);
+      doc.text(m.price.toFixed(2), 120, y); doc.text(total.toLocaleString(), 155, y);
       y += 8; i++;
     });
 
     y += 4;
-    drawTotalLine(doc, `Grand Total: KES ${grandTotal.toLocaleString()}`, y);
+    y = drawVatTotalBlock(doc, grandTotal, vat.vatPercent, vat.includeVat, y);
 
     finalizeCleanPdf(doc);
     doc.save(`invoice-${invoiceNo}.pdf`);
@@ -102,10 +100,7 @@ const InvoicesPanel = () => {
     ], y);
 
     y = drawTableHeader(doc, [
-      { label: "Batch ID", x: 17 },
-      { label: "Material", x: 65 },
-      { label: "Quantity", x: 115 },
-      { label: "Date", x: 155 },
+      { label: "Batch ID", x: 17 }, { label: "Material", x: 65 }, { label: "Quantity", x: 115 }, { label: "Date", x: 155 },
     ], y, 180);
 
     collections.slice(0, 30).forEach((c, i) => {
@@ -113,8 +108,7 @@ const InvoicesPanel = () => {
       const mt = (c as any).material_types;
       drawTableRow(doc, y, i, 180);
       doc.setFontSize(8);
-      doc.text(c.batch_id, 17, y);
-      doc.text(mt?.name || "—", 65, y);
+      doc.text(c.batch_id, 17, y); doc.text(mt?.name || "—", 65, y);
       doc.text(`${Number(c.quantity).toFixed(1)} ${mt?.unit || "kg"}`, 115, y);
       doc.text(format(new Date(c.collected_at), "MMM d"), 155, y);
       y += 7;
@@ -148,31 +142,25 @@ const InvoicesPanel = () => {
     ], y);
 
     y = drawTableHeader(doc, [
-      { label: "Batch ID", x: 17 },
-      { label: "Quantity", x: 85 },
-      { label: "Location", x: 120 },
-      { label: "Date", x: 165 },
+      { label: "Batch ID", x: 17 }, { label: "Quantity", x: 85 }, { label: "Location", x: 120 }, { label: "Date", x: 165 },
     ], y, 180);
 
     items.slice(0, 30).forEach((c, i) => {
       if (y > 260) { doc.addPage(); y = 20; }
       drawTableRow(doc, y, i, 180);
       doc.setFontSize(8);
-      doc.text(c.batch_id, 17, y);
-      doc.text(`${Number(c.quantity).toFixed(1)} ${mt?.unit || "kg"}`, 85, y);
-      doc.text(c.location_name || "—", 120, y);
-      doc.text(format(new Date(c.collected_at), "MMM d"), 165, y);
+      doc.text(c.batch_id, 17, y); doc.text(`${Number(c.quantity).toFixed(1)} ${mt?.unit || "kg"}`, 85, y);
+      doc.text(c.location_name || "—", 120, y); doc.text(format(new Date(c.collected_at), "MMM d"), 165, y);
       y += 7;
     });
 
     y += 4;
-    drawTotalLine(doc, `Total: ${totalQty.toFixed(1)} ${mt?.unit || "kg"}  •  KES ${totalVal.toLocaleString()}`, y);
+    y = drawVatTotalBlock(doc, totalVal, vat.vatPercent, vat.includeVat, y);
 
     finalizeCleanPdf(doc);
     doc.save(`invoice-${mt?.name?.replace(/\s/g, "-")}-${invoiceNo}.pdf`);
   };
 
-  // Get unique material types
   const materialGroups = new Map<string, { name: string; qty: number; value: number; unit: string }>();
   collections?.forEach(c => {
     const mt = (c as any).material_types;
@@ -185,6 +173,8 @@ const InvoicesPanel = () => {
 
   return (
     <div className="space-y-6">
+      <VatOptions value={vat} onChange={setVat} />
+
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <Card className="shadow-soft">
           <CardContent className="p-5 space-y-3">

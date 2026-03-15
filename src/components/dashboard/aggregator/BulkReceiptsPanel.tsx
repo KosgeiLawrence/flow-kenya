@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
@@ -7,20 +8,19 @@ import { Button } from "@/components/ui/button";
 import { Download, FileText, Printer } from "lucide-react";
 import { format } from "date-fns";
 import jsPDF from "jspdf";
-import { addCleanHeader, addDocMeta, drawTableHeader, drawTableRow, drawTotalLine, finalizeCleanPdf, loadImageAsBase64, buildPdfOrgInfo } from "@/lib/pdfBranding";
+import { addCleanHeader, addDocMeta, drawTableHeader, drawTableRow, drawVatTotalBlock, finalizeCleanPdf, loadImageAsBase64, buildPdfOrgInfo } from "@/lib/pdfBranding";
+import VatOptions, { DEFAULT_VAT, type VatConfig } from "@/components/dashboard/shared/VatOptions";
 
 const BulkReceiptsPanel = () => {
   const { user, profile } = useAuth();
   const { orgInfo } = useOrgInfo();
+  const [vat, setVat] = useState<VatConfig>(DEFAULT_VAT);
 
   const { data: payments } = useQuery({
     queryKey: ["aggregator_bulk_payments", user?.id],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from("payments")
-        .select("*")
-        .eq("status", "completed")
-        .order("created_at", { ascending: false });
+        .from("payments").select("*").eq("status", "completed").order("created_at", { ascending: false });
       if (error) throw error;
       return data;
     },
@@ -43,7 +43,6 @@ const BulkReceiptsPanel = () => {
     const pdfOrg = await getOrgPdfInfo();
 
     let y = addCleanHeader(doc, "Bulk Payment Receipt", "Combined receipt for all completed payments", pdfOrg);
-
     y = addDocMeta(doc, [
       { label: "Date", value: today },
       { label: "Aggregator", value: entityName },
@@ -51,10 +50,7 @@ const BulkReceiptsPanel = () => {
     ], y);
 
     y = drawTableHeader(doc, [
-      { label: "Date", x: 17 },
-      { label: "Phone", x: 55 },
-      { label: "Receipt #", x: 95 },
-      { label: "Amount (KES)", x: 145 },
+      { label: "Date", x: 17 }, { label: "Phone", x: 55 }, { label: "Receipt #", x: 95 }, { label: "Amount (KES)", x: 145 },
     ], y, 180);
 
     let totalAmount = 0;
@@ -71,7 +67,7 @@ const BulkReceiptsPanel = () => {
     });
 
     y += 4;
-    drawTotalLine(doc, `Total: KES ${totalAmount.toLocaleString()}`, y);
+    y = drawVatTotalBlock(doc, totalAmount, vat.vatPercent, vat.includeVat, y);
 
     finalizeCleanPdf(doc);
     doc.save(`bulk-receipt-${format(new Date(), "yyyy-MM-dd")}.pdf`);
@@ -80,17 +76,21 @@ const BulkReceiptsPanel = () => {
   const downloadSingleReceipt = async (payment: any) => {
     const doc = new jsPDF();
     const pdfOrg = await getOrgPdfInfo();
+    const amount = Number(payment.amount);
 
     let y = addCleanHeader(doc, "Payment Receipt", undefined, pdfOrg);
-
     y = addDocMeta(doc, [
       { label: "Date", value: format(new Date(payment.created_at), "MMM d, yyyy") },
-      { label: "Amount", value: `KES ${Number(payment.amount).toLocaleString()}` },
+      { label: "Amount", value: `KES ${amount.toLocaleString()}` },
       { label: "Phone", value: payment.phone_number },
       { label: "Receipt #", value: payment.mpesa_receipt_number || "N/A" },
       { label: "Status", value: payment.status },
       ...(payment.description ? [{ label: "Description", value: payment.description }] : []),
     ], y);
+
+    if (vat.includeVat) {
+      y = drawVatTotalBlock(doc, amount, vat.vatPercent, true, y);
+    }
 
     finalizeCleanPdf(doc);
     doc.save(`receipt-${payment.id.slice(0, 8)}.pdf`);
@@ -98,6 +98,8 @@ const BulkReceiptsPanel = () => {
 
   return (
     <div className="space-y-6">
+      <VatOptions value={vat} onChange={setVat} />
+
       <Card className="shadow-soft">
         <CardContent className="flex items-center justify-between p-5">
           <div className="flex items-center gap-3">

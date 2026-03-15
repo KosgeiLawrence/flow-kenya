@@ -15,7 +15,8 @@ import { Package, Plus, Download, Trash2, ShoppingBag } from "lucide-react";
 import { toast } from "sonner";
 import jsPDF from "jspdf";
 import { format } from "date-fns";
-import { addCleanHeader, addDocMeta, drawTableHeader, drawTableRow, drawTotalLine, finalizeCleanPdf, loadImageAsBase64, buildPdfOrgInfo } from "@/lib/pdfBranding";
+import { addCleanHeader, addDocMeta, drawTableHeader, drawTableRow, drawVatTotalBlock, finalizeCleanPdf, loadImageAsBase64, buildPdfOrgInfo } from "@/lib/pdfBranding";
+import VatOptions, { DEFAULT_VAT, type VatConfig } from "@/components/dashboard/shared/VatOptions";
 
 const ProductCatalogPanel = () => {
   const { user, profile } = useAuth();
@@ -25,6 +26,7 @@ const ProductCatalogPanel = () => {
   const [quoteDialog, setQuoteDialog] = useState<string | null>(null);
   const [form, setForm] = useState({ name: "", description: "", material_source: "", stock_quantity: "", unit: "kg", price_per_unit: "" });
   const [quoteForm, setQuoteForm] = useState({ client_name: "", client_phone: "", quantity: "", notes: "" });
+  const [vat, setVat] = useState<VatConfig>(DEFAULT_VAT);
 
   const { data: products } = useQuery({
     queryKey: ["recycler_products", user?.id],
@@ -56,15 +58,13 @@ const ProductCatalogPanel = () => {
   const getOrgPdfInfo = async () => {
     if (!orgInfo) return null;
     let logoBase64: string | null = null;
-    if (orgInfo.orgLogoUrl) {
-      logoBase64 = await loadImageAsBase64(orgInfo.orgLogoUrl);
-    }
+    if (orgInfo.orgLogoUrl) logoBase64 = await loadImageAsBase64(orgInfo.orgLogoUrl);
     return buildPdfOrgInfo(orgInfo, logoBase64);
   };
 
   const generateInvoice = async (product: any) => {
     const qty = Number(quoteForm.quantity) || 1;
-    const total = qty * Number(product.price_per_unit);
+    const subtotal = qty * Number(product.price_per_unit);
     const doc = new jsPDF();
     const invNo = `INV-${Date.now().toString(36).toUpperCase()}`;
     const pdfOrg = await getOrgPdfInfo();
@@ -86,11 +86,11 @@ const ProductCatalogPanel = () => {
     drawTableRow(doc, y, 0, 180);
     doc.setFontSize(8);
     doc.text(product.name, 17, y); doc.text(`${qty} ${product.unit}`, 95, y);
-    doc.text(Number(product.price_per_unit).toFixed(2), 125, y); doc.text(total.toLocaleString(), 165, y);
+    doc.text(Number(product.price_per_unit).toFixed(2), 125, y); doc.text(subtotal.toLocaleString(), 165, y);
     y += 10;
 
-    drawTotalLine(doc, `Total: KES ${total.toLocaleString()}`, y);
-    if (quoteForm.notes) { y += 10; doc.setFontSize(9); doc.text(`Notes: ${quoteForm.notes}`, 15, y); }
+    y = drawVatTotalBlock(doc, subtotal, vat.vatPercent, vat.includeVat, y);
+    if (quoteForm.notes) { doc.setFontSize(9); doc.text(`Notes: ${quoteForm.notes}`, 15, y); }
 
     finalizeCleanPdf(doc);
     doc.save(`invoice-${invNo}.pdf`);
@@ -100,7 +100,7 @@ const ProductCatalogPanel = () => {
 
   const generateQuotation = async (product: any) => {
     const qty = Number(quoteForm.quantity) || 1;
-    const total = qty * Number(product.price_per_unit);
+    const subtotal = qty * Number(product.price_per_unit);
     const doc = new jsPDF();
     const qNo = `QT-${Date.now().toString(36).toUpperCase()}`;
     const pdfOrg = await getOrgPdfInfo();
@@ -122,11 +122,10 @@ const ProductCatalogPanel = () => {
     drawTableRow(doc, y, 0, 180);
     doc.setFontSize(8);
     doc.text(product.name, 17, y); doc.text(`${qty} ${product.unit}`, 95, y);
-    doc.text(Number(product.price_per_unit).toFixed(2), 125, y); doc.text(total.toLocaleString(), 165, y);
+    doc.text(Number(product.price_per_unit).toFixed(2), 125, y); doc.text(subtotal.toLocaleString(), 165, y);
     y += 10;
 
-    drawTotalLine(doc, `Total: KES ${total.toLocaleString()}`, y);
-    y += 10;
+    y = drawVatTotalBlock(doc, subtotal, vat.vatPercent, vat.includeVat, y);
     doc.setFontSize(9);
     doc.text("This quotation is valid for 30 days from the date of issue.", 15, y);
     if (quoteForm.notes) { y += 8; doc.text(`Notes: ${quoteForm.notes}`, 15, y); }
@@ -239,6 +238,7 @@ const ProductCatalogPanel = () => {
               <div><Label>Client Phone</Label><Input value={quoteForm.client_phone} onChange={(e) => setQuoteForm({ ...quoteForm, client_phone: e.target.value })} placeholder="0712 345 678" /></div>
               <div><Label>Quantity ({selectedProduct.unit})</Label><Input type="number" value={quoteForm.quantity} onChange={(e) => setQuoteForm({ ...quoteForm, quantity: e.target.value })} /></div>
               <div><Label>Notes</Label><Textarea value={quoteForm.notes} onChange={(e) => setQuoteForm({ ...quoteForm, notes: e.target.value })} rows={2} /></div>
+              <VatOptions value={vat} onChange={setVat} />
               <div className="flex gap-2">
                 <Button className="flex-1" onClick={() => generateInvoice(selectedProduct)} disabled={!quoteForm.client_name || !quoteForm.quantity}>
                   <Download className="w-4 h-4 mr-1" /> Invoice

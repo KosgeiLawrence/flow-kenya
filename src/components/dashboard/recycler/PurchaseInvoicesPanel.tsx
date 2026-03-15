@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
@@ -8,20 +9,19 @@ import { Download, FileText } from "lucide-react";
 import { format } from "date-fns";
 import jsPDF from "jspdf";
 import { toast } from "sonner";
-import { addCleanHeader, addDocMeta, drawTableHeader, drawTableRow, drawTotalLine, finalizeCleanPdf, loadImageAsBase64, buildPdfOrgInfo } from "@/lib/pdfBranding";
+import { addCleanHeader, addDocMeta, drawTableHeader, drawTableRow, drawVatTotalBlock, finalizeCleanPdf, loadImageAsBase64, buildPdfOrgInfo } from "@/lib/pdfBranding";
+import VatOptions, { DEFAULT_VAT, type VatConfig } from "@/components/dashboard/shared/VatOptions";
 
 const PurchaseInvoicesPanel = () => {
   const { user, profile } = useAuth();
   const { orgInfo } = useOrgInfo();
+  const [vat, setVat] = useState<VatConfig>(DEFAULT_VAT);
 
   const { data: payments } = useQuery({
     queryKey: ["recycler_purchases", user?.id],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from("payments")
-        .select("*")
-        .eq("status", "completed")
-        .order("created_at", { ascending: false });
+        .from("payments").select("*").eq("status", "completed").order("created_at", { ascending: false });
       if (error) throw error;
       return data;
     },
@@ -32,9 +32,7 @@ const PurchaseInvoicesPanel = () => {
     queryKey: ["recycler_invoice_collections", user?.id],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from("collections")
-        .select("*, material_types(name, unit, price_per_unit)")
-        .order("collected_at", { ascending: false });
+        .from("collections").select("*, material_types(name, unit, price_per_unit)").order("collected_at", { ascending: false });
       if (error) throw error;
       return data;
     },
@@ -74,10 +72,7 @@ const PurchaseInvoicesPanel = () => {
     });
 
     y = drawTableHeader(doc, [
-      { label: "Material", x: 17 },
-      { label: "Quantity", x: 85 },
-      { label: "Unit Price", x: 120 },
-      { label: "Total (KES)", x: 155 },
+      { label: "Material", x: 17 }, { label: "Quantity", x: 85 }, { label: "Unit Price", x: 120 }, { label: "Total (KES)", x: 155 },
     ], y, 180);
 
     let grandTotal = 0;
@@ -86,15 +81,13 @@ const PurchaseInvoicesPanel = () => {
       const total = m.qty * m.price; grandTotal += total;
       drawTableRow(doc, y, i, 180);
       doc.setFontSize(8);
-      doc.text(m.name, 17, y);
-      doc.text(`${m.qty.toFixed(1)} ${m.unit}`, 85, y);
-      doc.text(m.price.toFixed(2), 120, y);
-      doc.text(total.toLocaleString(), 155, y);
+      doc.text(m.name, 17, y); doc.text(`${m.qty.toFixed(1)} ${m.unit}`, 85, y);
+      doc.text(m.price.toFixed(2), 120, y); doc.text(total.toLocaleString(), 155, y);
       y += 8; i++;
     });
 
     y += 4;
-    drawTotalLine(doc, `Total: KES ${grandTotal.toLocaleString()}`, y);
+    y = drawVatTotalBlock(doc, grandTotal, vat.vatPercent, vat.includeVat, y);
 
     finalizeCleanPdf(doc);
     doc.save(`purchase-invoice-${invNo}.pdf`);
@@ -116,8 +109,7 @@ const PurchaseInvoicesPanel = () => {
     ], y);
 
     y = drawTableHeader(doc, [
-      { label: "Description", x: 17 },
-      { label: "Amount (KES)", x: 150 },
+      { label: "Description", x: 17 }, { label: "Amount (KES)", x: 150 },
     ], y, 180);
 
     drawTableRow(doc, y, 0, 180);
@@ -126,10 +118,9 @@ const PurchaseInvoicesPanel = () => {
     doc.text(Number(payment.amount).toLocaleString(), 150, y);
     y += 10;
 
-    drawTotalLine(doc, `Total: KES ${Number(payment.amount).toLocaleString()}`, y);
+    y = drawVatTotalBlock(doc, Number(payment.amount), vat.vatPercent, vat.includeVat, y);
 
     if (payment.mpesa_receipt_number) {
-      y += 16;
       doc.setFontSize(9);
       doc.text(`M-Pesa Receipt: ${payment.mpesa_receipt_number}`, 15, y);
     }
@@ -141,6 +132,8 @@ const PurchaseInvoicesPanel = () => {
 
   return (
     <div className="space-y-6">
+      <VatOptions value={vat} onChange={setVat} />
+
       <Card className="shadow-soft">
         <CardContent className="flex items-center justify-between p-5">
           <div className="flex items-center gap-3">
