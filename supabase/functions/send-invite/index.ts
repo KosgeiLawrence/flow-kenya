@@ -72,7 +72,8 @@ Deno.serve(async (req) => {
       })
     }
 
-    const { email, couponCode } = await req.json()
+    const { email } = await req.json()
+    const couponCode = 'PILOT2026'
 
     if (!email || typeof email !== 'string') {
       return new Response(JSON.stringify({ error: 'Email is required' }), {
