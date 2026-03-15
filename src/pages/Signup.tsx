@@ -35,9 +35,18 @@ const Signup = () => {
   const [role, setRole] = useState<AppRole | null>(null);
 
   // Step 2: Plan
+  const [searchParams] = useSearchParams();
   const [selectedPlan, setSelectedPlan] = useState<string | null>(null);
   const [promoCode, setPromoCode] = useState("");
   const promoValid = isPromoValidForRole(promoCode, role);
+
+  // Auto-fill coupon code from invite link
+  useEffect(() => {
+    const coupon = searchParams.get("coupon");
+    if (coupon) {
+      setPromoCode(coupon.toUpperCase());
+    }
+  }, [searchParams]);
 
   // Step 3: Personal info
   const [fullName, setFullName] = useState("");
