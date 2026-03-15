@@ -604,17 +604,22 @@ const CleanupExercisePanel = ({ isAdmin = false }: Props) => {
                     toast.error("Please fill in the title and location");
                     return;
                   }
-                  createMutation.mutate({
+                  const submitData = {
                     ...form,
                     lead_organizer: form.lead_organizer || profile?.full_name || "",
-                  });
+                  };
+                  if (editingId) {
+                    updateMutation.mutate({ id: editingId, formData: submitData });
+                  } else {
+                    createMutation.mutate(submitData);
+                  }
                 }}
-                disabled={createMutation.isPending}
+                disabled={createMutation.isPending || updateMutation.isPending}
               >
-                {createMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
-                Submit Cleanup
+                {(createMutation.isPending || updateMutation.isPending) ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
+                {editingId ? "Update Cleanup" : "Submit Cleanup"}
               </Button>
-              <Button variant="outline" onClick={() => setShowForm(false)}>Cancel</Button>
+              <Button variant="outline" onClick={resetForm}>Cancel</Button>
             </div>
           </CardContent>
         </Card>
