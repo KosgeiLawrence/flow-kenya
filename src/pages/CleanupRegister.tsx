@@ -5,9 +5,10 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Loader2, UserPlus, ArrowLeft, Leaf, CheckCircle2 } from "lucide-react";
+import { Loader2, UserPlus, ArrowLeft, CheckCircle2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import duaraFlowIcon from "@/assets/duara-flow-icon.png";
 
 const CleanupRegister = () => {
   const { id } = useParams<{ id: string }>();
