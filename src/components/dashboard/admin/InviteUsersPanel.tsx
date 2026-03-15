@@ -112,11 +112,9 @@ const InviteUsersPanel = () => {
                       <p className="text-xs text-muted-foreground">{item.sentAt}</p>
                     </div>
                   </div>
-                  {item.coupon && (
-                    <span className="text-xs font-mono bg-secondary/20 text-secondary-foreground px-2 py-1 rounded">
-                      {item.coupon}
-                    </span>
-                  )}
+                  <span className="text-xs font-mono bg-secondary/20 text-secondary-foreground px-2 py-1 rounded">
+                    PILOT2026
+                  </span>
                 </div>
               ))}
             </div>
