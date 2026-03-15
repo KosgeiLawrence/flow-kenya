@@ -582,14 +582,26 @@ const CleanupExercisePanel = ({ isAdmin = false }: Props) => {
                     <Button
                       variant="ghost"
                       size="icon"
-                      title="Copy shareable link"
+                      title="Copy report share link"
                       onClick={() => {
                         const shareUrl = `https://duaraflow.co.ke/report/${c.id}`;
                         navigator.clipboard.writeText(shareUrl);
-                        toast.success("Share link copied to clipboard!");
+                        toast.success("Report share link copied!");
                       }}
                     >
                       <Share2 className="w-4 h-4" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      title="Copy registration link"
+                      onClick={() => {
+                        const regUrl = `https://duaraflow.co.ke/cleanup/${c.id}/register`;
+                        navigator.clipboard.writeText(regUrl);
+                        toast.success("Registration link copied!");
+                      }}
+                    >
+                      <ClipboardList className="w-4 h-4" />
                     </Button>
                     {!isAdmin && (
                       <Button variant="ghost" size="icon" onClick={() => deleteMutation.mutate(c.id)} title="Delete" className="text-destructive hover:text-destructive">
