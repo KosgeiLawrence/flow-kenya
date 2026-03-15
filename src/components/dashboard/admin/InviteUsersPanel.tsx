@@ -3,10 +3,9 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { Mail, Gift, Send, Loader2, CheckCircle } from "lucide-react";
+import { Mail, Send, Loader2, CheckCircle } from "lucide-react";
 
 const InviteUsersPanel = () => {
   const { toast } = useToast();
