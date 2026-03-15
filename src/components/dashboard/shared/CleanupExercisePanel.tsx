@@ -584,7 +584,7 @@ const CleanupExercisePanel = ({ isAdmin = false }: Props) => {
                       size="icon"
                       title="Copy shareable link"
                       onClick={() => {
-                        const shareUrl = `${window.location.origin}/report/${c.id}`;
+                        const shareUrl = `https://duaraflow.co.ke/report/${c.id}`;
                         navigator.clipboard.writeText(shareUrl);
                         toast.success("Share link copied to clipboard!");
                       }}
@@ -699,7 +699,7 @@ const CleanupExercisePanel = ({ isAdmin = false }: Props) => {
                     variant="outline"
                     className="gap-1"
                     onClick={() => {
-                      const shareUrl = `${window.location.origin}/report/${viewCleanup.id}`;
+                      const shareUrl = `https://duaraflow.co.ke/report/${viewCleanup.id}`;
                       navigator.clipboard.writeText(shareUrl);
                       toast.success("Share link copied to clipboard!");
                     }}
