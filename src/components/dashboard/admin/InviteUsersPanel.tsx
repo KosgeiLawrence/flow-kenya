@@ -50,7 +50,7 @@ const InviteUsersPanel = () => {
             Invite Users
           </CardTitle>
           <CardDescription>
-            Send email invitations to join Duara Flow. Optionally include a coupon code for discounts.
+            Send email invitations to join Duara Flow. Each invite automatically includes the PILOT2026 coupon for free access.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-5">
