@@ -67,14 +67,24 @@ const OrdersPanel = () => {
     },
   });
 
+  const getOrgPdfInfo = async () => {
+    if (!orgInfo) return null;
+    let logoBase64: string | null = null;
+    if (orgInfo.orgLogoUrl) logoBase64 = await loadImageAsBase64(orgInfo.orgLogoUrl);
+    return buildPdfOrgInfo(orgInfo, logoBase64);
+  };
+
   const generateOrderPDF = async (o: any) => {
     const doc = new jsPDF();
+    const pdfOrg = await getOrgPdfInfo();
+    const entityName = orgInfo?.orgName || profile?.full_name || "Recycler";
 
-    let y = addCleanHeader(doc, "Purchase Order / Contract");
+    let y = addCleanHeader(doc, "Purchase Order / Contract", undefined, pdfOrg);
     y = addDocMeta(doc, [
       { label: "Order Date", value: format(new Date(o.order_date), "MMM d, yyyy") },
-      { label: "Buyer", value: profile?.full_name || "Recycler" },
-      ...(profile?.phone_number ? [{ label: "Phone", value: profile.phone_number }] : []),
+      { label: "Buyer", value: entityName },
+      ...(orgInfo?.contactPhone ? [{ label: "Phone", value: orgInfo.contactPhone }] : []),
+      ...(orgInfo?.contactEmail ? [{ label: "Email", value: orgInfo.contactEmail }] : []),
       { label: "Supplier", value: o.supplier_name },
     ], y);
 
