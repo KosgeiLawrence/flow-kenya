@@ -396,7 +396,7 @@ const CleanupExercisePanel = ({ isAdmin = false }: Props) => {
     setSendingInvite(true);
     try {
       const { error } = await supabase.functions.invoke("send-invite", {
-        body: { email: inviteEmail.trim() },
+        body: { email: inviteEmail.trim(), source: "cleanup_partner" },
       });
       if (error) throw error;
       toast.success(`Invitation sent to ${inviteEmail.trim()}`);
