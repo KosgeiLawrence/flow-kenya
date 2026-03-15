@@ -108,6 +108,7 @@ const emptyForm = {
   environmental_issues: "",
   recommendations: "",
   partner_org_ids: [] as string[],
+  external_orgs: [] as { name: string; type: string }[],
 };
 
 interface Props {
@@ -127,6 +128,10 @@ const CleanupExercisePanel = ({ isAdmin = false }: Props) => {
   const [duringPhotos, setDuringPhotos] = useState<string[]>([]);
   const [afterPhotos, setAfterPhotos] = useState<string[]>([]);
   const [geoLoading, setGeoLoading] = useState(false);
+  const [externalOrgName, setExternalOrgName] = useState("");
+  const [externalOrgType, setExternalOrgType] = useState("ngo");
+  const [inviteEmail, setInviteEmail] = useState("");
+  const [sendingInvite, setSendingInvite] = useState(false);
 
   const resetForm = () => {
     setForm({ ...emptyForm });
@@ -170,6 +175,7 @@ const CleanupExercisePanel = ({ isAdmin = false }: Props) => {
       environmental_issues: c.environmental_issues || "",
       recommendations: c.recommendations || "",
       partner_org_ids: [],
+      external_orgs: [],
     });
     setBeforePhotos(c.before_photos || []);
     setDuringPhotos(c.during_photos || []);
@@ -204,7 +210,7 @@ const CleanupExercisePanel = ({ isAdmin = false }: Props) => {
 
   const createMutation = useMutation({
     mutationFn: async (formData: typeof form) => {
-      const { partner_org_ids, ...cleanupData } = formData;
+      const { partner_org_ids, external_orgs, ...cleanupData } = formData;
       const { data, error } = await supabase
         .from("cleanup_exercises")
         .insert({
@@ -223,9 +229,24 @@ const CleanupExercisePanel = ({ isAdmin = false }: Props) => {
         .single();
       if (error) throw error;
 
+      // Create external organizations and collect their IDs
+      const allPartnerIds = [...partner_org_ids];
+      for (const ext of external_orgs) {
+        const { data: newOrg, error: orgError } = await supabase
+          .from("organizations")
+          .insert({ name: ext.name, type: ext.type })
+          .select()
+          .single();
+        if (orgError) {
+          console.error("Failed to create org:", orgError.message);
+          continue;
+        }
+        allPartnerIds.push(newOrg.id);
+      }
+
       // Insert partner organizations
-      if (partner_org_ids.length > 0) {
-        const partners = partner_org_ids.map((orgId) => ({
+      if (allPartnerIds.length > 0) {
+        const partners = allPartnerIds.map((orgId) => ({
           cleanup_id: data.id,
           organization_id: orgId,
         }));
@@ -238,6 +259,7 @@ const CleanupExercisePanel = ({ isAdmin = false }: Props) => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["cleanup-exercises"] });
+      queryClient.invalidateQueries({ queryKey: ["organizations-list"] });
       resetForm();
       toast.success("Cleanup exercise logged successfully!");
     },
@@ -246,7 +268,7 @@ const CleanupExercisePanel = ({ isAdmin = false }: Props) => {
 
   const updateMutation = useMutation({
     mutationFn: async ({ id, formData }: { id: string; formData: typeof form }) => {
-      const { partner_org_ids, ...cleanupData } = formData;
+      const { partner_org_ids, external_orgs, ...cleanupData } = formData;
       const { error } = await supabase
         .from("cleanup_exercises")
         .update({
@@ -262,9 +284,36 @@ const CleanupExercisePanel = ({ isAdmin = false }: Props) => {
         })
         .eq("id", id);
       if (error) throw error;
+
+      // Create external organizations and add as partners
+      const allPartnerIds = [...partner_org_ids];
+      for (const ext of external_orgs) {
+        const { data: newOrg, error: orgError } = await supabase
+          .from("organizations")
+          .insert({ name: ext.name, type: ext.type })
+          .select()
+          .single();
+        if (orgError) {
+          console.error("Failed to create org:", orgError.message);
+          continue;
+        }
+        allPartnerIds.push(newOrg.id);
+      }
+
+      if (allPartnerIds.length > 0) {
+        const partners = allPartnerIds.map((orgId) => ({
+          cleanup_id: id,
+          organization_id: orgId,
+        }));
+        const { error: partnerError } = await supabase
+          .from("cleanup_partners")
+          .insert(partners);
+        if (partnerError) console.error("Partner insert error:", partnerError.message);
+      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["cleanup-exercises"] });
+      queryClient.invalidateQueries({ queryKey: ["organizations-list"] });
       resetForm();
       toast.success("Cleanup exercise updated successfully!");
     },
@@ -340,6 +389,23 @@ const CleanupExercisePanel = ({ isAdmin = false }: Props) => {
         ? f.partner_org_ids.length - 1
         : f.partner_org_ids.length + 1,
     }));
+  };
+
+  const sendOrgInvite = async () => {
+    if (!inviteEmail.trim()) return;
+    setSendingInvite(true);
+    try {
+      const { error } = await supabase.functions.invoke("send-invite", {
+        body: { email: inviteEmail.trim() },
+      });
+      if (error) throw error;
+      toast.success(`Invitation sent to ${inviteEmail.trim()}`);
+      setInviteEmail("");
+    } catch (err: any) {
+      toast.error(err.message || "Failed to send invite");
+    } finally {
+      setSendingInvite(false);
+    }
   };
 
   const generatePDF = async (cleanup: CleanupExercise) => {
@@ -491,28 +557,124 @@ const CleanupExercisePanel = ({ isAdmin = false }: Props) => {
 
             {/* Organizer */}
             <div>
-              <h4 className="text-sm font-semibold text-foreground mb-3">Organizer</h4>
+              <h4 className="text-sm font-semibold text-foreground mb-3">Organizer & Partners</h4>
               <div>
                 <Label>Lead Organizer</Label>
                 <Input value={form.lead_organizer || profile?.full_name || ""} onChange={(e) => setForm({ ...form, lead_organizer: e.target.value })} />
               </div>
-              {organizations.length > 0 && (
-                <div className="mt-3">
-                  <Label>Partner Organizations</Label>
-                  <div className="flex flex-wrap gap-2 mt-1 max-h-32 overflow-y-auto">
-                    {organizations.map((org) => (
-                      <Badge
-                        key={org.id}
-                        variant={form.partner_org_ids.includes(org.id) ? "default" : "outline"}
-                        className="cursor-pointer"
-                        onClick={() => togglePartnerOrg(org.id)}
-                      >
-                        {org.name}
+
+              {/* Existing Organizations */}
+              <div className="mt-4">
+                <Label>Partner Organizations (from platform)</Label>
+                <div className="flex flex-wrap gap-2 mt-1 max-h-32 overflow-y-auto">
+                  {organizations.map((org) => (
+                    <Badge
+                      key={org.id}
+                      variant={form.partner_org_ids.includes(org.id) ? "default" : "outline"}
+                      className="cursor-pointer"
+                      onClick={() => togglePartnerOrg(org.id)}
+                    >
+                      {org.name}
+                    </Badge>
+                  ))}
+                  {organizations.length === 0 && (
+                    <p className="text-xs text-muted-foreground">No organizations registered yet.</p>
+                  )}
+                </div>
+              </div>
+
+              {/* Add External Organization */}
+              <div className="mt-4">
+                <Label>Add External Organization</Label>
+                <div className="flex gap-2 mt-1">
+                  <Input
+                    placeholder="Organization name"
+                    value={externalOrgName}
+                    onChange={(e) => setExternalOrgName(e.target.value)}
+                    className="flex-1"
+                  />
+                  <Select value={externalOrgType} onValueChange={setExternalOrgType}>
+                    <SelectTrigger className="w-[140px]">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="ngo">NGO</SelectItem>
+                      <SelectItem value="private_company">Private Company</SelectItem>
+                      <SelectItem value="government">Government</SelectItem>
+                      <SelectItem value="community_group">Community Group</SelectItem>
+                      <SelectItem value="academic">Academic</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="icon"
+                    onClick={() => {
+                      if (!externalOrgName.trim()) {
+                        toast.error("Enter an organization name");
+                        return;
+                      }
+                      setForm((f) => ({
+                        ...f,
+                        external_orgs: [...f.external_orgs, { name: externalOrgName.trim(), type: externalOrgType }],
+                        num_partner_orgs: f.num_partner_orgs + 1,
+                      }));
+                      setExternalOrgName("");
+                      toast.success(`Added "${externalOrgName.trim()}"`);
+                    }}
+                  >
+                    <Plus className="w-4 h-4" />
+                  </Button>
+                </div>
+                {form.external_orgs.length > 0 && (
+                  <div className="flex flex-wrap gap-2 mt-2">
+                    {form.external_orgs.map((ext, i) => (
+                      <Badge key={i} variant="secondary" className="gap-1">
+                        {ext.name}
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setForm((f) => ({
+                              ...f,
+                              external_orgs: f.external_orgs.filter((_, idx) => idx !== i),
+                              num_partner_orgs: Math.max(0, f.num_partner_orgs - 1),
+                            }))
+                          }
+                          className="ml-1 hover:text-destructive"
+                        >
+                          <X className="w-3 h-3" />
+                        </button>
                       </Badge>
                     ))}
                   </div>
+                )}
+              </div>
+
+              {/* Invite Organization via Email */}
+              <div className="mt-4">
+                <Label>Invite Organization via Email</Label>
+                <div className="flex gap-2 mt-1">
+                  <Input
+                    type="email"
+                    placeholder="organization@example.com"
+                    value={inviteEmail}
+                    onChange={(e) => setInviteEmail(e.target.value)}
+                    className="flex-1"
+                    onKeyDown={(e) => e.key === "Enter" && inviteEmail.trim() && sendOrgInvite()}
+                  />
+                  <Button
+                    type="button"
+                    variant="outline"
+                    disabled={sendingInvite || !inviteEmail.trim()}
+                    onClick={sendOrgInvite}
+                    className="gap-1"
+                  >
+                    {sendingInvite ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
+                    Invite
+                  </Button>
                 </div>
-              )}
+                <p className="text-xs text-muted-foreground mt-1">Send an invitation to join the platform to an external organization.</p>
+              </div>
             </div>
 
             <Separator />
