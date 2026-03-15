@@ -55,7 +55,14 @@ const OrdersPanel = () => {
 
   const updateStatus = useMutation({
     mutationFn: async ({ id, status }: { id: string; status: string }) => { const { error } = await supabase.from("recycler_orders").update({ status }).eq("id", id); if (error) throw error; },
-    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ["recycler_orders"] }); toast.success("Status updated"); },
+    onSuccess: (_data, variables) => {
+      queryClient.invalidateQueries({ queryKey: ["recycler_orders"] });
+      if (variables.status === "delivered") {
+        queryClient.invalidateQueries({ queryKey: ["recycler_delivered_orders"] });
+        queryClient.invalidateQueries({ queryKey: ["recycler_inventory"] });
+      }
+      toast.success("Status updated");
+    },
   });
 
   const generateOrderPDF = async (o: any) => {

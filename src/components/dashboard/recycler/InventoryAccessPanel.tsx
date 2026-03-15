@@ -8,8 +8,18 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Package, Layers, TrendingUp, Users, Plus } from "lucide-react";
+import { Package, Layers, TrendingUp, Users, Plus, ClipboardList } from "lucide-react";
 import { toast } from "sonner";
+import { format } from "date-fns";
+
+interface InventoryItem {
+  name: string;
+  qty: number;
+  unit: string;
+  value: number;
+  icon: string;
+  source: "collection" | "order" | "both";
+}
 
 const InventoryAccessPanel = () => {
   const { user } = useAuth();
@@ -39,6 +49,21 @@ const InventoryAccessPanel = () => {
     enabled: !!user,
   });
 
+  const { data: deliveredOrders } = useQuery({
+    queryKey: ["recycler_delivered_orders", user?.id],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("recycler_orders")
+        .select("*")
+        .eq("user_id", user!.id)
+        .eq("status", "delivered")
+        .order("created_at", { ascending: false });
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!user,
+  });
+
   const addEntry = useMutation({
     mutationFn: async () => {
       const { error } = await supabase.from("collections").insert({
@@ -58,33 +83,63 @@ const InventoryAccessPanel = () => {
     onError: (e: any) => toast.error(e.message),
   });
 
-  // Aggregate by material
-  const materialMap = new Map<string, { name: string; qty: number; unit: string; value: number; icon: string }>();
+  // Aggregate collections by material type
+  const materialMap = new Map<string, InventoryItem>();
+
   collections?.forEach((c) => {
     const mt = (c as any).material_types;
-    const key = c.material_type_id;
+    const key = mt?.name || c.material_type_id;
     const existing = materialMap.get(key);
+    const qty = Number(c.quantity);
+    const price = Number(mt?.price_per_unit || 0);
     if (existing) {
-      existing.qty += Number(c.quantity);
-      existing.value += Number(c.quantity) * Number(mt?.price_per_unit || 0);
+      existing.qty += qty;
+      existing.value += qty * price;
     } else {
       materialMap.set(key, {
         name: mt?.name || "Unknown",
-        qty: Number(c.quantity),
+        qty,
         unit: mt?.unit || "kg",
-        value: Number(c.quantity) * Number(mt?.price_per_unit || 0),
+        value: qty * price,
         icon: mt?.icon || "♻️",
+        source: "collection",
+      });
+    }
+  });
+
+  // Merge delivered orders into inventory
+  deliveredOrders?.forEach((o) => {
+    const key = o.material_type;
+    const existing = materialMap.get(key);
+    const qty = Number(o.quantity);
+    const unitPrice = Number(o.unit_price);
+    if (existing) {
+      existing.qty += qty;
+      existing.value += qty * unitPrice;
+      existing.source = "both";
+    } else {
+      materialMap.set(key, {
+        name: o.material_type,
+        qty,
+        unit: o.unit,
+        value: qty * unitPrice,
+        icon: "📦",
+        source: "order",
       });
     }
   });
 
   const totalValue = Array.from(materialMap.values()).reduce((s, m) => s + m.value, 0);
   const totalQty = Array.from(materialMap.values()).reduce((s, m) => s + m.qty, 0);
-  const uniqueSuppliers = new Set(collections?.map((c) => c.user_id)).size;
+  const uniqueSuppliers = new Set([
+    ...(collections?.map((c) => c.user_id) || []),
+    ...(deliveredOrders?.map((o) => o.supplier_name) || []),
+  ]).size;
+  const totalOrders = deliveredOrders?.length || 0;
 
   return (
     <div className="space-y-6">
-      <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
         <Card className="shadow-soft">
           <CardContent className="flex items-center gap-3 p-4">
             <Package className="w-7 h-7 text-primary" />
@@ -114,10 +169,10 @@ const InventoryAccessPanel = () => {
         </Card>
         <Card className="shadow-soft">
           <CardContent className="flex items-center gap-3 p-4">
-            <Users className="w-7 h-7 text-muted-foreground" />
+            <ClipboardList className="w-7 h-7 text-muted-foreground" />
             <div>
-              <p className="text-xl font-bold text-foreground">{uniqueSuppliers}</p>
-              <p className="text-xs text-muted-foreground">Suppliers</p>
+              <p className="text-xl font-bold text-foreground">{totalOrders}</p>
+              <p className="text-xs text-muted-foreground">Delivered Orders</p>
             </div>
           </CardContent>
         </Card>
@@ -162,7 +217,7 @@ const InventoryAccessPanel = () => {
       </Dialog>
 
       <Card className="shadow-soft">
-        <CardHeader><CardTitle className="text-lg">Available Materials from Aggregators</CardTitle></CardHeader>
+        <CardHeader><CardTitle className="text-lg">Inventory Summary</CardTitle></CardHeader>
         <CardContent>
           {!materialMap.size ? (
             <p className="text-sm text-muted-foreground">No inventory data available.</p>
@@ -177,13 +232,37 @@ const InventoryAccessPanel = () => {
                       <p className="text-xs text-muted-foreground">{m.qty.toFixed(1)} {m.unit} available</p>
                     </div>
                   </div>
-                  <p className="text-sm font-semibold text-foreground">KES {m.value.toLocaleString()}</p>
+                  <div className="flex items-center gap-2">
+                    {m.source === "order" && <Badge variant="secondary" className="text-xs">From Orders</Badge>}
+                    {m.source === "both" && <Badge variant="secondary" className="text-xs">Mixed Sources</Badge>}
+                    <p className="text-sm font-semibold text-foreground">KES {m.value.toLocaleString()}</p>
+                  </div>
                 </div>
               ))}
             </div>
           )}
         </CardContent>
       </Card>
+
+      {/* Recent Delivered Orders */}
+      {deliveredOrders && deliveredOrders.length > 0 && (
+        <Card className="shadow-soft">
+          <CardHeader><CardTitle className="text-lg">Recent Delivered Orders</CardTitle></CardHeader>
+          <CardContent>
+            <div className="divide-y divide-border">
+              {deliveredOrders.slice(0, 10).map((o) => (
+                <div key={o.id} className="flex items-center justify-between py-3">
+                  <div>
+                    <p className="text-sm font-medium text-foreground">{o.material_type} — {Number(o.quantity).toFixed(0)} {o.unit}</p>
+                    <p className="text-xs text-muted-foreground">{o.supplier_name} · {format(new Date(o.order_date), "MMM d, yyyy")}</p>
+                  </div>
+                  <p className="text-sm font-semibold text-foreground">KES {Number(o.total_amount).toLocaleString()}</p>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      )}
     </div>
   );
 };
