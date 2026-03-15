@@ -210,7 +210,7 @@ const CleanupExercisePanel = ({ isAdmin = false }: Props) => {
 
   const createMutation = useMutation({
     mutationFn: async (formData: typeof form) => {
-      const { partner_org_ids, ...cleanupData } = formData;
+      const { partner_org_ids, external_orgs, ...cleanupData } = formData;
       const { data, error } = await supabase
         .from("cleanup_exercises")
         .insert({
@@ -229,9 +229,24 @@ const CleanupExercisePanel = ({ isAdmin = false }: Props) => {
         .single();
       if (error) throw error;
 
+      // Create external organizations and collect their IDs
+      const allPartnerIds = [...partner_org_ids];
+      for (const ext of external_orgs) {
+        const { data: newOrg, error: orgError } = await supabase
+          .from("organizations")
+          .insert({ name: ext.name, type: ext.type })
+          .select()
+          .single();
+        if (orgError) {
+          console.error("Failed to create org:", orgError.message);
+          continue;
+        }
+        allPartnerIds.push(newOrg.id);
+      }
+
       // Insert partner organizations
-      if (partner_org_ids.length > 0) {
-        const partners = partner_org_ids.map((orgId) => ({
+      if (allPartnerIds.length > 0) {
+        const partners = allPartnerIds.map((orgId) => ({
           cleanup_id: data.id,
           organization_id: orgId,
         }));
@@ -244,6 +259,7 @@ const CleanupExercisePanel = ({ isAdmin = false }: Props) => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["cleanup-exercises"] });
+      queryClient.invalidateQueries({ queryKey: ["organizations-list"] });
       resetForm();
       toast.success("Cleanup exercise logged successfully!");
     },
