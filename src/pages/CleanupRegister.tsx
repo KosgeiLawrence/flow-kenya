@@ -8,7 +8,6 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Loader2, UserPlus, ArrowLeft, CheckCircle2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import duaraFlowIcon from "@/assets/duara-flow-icon.png";
 
 const CleanupRegister = () => {
   const { id } = useParams<{ id: string }>();
