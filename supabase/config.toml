@@ -7,3 +7,5 @@ project_id = "gbchyukefjnqhvajlehl"
     verify_jwt = false
   [functions.check-subscription]
     verify_jwt = false
+  [functions.get-public-report]
+    verify_jwt = false
