@@ -8,7 +8,6 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Loader2, UserPlus, ArrowLeft, CheckCircle2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import duaraFlowIcon from "@/assets/duara-flow-icon.png";
 
 const CleanupRegister = () => {
   const { id } = useParams<{ id: string }>();
@@ -62,7 +61,7 @@ const CleanupRegister = () => {
       <div className="min-h-screen bg-background flex flex-col items-center justify-center p-4">
         <div className="w-full max-w-md space-y-6 text-center">
           <div className="flex items-center justify-center gap-2 mb-4">
-            <img src={duaraFlowIcon} alt="Duara Flow" className="w-8 h-8" />
+            <img src="/pwa-icon-192.png" alt="Duara Flow" className="w-8 h-8" />
             <span className="text-2xl font-bold font-display text-foreground">Duara Flow</span>
           </div>
           <Card>
@@ -95,7 +94,7 @@ const CleanupRegister = () => {
       <div className="w-full max-w-md space-y-6">
         <div className="text-center space-y-2">
           <div className="flex items-center justify-center gap-2 mb-4">
-            <img src={duaraFlowIcon} alt="Duara Flow" className="w-8 h-8" />
+            <img src="/pwa-icon-192.png" alt="Duara Flow" className="w-8 h-8" />
             <span className="text-2xl font-bold font-display text-foreground">Duara Flow</span>
           </div>
           <h1 className="text-xl font-semibold text-foreground">Cleanup Exercise Registration</h1>
