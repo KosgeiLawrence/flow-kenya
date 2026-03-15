@@ -10,10 +10,8 @@ import { Mail, Send, Loader2, CheckCircle } from "lucide-react";
 const InviteUsersPanel = () => {
   const { toast } = useToast();
   const [email, setEmail] = useState("");
-  const [includeCoupon, setIncludeCoupon] = useState(false);
-  const [couponCode, setCouponCode] = useState("");
   const [sending, setSending] = useState(false);
-  const [sentEmails, setSentEmails] = useState<{ email: string; coupon?: string; sentAt: string }[]>([]);
+  const [sentEmails, setSentEmails] = useState<{ email: string; sentAt: string }[]>([]);
 
   const handleSend = async () => {
     if (!email.trim()) {
