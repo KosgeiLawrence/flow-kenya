@@ -16,7 +16,7 @@ import { toast } from "sonner";
 import { format } from "date-fns";
 import {
   Plus, MapPin, Users, Trash2, Package, Eye, Download, FileText,
-  Camera, ChevronDown, ChevronUp, Loader2, Upload, X, Share2, Link as LinkIcon, UserPlus, ClipboardList
+  Camera, ChevronDown, ChevronUp, Loader2, Upload, X, Share2, Link as LinkIcon, UserPlus, ClipboardList, Pencil
 } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { generateCleanupReportPDF } from "@/lib/cleanupReportPdf";
@@ -119,6 +119,7 @@ const CleanupExercisePanel = ({ isAdmin = false }: Props) => {
   const queryClient = useQueryClient();
   const [showForm, setShowForm] = useState(false);
   const [form, setForm] = useState({ ...emptyForm });
+  const [editingId, setEditingId] = useState<string | null>(null);
   const [showBreakdown, setShowBreakdown] = useState(false);
   const [viewCleanup, setViewCleanup] = useState<CleanupExercise | null>(null);
   const [uploading, setUploading] = useState<string | null>(null);
@@ -126,6 +127,56 @@ const CleanupExercisePanel = ({ isAdmin = false }: Props) => {
   const [duringPhotos, setDuringPhotos] = useState<string[]>([]);
   const [afterPhotos, setAfterPhotos] = useState<string[]>([]);
   const [geoLoading, setGeoLoading] = useState(false);
+
+  const resetForm = () => {
+    setForm({ ...emptyForm });
+    setEditingId(null);
+    setShowForm(false);
+    setBeforePhotos([]);
+    setDuringPhotos([]);
+    setAfterPhotos([]);
+  };
+
+  const startEditing = (c: CleanupExercise) => {
+    setForm({
+      title: c.title,
+      cleanup_date: c.cleanup_date,
+      start_time: c.start_time,
+      end_time: c.end_time,
+      location_name: c.location_name,
+      location_lat: c.location_lat,
+      location_lng: c.location_lng,
+      location_type: c.location_type,
+      lead_organizer: c.lead_organizer,
+      num_volunteers: c.num_volunteers,
+      num_waste_pickers: c.num_waste_pickers,
+      num_partner_orgs: c.num_partner_orgs,
+      total_waste_kg: Number(c.total_waste_kg),
+      plastic_waste_kg: Number(c.plastic_waste_kg),
+      recyclable_waste_kg: Number(c.recyclable_waste_kg),
+      non_recyclable_waste_kg: Number(c.non_recyclable_waste_kg),
+      num_bags: c.num_bags,
+      pet_bottles_kg: Number(c.pet_bottles_kg),
+      hdpe_kg: Number(c.hdpe_kg),
+      fishing_nets_kg: Number(c.fishing_nets_kg),
+      sachets_kg: Number(c.sachets_kg),
+      glass_kg: Number(c.glass_kg),
+      metal_kg: Number(c.metal_kg),
+      other_materials_kg: Number(c.other_materials_kg),
+      waste_destination: c.waste_destination || "",
+      transport_method: c.transport_method || "",
+      waste_sorted: c.waste_sorted,
+      observations: c.observations || "",
+      environmental_issues: c.environmental_issues || "",
+      recommendations: c.recommendations || "",
+      partner_org_ids: [],
+    });
+    setBeforePhotos(c.before_photos || []);
+    setDuringPhotos(c.during_photos || []);
+    setAfterPhotos(c.after_photos || []);
+    setEditingId(c.id);
+    setShowForm(true);
+  };
 
   const { data: cleanups = [], isLoading } = useQuery({
     queryKey: ["cleanup-exercises", isAdmin],
@@ -187,12 +238,35 @@ const CleanupExercisePanel = ({ isAdmin = false }: Props) => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["cleanup-exercises"] });
-      setShowForm(false);
-      setForm({ ...emptyForm });
-      setBeforePhotos([]);
-      setDuringPhotos([]);
-      setAfterPhotos([]);
+      resetForm();
       toast.success("Cleanup exercise logged successfully!");
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+  const updateMutation = useMutation({
+    mutationFn: async ({ id, formData }: { id: string; formData: typeof form }) => {
+      const { partner_org_ids, ...cleanupData } = formData;
+      const { error } = await supabase
+        .from("cleanup_exercises")
+        .update({
+          ...cleanupData,
+          before_photos: beforePhotos,
+          during_photos: duringPhotos,
+          after_photos: afterPhotos,
+          waste_destination: cleanupData.waste_destination || null,
+          transport_method: cleanupData.transport_method || null,
+          observations: cleanupData.observations || null,
+          environmental_issues: cleanupData.environmental_issues || null,
+          recommendations: cleanupData.recommendations || null,
+        })
+        .eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["cleanup-exercises"] });
+      resetForm();
+      toast.success("Cleanup exercise updated successfully!");
     },
     onError: (e: Error) => toast.error(e.message),
   });
@@ -358,7 +432,7 @@ const CleanupExercisePanel = ({ isAdmin = false }: Props) => {
       {/* Action Bar */}
       {!isAdmin && (
         <div className="flex justify-end">
-          <Button onClick={() => setShowForm(!showForm)} className="gap-2">
+          <Button onClick={() => { if (showForm && editingId) { resetForm(); } else { setShowForm(!showForm); setEditingId(null); } }} className="gap-2">
             <Plus className="w-4 h-4" /> Log Cleanup Exercise
           </Button>
         </div>
@@ -368,7 +442,7 @@ const CleanupExercisePanel = ({ isAdmin = false }: Props) => {
       {showForm && (
         <Card>
           <CardHeader>
-            <CardTitle className="text-lg">Log Cleanup Exercise</CardTitle>
+            <CardTitle className="text-lg">{editingId ? "Edit Cleanup Exercise" : "Log Cleanup Exercise"}</CardTitle>
           </CardHeader>
           <CardContent className="space-y-6">
             {/* Basic Info */}
@@ -530,17 +604,22 @@ const CleanupExercisePanel = ({ isAdmin = false }: Props) => {
                     toast.error("Please fill in the title and location");
                     return;
                   }
-                  createMutation.mutate({
+                  const submitData = {
                     ...form,
                     lead_organizer: form.lead_organizer || profile?.full_name || "",
-                  });
+                  };
+                  if (editingId) {
+                    updateMutation.mutate({ id: editingId, formData: submitData });
+                  } else {
+                    createMutation.mutate(submitData);
+                  }
                 }}
-                disabled={createMutation.isPending}
+                disabled={createMutation.isPending || updateMutation.isPending}
               >
-                {createMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
-                Submit Cleanup
+                {(createMutation.isPending || updateMutation.isPending) ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
+                {editingId ? "Update Cleanup" : "Submit Cleanup"}
               </Button>
-              <Button variant="outline" onClick={() => setShowForm(false)}>Cancel</Button>
+              <Button variant="outline" onClick={resetForm}>Cancel</Button>
             </div>
           </CardContent>
         </Card>
@@ -578,6 +657,9 @@ const CleanupExercisePanel = ({ isAdmin = false }: Props) => {
                   </div>
                   <div className="flex items-center gap-1 shrink-0">
                     <Button variant="ghost" size="icon" onClick={() => setViewCleanup(c)} title="View Report"><Eye className="w-4 h-4" /></Button>
+                    {!isAdmin && c.user_id === user?.id && (
+                      <Button variant="ghost" size="icon" onClick={() => startEditing(c)} title="Edit"><Pencil className="w-4 h-4" /></Button>
+                    )}
                     <Button variant="ghost" size="icon" onClick={() => generatePDF(c)} title="Download PDF"><Download className="w-4 h-4" /></Button>
                     <Button variant="ghost" size="icon" onClick={() => exportCSV(c)} title="Export CSV"><FileText className="w-4 h-4" /></Button>
                     <Button
