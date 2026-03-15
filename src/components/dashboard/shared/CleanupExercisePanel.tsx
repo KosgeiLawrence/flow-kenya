@@ -364,6 +364,23 @@ const CleanupExercisePanel = ({ isAdmin = false }: Props) => {
     }));
   };
 
+  const sendOrgInvite = async () => {
+    if (!inviteEmail.trim()) return;
+    setSendingInvite(true);
+    try {
+      const { error } = await supabase.functions.invoke("send-invite", {
+        body: { email: inviteEmail.trim() },
+      });
+      if (error) throw error;
+      toast.success(`Invitation sent to ${inviteEmail.trim()}`);
+      setInviteEmail("");
+    } catch (err: any) {
+      toast.error(err.message || "Failed to send invite");
+    } finally {
+      setSendingInvite(false);
+    }
+  };
+
   const generatePDF = async (cleanup: CleanupExercise) => {
     try {
       await generateCleanupReportPDF(cleanup);
