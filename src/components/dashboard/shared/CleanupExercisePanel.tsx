@@ -16,7 +16,7 @@ import { toast } from "sonner";
 import { format } from "date-fns";
 import {
   Plus, MapPin, Users, Trash2, Package, Eye, Download, FileText,
-  Camera, ChevronDown, ChevronUp, Loader2, Upload, X, Share2, Link as LinkIcon, UserPlus, ClipboardList, Pencil
+  Camera, ChevronDown, ChevronUp, Loader2, Upload, X, Share2, Link as LinkIcon, UserPlus, ClipboardList, Pencil, Mail, Send
 } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { generateCleanupReportPDF } from "@/lib/cleanupReportPdf";
