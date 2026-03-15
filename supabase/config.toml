@@ -9,3 +9,5 @@ project_id = "gbchyukefjnqhvajlehl"
     verify_jwt = false
   [functions.get-public-report]
     verify_jwt = false
+  [functions.register-cleanup-participant]
+    verify_jwt = false
