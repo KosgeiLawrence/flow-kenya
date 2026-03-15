@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { useNavigate, Link, useSearchParams } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowLeft, ArrowRight, Loader2, Eye, EyeOff, X } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
@@ -35,9 +35,18 @@ const Signup = () => {
   const [role, setRole] = useState<AppRole | null>(null);
 
   // Step 2: Plan
+  const [searchParams] = useSearchParams();
   const [selectedPlan, setSelectedPlan] = useState<string | null>(null);
   const [promoCode, setPromoCode] = useState("");
   const promoValid = isPromoValidForRole(promoCode, role);
+
+  // Auto-fill coupon code from invite link
+  useEffect(() => {
+    const coupon = searchParams.get("coupon");
+    if (coupon) {
+      setPromoCode(coupon.toUpperCase());
+    }
+  }, [searchParams]);
 
   // Step 3: Personal info
   const [fullName, setFullName] = useState("");
