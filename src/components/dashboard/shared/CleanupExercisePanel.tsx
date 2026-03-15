@@ -108,6 +108,7 @@ const emptyForm = {
   environmental_issues: "",
   recommendations: "",
   partner_org_ids: [] as string[],
+  external_orgs: [] as { name: string; type: string }[],
 };
 
 interface Props {
