@@ -34,7 +34,7 @@ Deno.serve(async (req) => {
   }
 
   try {
-    // Verify the caller is an admin
+    // Verify the caller is authenticated
     const authHeader = req.headers.get('Authorization')
     if (!authHeader) {
       return new Response(JSON.stringify({ error: 'Unauthorized' }), {
@@ -57,23 +57,25 @@ Deno.serve(async (req) => {
       })
     }
 
-    // Check admin role
-    const { data: roleData } = await supabase
-      .from('user_roles')
-      .select('role')
-      .eq('user_id', user.id)
-      .eq('role', 'admin')
-      .maybeSingle()
-
-    if (!roleData) {
-      return new Response(JSON.stringify({ error: 'Admin access required' }), {
-        status: 403,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      })
-    }
-
-    const { email } = await req.json()
+    const { email, source } = await req.json()
     const couponCode = 'PILOT2026'
+
+    // Only enforce admin check for non-partner invites
+    if (source !== 'cleanup_partner') {
+      const { data: roleData } = await supabase
+        .from('user_roles')
+        .select('role')
+        .eq('user_id', user.id)
+        .eq('role', 'admin')
+        .maybeSingle()
+
+      if (!roleData) {
+        return new Response(JSON.stringify({ error: 'Admin access required' }), {
+          status: 403,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        })
+      }
+    }
 
     if (!email || typeof email !== 'string') {
       return new Response(JSON.stringify({ error: 'Email is required' }), {
