@@ -8,6 +8,11 @@ import {
   addDocMeta,
 } from "./pdfBranding";
 
+interface PartnerOrg {
+  name: string;
+  type?: string;
+}
+
 interface CleanupData {
   id: string;
   title: string;
@@ -42,6 +47,7 @@ interface CleanupData {
   recommendations: string | null;
   status: string;
   created_at: string;
+  partner_organizations?: PartnerOrg[];
 }
 
 const LOCATION_LABELS: Record<string, string> = {

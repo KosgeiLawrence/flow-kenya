@@ -58,7 +58,18 @@ Deno.serve(async (req) => {
       })
     }
 
-    return new Response(JSON.stringify({ cleanup }), {
+    // Fetch partner organizations
+    const { data: partners } = await supabase
+      .from('cleanup_partners')
+      .select('organization_id, organizations(name, type)')
+      .eq('cleanup_id', reportId)
+
+    const partner_organizations = (partners || []).map((p: any) => ({
+      name: p.organizations?.name || 'Unknown',
+      type: p.organizations?.type || '',
+    }))
+
+    return new Response(JSON.stringify({ cleanup: { ...cleanup, partner_organizations } }), {
       status: 200,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     })
