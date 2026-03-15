@@ -657,6 +657,9 @@ const CleanupExercisePanel = ({ isAdmin = false }: Props) => {
                   </div>
                   <div className="flex items-center gap-1 shrink-0">
                     <Button variant="ghost" size="icon" onClick={() => setViewCleanup(c)} title="View Report"><Eye className="w-4 h-4" /></Button>
+                    {!isAdmin && c.user_id === user?.id && (
+                      <Button variant="ghost" size="icon" onClick={() => startEditing(c)} title="Edit"><Pencil className="w-4 h-4" /></Button>
+                    )}
                     <Button variant="ghost" size="icon" onClick={() => generatePDF(c)} title="Download PDF"><Download className="w-4 h-4" /></Button>
                     <Button variant="ghost" size="icon" onClick={() => exportCSV(c)} title="Export CSV"><FileText className="w-4 h-4" /></Button>
                     <Button
