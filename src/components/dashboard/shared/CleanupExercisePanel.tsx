@@ -579,6 +579,18 @@ const CleanupExercisePanel = ({ isAdmin = false }: Props) => {
                     <Button variant="ghost" size="icon" onClick={() => setViewCleanup(c)} title="View Report"><Eye className="w-4 h-4" /></Button>
                     <Button variant="ghost" size="icon" onClick={() => generatePDF(c)} title="Download PDF"><Download className="w-4 h-4" /></Button>
                     <Button variant="ghost" size="icon" onClick={() => exportCSV(c)} title="Export CSV"><FileText className="w-4 h-4" /></Button>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      title="Copy shareable link"
+                      onClick={() => {
+                        const shareUrl = `${window.location.origin}/report/${c.id}`;
+                        navigator.clipboard.writeText(shareUrl);
+                        toast.success("Share link copied to clipboard!");
+                      }}
+                    >
+                      <Share2 className="w-4 h-4" />
+                    </Button>
                     {!isAdmin && (
                       <Button variant="ghost" size="icon" onClick={() => deleteMutation.mutate(c.id)} title="Delete" className="text-destructive hover:text-destructive">
                         <Trash2 className="w-4 h-4" />
