@@ -52,7 +52,7 @@ const PublicReport = () => {
         {/* Logo / Branding */}
         <div className="text-center space-y-2">
           <div className="flex items-center justify-center gap-2 mb-4">
-            <Leaf className="w-8 h-8 text-primary" />
+            <img src={reportIcon} alt="Duara Flow" className="w-10 h-10" />
             <span className="text-2xl font-bold font-display text-foreground">Duara Flow</span>
           </div>
           <h1 className="text-xl font-semibold text-foreground">Cleanup Exercise Report</h1>
