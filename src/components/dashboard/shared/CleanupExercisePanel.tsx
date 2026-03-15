@@ -11,6 +11,7 @@ import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { Separator } from "@/components/ui/separator";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { toast } from "sonner";
 import { format } from "date-fns";
 import {
@@ -703,6 +704,9 @@ const CleanupExercisePanel = ({ isAdmin = false }: Props) => {
                   </>
                 )}
 
+                {/* Registered Participants */}
+                <ParticipantsSection cleanupId={viewCleanup.id} />
+
                 <div className="flex gap-2 pt-3">
                   <Button size="sm" onClick={() => generatePDF(viewCleanup)} className="gap-1"><Download className="w-3 h-3" /> PDF</Button>
                   <Button size="sm" variant="outline" onClick={() => exportCSV(viewCleanup)} className="gap-1"><FileText className="w-3 h-3" /> CSV</Button>
@@ -737,6 +741,76 @@ const CleanupExercisePanel = ({ isAdmin = false }: Props) => {
         </DialogContent>
       </Dialog>
     </div>
+  );
+};
+
+interface Participant {
+  id: string;
+  full_name: string;
+  email: string | null;
+  phone_number: string | null;
+  organization_name: string | null;
+  role_title: string | null;
+  created_at: string;
+}
+
+const ParticipantsSection = ({ cleanupId }: { cleanupId: string }) => {
+  const { data: participants, isLoading } = useQuery({
+    queryKey: ["cleanup-participants", cleanupId],
+    queryFn: async () => {
+      const { data, error } = await (supabase as any)
+        .from("cleanup_participants")
+        .select("*")
+        .eq("cleanup_id", cleanupId)
+        .order("created_at", { ascending: true });
+      if (error) throw error;
+      return data as Participant[];
+    },
+  });
+
+  return (
+    <>
+      <Separator />
+      <h4 className="font-semibold text-foreground flex items-center gap-2">
+        <Users className="w-4 h-4" />
+        Registered Participants
+        {participants && <Badge variant="secondary">{participants.length}</Badge>}
+      </h4>
+      {isLoading ? (
+        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+          <Loader2 className="w-3 h-3 animate-spin" /> Loading participants…
+        </div>
+      ) : !participants || participants.length === 0 ? (
+        <p className="text-sm text-muted-foreground">No participants registered yet.</p>
+      ) : (
+        <div className="border border-border rounded-md overflow-x-auto">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead className="text-xs">#</TableHead>
+                <TableHead className="text-xs">Name</TableHead>
+                <TableHead className="text-xs">Organization</TableHead>
+                <TableHead className="text-xs">Role</TableHead>
+                <TableHead className="text-xs">Email</TableHead>
+                <TableHead className="text-xs">Phone</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {participants.map((p, i) => (
+                <TableRow key={p.id}>
+                  <TableCell className="text-xs text-muted-foreground">{i + 1}</TableCell>
+                  <TableCell className="text-xs font-medium">{p.full_name}</TableCell>
+                  <TableCell className="text-xs">{p.organization_name || "—"}</TableCell>
+                  <TableCell className="text-xs">{p.role_title || "—"}</TableCell>
+                  <TableCell className="text-xs">{p.email || "—"}</TableCell>
+                  <TableCell className="text-xs">{p.phone_number || "—"}</TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
+      )}
+    </>
   );
 };
 
