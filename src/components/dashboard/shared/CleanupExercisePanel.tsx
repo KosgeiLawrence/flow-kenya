@@ -15,7 +15,7 @@ import { toast } from "sonner";
 import { format } from "date-fns";
 import {
   Plus, MapPin, Users, Trash2, Package, Eye, Download, FileText,
-  Camera, ChevronDown, ChevronUp, Loader2, Upload, X
+  Camera, ChevronDown, ChevronUp, Loader2, Upload, X, Share2, Link as LinkIcon
 } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { generateCleanupReportPDF } from "@/lib/cleanupReportPdf";
@@ -579,6 +579,18 @@ const CleanupExercisePanel = ({ isAdmin = false }: Props) => {
                     <Button variant="ghost" size="icon" onClick={() => setViewCleanup(c)} title="View Report"><Eye className="w-4 h-4" /></Button>
                     <Button variant="ghost" size="icon" onClick={() => generatePDF(c)} title="Download PDF"><Download className="w-4 h-4" /></Button>
                     <Button variant="ghost" size="icon" onClick={() => exportCSV(c)} title="Export CSV"><FileText className="w-4 h-4" /></Button>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      title="Copy shareable link"
+                      onClick={() => {
+                        const shareUrl = `${window.location.origin}/report/${c.id}`;
+                        navigator.clipboard.writeText(shareUrl);
+                        toast.success("Share link copied to clipboard!");
+                      }}
+                    >
+                      <Share2 className="w-4 h-4" />
+                    </Button>
                     {!isAdmin && (
                       <Button variant="ghost" size="icon" onClick={() => deleteMutation.mutate(c.id)} title="Delete" className="text-destructive hover:text-destructive">
                         <Trash2 className="w-4 h-4" />
@@ -682,6 +694,18 @@ const CleanupExercisePanel = ({ isAdmin = false }: Props) => {
                 <div className="flex gap-2 pt-3">
                   <Button size="sm" onClick={() => generatePDF(viewCleanup)} className="gap-1"><Download className="w-3 h-3" /> PDF</Button>
                   <Button size="sm" variant="outline" onClick={() => exportCSV(viewCleanup)} className="gap-1"><FileText className="w-3 h-3" /> CSV</Button>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="gap-1"
+                    onClick={() => {
+                      const shareUrl = `${window.location.origin}/report/${viewCleanup.id}`;
+                      navigator.clipboard.writeText(shareUrl);
+                      toast.success("Share link copied to clipboard!");
+                    }}
+                  >
+                    <Share2 className="w-3 h-3" /> Share
+                  </Button>
                 </div>
               </div>
             </>
