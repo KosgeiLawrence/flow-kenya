@@ -224,25 +224,14 @@ export const generateCleanupReportPDF = async (cleanup: CleanupData) => {
       ngo: "NGO", private_company: "Private Company", government: "Government",
       community_group: "Community Group", cooperative: "Cooperative",
     };
-    partnerOrgs.forEach((org, i) => {
+    partnerOrgs.forEach((org) => {
       y = ensurePage(doc, y, 8);
-      // Bullet
       doc.setFillColor(...PDF_COLORS.forest);
       doc.circle(22, y - 1, 1.2, "F");
-      // Name
       doc.setFontSize(8.5);
       doc.setFont("helvetica", "bold");
       doc.setTextColor(...PDF_COLORS.darkText);
       doc.text(org.name, 26, y);
-      // Type badge
-      if (org.type) {
-        const typeLabel = orgTypeLabels[org.type] || org.type;
-        doc.setFontSize(6.5);
-        doc.setFont("helvetica", "normal");
-        doc.setTextColor(...PDF_COLORS.mutedText);
-        const nameW = doc.getTextWidth(org.name);
-        doc.text(`(${typeLabel})`, 26 + nameW + 3, y);
-      }
       y += 8;
     });
     y += 2;
