@@ -238,12 +238,35 @@ const CleanupExercisePanel = ({ isAdmin = false }: Props) => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["cleanup-exercises"] });
-      setShowForm(false);
-      setForm({ ...emptyForm });
-      setBeforePhotos([]);
-      setDuringPhotos([]);
-      setAfterPhotos([]);
+      resetForm();
       toast.success("Cleanup exercise logged successfully!");
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+  const updateMutation = useMutation({
+    mutationFn: async ({ id, formData }: { id: string; formData: typeof form }) => {
+      const { partner_org_ids, ...cleanupData } = formData;
+      const { error } = await supabase
+        .from("cleanup_exercises")
+        .update({
+          ...cleanupData,
+          before_photos: beforePhotos,
+          during_photos: duringPhotos,
+          after_photos: afterPhotos,
+          waste_destination: cleanupData.waste_destination || null,
+          transport_method: cleanupData.transport_method || null,
+          observations: cleanupData.observations || null,
+          environmental_issues: cleanupData.environmental_issues || null,
+          recommendations: cleanupData.recommendations || null,
+        })
+        .eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["cleanup-exercises"] });
+      resetForm();
+      toast.success("Cleanup exercise updated successfully!");
     },
     onError: (e: Error) => toast.error(e.message),
   });
