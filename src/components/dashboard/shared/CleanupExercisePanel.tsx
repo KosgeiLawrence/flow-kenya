@@ -713,10 +713,22 @@ const CleanupExercisePanel = ({ isAdmin = false }: Props) => {
                     onClick={() => {
                       const shareUrl = `https://duaraflow.co.ke/report/${viewCleanup.id}`;
                       navigator.clipboard.writeText(shareUrl);
-                      toast.success("Share link copied to clipboard!");
+                      toast.success("Report share link copied!");
                     }}
                   >
-                    <Share2 className="w-3 h-3" /> Share
+                    <Share2 className="w-3 h-3" /> Share Report
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="gap-1"
+                    onClick={() => {
+                      const regUrl = `https://duaraflow.co.ke/cleanup/${viewCleanup.id}/register`;
+                      navigator.clipboard.writeText(regUrl);
+                      toast.success("Registration link copied!");
+                    }}
+                  >
+                    <ClipboardList className="w-3 h-3" /> Registration Link
                   </Button>
                 </div>
               </div>
