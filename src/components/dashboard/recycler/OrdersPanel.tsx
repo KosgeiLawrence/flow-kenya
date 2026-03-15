@@ -26,6 +26,7 @@ const statusMap: Record<string, { icon: React.ElementType; variant: "default" | 
 
 const OrdersPanel = () => {
   const { user, profile } = useAuth();
+  const { orgInfo } = useOrgInfo();
   const queryClient = useQueryClient();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [form, setForm] = useState({ supplier_name: "", material_type: "", quantity: "", unit: "kg", unit_price: "", delivery_date: "", notes: "" });
