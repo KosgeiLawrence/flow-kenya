@@ -26,6 +26,7 @@ import Privacy from "./pages/Privacy";
 import Terms from "./pages/Terms";
 import Contact from "./pages/Contact";
 import PublicReport from "./pages/PublicReport";
+import CleanupRegister from "./pages/CleanupRegister";
 import PWAInstallPrompt from "./components/PWAInstallPrompt";
 
 const queryClient = new QueryClient();
@@ -115,6 +116,7 @@ const App = () => (
             <Route path="/terms" element={<Terms />} />
             <Route path="/contact" element={<Contact />} />
             <Route path="/report/:id" element={<PublicReport />} />
+            <Route path="/cleanup/:id/register" element={<CleanupRegister />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </AuthProvider>
