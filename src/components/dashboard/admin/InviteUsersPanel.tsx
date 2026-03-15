@@ -66,29 +66,6 @@ const InviteUsersPanel = () => {
             />
           </div>
 
-          <div className="flex items-center justify-between rounded-lg border border-border p-4">
-            <div className="flex items-center gap-3">
-              <Gift className="w-5 h-5 text-secondary" />
-              <div>
-                <p className="text-sm font-medium text-foreground">Include Coupon Code</p>
-                <p className="text-xs text-muted-foreground">Award a discount coupon with the invitation</p>
-              </div>
-            </div>
-            <Switch checked={includeCoupon} onCheckedChange={setIncludeCoupon} />
-          </div>
-
-          {includeCoupon && (
-            <div className="space-y-2">
-              <Label htmlFor="coupon-code">Coupon Code</Label>
-              <Input
-                id="coupon-code"
-                placeholder="e.g. WELCOME2024"
-                value={couponCode}
-                onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
-              />
-            </div>
-          )}
-
           <Button onClick={handleSend} disabled={sending} className="w-full gap-2">
             {sending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
             {sending ? "Sending…" : "Send Invitation"}
