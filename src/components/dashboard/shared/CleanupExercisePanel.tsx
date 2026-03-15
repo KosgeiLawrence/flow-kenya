@@ -442,7 +442,7 @@ const CleanupExercisePanel = ({ isAdmin = false }: Props) => {
       {showForm && (
         <Card>
           <CardHeader>
-            <CardTitle className="text-lg">Log Cleanup Exercise</CardTitle>
+            <CardTitle className="text-lg">{editingId ? "Edit Cleanup Exercise" : "Log Cleanup Exercise"}</CardTitle>
           </CardHeader>
           <CardContent className="space-y-6">
             {/* Basic Info */}
