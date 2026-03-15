@@ -137,6 +137,50 @@ export type Database = {
         }
         Relationships: []
       }
+      cleanup_participants: {
+        Row: {
+          cleanup_id: string
+          created_at: string
+          email: string | null
+          full_name: string
+          id: string
+          notes: string | null
+          organization_name: string | null
+          phone_number: string | null
+          role_title: string | null
+        }
+        Insert: {
+          cleanup_id: string
+          created_at?: string
+          email?: string | null
+          full_name: string
+          id?: string
+          notes?: string | null
+          organization_name?: string | null
+          phone_number?: string | null
+          role_title?: string | null
+        }
+        Update: {
+          cleanup_id?: string
+          created_at?: string
+          email?: string | null
+          full_name?: string
+          id?: string
+          notes?: string | null
+          organization_name?: string | null
+          phone_number?: string | null
+          role_title?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "cleanup_participants_cleanup_id_fkey"
+            columns: ["cleanup_id"]
+            isOneToOne: false
+            referencedRelation: "cleanup_exercises"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       cleanup_partners: {
         Row: {
           cleanup_id: string
