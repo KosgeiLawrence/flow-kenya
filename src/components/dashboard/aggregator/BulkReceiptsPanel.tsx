@@ -1,15 +1,17 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
+import { useOrgInfo } from "@/hooks/useOrgInfo";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Download, FileText, Printer } from "lucide-react";
 import { format } from "date-fns";
 import jsPDF from "jspdf";
-import { addCleanHeader, addDocMeta, drawTableHeader, drawTableRow, drawTotalLine, finalizeCleanPdf } from "@/lib/pdfBranding";
+import { addCleanHeader, addDocMeta, drawTableHeader, drawTableRow, drawTotalLine, finalizeCleanPdf, loadImageAsBase64, buildPdfOrgInfo } from "@/lib/pdfBranding";
 
 const BulkReceiptsPanel = () => {
   const { user, profile } = useAuth();
+  const { orgInfo } = useOrgInfo();
 
   const { data: payments } = useQuery({
     queryKey: ["aggregator_bulk_payments", user?.id],
@@ -25,17 +27,27 @@ const BulkReceiptsPanel = () => {
     enabled: !!user,
   });
 
+  const getOrgPdfInfo = async () => {
+    if (!orgInfo) return null;
+    let logoBase64: string | null = null;
+    if (orgInfo.orgLogoUrl) logoBase64 = await loadImageAsBase64(orgInfo.orgLogoUrl);
+    return buildPdfOrgInfo(orgInfo, logoBase64);
+  };
+
+  const entityName = orgInfo?.orgName || profile?.full_name || "Aggregator";
+
   const downloadBulkReceipt = async () => {
     if (!payments?.length) return;
     const doc = new jsPDF();
     const today = format(new Date(), "MMM d, yyyy");
+    const pdfOrg = await getOrgPdfInfo();
 
-    let y = addCleanHeader(doc, "Bulk Payment Receipt", "Combined receipt for all completed payments");
+    let y = addCleanHeader(doc, "Bulk Payment Receipt", "Combined receipt for all completed payments", pdfOrg);
 
     y = addDocMeta(doc, [
       { label: "Date", value: today },
-      { label: "Aggregator", value: profile?.full_name || "Aggregator" },
-      ...(profile?.phone_number ? [{ label: "Phone", value: profile.phone_number }] : []),
+      { label: "Aggregator", value: entityName },
+      ...(orgInfo?.contactPhone ? [{ label: "Phone", value: orgInfo.contactPhone }] : []),
     ], y);
 
     y = drawTableHeader(doc, [
@@ -67,8 +79,9 @@ const BulkReceiptsPanel = () => {
 
   const downloadSingleReceipt = async (payment: any) => {
     const doc = new jsPDF();
+    const pdfOrg = await getOrgPdfInfo();
 
-    let y = addCleanHeader(doc, "Payment Receipt");
+    let y = addCleanHeader(doc, "Payment Receipt", undefined, pdfOrg);
 
     y = addDocMeta(doc, [
       { label: "Date", value: format(new Date(payment.created_at), "MMM d, yyyy") },

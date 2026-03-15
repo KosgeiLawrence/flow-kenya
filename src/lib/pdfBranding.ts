@@ -250,16 +250,29 @@ export const finalizePdf = async (doc: jsPDF) => {
 
 // ── Clean (unbranded) header for user-to-client documents ──
 
+export interface PdfOrgInfo {
+  orgName: string;
+  orgLogoBase64?: string | null;
+  contactEmail?: string | null;
+  contactPhone?: string | null;
+  physicalAddress?: string | null;
+  county?: string | null;
+  website?: string | null;
+  kraPin?: string | null;
+  companyRegistration?: string | null;
+}
+
 /**
- * Adds a simple, clean header without Duara Flow logos or contact info.
- * Suitable for invoices, receipts, quotations, and delivery notes
- * that are between the platform user and their client.
+ * Adds a clean header with the user's organization branding.
+ * If orgInfo is provided, displays org name, logo, address, and contact.
+ * Falls back to a simple title-only header if no orgInfo.
  * Returns the Y position after the header.
  */
 export const addCleanHeader = (
   doc: jsPDF,
   documentTitle: string,
-  documentSubtitle?: string
+  documentSubtitle?: string,
+  orgInfo?: PdfOrgInfo | null
 ): number => {
   const pageWidth = doc.internal.pageSize.getWidth();
 
@@ -268,12 +281,68 @@ export const addCleanHeader = (
   doc.setLineWidth(1);
   doc.line(15, 12, pageWidth - 15, 12);
 
+  let y = 14;
+
+  if (orgInfo) {
+    // ── Org Logo (left side) ──
+    if (orgInfo.orgLogoBase64) {
+      try {
+        doc.addImage(orgInfo.orgLogoBase64, "PNG", 15, y + 1, 28, 18);
+      } catch { /* logo failed, skip */ }
+    }
+
+    const textStartX = orgInfo.orgLogoBase64 ? 48 : 15;
+
+    // ── Organization Name ──
+    doc.setFontSize(14);
+    doc.setTextColor(...PDF_COLORS.forestDeep);
+    doc.text(orgInfo.orgName, textStartX, y + 8);
+
+    // ── Contact details ──
+    doc.setFontSize(7.5);
+    doc.setTextColor(...PDF_COLORS.mutedText);
+    let contactY = y + 13;
+    const contactParts: string[] = [];
+    if (orgInfo.contactPhone) contactParts.push(orgInfo.contactPhone);
+    if (orgInfo.contactEmail) contactParts.push(orgInfo.contactEmail);
+    if (contactParts.length) {
+      doc.text(contactParts.join("  •  "), textStartX, contactY);
+      contactY += 4;
+    }
+    const addressParts: string[] = [];
+    if (orgInfo.physicalAddress) addressParts.push(orgInfo.physicalAddress);
+    if (orgInfo.county) addressParts.push(orgInfo.county);
+    if (addressParts.length) {
+      doc.text(addressParts.join(", "), textStartX, contactY);
+      contactY += 4;
+    }
+    if (orgInfo.website) {
+      doc.text(orgInfo.website, textStartX, contactY);
+      contactY += 4;
+    }
+    const regParts: string[] = [];
+    if (orgInfo.kraPin) regParts.push(`KRA: ${orgInfo.kraPin}`);
+    if (orgInfo.companyRegistration) regParts.push(`Reg: ${orgInfo.companyRegistration}`);
+    if (regParts.length) {
+      doc.text(regParts.join("  •  "), textStartX, contactY);
+      contactY += 4;
+    }
+
+    y = Math.max(contactY, y + 22) + 2;
+
+    // ── Separator ──
+    doc.setDrawColor(...PDF_COLORS.forest);
+    doc.setLineWidth(0.5);
+    doc.line(15, y, pageWidth - 15, y);
+    y += 6;
+  }
+
   // ── Document Title ──
   doc.setFontSize(18);
   doc.setTextColor(...PDF_COLORS.forestDeep);
-  doc.text(documentTitle.toUpperCase(), 15, 24);
+  doc.text(documentTitle.toUpperCase(), 15, y + 6);
+  y += 10;
 
-  let y = 28;
   if (documentSubtitle) {
     doc.setFontSize(9);
     doc.setTextColor(...PDF_COLORS.mutedText);
@@ -317,3 +386,42 @@ export const addCleanFooter = (doc: jsPDF) => {
 export const finalizeCleanPdf = (doc: jsPDF) => {
   addCleanFooter(doc);
 };
+
+/**
+ * Load an image URL as base64 for use in PDFs.
+ */
+export const loadImageAsBase64 = (url: string): Promise<string | null> => {
+  return new Promise((resolve) => {
+    const img = new Image();
+    img.crossOrigin = "anonymous";
+    img.onload = () => {
+      const canvas = document.createElement("canvas");
+      canvas.width = img.naturalWidth;
+      canvas.height = img.naturalHeight;
+      const ctx = canvas.getContext("2d");
+      if (!ctx) { resolve(null); return; }
+      ctx.drawImage(img, 0, 0);
+      resolve(canvas.toDataURL("image/png"));
+    };
+    img.onerror = () => resolve(null);
+    img.src = url;
+  });
+};
+
+/**
+ * Build a PdfOrgInfo object from useOrgInfo data + optional logo base64.
+ */
+export const buildPdfOrgInfo = (
+  orgInfo: { orgName: string; contactEmail?: string | null; contactPhone?: string | null; physicalAddress?: string | null; county?: string | null; website?: string | null; kraPin?: string | null; companyRegistration?: string | null },
+  logoBase64?: string | null
+): PdfOrgInfo => ({
+  orgName: orgInfo.orgName,
+  orgLogoBase64: logoBase64,
+  contactEmail: orgInfo.contactEmail,
+  contactPhone: orgInfo.contactPhone,
+  physicalAddress: orgInfo.physicalAddress,
+  county: orgInfo.county,
+  website: orgInfo.website,
+  kraPin: orgInfo.kraPin,
+  companyRegistration: orgInfo.companyRegistration,
+});

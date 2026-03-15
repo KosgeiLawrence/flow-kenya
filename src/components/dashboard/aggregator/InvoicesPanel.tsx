@@ -1,15 +1,17 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
+import { useOrgInfo } from "@/hooks/useOrgInfo";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Download, FileText, Truck } from "lucide-react";
 import { format } from "date-fns";
 import jsPDF from "jspdf";
-import { addCleanHeader, addDocMeta, drawTableHeader, drawTableRow, drawTotalLine, finalizeCleanPdf, addSectionTitle } from "@/lib/pdfBranding";
+import { addCleanHeader, addDocMeta, drawTableHeader, drawTableRow, drawTotalLine, finalizeCleanPdf, loadImageAsBase64, buildPdfOrgInfo } from "@/lib/pdfBranding";
 
 const InvoicesPanel = () => {
   const { user, profile } = useAuth();
+  const { orgInfo } = useOrgInfo();
 
   const { data: collections } = useQuery({
     queryKey: ["aggregator_invoice_data", user?.id],
@@ -23,6 +25,15 @@ const InvoicesPanel = () => {
     },
     enabled: !!user,
   });
+
+  const getOrgPdfInfo = async () => {
+    if (!orgInfo) return null;
+    let logoBase64: string | null = null;
+    if (orgInfo.orgLogoUrl) logoBase64 = await loadImageAsBase64(orgInfo.orgLogoUrl);
+    return buildPdfOrgInfo(orgInfo, logoBase64);
+  };
+
+  const entityName = orgInfo?.orgName || profile?.full_name || "Aggregator";
 
   const getMaterialMap = () => {
     const materialMap = new Map<string, { name: string; qty: number; price: number; unit: string }>();
@@ -40,13 +51,14 @@ const InvoicesPanel = () => {
     if (!collections?.length) return;
     const doc = new jsPDF();
     const invoiceNo = `INV-${Date.now().toString(36).toUpperCase()}`;
+    const pdfOrg = await getOrgPdfInfo();
 
-    let y = addCleanHeader(doc, "Sales Invoice", "Combined invoice for all materials");
+    let y = addCleanHeader(doc, "Sales Invoice", "Combined invoice for all materials", pdfOrg);
     y = addDocMeta(doc, [
       { label: "Invoice #", value: invoiceNo },
       { label: "Date", value: format(new Date(), "MMM d, yyyy") },
-      { label: "From", value: profile?.full_name || "Aggregator" },
-      ...(profile?.phone_number ? [{ label: "Phone", value: profile.phone_number }] : []),
+      { label: "From", value: entityName },
+      ...(orgInfo?.contactPhone ? [{ label: "Phone", value: orgInfo.contactPhone }] : []),
     ], y);
 
     y = drawTableHeader(doc, [
@@ -80,12 +92,13 @@ const InvoicesPanel = () => {
     if (!collections?.length) return;
     const doc = new jsPDF();
     const noteNo = `DN-${Date.now().toString(36).toUpperCase()}`;
+    const pdfOrg = await getOrgPdfInfo();
 
-    let y = addCleanHeader(doc, "Delivery Note", "Batch details with signature block");
+    let y = addCleanHeader(doc, "Delivery Note", "Batch details with signature block", pdfOrg);
     y = addDocMeta(doc, [
       { label: "Note #", value: noteNo },
       { label: "Date", value: format(new Date(), "MMM d, yyyy") },
-      { label: "Delivered by", value: profile?.full_name || "Aggregator" },
+      { label: "Delivered by", value: entityName },
     ], y);
 
     y = drawTableHeader(doc, [
@@ -125,12 +138,13 @@ const InvoicesPanel = () => {
     const invoiceNo = `INV-M-${Date.now().toString(36).toUpperCase()}`;
     const totalQty = items.reduce((s, c) => s + Number(c.quantity), 0);
     const totalVal = totalQty * Number(mt?.price_per_unit || 0);
+    const pdfOrg = await getOrgPdfInfo();
 
-    let y = addCleanHeader(doc, `Material Invoice — ${mt?.name}`, "Single-material invoice with batch details");
+    let y = addCleanHeader(doc, `Material Invoice — ${mt?.name}`, "Single-material invoice with batch details", pdfOrg);
     y = addDocMeta(doc, [
       { label: "Invoice #", value: invoiceNo },
       { label: "Date", value: format(new Date(), "MMM d, yyyy") },
-      { label: "From", value: profile?.full_name || "Aggregator" },
+      { label: "From", value: entityName },
     ], y);
 
     y = drawTableHeader(doc, [
