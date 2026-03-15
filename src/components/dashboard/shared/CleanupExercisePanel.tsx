@@ -836,7 +836,9 @@ interface Participant {
   created_at: string;
 }
 
-const ParticipantsSection = ({ cleanupId }: { cleanupId: string }) => {
+const ParticipantsSection = ({ cleanupId, cleanupTitle }: { cleanupId: string; cleanupTitle: string }) => {
+  const [sending, setSending] = useState(false);
+
   const { data: participants, isLoading } = useQuery({
     queryKey: ["cleanup-participants", cleanupId],
     queryFn: async () => {
@@ -850,14 +852,50 @@ const ParticipantsSection = ({ cleanupId }: { cleanupId: string }) => {
     },
   });
 
+  const emailCount = participants?.filter((p) => p.email).length || 0;
+
+  const handleSendThankYou = async () => {
+    if (emailCount === 0) {
+      toast.error("No participants with email addresses to send to.");
+      return;
+    }
+    setSending(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("send-cleanup-thankyou", {
+        body: { cleanupId },
+      });
+      if (error) throw new Error(error.message);
+      if (data?.error) throw new Error(data.error);
+      toast.success(`Thank you emails sent to ${data.sent} participant(s)!${data.failed > 0 ? ` (${data.failed} failed)` : ""}`);
+    } catch (err: any) {
+      toast.error(err.message || "Failed to send emails.");
+    } finally {
+      setSending(false);
+    }
+  };
+
   return (
     <>
       <Separator />
-      <h4 className="font-semibold text-foreground flex items-center gap-2">
-        <Users className="w-4 h-4" />
-        Registered Participants
-        {participants && <Badge variant="secondary">{participants.length}</Badge>}
-      </h4>
+      <div className="flex items-center justify-between">
+        <h4 className="font-semibold text-foreground flex items-center gap-2">
+          <Users className="w-4 h-4" />
+          Registered Participants
+          {participants && <Badge variant="secondary">{participants.length}</Badge>}
+        </h4>
+        {emailCount > 0 && (
+          <Button
+            size="sm"
+            variant="outline"
+            className="gap-1"
+            onClick={handleSendThankYou}
+            disabled={sending}
+          >
+            {sending ? <Loader2 className="w-3 h-3 animate-spin" /> : <Mail className="w-3 h-3" />}
+            {sending ? "Sending…" : `Send Thank You (${emailCount})`}
+          </Button>
+        )}
+      </div>
       {isLoading ? (
         <div className="flex items-center gap-2 text-sm text-muted-foreground">
           <Loader2 className="w-3 h-3 animate-spin" /> Loading participants…
