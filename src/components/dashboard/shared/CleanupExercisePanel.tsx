@@ -128,6 +128,10 @@ const CleanupExercisePanel = ({ isAdmin = false }: Props) => {
   const [duringPhotos, setDuringPhotos] = useState<string[]>([]);
   const [afterPhotos, setAfterPhotos] = useState<string[]>([]);
   const [geoLoading, setGeoLoading] = useState(false);
+  const [externalOrgName, setExternalOrgName] = useState("");
+  const [externalOrgType, setExternalOrgType] = useState("ngo");
+  const [inviteEmail, setInviteEmail] = useState("");
+  const [sendingInvite, setSendingInvite] = useState(false);
 
   const resetForm = () => {
     setForm({ ...emptyForm });
