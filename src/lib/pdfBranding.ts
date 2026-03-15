@@ -386,3 +386,42 @@ export const addCleanFooter = (doc: jsPDF) => {
 export const finalizeCleanPdf = (doc: jsPDF) => {
   addCleanFooter(doc);
 };
+
+/**
+ * Load an image URL as base64 for use in PDFs.
+ */
+export const loadImageAsBase64 = (url: string): Promise<string | null> => {
+  return new Promise((resolve) => {
+    const img = new Image();
+    img.crossOrigin = "anonymous";
+    img.onload = () => {
+      const canvas = document.createElement("canvas");
+      canvas.width = img.naturalWidth;
+      canvas.height = img.naturalHeight;
+      const ctx = canvas.getContext("2d");
+      if (!ctx) { resolve(null); return; }
+      ctx.drawImage(img, 0, 0);
+      resolve(canvas.toDataURL("image/png"));
+    };
+    img.onerror = () => resolve(null);
+    img.src = url;
+  });
+};
+
+/**
+ * Build a PdfOrgInfo object from useOrgInfo data + optional logo base64.
+ */
+export const buildPdfOrgInfo = (
+  orgInfo: { orgName: string; contactEmail?: string | null; contactPhone?: string | null; physicalAddress?: string | null; county?: string | null; website?: string | null; kraPin?: string | null; companyRegistration?: string | null },
+  logoBase64?: string | null
+): PdfOrgInfo => ({
+  orgName: orgInfo.orgName,
+  orgLogoBase64: logoBase64,
+  contactEmail: orgInfo.contactEmail,
+  contactPhone: orgInfo.contactPhone,
+  physicalAddress: orgInfo.physicalAddress,
+  county: orgInfo.county,
+  website: orgInfo.website,
+  kraPin: orgInfo.kraPin,
+  companyRegistration: orgInfo.companyRegistration,
+});
