@@ -8,13 +8,14 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
-import { Plus, Loader2, MapPin, User, Phone, Mail, FileText, ArrowLeft } from "lucide-react";
+import { Plus, Loader2, User, FileText, ArrowLeft } from "lucide-react";
 import { format } from "date-fns";
 import jsPDF from "jspdf";
 import {
   PDF_COLORS, addCleanHeader, addDocMeta, drawTableHeader,
-  drawTableRow, drawTotalLine, finalizeCleanPdf, loadImageAsBase64, buildPdfOrgInfo,
+  drawTableRow, drawVatTotalBlock, finalizeCleanPdf, loadImageAsBase64, buildPdfOrgInfo,
 } from "@/lib/pdfBranding";
+import VatOptions, { DEFAULT_VAT, type VatConfig } from "@/components/dashboard/shared/VatOptions";
 
 interface Props {
   onBack: () => void;
@@ -33,6 +34,7 @@ const ClientCollectionFlow = ({ onBack }: Props) => {
   const [unitPrice, setUnitPrice] = useState("");
   const [locationName, setLocationName] = useState("");
   const [notes, setNotes] = useState("");
+  const [vat, setVat] = useState<VatConfig>(DEFAULT_VAT);
 
   const { data: collections, isLoading } = useQuery({
     queryKey: ["client_collections", user?.id],
@@ -79,9 +81,7 @@ const ClientCollectionFlow = ({ onBack }: Props) => {
   const getOrgPdfInfo = async () => {
     if (!orgInfo) return null;
     let logoBase64: string | null = null;
-    if (orgInfo.orgLogoUrl) {
-      logoBase64 = await loadImageAsBase64(orgInfo.orgLogoUrl);
-    }
+    if (orgInfo.orgLogoUrl) logoBase64 = await loadImageAsBase64(orgInfo.orgLogoUrl);
     return buildPdfOrgInfo(orgInfo, logoBase64);
   };
 
@@ -89,18 +89,15 @@ const ClientCollectionFlow = ({ onBack }: Props) => {
     const doc = new jsPDF();
     const title = type === "quotation" ? "Quotation" : type === "invoice" ? "Invoice" : "Receipt";
     const pdfOrg = await getOrgPdfInfo();
-    const entityName = orgInfo?.orgName || profile?.full_name || "Waste Picker";
 
     let y = addCleanHeader(doc, title, `Ref: ${type.toUpperCase().slice(0, 3)}-${item.id.slice(0, 8).toUpperCase()}`, pdfOrg);
 
-    // From (organization / waste picker)
     y = addDocMeta(doc, [
-      { label: "From", value: entityName },
+      { label: "From", value: orgInfo?.orgName || profile?.full_name || "Waste Picker" },
       { label: "Phone", value: orgInfo?.contactPhone || profile?.phone_number || "N/A" },
       { label: "Email", value: orgInfo?.contactEmail || profile?.email || "N/A" },
     ], y);
 
-    // To (client)
     y = addDocMeta(doc, [
       { label: "To", value: item.client_name },
       { label: "Phone", value: item.client_phone || "N/A" },
@@ -113,7 +110,6 @@ const ClientCollectionFlow = ({ onBack }: Props) => {
       { label: "Location", value: item.location_name || "N/A" },
     ], y);
 
-    // Table
     const cols = [
       { label: "Material", x: 17 },
       { label: "Qty (kg)", x: 80 },
@@ -129,7 +125,7 @@ const ClientCollectionFlow = ({ onBack }: Props) => {
     doc.text(`KES ${Number(item.total_amount).toLocaleString()}`, 150, y);
     y += 10;
 
-    y = drawTotalLine(doc, `Total: KES ${Number(item.total_amount).toLocaleString()}`, y);
+    y = drawVatTotalBlock(doc, Number(item.total_amount), vat.vatPercent, vat.includeVat, y);
 
     if (item.notes) {
       doc.setFontSize(8);
@@ -191,6 +187,8 @@ const ClientCollectionFlow = ({ onBack }: Props) => {
           </CardContent>
         </Card>
       )}
+
+      <VatOptions value={vat} onChange={setVat} />
 
       <Card className="shadow-soft">
         <CardHeader><CardTitle className="text-base">Collection History</CardTitle></CardHeader>

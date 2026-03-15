@@ -221,6 +221,46 @@ export const drawTotalLine = (doc: jsPDF, label: string, y: number): number => {
 };
 
 /**
+ * Draw subtotal, VAT, and grand total lines on the PDF.
+ * Use this instead of drawTotalLine when VAT is applicable.
+ */
+export const drawVatTotalBlock = (
+  doc: jsPDF,
+  subtotal: number,
+  vatPercent: number,
+  includeVat: boolean,
+  y: number,
+  currency: string = "KES"
+): number => {
+  doc.setDrawColor(...PDF_COLORS.gold);
+  doc.setLineWidth(0.5);
+  doc.line(15, y, 195, y);
+  y += 6;
+
+  doc.setFontSize(9);
+  doc.setTextColor(...PDF_COLORS.darkText);
+  doc.text(`Subtotal: ${currency} ${subtotal.toLocaleString()}`, 110, y);
+  y += 6;
+
+  if (includeVat) {
+    const vatAmount = subtotal * (vatPercent / 100);
+    doc.text(`VAT (${vatPercent}%): ${currency} ${vatAmount.toLocaleString()}`, 110, y);
+    y += 6;
+    const grandTotal = subtotal + vatAmount;
+    doc.setFontSize(11);
+    doc.setTextColor(...PDF_COLORS.forestDeep);
+    doc.text(`Total: ${currency} ${grandTotal.toLocaleString()}`, 110, y);
+  } else {
+    doc.setFontSize(11);
+    doc.setTextColor(...PDF_COLORS.forestDeep);
+    doc.text(`Total: ${currency} ${subtotal.toLocaleString()}`, 110, y);
+  }
+
+  doc.setTextColor(...PDF_COLORS.darkText);
+  return y + 8;
+};
+
+/**
  * Add document metadata (date, reference, entity, etc.)
  */
 export const addDocMeta = (
