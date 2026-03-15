@@ -113,30 +113,6 @@ const AboutSection = () => {
           ))}
         </div>
 
-        {/* Timeline */}
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={isInView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.7, delay: 0.5 }}
-          className="mx-auto max-w-2xl"
-        >
-          <h3 className="font-display text-2xl font-bold text-foreground text-center mb-8">Our Journey</h3>
-          <div className="relative border-l-2 border-primary/20 pl-8 space-y-8">
-            {milestones.map((m, i) => (
-              <motion.div
-                key={i}
-                initial={{ opacity: 0, x: -20 }}
-                animate={isInView ? { opacity: 1, x: 0 } : {}}
-                transition={{ duration: 0.4, delay: 0.6 + i * 0.1 }}
-                className="relative"
-              >
-                <div className="absolute -left-[2.55rem] top-1 h-4 w-4 rounded-full border-2 border-primary bg-card" />
-                <span className="text-xs font-bold uppercase tracking-wider text-primary">{m.year}</span>
-                <p className="text-foreground font-medium">{m.label}</p>
-              </motion.div>
-            ))}
-          </div>
-        </motion.div>
       </div>
     </section>
   );
