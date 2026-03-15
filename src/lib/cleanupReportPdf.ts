@@ -8,6 +8,11 @@ import {
   addDocMeta,
 } from "./pdfBranding";
 
+interface PartnerOrg {
+  name: string;
+  type?: string;
+}
+
 interface CleanupData {
   id: string;
   title: string;
@@ -42,6 +47,7 @@ interface CleanupData {
   recommendations: string | null;
   status: string;
   created_at: string;
+  partner_organizations?: PartnerOrg[];
 }
 
 const LOCATION_LABELS: Record<string, string> = {
@@ -209,7 +215,39 @@ export const generateCleanupReportPDF = async (cleanup: CleanupData) => {
   });
   y += 4;
 
-  // ── Waste Collection Summary ──
+  // ── Partner Organizations ──
+  const partnerOrgs = cleanup.partner_organizations || [];
+  if (partnerOrgs.length > 0) {
+    y = ensurePage(doc, y, 20 + partnerOrgs.length * 8);
+    y = addSectionTitle(doc, "Partner Organizations", y);
+    const orgTypeLabels: Record<string, string> = {
+      ngo: "NGO", private_company: "Private Company", government: "Government",
+      community_group: "Community Group", cooperative: "Cooperative",
+    };
+    partnerOrgs.forEach((org, i) => {
+      y = ensurePage(doc, y, 8);
+      // Bullet
+      doc.setFillColor(...PDF_COLORS.forest);
+      doc.circle(22, y - 1, 1.2, "F");
+      // Name
+      doc.setFontSize(8.5);
+      doc.setFont("helvetica", "bold");
+      doc.setTextColor(...PDF_COLORS.darkText);
+      doc.text(org.name, 26, y);
+      // Type badge
+      if (org.type) {
+        const typeLabel = orgTypeLabels[org.type] || org.type;
+        doc.setFontSize(6.5);
+        doc.setFont("helvetica", "normal");
+        doc.setTextColor(...PDF_COLORS.mutedText);
+        const nameW = doc.getTextWidth(org.name);
+        doc.text(`(${typeLabel})`, 26 + nameW + 3, y);
+      }
+      y += 8;
+    });
+    y += 2;
+  }
+
   y = ensurePage(doc, y, 40);
   y = addSectionTitle(doc, "Waste Collection Summary", y);
 

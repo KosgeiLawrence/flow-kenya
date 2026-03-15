@@ -410,7 +410,18 @@ const CleanupExercisePanel = ({ isAdmin = false }: Props) => {
 
   const generatePDF = async (cleanup: CleanupExercise) => {
     try {
-      await generateCleanupReportPDF(cleanup);
+      // Fetch partner organizations for the report
+      const { data: partners } = await supabase
+        .from("cleanup_partners")
+        .select("organization_id, organizations(name, type)")
+        .eq("cleanup_id", cleanup.id);
+
+      const partner_organizations = (partners || []).map((p: any) => ({
+        name: p.organizations?.name || "Unknown",
+        type: p.organizations?.type || "",
+      }));
+
+      await generateCleanupReportPDF({ ...cleanup, partner_organizations });
       toast.success("PDF report downloaded");
     } catch (e) {
       console.error(e);
