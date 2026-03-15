@@ -95,7 +95,7 @@ const CleanupRegister = () => {
       <div className="w-full max-w-md space-y-6">
         <div className="text-center space-y-2">
           <div className="flex items-center justify-center gap-2 mb-4">
-            <Leaf className="w-8 h-8 text-primary" />
+            <img src={duaraFlowIcon} alt="Duara Flow" className="w-8 h-8" />
             <span className="text-2xl font-bold font-display text-foreground">Duara Flow</span>
           </div>
           <h1 className="text-xl font-semibold text-foreground">Cleanup Exercise Registration</h1>
