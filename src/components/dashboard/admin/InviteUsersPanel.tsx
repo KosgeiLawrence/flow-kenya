@@ -19,32 +19,21 @@ const InviteUsersPanel = () => {
       return;
     }
 
-    if (includeCoupon && !couponCode.trim()) {
-      toast({ title: "Coupon code required", description: "Please enter a coupon code or disable the coupon option.", variant: "destructive" });
-      return;
-    }
-
     setSending(true);
     try {
       const { data, error } = await supabase.functions.invoke("send-invite", {
-        body: {
-          email: email.trim(),
-          couponCode: includeCoupon ? couponCode.trim() : null,
-        },
+        body: { email: email.trim() },
       });
 
       if (error) throw error;
 
       setSentEmails(prev => [{
         email: email.trim(),
-        coupon: includeCoupon ? couponCode.trim() : undefined,
         sentAt: new Date().toLocaleString(),
       }, ...prev]);
 
-      toast({ title: "Invitation sent! ✉️", description: `Invite sent to ${email.trim()}` });
+      toast({ title: "Invitation sent! ✉️", description: `Invite with PILOT2026 coupon sent to ${email.trim()}` });
       setEmail("");
-      setCouponCode("");
-      setIncludeCoupon(false);
     } catch (err: any) {
       toast({ title: "Failed to send", description: err.message || "Something went wrong.", variant: "destructive" });
     } finally {
