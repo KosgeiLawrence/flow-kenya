@@ -704,6 +704,9 @@ const CleanupExercisePanel = ({ isAdmin = false }: Props) => {
                   </>
                 )}
 
+                {/* Registered Participants */}
+                <ParticipantsSection cleanupId={viewCleanup.id} />
+
                 <div className="flex gap-2 pt-3">
                   <Button size="sm" onClick={() => generatePDF(viewCleanup)} className="gap-1"><Download className="w-3 h-3" /> PDF</Button>
                   <Button size="sm" variant="outline" onClick={() => exportCSV(viewCleanup)} className="gap-1"><FileText className="w-3 h-3" /> CSV</Button>
