@@ -70,7 +70,11 @@ const BiometricGate = ({ children }: { children: React.ReactNode }) => {
   if (user && bio.isLocked) {
     return (
       <BiometricLockScreen
-        onAuthenticate={bio.authenticate}
+        onAuthenticate={async () => {
+          const success = await bio.authenticate();
+          if (success) navigateToDashboard();
+          return success;
+        }}
         isAuthenticating={bio.isAuthenticating}
         userName={profile?.full_name}
       onUsePassword={() => {
