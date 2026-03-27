@@ -37,8 +37,17 @@ serve(async (req) => {
     const user = userData.user;
     if (!user?.email) throw new Error("User not authenticated");
 
-    // Specific admin bypasses payment
-    if (user.email === "kplowren@yahoo.com") {
+    // Specific accounts bypass payment
+    const bypassEmails = [
+      "kplowren@yahoo.com",
+      "wastepicker@email.com",
+      "aggregator@email.com",
+      "recycler@email.com",
+      "ngo@email.com",
+      "corporate@email.com",
+      "county@email.com",
+    ];
+    if (bypassEmails.includes(user.email)) {
       return new Response(JSON.stringify({ subscribed: true, free_plan: true }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
