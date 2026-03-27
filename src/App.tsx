@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -37,10 +37,18 @@ const queryClient = new QueryClient();
 
 /** Biometric layer — wraps all routes inside AuthProvider + BrowserRouter */
 const BiometricGate = ({ children }: { children: React.ReactNode }) => {
-  const { user, profile, signOut } = useAuth();
+  const { user, profile, role, signOut } = useAuth();
   const bio = useBiometrics(user?.id);
   const navigate = useNavigate();
   const [showSetup, setShowSetup] = useState(false);
+
+  const navigateToDashboard = useCallback(() => {
+    if (role) {
+      navigate(`/dashboard/${role.replace("_", "-")}`);
+    } else {
+      navigate("/dashboard");
+    }
+  }, [role, navigate]);
 
   // After login, offer biometric setup if supported & not already enabled/dismissed
   useEffect(() => {
@@ -62,11 +70,16 @@ const BiometricGate = ({ children }: { children: React.ReactNode }) => {
   if (user && bio.isLocked) {
     return (
       <BiometricLockScreen
-        onAuthenticate={bio.authenticate}
+        onAuthenticate={async () => {
+          const success = await bio.authenticate();
+          if (success) navigateToDashboard();
+          return success;
+        }}
         isAuthenticating={bio.isAuthenticating}
         userName={profile?.full_name}
-        onUsePassword={() => {
+      onUsePassword={() => {
           bio.unlock();
+          navigateToDashboard();
         }}
         onSignOut={async () => {
           bio.disable();
