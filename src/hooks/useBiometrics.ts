@@ -28,7 +28,9 @@ export function useBiometrics(userId: string | undefined) {
   // Check WebAuthn support
   useEffect(() => {
     const check = async () => {
-      if (!window.PublicKeyCredential) {
+      // WebAuthn is blocked inside iframes (e.g. Lovable preview)
+      const isInIframe = (() => { try { return window.self !== window.top; } catch { return true; } })();
+      if (isInIframe || !window.PublicKeyCredential) {
         setIsSupported(false);
         return;
       }
