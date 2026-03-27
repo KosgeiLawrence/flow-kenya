@@ -65,8 +65,9 @@ const BiometricGate = ({ children }: { children: React.ReactNode }) => {
         onAuthenticate={bio.authenticate}
         isAuthenticating={bio.isAuthenticating}
         userName={profile?.full_name}
-        onUsePassword={() => {
+      onUsePassword={() => {
           bio.unlock();
+          navigateToDashboard();
         }}
         onSignOut={async () => {
           bio.disable();
