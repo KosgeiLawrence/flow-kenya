@@ -1,9 +1,11 @@
+import { useState, useEffect } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { AuthProvider } from "@/hooks/useAuth";
+import { BrowserRouter, Routes, Route, useNavigate } from "react-router-dom";
+import { AuthProvider, useAuth } from "@/hooks/useAuth";
+import { useBiometrics } from "@/hooks/useBiometrics";
 import Index from "./pages/Index";
 import ImpactDashboard from "./pages/ImpactDashboard";
 import Login from "./pages/Login";
@@ -28,8 +30,66 @@ import Contact from "./pages/Contact";
 import PublicReport from "./pages/PublicReport";
 import CleanupRegister from "./pages/CleanupRegister";
 import PWAInstallPrompt from "./components/PWAInstallPrompt";
+import BiometricLockScreen from "./components/auth/BiometricLockScreen";
+import BiometricSetupPrompt from "./components/auth/BiometricSetupPrompt";
 
 const queryClient = new QueryClient();
+
+/** Biometric layer — wraps all routes inside AuthProvider + BrowserRouter */
+const BiometricGate = ({ children }: { children: React.ReactNode }) => {
+  const { user, profile, signOut } = useAuth();
+  const bio = useBiometrics(user?.id);
+  const navigate = useNavigate();
+  const [showSetup, setShowSetup] = useState(false);
+
+  // After login, offer biometric setup if supported & not already enabled/dismissed
+  useEffect(() => {
+    if (!user || !bio.isSupported || bio.isEnabled) {
+      setShowSetup(false);
+      return;
+    }
+    const dismissed = localStorage.getItem("biometric-setup-dismissed");
+    if (dismissed) {
+      setShowSetup(false);
+      return;
+    }
+    // Show after a short delay
+    const timer = setTimeout(() => setShowSetup(true), 2000);
+    return () => clearTimeout(timer);
+  }, [user, bio.isSupported, bio.isEnabled]);
+
+  // If locked, show lock screen
+  if (user && bio.isLocked) {
+    return (
+      <BiometricLockScreen
+        onAuthenticate={bio.authenticate}
+        isAuthenticating={bio.isAuthenticating}
+        userName={profile?.full_name}
+        onUsePassword={() => {
+          bio.unlock();
+        }}
+        onSignOut={async () => {
+          bio.disable();
+          await signOut();
+          navigate("/login");
+        }}
+      />
+    );
+  }
+
+  return (
+    <>
+      {children}
+      {showSetup && user && (
+        <BiometricSetupPrompt
+          onRegister={bio.register}
+          onDismiss={() => setShowSetup(false)}
+          isRegistering={bio.isRegistering}
+        />
+      )}
+    </>
+  );
+};
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
@@ -38,87 +98,89 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <AuthProvider>
-          <PWAInstallPrompt />
-          <Routes>
-            <Route path="/" element={<Index />} />
-            <Route path="/impact" element={<ImpactDashboard />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/signup" element={<Signup />} />
-            <Route path="/forgot-password" element={<ForgotPassword />} />
-            <Route path="/payment" element={<Payment />} />
-            <Route path="/reset-password" element={<ResetPassword />} />
-            <Route path="/auth/confirm" element={<AuthConfirm />} />
-            <Route
-              path="/dashboard/waste-picker/*"
-              element={
-                <ProtectedRoute allowedRoles={["waste_picker"]}>
-                  <WastePickerDashboard />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/dashboard/aggregator/*"
-              element={
-                <ProtectedRoute allowedRoles={["aggregator"]}>
-                  <AggregatorDashboard />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/dashboard/recycler/*"
-              element={
-                <ProtectedRoute allowedRoles={["recycler"]}>
-                  <RecyclerDashboard />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/dashboard/ngo/*"
-              element={
-                <ProtectedRoute allowedRoles={["ngo"]}>
-                  <NGODashboard />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/dashboard/corporate/*"
-              element={
-                <ProtectedRoute allowedRoles={["corporate"]}>
-                  <CorporateDashboard />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/dashboard/admin/*"
-              element={
-                <ProtectedRoute allowedRoles={["admin"]}>
-                  <AdminDashboard />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/dashboard/county-government/*"
-              element={
-                <ProtectedRoute allowedRoles={["county_government"]}>
-                  <CountyGovernmentDashboard />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/dashboard/*"
-              element={
-                <ProtectedRoute>
-                  <Dashboard />
-                </ProtectedRoute>
-              }
-            />
-            <Route path="/privacy" element={<Privacy />} />
-            <Route path="/terms" element={<Terms />} />
-            <Route path="/contact" element={<Contact />} />
-            <Route path="/report/:id" element={<PublicReport />} />
-            <Route path="/cleanup/:id/register" element={<CleanupRegister />} />
-            <Route path="*" element={<NotFound />} />
-          </Routes>
+          <BiometricGate>
+            <PWAInstallPrompt />
+            <Routes>
+              <Route path="/" element={<Index />} />
+              <Route path="/impact" element={<ImpactDashboard />} />
+              <Route path="/login" element={<Login />} />
+              <Route path="/signup" element={<Signup />} />
+              <Route path="/forgot-password" element={<ForgotPassword />} />
+              <Route path="/payment" element={<Payment />} />
+              <Route path="/reset-password" element={<ResetPassword />} />
+              <Route path="/auth/confirm" element={<AuthConfirm />} />
+              <Route
+                path="/dashboard/waste-picker/*"
+                element={
+                  <ProtectedRoute allowedRoles={["waste_picker"]}>
+                    <WastePickerDashboard />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/dashboard/aggregator/*"
+                element={
+                  <ProtectedRoute allowedRoles={["aggregator"]}>
+                    <AggregatorDashboard />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/dashboard/recycler/*"
+                element={
+                  <ProtectedRoute allowedRoles={["recycler"]}>
+                    <RecyclerDashboard />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/dashboard/ngo/*"
+                element={
+                  <ProtectedRoute allowedRoles={["ngo"]}>
+                    <NGODashboard />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/dashboard/corporate/*"
+                element={
+                  <ProtectedRoute allowedRoles={["corporate"]}>
+                    <CorporateDashboard />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/dashboard/admin/*"
+                element={
+                  <ProtectedRoute allowedRoles={["admin"]}>
+                    <AdminDashboard />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/dashboard/county-government/*"
+                element={
+                  <ProtectedRoute allowedRoles={["county_government"]}>
+                    <CountyGovernmentDashboard />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/dashboard/*"
+                element={
+                  <ProtectedRoute>
+                    <Dashboard />
+                  </ProtectedRoute>
+                }
+              />
+              <Route path="/privacy" element={<Privacy />} />
+              <Route path="/terms" element={<Terms />} />
+              <Route path="/contact" element={<Contact />} />
+              <Route path="/report/:id" element={<PublicReport />} />
+              <Route path="/cleanup/:id/register" element={<CleanupRegister />} />
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </BiometricGate>
         </AuthProvider>
       </BrowserRouter>
     </TooltipProvider>
