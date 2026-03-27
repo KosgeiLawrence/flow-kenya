@@ -37,10 +37,18 @@ const queryClient = new QueryClient();
 
 /** Biometric layer — wraps all routes inside AuthProvider + BrowserRouter */
 const BiometricGate = ({ children }: { children: React.ReactNode }) => {
-  const { user, profile, signOut } = useAuth();
+  const { user, profile, role, signOut } = useAuth();
   const bio = useBiometrics(user?.id);
   const navigate = useNavigate();
   const [showSetup, setShowSetup] = useState(false);
+
+  const navigateToDashboard = useCallback(() => {
+    if (role) {
+      navigate(`/dashboard/${role.replace("_", "-")}`);
+    } else {
+      navigate("/dashboard");
+    }
+  }, [role, navigate]);
 
   // After login, offer biometric setup if supported & not already enabled/dismissed
   useEffect(() => {
