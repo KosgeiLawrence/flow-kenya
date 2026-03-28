@@ -49,11 +49,9 @@ const BiometricGate = ({ children }: { children: React.ReactNode }) => {
   const [showSetup, setShowSetup] = useState(false);
 
   const navigateToDashboard = useCallback(() => {
-    if (role) {
-      navigate(`/dashboard/${role.replace("_", "-")}`);
-    } else {
-      navigate("/dashboard");
-    }
+    const path = role ? `/dashboard/${role.replace("_", "-")}` : "/dashboard";
+    // Replace history so back button doesn't return to login/landing
+    navigate(path, { replace: true });
   }, [role, navigate]);
 
   // After login, offer biometric setup if supported & not already enabled/dismissed

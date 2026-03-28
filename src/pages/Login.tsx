@@ -35,7 +35,7 @@ const Login = () => {
         .single();
 
       const role = roleData?.role || "waste_picker";
-      navigate(`/dashboard/${role.replace("_", "-")}`);
+      navigate(`/dashboard/${role.replace("_", "-")}`, { replace: true });
     } catch (error: any) {
       toast({
         title: "Login failed",
