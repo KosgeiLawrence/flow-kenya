@@ -115,6 +115,8 @@ const GrantsDiscoveryPanel = ({ userRole = "waste_picker" }: { userRole?: string
 
   return (
     <div className="space-y-6">
+      {/* AI-curated external grants feed */}
+      <ExternalGrantsFeed userRole={userRole} />
       {/* Summary cards */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <Card className="shadow-soft">
