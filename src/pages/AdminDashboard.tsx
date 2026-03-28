@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
-import { LogOut, Users, BarChart3, DollarSign, ShieldAlert, FileText, Settings, MapPin, Menu, X, ChevronRight, User, BookOpen, Mail } from "lucide-react";
+import { LogOut, Users, BarChart3, DollarSign, ShieldAlert, FileText, Settings, MapPin, Menu, X, ChevronRight, User, BookOpen, Mail, Eye } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import UserVerificationPanel from "@/components/dashboard/admin/UserVerificationPanel";
@@ -15,9 +15,11 @@ import ProfileSettingsPanel from "@/components/dashboard/shared/ProfileSettingsP
 import TrainingManagementPanel from "@/components/dashboard/shared/TrainingManagementPanel";
 import CleanupExercisePanel from "@/components/dashboard/shared/CleanupExercisePanel";
 import InviteUsersPanel from "@/components/dashboard/admin/InviteUsersPanel";
+import ViewUserDashboardPanel from "@/components/dashboard/admin/ViewUserDashboardPanel";
 
 const navItems = [
   { id: "users", label: "User Verification", icon: Users },
+  { id: "view-dashboards", label: "View User Dashboards", icon: Eye },
   { id: "invite", label: "Invite Users", icon: Mail },
   { id: "analytics", label: "Platform Analytics", icon: BarChart3 },
   { id: "transactions", label: "Transactions", icon: DollarSign },
@@ -44,6 +46,7 @@ const AdminDashboard = () => {
   const renderPanel = () => {
     switch (activeTab) {
       case "users": return <UserVerificationPanel />;
+      case "view-dashboards": return <ViewUserDashboardPanel />;
       case "invite": return <InviteUsersPanel />;
       case "analytics": return <PlatformAnalyticsPanel />;
       case "transactions": return <TransactionTrackingPanel />;
