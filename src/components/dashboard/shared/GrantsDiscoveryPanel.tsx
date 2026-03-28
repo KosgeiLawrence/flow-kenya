@@ -11,6 +11,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Briefcase, Target, Calendar, Send, CheckCircle2, Clock, XCircle, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { format } from "date-fns";
+import ExternalGrantsFeed from "./ExternalGrantsFeed";
 
 const GrantsDiscoveryPanel = () => {
   const { user, profile } = useAuth();
