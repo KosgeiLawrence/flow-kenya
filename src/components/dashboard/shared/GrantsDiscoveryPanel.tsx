@@ -13,7 +13,7 @@ import { toast } from "sonner";
 import { format } from "date-fns";
 import ExternalGrantsFeed from "./ExternalGrantsFeed";
 
-const GrantsDiscoveryPanel = () => {
+const GrantsDiscoveryPanel = ({ userRole = "waste_picker" }: { userRole?: string }) => {
   const { user, profile } = useAuth();
   const queryClient = useQueryClient();
   const [applyingTo, setApplyingTo] = useState<string | null>(null);
