@@ -508,6 +508,12 @@ const EarningsExpensesPanel = ({ role }: Props) => {
         </CardContent>
       </Card>
     </div>
+      </TabsContent>
+
+      <TabsContent value="reports">
+        <FinancialReportsPanel role={role} />
+      </TabsContent>
+    </Tabs>
   );
 };
 
