@@ -98,7 +98,7 @@ Return EXACTLY a JSON array of the top 10 most relevant opportunities. Each obje
 
 If fewer than 10 relevant opportunities exist, return what you find. Return ONLY the JSON array, no markdown.`;
 
-    const aiRes = await fetch("https://ai.lovable.dev/v1/chat/completions", {
+    const aiRes = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
       headers: {
         Authorization: `Bearer ${apiKey}`,
