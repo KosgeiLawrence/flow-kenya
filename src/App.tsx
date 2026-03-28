@@ -110,100 +110,108 @@ const BiometricGate = ({ children }: { children: React.ReactNode }) => {
   );
 };
 
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <AuthProvider>
-          <BiometricGate>
-            <PWAInstallPrompt />
-            <Routes>
-              <Route path="/" element={<Index />} />
-              <Route path="/impact" element={<ImpactDashboard />} />
-              <Route path="/login" element={<Login />} />
-              <Route path="/signup" element={<Signup />} />
-              <Route path="/forgot-password" element={<ForgotPassword />} />
-              <Route path="/payment" element={<Payment />} />
-              <Route path="/reset-password" element={<ResetPassword />} />
-              <Route path="/auth/confirm" element={<AuthConfirm />} />
-              <Route
-                path="/dashboard/waste-picker/*"
-                element={
-                  <ProtectedRoute allowedRoles={["waste_picker"]}>
-                    <WastePickerDashboard />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/dashboard/aggregator/*"
-                element={
-                  <ProtectedRoute allowedRoles={["aggregator"]}>
-                    <AggregatorDashboard />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/dashboard/recycler/*"
-                element={
-                  <ProtectedRoute allowedRoles={["recycler"]}>
-                    <RecyclerDashboard />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/dashboard/ngo/*"
-                element={
-                  <ProtectedRoute allowedRoles={["ngo"]}>
-                    <NGODashboard />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/dashboard/corporate/*"
-                element={
-                  <ProtectedRoute allowedRoles={["corporate"]}>
-                    <CorporateDashboard />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/dashboard/admin/*"
-                element={
-                  <ProtectedRoute allowedRoles={["admin"]}>
-                    <AdminDashboard />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/dashboard/county-government/*"
-                element={
-                  <ProtectedRoute allowedRoles={["county_government"]}>
-                    <CountyGovernmentDashboard />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/dashboard/*"
-                element={
-                  <ProtectedRoute>
-                    <Dashboard />
-                  </ProtectedRoute>
-                }
-              />
-              <Route path="/privacy" element={<Privacy />} />
-              <Route path="/terms" element={<Terms />} />
-              <Route path="/contact" element={<Contact />} />
-              <Route path="/report/:id" element={<PublicReport />} />
-              <Route path="/cleanup/:id/register" element={<CleanupRegister />} />
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </BiometricGate>
-        </AuthProvider>
-      </BrowserRouter>
-    </TooltipProvider>
-  </QueryClientProvider>
-);
+const App = () => {
+  const [showSplash, setShowSplash] = useState(() => isInstalledPWA());
+
+  if (showSplash) {
+    return <SplashScreen onComplete={() => setShowSplash(false)} />;
+  }
+
+  return (
+    <QueryClientProvider client={queryClient}>
+      <TooltipProvider>
+        <Toaster />
+        <Sonner />
+        <BrowserRouter>
+          <AuthProvider>
+            <BiometricGate>
+              <PWAInstallPrompt />
+              <Routes>
+                <Route path="/" element={<Index />} />
+                <Route path="/impact" element={<ImpactDashboard />} />
+                <Route path="/login" element={<Login />} />
+                <Route path="/signup" element={<Signup />} />
+                <Route path="/forgot-password" element={<ForgotPassword />} />
+                <Route path="/payment" element={<Payment />} />
+                <Route path="/reset-password" element={<ResetPassword />} />
+                <Route path="/auth/confirm" element={<AuthConfirm />} />
+                <Route
+                  path="/dashboard/waste-picker/*"
+                  element={
+                    <ProtectedRoute allowedRoles={["waste_picker"]}>
+                      <WastePickerDashboard />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/dashboard/aggregator/*"
+                  element={
+                    <ProtectedRoute allowedRoles={["aggregator"]}>
+                      <AggregatorDashboard />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/dashboard/recycler/*"
+                  element={
+                    <ProtectedRoute allowedRoles={["recycler"]}>
+                      <RecyclerDashboard />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/dashboard/ngo/*"
+                  element={
+                    <ProtectedRoute allowedRoles={["ngo"]}>
+                      <NGODashboard />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/dashboard/corporate/*"
+                  element={
+                    <ProtectedRoute allowedRoles={["corporate"]}>
+                      <CorporateDashboard />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/dashboard/admin/*"
+                  element={
+                    <ProtectedRoute allowedRoles={["admin"]}>
+                      <AdminDashboard />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/dashboard/county-government/*"
+                  element={
+                    <ProtectedRoute allowedRoles={["county_government"]}>
+                      <CountyGovernmentDashboard />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/dashboard/*"
+                  element={
+                    <ProtectedRoute>
+                      <Dashboard />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route path="/privacy" element={<Privacy />} />
+                <Route path="/terms" element={<Terms />} />
+                <Route path="/contact" element={<Contact />} />
+                <Route path="/report/:id" element={<PublicReport />} />
+                <Route path="/cleanup/:id/register" element={<CleanupRegister />} />
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </BiometricGate>
+          </AuthProvider>
+        </BrowserRouter>
+      </TooltipProvider>
+    </QueryClientProvider>
+  );
+};
 
 export default App;
