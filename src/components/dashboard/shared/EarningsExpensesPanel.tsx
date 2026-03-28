@@ -14,10 +14,11 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { toast } from "sonner";
 import {
   Plus, TrendingUp, TrendingDown, Wallet, ArrowUpCircle, ArrowDownCircle,
-  Calendar, Target, AlertTriangle, CheckCircle2, Trash2, Receipt
+  Calendar, Target, AlertTriangle, CheckCircle2, Trash2, Receipt, FileBarChart
 } from "lucide-react";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
 import { format, subDays, startOfWeek, startOfMonth, endOfMonth, startOfDay, endOfDay, isWithinInterval, startOfYear, endOfYear } from "date-fns";
+import FinancialReportsPanel from "./FinancialReportsPanel";
 
 const COLORS = ["hsl(152,45%,22%)", "hsl(40,55%,55%)", "hsl(195,60%,50%)", "hsl(25,30%,35%)", "hsl(340,55%,50%)", "hsl(270,40%,50%)"];
 
