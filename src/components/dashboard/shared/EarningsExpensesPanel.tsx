@@ -242,6 +242,13 @@ const EarningsExpensesPanel = ({ role }: Props) => {
   const activeCats = newTx.type === "income" ? incomeCategories : expenseCategories;
 
   return (
+    <Tabs defaultValue="tracking" className="w-full">
+      <TabsList className="w-full grid grid-cols-2 mb-4">
+        <TabsTrigger value="tracking" className="gap-1.5"><Receipt className="w-4 h-4" /> {config.simple ? "Track" : "Track Finances"}</TabsTrigger>
+        <TabsTrigger value="reports" className="gap-1.5"><FileBarChart className="w-4 h-4" /> Reports</TabsTrigger>
+      </TabsList>
+
+      <TabsContent value="tracking">
     <div className="space-y-4">
       {/* Quick action buttons */}
       <div className="flex flex-wrap gap-2">
