@@ -122,18 +122,31 @@ const ExternalGrantsFeed = ({ userRole }: { userRole: string }) => {
                   <p className="text-xs text-muted-foreground mt-0.5">{grant.relevance}</p>
                 </div>
 
-                {grant.url && grant.url !== "Unknown" && (
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="w-full sm:w-auto gap-1"
-                    asChild
-                  >
-                    <a href={grant.url} target="_blank" rel="noopener noreferrer">
-                      <ExternalLink className="w-3 h-3" /> Learn More & Apply
-                    </a>
-                  </Button>
-                )}
+                <div className="flex flex-col sm:flex-row gap-2">
+                  {grant.url && grant.url !== "Unknown" && (
+                    <>
+                      <Button
+                        size="sm"
+                        className="w-full sm:w-auto gap-1"
+                        asChild
+                      >
+                        <a href={grant.url} target="_blank" rel="noopener noreferrer">
+                          <ExternalLink className="w-3 h-3" /> Apply Now
+                        </a>
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="w-full sm:w-auto gap-1"
+                        asChild
+                      >
+                        <a href={grant.url} target="_blank" rel="noopener noreferrer">
+                          <Globe className="w-3 h-3" /> Learn More
+                        </a>
+                      </Button>
+                    </>
+                  )}
+                </div>
               </div>
             ))}
           </div>
