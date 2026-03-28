@@ -123,7 +123,7 @@ const ExternalGrantsFeed = ({ userRole }: { userRole: string }) => {
                 </div>
 
                 <div className="flex flex-col sm:flex-row gap-2">
-                  {grant.url && grant.url !== "Unknown" && (
+                  {grant.url && grant.url !== "Unknown" && grant.url.startsWith("http") ? (
                     <>
                       <Button
                         size="sm"
@@ -145,6 +145,21 @@ const ExternalGrantsFeed = ({ userRole }: { userRole: string }) => {
                         </a>
                       </Button>
                     </>
+                  ) : (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="w-full sm:w-auto gap-1"
+                      asChild
+                    >
+                      <a
+                        href={`https://www.google.com/search?q=${encodeURIComponent(grant.title + " " + grant.organization + " apply")}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        <ExternalLink className="w-3 h-3" /> Search & Apply
+                      </a>
+                    </Button>
                   )}
                 </div>
               </div>
