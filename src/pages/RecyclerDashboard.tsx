@@ -77,7 +77,7 @@ const RecyclerDashboard = () => {
       case "pickup-requests": return <RequestedPickupsPanel />;
       case "training": return <TrainingPanel viewerRole="recycler" />;
       case "cleanup": return <CleanupExercisePanel />;
-      case "grants": return <GrantsDiscoveryPanel />;
+      case "grants": return <GrantsDiscoveryPanel userRole="recycler" />;
       case "settings": return <ProfileSettingsPanel role="recycler" />;
       default: return <InventoryAccessPanel />;
     }

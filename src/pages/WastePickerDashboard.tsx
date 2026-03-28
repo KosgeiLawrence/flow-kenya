@@ -66,7 +66,7 @@ const WastePickerDashboard = () => {
       case "qr-id": return <QRIDPanel />;
       case "training": return <TrainingPanel viewerRole="waste_picker" />;
       case "cleanup": return <CleanupExercisePanel />;
-      case "grants": return <GrantsDiscoveryPanel />;
+      case "grants": return <GrantsDiscoveryPanel userRole="waste_picker" />;
       case "settings": return <ProfileSettingsPanel role="waste_picker" />;
       default: return <CollectionPanel />;
     }

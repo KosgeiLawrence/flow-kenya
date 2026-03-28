@@ -11,8 +11,9 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Briefcase, Target, Calendar, Send, CheckCircle2, Clock, XCircle, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { format } from "date-fns";
+import ExternalGrantsFeed from "./ExternalGrantsFeed";
 
-const GrantsDiscoveryPanel = () => {
+const GrantsDiscoveryPanel = ({ userRole = "waste_picker" }: { userRole?: string }) => {
   const { user, profile } = useAuth();
   const queryClient = useQueryClient();
   const [applyingTo, setApplyingTo] = useState<string | null>(null);
@@ -45,7 +46,7 @@ const GrantsDiscoveryPanel = () => {
     },
   });
 
-  const userRole = useQuery({
+  const userRoleQuery = useQuery({
     queryKey: ["my_role"],
     queryFn: async () => {
       if (!user) return null;
@@ -66,7 +67,7 @@ const GrantsDiscoveryPanel = () => {
         program_id: programId,
         user_id: user.id,
         applicant_name: profile.full_name || "Unknown",
-        applicant_role: userRole.data || "unknown",
+        applicant_role: userRoleQuery.data || "unknown",
         message: message.trim() || null,
       });
       if (error) {
@@ -114,6 +115,8 @@ const GrantsDiscoveryPanel = () => {
 
   return (
     <div className="space-y-6">
+      {/* AI-curated external grants feed */}
+      <ExternalGrantsFeed userRole={userRole} />
       {/* Summary cards */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <Card className="shadow-soft">
@@ -236,7 +239,7 @@ const GrantsDiscoveryPanel = () => {
                               Your name: <span className="font-medium text-foreground">{profile?.full_name}</span>
                             </p>
                             <p className="text-sm text-muted-foreground">
-                              Role: <span className="font-medium text-foreground capitalize">{userRole.data?.replace("_", " ")}</span>
+                              Role: <span className="font-medium text-foreground capitalize">{userRoleQuery.data?.replace("_", " ")}</span>
                             </p>
                           </div>
                           <div>
