@@ -4,27 +4,32 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
-async function fetchPageText(url: string): Promise<string> {
+async function fetchWithTimeout(url: string, timeoutMs = 8000): Promise<string> {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
   try {
     const res = await fetch(url, {
+      signal: controller.signal,
       headers: {
-        "User-Agent":
-          "Mozilla/5.0 (compatible; DuaraFlowBot/1.0; +https://flow-kenya-trace.lovable.app)",
+        "User-Agent": "Mozilla/5.0 (Linux; Android 13) AppleWebKit/537.36 Chrome/120.0.0.0 Mobile Safari/537.36",
+        "Accept": "text/html,application/xhtml+xml",
+        "Accept-Language": "en-US,en;q=0.9",
       },
     });
+    clearTimeout(timer);
     if (!res.ok) return "";
     const html = await res.text();
-    // Strip tags, keep text
     const text = html
       .replace(/<script[\s\S]*?<\/script>/gi, "")
       .replace(/<style[\s\S]*?<\/style>/gi, "")
       .replace(/<[^>]+>/g, " ")
+      .replace(/&nbsp;/g, " ")
       .replace(/\s+/g, " ")
       .trim();
-    // Limit to ~4000 chars to stay within token limits
-    return text.slice(0, 4000);
+    return text.slice(0, 3000);
   } catch (e) {
-    console.error(`Failed to fetch ${url}:`, e);
+    clearTimeout(timer);
+    console.log(`Timeout/error fetching ${url}: ${e}`);
     return "";
   }
 }
@@ -38,23 +43,32 @@ Deno.serve(async (req) => {
     const { userRole, impactArea } = await req.json();
 
     const sources = [
-      "https://www.opportunitiesforafricans.com/",
-      "https://opportunitydesk.org/",
-      "https://opportunitiesforyouth.org/",
-      "https://www.youthop.com/",
+      { url: "https://www.opportunitiesforafricans.com/", name: "OpportunitiesForAfricans" },
+      { url: "https://opportunitydesk.org/", name: "OpportunityDesk" },
+      { url: "https://opportunitiesforyouth.org/", name: "OpportunitiesForYouth" },
+      { url: "https://www.youthop.com/", name: "YouthOp" },
     ];
 
-    // Fetch all pages in parallel
-    const pageTexts = await Promise.all(sources.map(fetchPageText));
+    console.log("Fetching sources...");
+    const results = await Promise.allSettled(
+      sources.map(s => fetchWithTimeout(s.url))
+    );
 
     const combinedContent = sources
-      .map((url, i) => `--- Source: ${url} ---\n${pageTexts[i]}`)
-      .filter((_, i) => pageTexts[i].length > 0)
+      .map((s, i) => {
+        const result = results[i];
+        const text = result.status === "fulfilled" ? result.value : "";
+        return text ? `--- ${s.name} ---\n${text}` : "";
+      })
+      .filter(Boolean)
       .join("\n\n");
 
+    console.log(`Fetched content length: ${combinedContent.length}`);
+
     if (!combinedContent.trim()) {
+      console.log("No content fetched from any source");
       return new Response(
-        JSON.stringify({ grants: [], error: "Could not fetch any sources" }),
+        JSON.stringify({ grants: [], error: "Could not reach opportunity sources" }),
         { headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
@@ -63,41 +77,28 @@ Deno.serve(async (req) => {
     if (!apiKey) {
       return new Response(
         JSON.stringify({ grants: [], error: "AI not configured" }),
-        {
-          status: 500,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
-        }
+        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 
     const roleLabel =
-      userRole === "waste_picker"
-        ? "waste picker / informal recycler"
-        : userRole === "aggregator"
-        ? "waste aggregator / collection center"
+      userRole === "waste_picker" ? "waste picker / informal recycler"
+        : userRole === "aggregator" ? "waste aggregator / collection center"
         : "recycler / plastic processor";
 
-    const systemPrompt = `You are an AI that extracts grants, fellowships, funding opportunities, and programs from scraped website content. Focus ONLY on opportunities relevant to:
-- Waste management, recycling, circular economy, environmental sustainability
+    const systemPrompt = `Extract grants, fellowships, funding and programs from scraped website text. Focus on opportunities relevant to:
+- Waste management, recycling, circular economy, environment
 - Youth empowerment, community development in Africa
 - Small business grants, social enterprise funding
-- Climate action, plastic pollution, clean energy
+- Climate action, plastic pollution
 - Role: ${roleLabel}
 ${impactArea ? `- Impact area: ${impactArea}` : ""}
 
-Return EXACTLY a JSON array of the top 10 most relevant opportunities. Each object must have:
-{
-  "title": "string - opportunity name",
-  "organization": "string - funding org",
-  "deadline": "string - deadline date or 'Rolling' or 'Unknown'",
-  "description": "string - 2 sentence summary",
-  "url": "string - link to apply or learn more",
-  "relevance": "string - why it's relevant to this user",
-  "funding_amount": "string - amount if mentioned or 'Varies'"
-}
+Return a JSON array of up to 10 relevant opportunities:
+[{"title":"string","organization":"string","deadline":"string or Rolling","description":"2 sentences","url":"string or empty","relevance":"why relevant","funding_amount":"string or Varies"}]
+Return ONLY the JSON array.`;
 
-If fewer than 10 relevant opportunities exist, return what you find. Return ONLY the JSON array, no markdown.`;
-
+    console.log("Calling AI gateway...");
     const aiRes = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
       headers: {
@@ -105,61 +106,45 @@ If fewer than 10 relevant opportunities exist, return what you find. Return ONLY
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "google/gemini-2.5-flash",
+        model: "google/gemini-2.5-flash-lite",
         messages: [
           { role: "system", content: systemPrompt },
-          {
-            role: "user",
-            content: `Extract the top 10 relevant grants and programs from these pages:\n\n${combinedContent}`,
-          },
+          { role: "user", content: `Extract relevant grants:\n\n${combinedContent.slice(0, 8000)}` },
         ],
-        temperature: 0.3,
+        temperature: 0.2,
       }),
     });
 
     if (!aiRes.ok) {
       const errText = await aiRes.text();
-      console.error("AI error:", errText);
+      console.error("AI error:", aiRes.status, errText);
       return new Response(
         JSON.stringify({ grants: [], error: "AI processing failed" }),
-        {
-          status: 500,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
-        }
+        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 
     const aiData = await aiRes.json();
     let content = aiData.choices?.[0]?.message?.content || "[]";
-
-    // Clean markdown code fences if present
-    content = content
-      .replace(/```json\s*/g, "")
-      .replace(/```\s*/g, "")
-      .trim();
+    content = content.replace(/```json\s*/g, "").replace(/```\s*/g, "").trim();
 
     let grants;
     try {
       grants = JSON.parse(content);
     } catch {
-      console.error("Failed to parse AI response:", content);
+      console.error("Failed to parse:", content.slice(0, 200));
       grants = [];
     }
 
+    console.log(`Returning ${grants.length} grants`);
     return new Response(JSON.stringify({ grants }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (error) {
     console.error("Error:", error);
     return new Response(
-      JSON.stringify({
-        grants: [],
-        error: error instanceof Error ? error.message : "Unknown error",
-      }),
-      {
-        status: 500,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      }
+      JSON.stringify({ grants: [], error: error instanceof Error ? error.message : "Unknown error" }),
+      { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   }
 });
