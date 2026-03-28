@@ -19,14 +19,20 @@ async function fetchWithTimeout(url: string, timeoutMs = 8000): Promise<string> 
     clearTimeout(timer);
     if (!res.ok) return "";
     const html = await res.text();
-    const text = html
+    // Preserve links: convert <a href="...">text</a> to [text](url)
+    const withLinks = html
       .replace(/<script[\s\S]*?<\/script>/gi, "")
       .replace(/<style[\s\S]*?<\/style>/gi, "")
+      .replace(/<a\s[^>]*href=["']([^"']+)["'][^>]*>([\s\S]*?)<\/a>/gi, (_, href, text) => {
+        const cleanText = text.replace(/<[^>]+>/g, "").trim();
+        const fullUrl = href.startsWith("http") ? href : "";
+        return fullUrl ? ` [${cleanText}](${fullUrl}) ` : ` ${cleanText} `;
+      })
       .replace(/<[^>]+>/g, " ")
       .replace(/&nbsp;/g, " ")
       .replace(/\s+/g, " ")
       .trim();
-    return text.slice(0, 3000);
+    return withLinks.slice(0, 5000);
   } catch (e) {
     clearTimeout(timer);
     console.log(`Timeout/error fetching ${url}: ${e}`);
@@ -94,8 +100,10 @@ Deno.serve(async (req) => {
 - Role: ${roleLabel}
 ${impactArea ? `- Impact area: ${impactArea}` : ""}
 
+CRITICAL: The text contains markdown-style links like [Title](https://full-url). You MUST extract the REAL full URL from these links and include it in the "url" field. Never make up or guess URLs. If no real URL is found for an opportunity, set url to "".
+
 Return a JSON array of up to 10 relevant opportunities:
-[{"title":"string","organization":"string","deadline":"string or Rolling","description":"2 sentences","url":"string or empty","relevance":"why relevant","funding_amount":"string or Varies"}]
+[{"title":"string","organization":"string","deadline":"string or Rolling","description":"2 sentences","url":"the REAL full https:// URL extracted from the text","relevance":"why relevant","funding_amount":"string or Varies"}]
 Return ONLY the JSON array.`;
 
     console.log("Calling AI gateway...");
@@ -109,7 +117,7 @@ Return ONLY the JSON array.`;
         model: "google/gemini-2.5-flash-lite",
         messages: [
           { role: "system", content: systemPrompt },
-          { role: "user", content: `Extract relevant grants:\n\n${combinedContent.slice(0, 8000)}` },
+          { role: "user", content: `Extract relevant grants with their REAL URLs:\n\n${combinedContent.slice(0, 12000)}` },
         ],
         temperature: 0.2,
       }),
