@@ -22,9 +22,11 @@ import ProfileSettingsPanel from "@/components/dashboard/shared/ProfileSettingsP
 import RequestedPickupsPanel from "@/components/dashboard/shared/RequestedPickupsPanel";
 import TrainingPanel from "@/components/dashboard/waste-picker/TrainingPanel";
 import CleanupExercisePanel from "@/components/dashboard/shared/CleanupExercisePanel";
+import EarningsExpensesPanel from "@/components/dashboard/shared/EarningsExpensesPanel";
 
 const navItems = [
   { id: "inventory", label: "Inventory", icon: Package },
+  { id: "business-insights", label: "Business Insights", icon: TrendingUp },
   { id: "products", label: "Products & Pricing", icon: ShoppingBag },
   { id: "orders", label: "Orders & Contracts", icon: ClipboardList },
   { id: "invoices", label: "Purchase Invoices", icon: FileText },
@@ -63,6 +65,7 @@ const RecyclerDashboard = () => {
   const renderPanel = () => {
     switch (activePanel) {
       case "inventory": return <InventoryAccessPanel />;
+      case "business-insights": return <EarningsExpensesPanel role="recycler" />;
       case "products": return <ProductCatalogPanel />;
       case "orders": return <OrdersPanel />;
       case "invoices": return <PurchaseInvoicesPanel />;
