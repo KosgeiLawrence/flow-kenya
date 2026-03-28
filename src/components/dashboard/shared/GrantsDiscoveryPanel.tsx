@@ -67,7 +67,7 @@ const GrantsDiscoveryPanel = ({ userRole = "waste_picker" }: { userRole?: string
         program_id: programId,
         user_id: user.id,
         applicant_name: profile.full_name || "Unknown",
-        applicant_role: userRole.data || "unknown",
+        applicant_role: userRoleQuery.data || "unknown",
         message: message.trim() || null,
       });
       if (error) {
@@ -237,7 +237,7 @@ const GrantsDiscoveryPanel = ({ userRole = "waste_picker" }: { userRole?: string
                               Your name: <span className="font-medium text-foreground">{profile?.full_name}</span>
                             </p>
                             <p className="text-sm text-muted-foreground">
-                              Role: <span className="font-medium text-foreground capitalize">{userRole.data?.replace("_", " ")}</span>
+                              Role: <span className="font-medium text-foreground capitalize">{userRoleQuery.data?.replace("_", " ")}</span>
                             </p>
                           </div>
                           <div>
