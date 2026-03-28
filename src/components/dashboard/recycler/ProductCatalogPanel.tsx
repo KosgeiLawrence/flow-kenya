@@ -11,21 +11,45 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Package, Plus, Download, Trash2, ShoppingBag } from "lucide-react";
+import { Package, Plus, Download, Trash2, ShoppingBag, ShoppingCart, FileText, Receipt, CheckCircle2, ArrowRight } from "lucide-react";
 import { toast } from "sonner";
 import jsPDF from "jspdf";
 import { format } from "date-fns";
 import { addCleanHeader, addDocMeta, drawTableHeader, drawTableRow, drawVatTotalBlock, finalizeCleanPdf, loadImageAsBase64, buildPdfOrgInfo } from "@/lib/pdfBranding";
 import VatOptions, { DEFAULT_VAT, type VatConfig } from "@/components/dashboard/shared/VatOptions";
 
+type SaleStep = "details" | "quotation_sent" | "invoice_sent" | "receipt_done";
+
+interface SaleState {
+  productId: string;
+  step: SaleStep;
+  client_name: string;
+  client_email: string;
+  client_phone: string;
+  quantity: string;
+  notes: string;
+  refNo: string;
+}
+
+const initialSale: SaleState = {
+  productId: "",
+  step: "details",
+  client_name: "",
+  client_email: "",
+  client_phone: "",
+  quantity: "",
+  notes: "",
+  refNo: "",
+};
+
 const ProductCatalogPanel = () => {
   const { user, profile } = useAuth();
   const { orgInfo } = useOrgInfo();
   const queryClient = useQueryClient();
   const [dialogOpen, setDialogOpen] = useState(false);
-  const [quoteDialog, setQuoteDialog] = useState<string | null>(null);
+  const [saleDialog, setSaleDialog] = useState(false);
+  const [sale, setSale] = useState<SaleState>(initialSale);
   const [form, setForm] = useState({ name: "", description: "", material_source: "", stock_quantity: "", unit: "kg", price_per_unit: "" });
-  const [quoteForm, setQuoteForm] = useState({ client_name: "", client_phone: "", quantity: "", notes: "" });
   const [vat, setVat] = useState<VatConfig>(DEFAULT_VAT);
 
   const { data: products } = useQuery({
@@ -55,6 +79,8 @@ const ProductCatalogPanel = () => {
     onSuccess: () => { queryClient.invalidateQueries({ queryKey: ["recycler_products"] }); toast.success("Product removed"); },
   });
 
+  const selectedProduct = products?.find((p) => p.id === sale.productId);
+
   const getOrgPdfInfo = async () => {
     if (!orgInfo) return null;
     let logoBase64: string | null = null;
@@ -62,83 +88,139 @@ const ProductCatalogPanel = () => {
     return buildPdfOrgInfo(orgInfo, logoBase64);
   };
 
-  const generateInvoice = async (product: any) => {
-    const qty = Number(quoteForm.quantity) || 1;
-    const subtotal = qty * Number(product.price_per_unit);
-    const doc = new jsPDF();
-    const invNo = `INV-${Date.now().toString(36).toUpperCase()}`;
-    const pdfOrg = await getOrgPdfInfo();
-
-    let y = addCleanHeader(doc, "Sales Invoice", undefined, pdfOrg);
-    y = addDocMeta(doc, [
-      { label: "Invoice #", value: invNo },
-      { label: "Date", value: format(new Date(), "MMM d, yyyy") },
-      { label: "Seller", value: orgInfo?.orgName || profile?.full_name || "Recycler" },
-      ...(orgInfo?.contactPhone ? [{ label: "Phone", value: orgInfo.contactPhone }] : []),
-      { label: "Client", value: quoteForm.client_name || "—" },
-      ...(quoteForm.client_phone ? [{ label: "Client Phone", value: quoteForm.client_phone }] : []),
-    ], y);
-
-    y = drawTableHeader(doc, [
-      { label: "Product", x: 17 }, { label: "Quantity", x: 95 }, { label: "Unit Price (KES)", x: 125 }, { label: "Total (KES)", x: 165 },
-    ], y, 180);
-
-    drawTableRow(doc, y, 0, 180);
-    doc.setFontSize(8);
-    doc.text(product.name, 17, y); doc.text(`${qty} ${product.unit}`, 95, y);
-    doc.text(Number(product.price_per_unit).toFixed(2), 125, y); doc.text(subtotal.toLocaleString(), 165, y);
-    y += 10;
-
-    y = drawVatTotalBlock(doc, subtotal, vat.vatPercent, vat.includeVat, y);
-    if (quoteForm.notes) { doc.setFontSize(9); doc.text(`Notes: ${quoteForm.notes}`, 15, y); }
-
-    finalizeCleanPdf(doc);
-    doc.save(`invoice-${invNo}.pdf`);
-    toast.success("Invoice downloaded");
-    setQuoteDialog(null); setQuoteForm({ client_name: "", client_phone: "", quantity: "", notes: "" });
+  const calcSubtotal = () => {
+    if (!selectedProduct) return 0;
+    return (Number(sale.quantity) || 1) * Number(selectedProduct.price_per_unit);
   };
 
-  const generateQuotation = async (product: any) => {
-    const qty = Number(quoteForm.quantity) || 1;
-    const subtotal = qty * Number(product.price_per_unit);
-    const doc = new jsPDF();
-    const qNo = `QT-${Date.now().toString(36).toUpperCase()}`;
-    const pdfOrg = await getOrgPdfInfo();
+  const calcVatAmount = () => {
+    if (!vat.includeVat) return 0;
+    return calcSubtotal() * (vat.vatPercent / 100);
+  };
 
-    let y = addCleanHeader(doc, "Quotation", undefined, pdfOrg);
+  const calcTotal = () => calcSubtotal() + calcVatAmount();
+
+  const openSale = (productId: string) => {
+    const ref = `SL-${Date.now().toString(36).toUpperCase()}`;
+    setSale({ ...initialSale, productId, refNo: ref });
+    setSaleDialog(true);
+  };
+
+  const closeSale = () => {
+    setSaleDialog(false);
+    setSale(initialSale);
+    setVat(DEFAULT_VAT);
+  };
+
+  const generatePdf = async (docType: "Quotation" | "Invoice" | "Receipt") => {
+    if (!selectedProduct) return;
+    const qty = Number(sale.quantity) || 1;
+    const subtotal = calcSubtotal();
+    const doc = new jsPDF();
+    const pdfOrg = await getOrgPdfInfo();
+    const prefix = docType === "Quotation" ? "QT" : docType === "Invoice" ? "INV" : "RCT";
+    const docNo = `${prefix}-${sale.refNo.replace("SL-", "")}`;
+
+    let y = addCleanHeader(doc, docType, undefined, pdfOrg);
     y = addDocMeta(doc, [
-      { label: "Quotation #", value: qNo },
+      { label: `${docType} #`, value: docNo },
       { label: "Date", value: format(new Date(), "MMM d, yyyy") },
-      { label: "From", value: orgInfo?.orgName || profile?.full_name || "Recycler" },
+      { label: "Ref", value: sale.refNo },
+      { label: docType === "Quotation" ? "From" : "Seller", value: orgInfo?.orgName || profile?.full_name || "Recycler" },
       ...(orgInfo?.contactPhone ? [{ label: "Phone", value: orgInfo.contactPhone }] : []),
-      { label: "To", value: quoteForm.client_name || "—" },
-      ...(quoteForm.client_phone ? [{ label: "Client Phone", value: quoteForm.client_phone }] : []),
+      { label: docType === "Quotation" ? "To" : "Client", value: sale.client_name || "—" },
+      ...(sale.client_phone ? [{ label: "Client Phone", value: sale.client_phone }] : []),
+      ...(sale.client_email ? [{ label: "Client Email", value: sale.client_email }] : []),
     ], y);
 
     y = drawTableHeader(doc, [
-      { label: "Product", x: 17 }, { label: "Quantity", x: 95 }, { label: "Unit Price (KES)", x: 125 }, { label: "Total (KES)", x: 165 },
+      { label: "Product", x: 17 }, { label: "Qty", x: 95 }, { label: "Unit Price (KES)", x: 120 }, { label: "Total (KES)", x: 165 },
     ], y, 180);
 
     drawTableRow(doc, y, 0, 180);
     doc.setFontSize(8);
-    doc.text(product.name, 17, y); doc.text(`${qty} ${product.unit}`, 95, y);
-    doc.text(Number(product.price_per_unit).toFixed(2), 125, y); doc.text(subtotal.toLocaleString(), 165, y);
+    doc.text(selectedProduct.name, 17, y);
+    doc.text(`${qty} ${selectedProduct.unit}`, 95, y);
+    doc.text(Number(selectedProduct.price_per_unit).toFixed(2), 120, y);
+    doc.text(subtotal.toLocaleString(), 165, y);
     y += 10;
 
     y = drawVatTotalBlock(doc, subtotal, vat.vatPercent, vat.includeVat, y);
-    doc.setFontSize(9);
-    doc.text("This quotation is valid for 30 days from the date of issue.", 15, y);
-    if (quoteForm.notes) { y += 8; doc.text(`Notes: ${quoteForm.notes}`, 15, y); }
+
+    if (docType === "Quotation") {
+      doc.setFontSize(9);
+      doc.text("This quotation is valid for 30 days from the date of issue.", 15, y);
+      y += 6;
+    }
+    if (docType === "Receipt") {
+      doc.setFontSize(9);
+      doc.setTextColor(34, 139, 34);
+      doc.text("PAID IN FULL", 15, y);
+      doc.setTextColor(0);
+      y += 6;
+    }
+    if (sale.notes) { doc.setFontSize(9); doc.text(`Notes: ${sale.notes}`, 15, y); }
 
     finalizeCleanPdf(doc);
-    doc.save(`quotation-${qNo}.pdf`);
-    toast.success("Quotation downloaded");
-    setQuoteDialog(null); setQuoteForm({ client_name: "", client_phone: "", quantity: "", notes: "" });
+    doc.save(`${docType.toLowerCase()}-${docNo}.pdf`);
+    toast.success(`${docType} downloaded`);
+  };
+
+  // Step handlers
+  const handleSendQuotation = async () => {
+    await generatePdf("Quotation");
+    setSale((s) => ({ ...s, step: "quotation_sent" }));
+  };
+
+  const handleClientAccepts = async () => {
+    await generatePdf("Invoice");
+    setSale((s) => ({ ...s, step: "invoice_sent" }));
+  };
+
+  const handleGenerateReceipt = async () => {
+    if (!selectedProduct || !user) return;
+    const qty = Number(sale.quantity) || 1;
+    const total = calcTotal();
+
+    // Generate receipt PDF
+    await generatePdf("Receipt");
+
+    // Deduct stock
+    const newStock = Math.max(0, Number(selectedProduct.stock_quantity) - qty);
+    await supabase.from("recycler_products").update({ stock_quantity: newStock }).eq("id", selectedProduct.id);
+
+    // Log as income in financial_transactions
+    const { data: incomeCats } = await supabase.from("financial_categories").select("id").eq("name", "Plastic Sales").eq("is_system", true).limit(1);
+    const categoryId = incomeCats?.[0]?.id || null;
+
+    await supabase.from("financial_transactions").insert({
+      user_id: user.id,
+      type: "income",
+      amount: total,
+      description: `Sale: ${qty} ${selectedProduct.unit} of ${selectedProduct.name} to ${sale.client_name}`,
+      category_id: categoryId,
+      payment_method: "cash",
+      reference_number: sale.refNo,
+      transaction_date: new Date().toISOString().split("T")[0],
+    });
+
+    // Refresh queries
+    queryClient.invalidateQueries({ queryKey: ["recycler_products"] });
+    queryClient.invalidateQueries({ queryKey: ["financial_transactions"] });
+
+    setSale((s) => ({ ...s, step: "receipt_done" }));
+    toast.success("Sale completed! Stock updated & income recorded.");
   };
 
   const totalStock = products?.reduce((s, p) => s + Number(p.stock_quantity), 0) || 0;
   const totalValue = products?.reduce((s, p) => s + Number(p.stock_quantity) * Number(p.price_per_unit), 0) || 0;
-  const selectedProduct = products?.find((p) => p.id === quoteDialog);
+
+  const stepLabels: Record<SaleStep, string> = {
+    details: "Client & Quantity",
+    quotation_sent: "Quotation Sent",
+    invoice_sent: "Invoice Sent",
+    receipt_done: "Sale Complete",
+  };
 
   return (
     <div className="space-y-6">
@@ -214,8 +296,8 @@ const ProductCatalogPanel = () => {
                     </div>
                   </div>
                   <div className="flex items-center gap-1 shrink-0">
-                    <Button variant="outline" size="sm" onClick={() => { setQuoteDialog(p.id); setQuoteForm({ client_name: "", client_phone: "", quantity: "", notes: "" }); }}>
-                      <Download className="w-3 h-3 mr-1" /> Invoice
+                    <Button size="sm" onClick={() => openSale(p.id)} disabled={Number(p.stock_quantity) <= 0}>
+                      <ShoppingCart className="w-3 h-3 mr-1" /> Sell
                     </Button>
                     <Button variant="ghost" size="icon" onClick={() => deleteProduct.mutate(p.id)} title="Remove">
                       <Trash2 className="w-4 h-4 text-destructive" />
@@ -228,25 +310,137 @@ const ProductCatalogPanel = () => {
         </CardContent>
       </Card>
 
-      <Dialog open={!!quoteDialog} onOpenChange={(open) => { if (!open) setQuoteDialog(null); }}>
+      {/* Sales Flow Dialog */}
+      <Dialog open={saleDialog} onOpenChange={(open) => { if (!open) closeSale(); }}>
         <DialogContent className="max-w-md">
-          <DialogHeader><DialogTitle>Generate Invoice / Quotation</DialogTitle></DialogHeader>
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <ShoppingCart className="w-5 h-5" /> Sell Product
+            </DialogTitle>
+          </DialogHeader>
+
           {selectedProduct && (
-            <div className="space-y-3">
-              <p className="text-sm text-muted-foreground">Product: <strong className="text-foreground">{selectedProduct.name}</strong> — KES {Number(selectedProduct.price_per_unit).toFixed(2)}/{selectedProduct.unit}</p>
-              <div><Label>Client Name</Label><Input value={quoteForm.client_name} onChange={(e) => setQuoteForm({ ...quoteForm, client_name: e.target.value })} placeholder="Client / company name" /></div>
-              <div><Label>Client Phone</Label><Input value={quoteForm.client_phone} onChange={(e) => setQuoteForm({ ...quoteForm, client_phone: e.target.value })} placeholder="0712 345 678" /></div>
-              <div><Label>Quantity ({selectedProduct.unit})</Label><Input type="number" value={quoteForm.quantity} onChange={(e) => setQuoteForm({ ...quoteForm, quantity: e.target.value })} /></div>
-              <div><Label>Notes</Label><Textarea value={quoteForm.notes} onChange={(e) => setQuoteForm({ ...quoteForm, notes: e.target.value })} rows={2} /></div>
-              <VatOptions value={vat} onChange={setVat} />
-              <div className="flex gap-2">
-                <Button className="flex-1" onClick={() => generateInvoice(selectedProduct)} disabled={!quoteForm.client_name || !quoteForm.quantity}>
-                  <Download className="w-4 h-4 mr-1" /> Invoice
-                </Button>
-                <Button variant="outline" className="flex-1" onClick={() => generateQuotation(selectedProduct)} disabled={!quoteForm.client_name || !quoteForm.quantity}>
-                  <Download className="w-4 h-4 mr-1" /> Quotation
-                </Button>
+            <div className="space-y-4">
+              {/* Progress Steps */}
+              <div className="flex items-center gap-1 text-xs overflow-x-auto pb-1">
+                {(["details", "quotation_sent", "invoice_sent", "receipt_done"] as SaleStep[]).map((step, i) => {
+                  const steps: SaleStep[] = ["details", "quotation_sent", "invoice_sent", "receipt_done"];
+                  const currentIdx = steps.indexOf(sale.step);
+                  const stepIdx = i;
+                  const isDone = stepIdx < currentIdx;
+                  const isCurrent = stepIdx === currentIdx;
+                  return (
+                    <div key={step} className="flex items-center gap-1">
+                      <div className={`w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold shrink-0 ${
+                        isDone ? "bg-primary text-primary-foreground" : isCurrent ? "bg-primary/20 text-primary border-2 border-primary" : "bg-muted text-muted-foreground"
+                      }`}>
+                        {isDone ? <CheckCircle2 className="w-3.5 h-3.5" /> : i + 1}
+                      </div>
+                      {i < 3 && <ArrowRight className="w-3 h-3 text-muted-foreground shrink-0" />}
+                    </div>
+                  );
+                })}
               </div>
+              <p className="text-xs text-muted-foreground font-medium">{stepLabels[sale.step]}</p>
+
+              {/* Product info */}
+              <Card className="bg-muted/30">
+                <CardContent className="p-3">
+                  <p className="text-sm font-medium text-foreground">{selectedProduct.name}</p>
+                  <p className="text-xs text-muted-foreground">KES {Number(selectedProduct.price_per_unit).toFixed(2)}/{selectedProduct.unit} • Stock: {Number(selectedProduct.stock_quantity).toFixed(0)} {selectedProduct.unit}</p>
+                </CardContent>
+              </Card>
+
+              {/* Step 1: Client Details */}
+              {sale.step === "details" && (
+                <div className="space-y-3">
+                  <div><Label>Client Name *</Label><Input value={sale.client_name} onChange={(e) => setSale({ ...sale, client_name: e.target.value })} placeholder="Client / company name" /></div>
+                  <div><Label>Client Phone</Label><Input value={sale.client_phone} onChange={(e) => setSale({ ...sale, client_phone: e.target.value })} placeholder="0712 345 678" /></div>
+                  <div><Label>Client Email</Label><Input type="email" value={sale.client_email} onChange={(e) => setSale({ ...sale, client_email: e.target.value })} placeholder="client@email.com" /></div>
+                  <div><Label>Quantity ({selectedProduct.unit}) *</Label><Input type="number" value={sale.quantity} onChange={(e) => setSale({ ...sale, quantity: e.target.value })} max={Number(selectedProduct.stock_quantity)} /></div>
+                  <div><Label>Notes</Label><Textarea value={sale.notes} onChange={(e) => setSale({ ...sale, notes: e.target.value })} rows={2} /></div>
+                  <VatOptions value={vat} onChange={setVat} />
+
+                  {sale.quantity && (
+                    <Card className="bg-primary/5 border-primary/20">
+                      <CardContent className="p-3 text-sm">
+                        <div className="flex justify-between"><span className="text-muted-foreground">Subtotal</span><span className="font-medium text-foreground">KES {calcSubtotal().toLocaleString()}</span></div>
+                        {vat.includeVat && <div className="flex justify-between"><span className="text-muted-foreground">VAT ({vat.vatPercent}%)</span><span className="text-foreground">KES {calcVatAmount().toLocaleString()}</span></div>}
+                        <div className="flex justify-between font-bold border-t border-border mt-1 pt-1"><span>Total</span><span className="text-primary">KES {calcTotal().toLocaleString()}</span></div>
+                      </CardContent>
+                    </Card>
+                  )}
+
+                  <Button className="w-full" onClick={handleSendQuotation} disabled={!sale.client_name || !sale.quantity || Number(sale.quantity) <= 0}>
+                    <FileText className="w-4 h-4 mr-1" /> Generate Quotation
+                  </Button>
+                </div>
+              )}
+
+              {/* Step 2: Quotation Sent - Client accepts? */}
+              {sale.step === "quotation_sent" && (
+                <div className="space-y-3">
+                  <Card className="bg-accent/10 border-accent/30">
+                    <CardContent className="p-4 text-center space-y-2">
+                      <FileText className="w-8 h-8 text-accent mx-auto" />
+                      <p className="text-sm font-medium text-foreground">Quotation sent to {sale.client_name}</p>
+                      <p className="text-xs text-muted-foreground">KES {calcTotal().toLocaleString()} for {sale.quantity} {selectedProduct.unit}</p>
+                    </CardContent>
+                  </Card>
+                  <p className="text-sm text-center text-muted-foreground">Did the client accept the quotation?</p>
+                  <div className="flex gap-2">
+                    <Button className="flex-1" onClick={handleClientAccepts}>
+                      <CheckCircle2 className="w-4 h-4 mr-1" /> Yes, Generate Invoice
+                    </Button>
+                    <Button variant="outline" className="flex-1" onClick={() => { generatePdf("Quotation"); toast.info("Revised quotation downloaded"); }}>
+                      Resend Quotation
+                    </Button>
+                  </div>
+                  <Button variant="ghost" className="w-full text-destructive" onClick={closeSale}>Cancel Sale</Button>
+                </div>
+              )}
+
+              {/* Step 3: Invoice Sent - Generate Receipt */}
+              {sale.step === "invoice_sent" && (
+                <div className="space-y-3">
+                  <Card className="bg-primary/10 border-primary/30">
+                    <CardContent className="p-4 text-center space-y-2">
+                      <FileText className="w-8 h-8 text-primary mx-auto" />
+                      <p className="text-sm font-medium text-foreground">Invoice sent to {sale.client_name}</p>
+                      <p className="text-xs text-muted-foreground">Amount: KES {calcTotal().toLocaleString()}</p>
+                    </CardContent>
+                  </Card>
+                  <p className="text-sm text-center text-muted-foreground">Has the client paid?</p>
+                  <Button className="w-full" onClick={handleGenerateReceipt}>
+                    <Receipt className="w-4 h-4 mr-1" /> Confirm Payment & Generate Receipt
+                  </Button>
+                  <Button variant="outline" className="w-full" onClick={() => { generatePdf("Invoice"); toast.info("Invoice re-downloaded"); }}>
+                    Re-download Invoice
+                  </Button>
+                  <Button variant="ghost" className="w-full text-destructive" onClick={closeSale}>Cancel Sale</Button>
+                </div>
+              )}
+
+              {/* Step 4: Done */}
+              {sale.step === "receipt_done" && (
+                <div className="space-y-3">
+                  <Card className="bg-primary/10 border-primary/30">
+                    <CardContent className="p-6 text-center space-y-3">
+                      <CheckCircle2 className="w-12 h-12 text-primary mx-auto" />
+                      <p className="text-lg font-bold text-foreground">Sale Complete!</p>
+                      <p className="text-sm text-muted-foreground">
+                        {sale.quantity} {selectedProduct.unit} of {selectedProduct.name} sold to {sale.client_name} for KES {calcTotal().toLocaleString()}
+                      </p>
+                      <div className="text-xs text-muted-foreground space-y-1">
+                        <p>✅ Stock deducted automatically</p>
+                        <p>✅ Income recorded in Business Insights</p>
+                        <p>✅ Receipt generated</p>
+                      </div>
+                    </CardContent>
+                  </Card>
+                  <Button className="w-full" onClick={closeSale}>Done</Button>
+                </div>
+              )}
             </div>
           )}
         </DialogContent>
