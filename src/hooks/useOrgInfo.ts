@@ -40,7 +40,7 @@ export const useOrgInfo = (): { orgInfo: OrgInfo | null; isLoading: boolean } =>
 
   const orgInfo: OrgInfo = {
     orgName: org?.name || profile.full_name,
-    orgLogoUrl: org?.logo_url || null,
+    orgLogoUrl: org?.logo_url || profile.avatar_url || null,
     contactEmail: profile.email || null,
     contactPhone: profile.phone_number || null,
     physicalAddress: profile.physical_address || null,
