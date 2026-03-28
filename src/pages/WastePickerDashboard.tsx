@@ -19,9 +19,11 @@ import QRIDPanel from "@/components/dashboard/waste-picker/QRIDPanel";
 import TrainingPanel from "@/components/dashboard/waste-picker/TrainingPanel";
 import GrantsDiscoveryPanel from "@/components/dashboard/shared/GrantsDiscoveryPanel";
 import CleanupExercisePanel from "@/components/dashboard/shared/CleanupExercisePanel";
+import EarningsExpensesPanel from "@/components/dashboard/shared/EarningsExpensesPanel";
 
 const navItems = [
   { id: "collection", label: "Collections", icon: Package },
+  { id: "my-earnings", label: "My Earnings", icon: DollarSign },
   { id: "pricing", label: "Live Pricing", icon: DollarSign },
   { id: "earnings", label: "Earnings", icon: BarChart3 },
   { id: "schedule", label: "Pickups", icon: Calendar },
@@ -56,6 +58,7 @@ const WastePickerDashboard = () => {
   const renderPanel = () => {
     switch (activePanel) {
       case "collection": return <CollectionPanel />;
+      case "my-earnings": return <EarningsExpensesPanel role="waste_picker" />;
       case "pricing": return <PricingPanel />;
       case "earnings": return <EarningsPanel />;
       case "schedule": return <SchedulePanel />;

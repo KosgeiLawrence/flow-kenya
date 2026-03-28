@@ -22,9 +22,11 @@ import ProfileSettingsPanel from "@/components/dashboard/shared/ProfileSettingsP
 import RequestedPickupsPanel from "@/components/dashboard/shared/RequestedPickupsPanel";
 import TrainingPanel from "@/components/dashboard/waste-picker/TrainingPanel";
 import CleanupExercisePanel from "@/components/dashboard/shared/CleanupExercisePanel";
+import EarningsExpensesPanel from "@/components/dashboard/shared/EarningsExpensesPanel";
 
 const navItems = [
   { id: "pickers", label: "Waste Pickers", icon: Users },
+  { id: "earnings-expenses", label: "Earnings & Expenses", icon: DollarSign },
   { id: "inventory", label: "Inventory", icon: Package },
   { id: "marketplace", label: "Marketplace", icon: Store },
   { id: "logistics", label: "Logistics", icon: Truck },
@@ -63,6 +65,7 @@ const AggregatorDashboard = () => {
   const renderPanel = () => {
     switch (activePanel) {
       case "pickers": return <WastePickerMgmtPanel />;
+      case "earnings-expenses": return <EarningsExpensesPanel role="aggregator" />;
       case "inventory": return <InventoryPanel />;
       case "marketplace": return <MarketplacePanel />;
       case "logistics": return <LogisticsPanel />;
