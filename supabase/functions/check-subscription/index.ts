@@ -46,6 +46,7 @@ serve(async (req) => {
       "ngo@email.com",
       "corporate@email.com",
       "county@email.com",
+      "lagatolivia7@gmail.com",
     ];
     if (bypassEmails.includes(user.email)) {
       return new Response(JSON.stringify({ subscribed: true, free_plan: true }), {
