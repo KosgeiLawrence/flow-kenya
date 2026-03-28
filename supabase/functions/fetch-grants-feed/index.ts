@@ -100,8 +100,10 @@ Deno.serve(async (req) => {
 - Role: ${roleLabel}
 ${impactArea ? `- Impact area: ${impactArea}` : ""}
 
+CRITICAL: The text contains markdown-style links like [Title](https://full-url). You MUST extract the REAL full URL from these links and include it in the "url" field. Never make up or guess URLs. If no real URL is found for an opportunity, set url to "".
+
 Return a JSON array of up to 10 relevant opportunities:
-[{"title":"string","organization":"string","deadline":"string or Rolling","description":"2 sentences","url":"string or empty","relevance":"why relevant","funding_amount":"string or Varies"}]
+[{"title":"string","organization":"string","deadline":"string or Rolling","description":"2 sentences","url":"the REAL full https:// URL extracted from the text","relevance":"why relevant","funding_amount":"string or Varies"}]
 Return ONLY the JSON array.`;
 
     console.log("Calling AI gateway...");
