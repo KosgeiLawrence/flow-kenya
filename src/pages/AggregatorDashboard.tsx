@@ -77,7 +77,7 @@ const AggregatorDashboard = () => {
       case "pickup-requests": return <RequestedPickupsPanel />;
       case "training": return <TrainingPanel viewerRole="aggregator" />;
       case "cleanup": return <CleanupExercisePanel />;
-      case "grants": return <GrantsDiscoveryPanel />;
+      case "grants": return <GrantsDiscoveryPanel userRole="aggregator" />;
       case "settings": return <ProfileSettingsPanel role="aggregator" />;
       default: return <WastePickerMgmtPanel />;
     }
