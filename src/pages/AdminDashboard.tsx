@@ -19,6 +19,7 @@ import ViewUserDashboardPanel from "@/components/dashboard/admin/ViewUserDashboa
 
 const navItems = [
   { id: "users", label: "User Verification", icon: Users },
+  { id: "view-dashboards", label: "View User Dashboards", icon: Eye },
   { id: "invite", label: "Invite Users", icon: Mail },
   { id: "analytics", label: "Platform Analytics", icon: BarChart3 },
   { id: "transactions", label: "Transactions", icon: DollarSign },
@@ -45,7 +46,7 @@ const AdminDashboard = () => {
   const renderPanel = () => {
     switch (activeTab) {
       case "users": return <UserVerificationPanel />;
-      case "invite": return <InviteUsersPanel />;
+      case "view-dashboards": return <ViewUserDashboardPanel />;
       case "analytics": return <PlatformAnalyticsPanel />;
       case "transactions": return <TransactionTrackingPanel />;
       case "fraud": return <FraudDetectionPanel />;
