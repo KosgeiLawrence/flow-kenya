@@ -46,7 +46,7 @@ const GrantsDiscoveryPanel = ({ userRole = "waste_picker" }: { userRole?: string
     },
   });
 
-  const userRole = useQuery({
+  const userRoleQuery = useQuery({
     queryKey: ["my_role"],
     queryFn: async () => {
       if (!user) return null;
