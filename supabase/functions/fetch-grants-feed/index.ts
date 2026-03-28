@@ -117,7 +117,7 @@ Return ONLY the JSON array.`;
         model: "google/gemini-2.5-flash-lite",
         messages: [
           { role: "system", content: systemPrompt },
-          { role: "user", content: `Extract relevant grants:\n\n${combinedContent.slice(0, 8000)}` },
+          { role: "user", content: `Extract relevant grants with their REAL URLs:\n\n${combinedContent.slice(0, 12000)}` },
         ],
         temperature: 0.2,
       }),
