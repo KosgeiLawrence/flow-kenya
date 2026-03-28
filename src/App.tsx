@@ -32,8 +32,14 @@ import CleanupRegister from "./pages/CleanupRegister";
 import PWAInstallPrompt from "./components/PWAInstallPrompt";
 import BiometricLockScreen from "./components/auth/BiometricLockScreen";
 import BiometricSetupPrompt from "./components/auth/BiometricSetupPrompt";
+import SplashScreen from "./components/SplashScreen";
 
 const queryClient = new QueryClient();
+
+/** Detect if running as installed PWA (standalone mode) */
+const isInstalledPWA = () =>
+  window.matchMedia("(display-mode: standalone)").matches ||
+  (navigator as any).standalone === true;
 
 /** Biometric layer — wraps all routes inside AuthProvider + BrowserRouter */
 const BiometricGate = ({ children }: { children: React.ReactNode }) => {
