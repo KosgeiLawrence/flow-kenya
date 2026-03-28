@@ -14,10 +14,11 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { toast } from "sonner";
 import {
   Plus, TrendingUp, TrendingDown, Wallet, ArrowUpCircle, ArrowDownCircle,
-  Calendar, Target, AlertTriangle, CheckCircle2, Trash2, Receipt
+  Calendar, Target, AlertTriangle, CheckCircle2, Trash2, Receipt, FileBarChart
 } from "lucide-react";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
 import { format, subDays, startOfWeek, startOfMonth, endOfMonth, startOfDay, endOfDay, isWithinInterval, startOfYear, endOfYear } from "date-fns";
+import FinancialReportsPanel from "./FinancialReportsPanel";
 
 const COLORS = ["hsl(152,45%,22%)", "hsl(40,55%,55%)", "hsl(195,60%,50%)", "hsl(25,30%,35%)", "hsl(340,55%,50%)", "hsl(270,40%,50%)"];
 
@@ -241,6 +242,13 @@ const EarningsExpensesPanel = ({ role }: Props) => {
   const activeCats = newTx.type === "income" ? incomeCategories : expenseCategories;
 
   return (
+    <Tabs defaultValue="tracking" className="w-full">
+      <TabsList className="w-full grid grid-cols-2 mb-4">
+        <TabsTrigger value="tracking" className="gap-1.5"><Receipt className="w-4 h-4" /> {config.simple ? "Track" : "Track Finances"}</TabsTrigger>
+        <TabsTrigger value="reports" className="gap-1.5"><FileBarChart className="w-4 h-4" /> Reports</TabsTrigger>
+      </TabsList>
+
+      <TabsContent value="tracking">
     <div className="space-y-4">
       {/* Quick action buttons */}
       <div className="flex flex-wrap gap-2">
@@ -500,6 +508,12 @@ const EarningsExpensesPanel = ({ role }: Props) => {
         </CardContent>
       </Card>
     </div>
+      </TabsContent>
+
+      <TabsContent value="reports">
+        <FinancialReportsPanel role={role} />
+      </TabsContent>
+    </Tabs>
   );
 };
 
