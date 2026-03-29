@@ -238,12 +238,34 @@ const ProductCatalogPanel = () => {
       transaction_date: new Date().toISOString().split("T")[0],
     });
 
+    // Auto-update CRM customer record
+    if (sale.client_name) {
+      const existing = crmCustomers.find(c => c.full_name.toLowerCase() === sale.client_name.toLowerCase());
+      if (existing) {
+        await supabase.from("customers").update({
+          total_transactions: (existing.total_transactions || 0) + 1,
+          total_revenue: (Number(existing.total_revenue) || 0) + total,
+          last_transaction_date: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+        }).eq("id", existing.id);
+      } else {
+        await supabase.from("customers").insert({
+          user_id: user.id, full_name: sale.client_name,
+          phone: sale.client_phone || null, email: sale.client_email || null,
+          total_transactions: 1, total_revenue: total,
+          last_transaction_date: new Date().toISOString(),
+        });
+      }
+      // Refresh CRM list
+      const { data: refreshed } = await supabase.from("customers").select("*").eq("user_id", user.id).order("full_name");
+      if (refreshed) setCrmCustomers(refreshed);
+    }
+
     // Refresh queries
     queryClient.invalidateQueries({ queryKey: ["recycler_products"] });
     queryClient.invalidateQueries({ queryKey: ["financial_transactions"] });
 
     setSale((s) => ({ ...s, step: "receipt_done" }));
-    // Remove from pending sales if it was resumed
     setPendingSales((prev) => prev.filter((s) => s.refNo !== sale.refNo));
     toast.success("Sale completed! Stock updated & income recorded.");
   };
