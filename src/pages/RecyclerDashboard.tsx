@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import {
   LogOut, Package, ClipboardList, FileText, ClipboardCheck, TrendingUp,
   BarChart3, Leaf, Shield, Clock, CheckCircle2, AlertTriangle,
-  Menu, X, ChevronRight, ShoppingBag, Briefcase, Settings, Truck, BookOpen, Recycle
+  Menu, X, ChevronRight, ShoppingBag, Briefcase, Settings, Truck, BookOpen, Recycle, HelpCircle
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
@@ -25,8 +25,10 @@ import CleanupExercisePanel from "@/components/dashboard/shared/CleanupExerciseP
 import EarningsExpensesPanel from "@/components/dashboard/shared/EarningsExpensesPanel";
 import CRMPanel from "@/components/dashboard/shared/CRMPanel";
 import MaterialTransformationPanel from "@/components/dashboard/recycler/MaterialTransformationPanel";
+import WorkflowGuidePanel from "@/components/dashboard/recycler/WorkflowGuidePanel";
 
 const navItems = [
+  { id: "workflows", label: "How It Works", icon: HelpCircle },
   { id: "inventory", label: "Inventory", icon: Package },
   { id: "transformation", label: "Transformation", icon: Recycle },
   { id: "business-insights", label: "Business Insights", icon: TrendingUp },
@@ -68,6 +70,7 @@ const RecyclerDashboard = () => {
 
   const renderPanel = () => {
     switch (activePanel) {
+      case "workflows": return <WorkflowGuidePanel />;
       case "inventory": return <InventoryAccessPanel />;
       case "transformation": return <MaterialTransformationPanel />;
       case "business-insights": return <EarningsExpensesPanel role="recycler" />;
