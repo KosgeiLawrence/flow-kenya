@@ -23,6 +23,7 @@ import RequestedPickupsPanel from "@/components/dashboard/shared/RequestedPickup
 import TrainingPanel from "@/components/dashboard/waste-picker/TrainingPanel";
 import CleanupExercisePanel from "@/components/dashboard/shared/CleanupExercisePanel";
 import EarningsExpensesPanel from "@/components/dashboard/shared/EarningsExpensesPanel";
+import CRMPanel from "@/components/dashboard/shared/CRMPanel";
 
 const navItems = [
   { id: "inventory", label: "Inventory", icon: Package },
@@ -38,6 +39,7 @@ const navItems = [
   { id: "pickup-requests", label: "Pickup Requests", icon: Truck },
   { id: "training", label: "Training", icon: BookOpen },
   { id: "cleanup", label: "Cleanup Exercise", icon: Package },
+  { id: "crm", label: "Customers", icon: ClipboardList },
   { id: "grants", label: "Grants & Programs", icon: Briefcase },
   { id: "settings", label: "Profile Settings", icon: Settings },
 ];
@@ -77,6 +79,7 @@ const RecyclerDashboard = () => {
       case "pickup-requests": return <RequestedPickupsPanel />;
       case "training": return <TrainingPanel viewerRole="recycler" />;
       case "cleanup": return <CleanupExercisePanel />;
+      case "crm": return <CRMPanel role="recycler" />;
       case "grants": return <GrantsDiscoveryPanel userRole="recycler" />;
       case "settings": return <ProfileSettingsPanel role="recycler" />;
       default: return <InventoryAccessPanel />;

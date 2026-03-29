@@ -20,6 +20,7 @@ import TrainingPanel from "@/components/dashboard/waste-picker/TrainingPanel";
 import GrantsDiscoveryPanel from "@/components/dashboard/shared/GrantsDiscoveryPanel";
 import CleanupExercisePanel from "@/components/dashboard/shared/CleanupExercisePanel";
 import EarningsExpensesPanel from "@/components/dashboard/shared/EarningsExpensesPanel";
+import CRMPanel from "@/components/dashboard/shared/CRMPanel";
 
 const navItems = [
   { id: "collection", label: "Collections", icon: Package },
@@ -31,6 +32,7 @@ const navItems = [
   { id: "qr-id", label: "QR ID", icon: QrCode },
   { id: "training", label: "Training", icon: BookOpen },
   { id: "cleanup", label: "Cleanup Exercise", icon: Package },
+  { id: "crm", label: "My Clients", icon: User },
   { id: "grants", label: "Grants & Programs", icon: Briefcase },
   { id: "settings", label: "Profile Settings", icon: Settings },
 ];
@@ -66,6 +68,7 @@ const WastePickerDashboard = () => {
       case "qr-id": return <QRIDPanel />;
       case "training": return <TrainingPanel viewerRole="waste_picker" />;
       case "cleanup": return <CleanupExercisePanel />;
+      case "crm": return <CRMPanel role="waste_picker" />;
       case "grants": return <GrantsDiscoveryPanel userRole="waste_picker" />;
       case "settings": return <ProfileSettingsPanel role="waste_picker" />;
       default: return <CollectionPanel />;
