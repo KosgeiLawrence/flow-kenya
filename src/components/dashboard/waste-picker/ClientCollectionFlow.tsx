@@ -314,45 +314,44 @@ const ClientCollectionFlow = ({ onBack }: Props) => {
         <Card className="shadow-soft">
           <CardHeader><CardTitle className="text-base">Record Collection</CardTitle></CardHeader>
           <CardContent className="space-y-3">
-            <div className="space-y-3">
-              {/* Client selection */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <div className="sm:col-span-2">
-                  <Select value={selectedCustomerId} onValueChange={(val) => {
-                    if (val === "__new__") {
-                      setIsNewClient(true);
-                      setSelectedCustomerId("__new__");
-                      setClientName(""); setClientPhone(""); setClientEmail("");
-                    } else {
-                      setIsNewClient(false);
-                      setSelectedCustomerId(val);
-                      const c = customers?.find(cu => cu.id === val);
-                      if (c) {
-                        setClientName(c.full_name);
-                        setClientPhone(c.phone || "");
-                        setClientEmail(c.email || "");
-                        setLocationName(c.location || "");
-                      }
+            {/* Client selection */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div className="sm:col-span-2">
+                <Select value={selectedCustomerId} onValueChange={(val) => {
+                  if (val === "__new__") {
+                    setIsNewClient(true);
+                    setSelectedCustomerId("__new__");
+                    setClientName(""); setClientPhone(""); setClientEmail("");
+                  } else {
+                    setIsNewClient(false);
+                    setSelectedCustomerId(val);
+                    const c = customers?.find(cu => cu.id === val);
+                    if (c) {
+                      setClientName(c.full_name);
+                      setClientPhone(c.phone || "");
+                      setClientEmail(c.email || "");
+                      setLocationName(c.location || "");
                     }
-                  }}>
-                    <SelectTrigger><SelectValue placeholder="Select client *" /></SelectTrigger>
-                    <SelectContent>
-                      {customers?.map(c => (
-                        <SelectItem key={c.id} value={c.id}>{c.full_name}{c.phone ? ` • ${c.phone}` : ""}</SelectItem>
-                      ))}
-                      <SelectItem value="__new__">+ Add New Client</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                {isNewClient && (
-                  <>
-                    <Input placeholder="Client Name *" value={clientName} onChange={e => setClientName(e.target.value)} />
-                    <Input placeholder="Client Phone" value={clientPhone} onChange={e => setClientPhone(e.target.value)} />
-                    <Input placeholder="Client Email" value={clientEmail} onChange={e => setClientEmail(e.target.value)} />
-                  </>
-                )}
+                  }
+                }}>
+                  <SelectTrigger><SelectValue placeholder="Select client *" /></SelectTrigger>
+                  <SelectContent>
+                    {customers?.map(c => (
+                      <SelectItem key={c.id} value={c.id}>{c.full_name}{c.phone ? ` • ${c.phone}` : ""}</SelectItem>
+                    ))}
+                    <SelectItem value="__new__">+ Add New Client</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {isNewClient && (
+                <>
+                  <Input placeholder="Client Name *" value={clientName} onChange={e => setClientName(e.target.value)} />
+                  <Input placeholder="Client Phone" value={clientPhone} onChange={e => setClientPhone(e.target.value)} />
+                  <Input placeholder="Client Email" value={clientEmail} onChange={e => setClientEmail(e.target.value)} />
+                </>
+              )}
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <Select value={materialType} onValueChange={(val) => {
                 setMaterialType(val);
                 const mt = materialTypes?.find(m => m.name === val);
