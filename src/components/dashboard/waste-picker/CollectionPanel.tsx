@@ -9,10 +9,16 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
-import { Plus, Package, Loader2, Leaf, Droplets, Trash2, Users } from "lucide-react";
+import { Plus, Package, Loader2, Leaf, Droplets, Trash2, Users, FileText } from "lucide-react";
 import { format } from "date-fns";
 import { calculateImpact } from "@/lib/impactUtils";
 import ClientCollectionFlow from "./ClientCollectionFlow";
+import jsPDF from "jspdf";
+import { useOrgInfo } from "@/hooks/useOrgInfo";
+import {
+  PDF_COLORS, addCleanHeader, addDocMeta, drawTableHeader,
+  drawTableRow, drawVatTotalBlock, finalizeCleanPdf, loadImageAsBase64, buildPdfOrgInfo,
+} from "@/lib/pdfBranding";
 
 const CollectionPanel = () => {
   const { user } = useAuth();
