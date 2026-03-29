@@ -35,6 +35,7 @@ const navItems = [
   { id: "workflows", label: "How It Works", icon: HelpCircle },
   { id: "pickers", label: "Waste Pickers", icon: Users },
   { id: "inventory", label: "Inventory", icon: Package },
+  { id: "sales", label: "Sales", icon: ShoppingCart },
   { id: "marketplace", label: "Marketplace", icon: Store },
   
   { id: "payments", label: "Payments", icon: DollarSign },
@@ -79,20 +80,19 @@ const AggregatorDashboard = () => {
       case "earnings-expenses": return <EarningsExpensesPanel role="aggregator" />;
       case "inventory": return (
         <Tabs defaultValue="stock" className="space-y-4">
-          <TabsList className="grid w-full grid-cols-5">
+          <TabsList className="grid w-full grid-cols-4">
             <TabsTrigger value="stock"><Package className="w-4 h-4 mr-1.5" />Stock</TabsTrigger>
-            <TabsTrigger value="sales"><ShoppingCart className="w-4 h-4 mr-1.5" />Sales</TabsTrigger>
             <TabsTrigger value="pickups"><Truck className="w-4 h-4 mr-1.5" />Pickup Requests</TabsTrigger>
             <TabsTrigger value="schedule"><Calendar className="w-4 h-4 mr-1.5" />Schedule Pickup</TabsTrigger>
             <TabsTrigger value="recycler-requests"><Send className="w-4 h-4 mr-1.5" />Request from Recyclers</TabsTrigger>
           </TabsList>
           <TabsContent value="stock"><InventoryPanel /></TabsContent>
-          <TabsContent value="sales"><AggregatorSalesPanel /></TabsContent>
           <TabsContent value="pickups"><RequestedPickupsPanel /></TabsContent>
           <TabsContent value="schedule"><LogisticsPanel /></TabsContent>
           <TabsContent value="recycler-requests"><RecyclerPickupRequestPanel /></TabsContent>
         </Tabs>
       );
+      case "sales": return <AggregatorSalesPanel />;
       case "marketplace": return <MarketplacePanel />;
       case "logistics": return <LogisticsPanel />;
       case "payments": return <PaymentsPanel />;
