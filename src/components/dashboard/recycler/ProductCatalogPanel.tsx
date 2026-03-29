@@ -313,107 +313,108 @@ const ProductCatalogPanel = () => {
           </CardContent>
         </Card>
       </div>
-
-      <Card className="shadow-soft">
-        <CardHeader className="flex flex-row items-center justify-between">
-          <CardTitle className="text-lg">Product Catalog & Pricing</CardTitle>
-          <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-            <DialogTrigger asChild><Button size="sm"><Plus className="w-4 h-4 mr-1" /> Add Product</Button></DialogTrigger>
-            <DialogContent className="max-w-md">
-              <DialogHeader><DialogTitle>Add Product</DialogTitle></DialogHeader>
-              <div className="space-y-3">
-                <div><Label>Product Name</Label><Input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder="e.g. Recycled PET Flakes" /></div>
-                <div><Label>Description</Label><Textarea value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} placeholder="Product description..." rows={2} /></div>
-                <div><Label>Material Source</Label><Input value={form.material_source} onChange={(e) => setForm({ ...form, material_source: e.target.value })} placeholder="e.g. Post-consumer PET" /></div>
-                <div className="grid grid-cols-2 gap-3">
-                  <div><Label>Stock Quantity</Label><Input type="number" value={form.stock_quantity} onChange={(e) => setForm({ ...form, stock_quantity: e.target.value })} /></div>
-                  <div>
-                    <Label>Unit</Label>
-                    <Select value={form.unit} onValueChange={(v) => setForm({ ...form, unit: v })}>
-                      <SelectTrigger><SelectValue /></SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="kg">kg</SelectItem><SelectItem value="tonnes">tonnes</SelectItem>
-                        <SelectItem value="pieces">pieces</SelectItem><SelectItem value="bags">bags</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
-                <div><Label>Price per Unit (KES)</Label><Input type="number" value={form.price_per_unit} onChange={(e) => setForm({ ...form, price_per_unit: e.target.value })} /></div>
-                <Button className="w-full" onClick={() => createProduct.mutate()} disabled={!form.name || !form.stock_quantity || !form.price_per_unit || createProduct.isPending}>
-                  {createProduct.isPending ? "Adding..." : "Add Product"}
-                </Button>
-              </div>
-            </DialogContent>
-          </Dialog>
-        </CardHeader>
-        <CardContent>
-          {!products?.length ? (
-            <p className="text-sm text-muted-foreground">No products yet. Add your first product above.</p>
-          ) : (
-            <div className="divide-y divide-border">
-              {products.map((p) => (
-                <div key={p.id} className="flex items-center justify-between py-3 gap-2">
-                  <div className="flex items-start gap-3 flex-1 min-w-0">
-                    <Package className="w-4 h-4 text-muted-foreground mt-0.5 shrink-0" />
-                    <div className="min-w-0">
-                      <p className="text-sm font-medium text-foreground truncate">{p.name}</p>
-                      {p.description && <p className="text-xs text-muted-foreground truncate">{p.description}</p>}
-                      <div className="flex items-center gap-2 mt-1">
-                        <span className="text-xs text-muted-foreground">Stock: {Number(p.stock_quantity).toFixed(0)} {p.unit}</span>
-                        <span className="text-xs font-semibold text-foreground">KES {Number(p.price_per_unit).toFixed(2)}/{p.unit}</span>
-                      </div>
+      <div className={`grid gap-6 ${pendingSales.length > 0 ? "grid-cols-1 lg:grid-cols-[1fr_340px]" : "grid-cols-1"}`}>
+        <Card className="shadow-soft">
+          <CardHeader className="flex flex-row items-center justify-between">
+            <CardTitle className="text-lg">Product Catalog & Pricing</CardTitle>
+            <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+              <DialogTrigger asChild><Button size="sm"><Plus className="w-4 h-4 mr-1" /> Add Product</Button></DialogTrigger>
+              <DialogContent className="max-w-md">
+                <DialogHeader><DialogTitle>Add Product</DialogTitle></DialogHeader>
+                <div className="space-y-3">
+                  <div><Label>Product Name</Label><Input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder="e.g. Recycled PET Flakes" /></div>
+                  <div><Label>Description</Label><Textarea value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} placeholder="Product description..." rows={2} /></div>
+                  <div><Label>Material Source</Label><Input value={form.material_source} onChange={(e) => setForm({ ...form, material_source: e.target.value })} placeholder="e.g. Post-consumer PET" /></div>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div><Label>Stock Quantity</Label><Input type="number" value={form.stock_quantity} onChange={(e) => setForm({ ...form, stock_quantity: e.target.value })} /></div>
+                    <div>
+                      <Label>Unit</Label>
+                      <Select value={form.unit} onValueChange={(v) => setForm({ ...form, unit: v })}>
+                        <SelectTrigger><SelectValue /></SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="kg">kg</SelectItem><SelectItem value="tonnes">tonnes</SelectItem>
+                          <SelectItem value="pieces">pieces</SelectItem><SelectItem value="bags">bags</SelectItem>
+                        </SelectContent>
+                      </Select>
                     </div>
                   </div>
-                  <div className="flex items-center gap-1 shrink-0">
-                    <Button size="sm" onClick={() => openSale(p.id)} disabled={Number(p.stock_quantity) <= 0}>
-                      <ShoppingCart className="w-3 h-3 mr-1" /> Sell
-                    </Button>
-                    <Button variant="ghost" size="icon" onClick={() => deleteProduct.mutate(p.id)} title="Remove">
-                      <Trash2 className="w-4 h-4 text-destructive" />
-                    </Button>
-                  </div>
+                  <div><Label>Price per Unit (KES)</Label><Input type="number" value={form.price_per_unit} onChange={(e) => setForm({ ...form, price_per_unit: e.target.value })} /></div>
+                  <Button className="w-full" onClick={() => createProduct.mutate()} disabled={!form.name || !form.stock_quantity || !form.price_per_unit || createProduct.isPending}>
+                    {createProduct.isPending ? "Adding..." : "Add Product"}
+                  </Button>
                 </div>
-              ))}
-            </div>
-          )}
-        </CardContent>
-      </Card>
-
-      {/* Pending Sales */}
-      {pendingSales.length > 0 && (
-        <Card className="shadow-soft border-accent/30">
-          <CardHeader>
-            <CardTitle className="text-lg flex items-center gap-2">
-              <ShoppingCart className="w-5 h-5 text-accent" /> Pending Sales ({pendingSales.length})
-            </CardTitle>
+              </DialogContent>
+            </Dialog>
           </CardHeader>
           <CardContent>
-            <div className="divide-y divide-border">
-              {pendingSales.map((ps) => {
-                const prod = products?.find((p) => p.id === ps.productId);
-                const stepLabel = ps.step === "quotation_sent" ? "Awaiting client response" : ps.step === "invoice_sent" ? "Awaiting payment" : ps.step;
-                return (
-                  <div key={ps.refNo} className="flex items-center justify-between py-3 gap-2">
-                    <div className="min-w-0 flex-1">
-                      <p className="text-sm font-medium text-foreground truncate">{ps.client_name}</p>
-                      <p className="text-xs text-muted-foreground">{prod?.name || "Product"} • {ps.quantity} {prod?.unit || "units"}</p>
-                      <Badge variant="outline" className="mt-1 text-[10px]">{stepLabel}</Badge>
+            {!products?.length ? (
+              <p className="text-sm text-muted-foreground">No products yet. Add your first product above.</p>
+            ) : (
+              <div className="divide-y divide-border">
+                {products.map((p) => (
+                  <div key={p.id} className="flex items-center justify-between py-3 gap-2">
+                    <div className="flex items-start gap-3 flex-1 min-w-0">
+                      <Package className="w-4 h-4 text-muted-foreground mt-0.5 shrink-0" />
+                      <div className="min-w-0">
+                        <p className="text-sm font-medium text-foreground truncate">{p.name}</p>
+                        {p.description && <p className="text-xs text-muted-foreground truncate">{p.description}</p>}
+                        <div className="flex items-center gap-2 mt-1">
+                          <span className="text-xs text-muted-foreground">Stock: {Number(p.stock_quantity).toFixed(0)} {p.unit}</span>
+                          <span className="text-xs font-semibold text-foreground">KES {Number(p.price_per_unit).toFixed(2)}/{p.unit}</span>
+                        </div>
+                      </div>
                     </div>
                     <div className="flex items-center gap-1 shrink-0">
-                      <Button size="sm" onClick={() => resumeSale(ps)}>
-                        <ArrowRight className="w-3 h-3 mr-1" /> Continue
+                      <Button size="sm" onClick={() => openSale(p.id)} disabled={Number(p.stock_quantity) <= 0}>
+                        <ShoppingCart className="w-3 h-3 mr-1" /> Sell
                       </Button>
-                      <Button variant="ghost" size="icon" onClick={() => removePending(ps.refNo)} title="Remove">
+                      <Button variant="ghost" size="icon" onClick={() => deleteProduct.mutate(p.id)} title="Remove">
                         <Trash2 className="w-4 h-4 text-destructive" />
                       </Button>
                     </div>
                   </div>
-                );
-              })}
-            </div>
+                ))}
+              </div>
+            )}
           </CardContent>
         </Card>
-      )}
+
+        {/* Pending Sales - Side by side */}
+        {pendingSales.length > 0 && (
+          <Card className="shadow-soft border-accent/30 h-fit">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-base flex items-center gap-2">
+                <ShoppingCart className="w-5 h-5 text-accent" /> Pending Sales ({pendingSales.length})
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="divide-y divide-border">
+                {pendingSales.map((ps) => {
+                  const prod = products?.find((p) => p.id === ps.productId);
+                  const stepLabel = ps.step === "quotation_sent" ? "Awaiting client response" : ps.step === "invoice_sent" ? "Awaiting payment" : ps.step;
+                  return (
+                    <div key={ps.refNo} className="py-3 space-y-2">
+                      <div className="min-w-0">
+                        <p className="text-sm font-medium text-foreground truncate">{ps.client_name}</p>
+                        <p className="text-xs text-muted-foreground">{prod?.name || "Product"} • {ps.quantity} {prod?.unit || "units"}</p>
+                        <Badge variant="outline" className="mt-1 text-[10px]">{stepLabel}</Badge>
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <Button size="sm" className="flex-1" onClick={() => resumeSale(ps)}>
+                          <ArrowRight className="w-3 h-3 mr-1" /> Continue
+                        </Button>
+                        <Button variant="ghost" size="icon" onClick={() => removePending(ps.refNo)} title="Remove">
+                          <Trash2 className="w-4 h-4 text-destructive" />
+                        </Button>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </CardContent>
+          </Card>
+        )}
+      </div>
 
       {/* Sales Flow Dialog */}
       <Dialog open={saleDialog} onOpenChange={(open) => { if (!open) closeSale(); }}>
