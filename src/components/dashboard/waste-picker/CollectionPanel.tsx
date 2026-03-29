@@ -272,9 +272,14 @@ const CollectionPanel = () => {
                       {c.location_name && ` • ${c.location_name}`}
                     </p>
                   </div>
-                  <div className="text-right">
-                    <p className="text-sm font-semibold">{Number(c.quantity).toFixed(1)} {(c as any).material_types?.unit}</p>
-                    <Badge variant="outline" className="text-xs">{c.batch_id}</Badge>
+                  <div className="text-right flex items-center gap-2">
+                    <div>
+                      <p className="text-sm font-semibold">{Number(c.quantity).toFixed(1)} {(c as any).material_types?.unit}</p>
+                      <Badge variant="outline" className="text-xs">{c.batch_id}</Badge>
+                    </div>
+                    <Button size="sm" variant="outline" className="text-xs h-7" onClick={() => generateCollectionReceipt(c)}>
+                      <FileText className="w-3 h-3 mr-1" /> Receipt
+                    </Button>
                   </div>
                 </div>
               ))}
