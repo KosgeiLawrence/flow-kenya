@@ -210,18 +210,35 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setSession(null);
     setRole(null);
     setProfile(null);
+    setOrgName(null);
+    setOrgLogoUrl(null);
     setSubscribed(null);
   };
 
   const refreshProfile = async () => {
     if (user) {
       const { data } = await supabase.from("profiles").select("*").eq("user_id", user.id).single();
-      if (data) setProfile(data as Profile);
+      if (data) {
+        setProfile(data as Profile);
+        if (data.organization_id) {
+          const { data: orgData } = await supabase
+            .from("organizations")
+            .select("name, logo_url")
+            .eq("id", data.organization_id)
+            .single();
+          if (orgData) {
+            setOrgName(orgData.name);
+            setOrgLogoUrl(orgData.logo_url);
+          }
+        }
+      }
     }
   };
 
+  const displayName = orgName || profile?.full_name || "";
+
   return (
-    <AuthContext.Provider value={{ user, session, role, profile, loading, subscribed, checkingSubscription, signOut, refreshProfile }}>
+    <AuthContext.Provider value={{ user, session, role, profile, displayName, orgLogoUrl, loading, subscribed, checkingSubscription, signOut, refreshProfile }}>
       {children}
     </AuthContext.Provider>
   );
