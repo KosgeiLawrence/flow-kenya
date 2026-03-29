@@ -22,10 +22,12 @@ import CleanupExercisePanel from "@/components/dashboard/shared/CleanupExerciseP
 import EarningsExpensesPanel from "@/components/dashboard/shared/EarningsExpensesPanel";
 import CRMPanel from "@/components/dashboard/shared/CRMPanel";
 import WastePickerWorkflowGuidePanel from "@/components/dashboard/waste-picker/WorkflowGuidePanel";
+import WastePickerSalesPanel from "@/components/dashboard/waste-picker/WastePickerSalesPanel";
 
 const navItems = [
   { id: "how-it-works", label: "How It Works", icon: BookOpen },
   { id: "collection", label: "Collections", icon: Package },
+  { id: "sales", label: "Sales", icon: ShoppingCart },
   { id: "my-earnings", label: "My Earnings", icon: DollarSign },
   { id: "pricing", label: "Live Pricing", icon: DollarSign },
   
