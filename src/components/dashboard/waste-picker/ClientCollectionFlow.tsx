@@ -37,6 +37,8 @@ const ClientCollectionFlow = ({ onBack }: Props) => {
   const { orgInfo } = useOrgInfo();
   const queryClient = useQueryClient();
   const [showForm, setShowForm] = useState(false);
+  const [selectedCustomerId, setSelectedCustomerId] = useState("");
+  const [isNewClient, setIsNewClient] = useState(false);
   const [clientName, setClientName] = useState("");
   const [clientPhone, setClientPhone] = useState("");
   const [clientEmail, setClientEmail] = useState("");
@@ -46,6 +48,20 @@ const ClientCollectionFlow = ({ onBack }: Props) => {
   const [locationName, setLocationName] = useState("");
   const [notes, setNotes] = useState("");
   const [vat, setVat] = useState<VatConfig>(DEFAULT_VAT);
+
+  const { data: customers } = useQuery({
+    queryKey: ["customers", user?.id],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("customers")
+        .select("*")
+        .eq("user_id", user!.id)
+        .order("full_name");
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!user?.id,
+  });
 
   const { data: materialTypes } = useQuery({
     queryKey: ["material_types"],
@@ -89,6 +105,25 @@ const ClientCollectionFlow = ({ onBack }: Props) => {
       });
       if (error) throw error;
 
+      // Auto-add new client to customers table
+      const { data: existingCustomer } = await supabase
+        .from("customers")
+        .select("id")
+        .eq("user_id", user!.id)
+        .ilike("full_name", clientName.trim())
+        .maybeSingle();
+
+      if (!existingCustomer) {
+        await supabase.from("customers").insert({
+          user_id: user!.id,
+          full_name: clientName.trim(),
+          phone: clientPhone || null,
+          email: clientEmail || null,
+          location: locationName || null,
+          category: "general",
+        });
+      }
+
       // Also log into the main collections table so it appears in Log Collection history
       const { data: matchingType } = await supabase
         .from("material_types")
@@ -109,7 +144,9 @@ const ClientCollectionFlow = ({ onBack }: Props) => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["client_collections"] });
       queryClient.invalidateQueries({ queryKey: ["collections"] });
+      queryClient.invalidateQueries({ queryKey: ["customers"] });
       toast.success("Collection recorded as draft!");
+      setSelectedCustomerId(""); setIsNewClient(false);
       setClientName(""); setClientPhone(""); setClientEmail("");
       setMaterialType(""); setQuantityKg(""); setUnitPrice("");
       setLocationName(""); setNotes(""); setShowForm(false);
@@ -249,7 +286,7 @@ const ClientCollectionFlow = ({ onBack }: Props) => {
     }
   };
 
-  const canSubmit = clientName && materialType && quantityKg && unitPrice;
+  const canSubmit = (selectedCustomerId && selectedCustomerId !== "__new__" ? true : clientName) && materialType && quantityKg && unitPrice;
 
   return (
     <div className="space-y-4">
@@ -277,10 +314,44 @@ const ClientCollectionFlow = ({ onBack }: Props) => {
         <Card className="shadow-soft">
           <CardHeader><CardTitle className="text-base">Record Collection</CardTitle></CardHeader>
           <CardContent className="space-y-3">
+            {/* Client selection */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <Input placeholder="Client Name *" value={clientName} onChange={e => setClientName(e.target.value)} />
-              <Input placeholder="Client Phone" value={clientPhone} onChange={e => setClientPhone(e.target.value)} />
-              <Input placeholder="Client Email" value={clientEmail} onChange={e => setClientEmail(e.target.value)} />
+              <div className="sm:col-span-2">
+                <Select value={selectedCustomerId} onValueChange={(val) => {
+                  if (val === "__new__") {
+                    setIsNewClient(true);
+                    setSelectedCustomerId("__new__");
+                    setClientName(""); setClientPhone(""); setClientEmail("");
+                  } else {
+                    setIsNewClient(false);
+                    setSelectedCustomerId(val);
+                    const c = customers?.find(cu => cu.id === val);
+                    if (c) {
+                      setClientName(c.full_name);
+                      setClientPhone(c.phone || "");
+                      setClientEmail(c.email || "");
+                      setLocationName(c.location || "");
+                    }
+                  }
+                }}>
+                  <SelectTrigger><SelectValue placeholder="Select client *" /></SelectTrigger>
+                  <SelectContent>
+                    {customers?.map(c => (
+                      <SelectItem key={c.id} value={c.id}>{c.full_name}{c.phone ? ` • ${c.phone}` : ""}</SelectItem>
+                    ))}
+                    <SelectItem value="__new__">+ Add New Client</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              {isNewClient && (
+                <>
+                  <Input placeholder="Client Name *" value={clientName} onChange={e => setClientName(e.target.value)} />
+                  <Input placeholder="Client Phone" value={clientPhone} onChange={e => setClientPhone(e.target.value)} />
+                  <Input placeholder="Client Email" value={clientEmail} onChange={e => setClientEmail(e.target.value)} />
+                </>
+              )}
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <Select value={materialType} onValueChange={(val) => {
                 setMaterialType(val);
                 const mt = materialTypes?.find(m => m.name === val);
