@@ -429,6 +429,7 @@ const WasteDeliveredPanel = () => {
               </Select>
             )}
 
+            <Select value={form.material_type} onValueChange={v => setForm({ ...form, material_type: v })}>
               <SelectTrigger><SelectValue placeholder="Select material type *" /></SelectTrigger>
               <SelectContent>
                 {materialTypes?.map(mt => (
