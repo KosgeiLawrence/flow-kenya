@@ -63,9 +63,13 @@ const CountyGovernmentDashboard = () => {
             </Button>
           </div>
           <div className="mt-3 flex items-center gap-2">
-            <div className="w-8 h-8 rounded-full bg-sidebar-accent flex items-center justify-center text-sm font-bold">
-              {profile?.full_name?.charAt(0) || "C"}
-            </div>
+            {profile?.avatar_url ? (
+              <img src={profile.avatar_url} alt={profile.full_name} className="w-8 h-8 rounded-full object-cover" />
+            ) : (
+              <div className="w-8 h-8 rounded-full bg-sidebar-accent flex items-center justify-center text-sm font-bold">
+                {profile?.full_name?.charAt(0) || "C"}
+              </div>
+            )}
             <div className="flex-1 min-w-0">
               <p className="text-sm font-medium truncate">{profile?.full_name || "County Official"}</p>
               <span className="text-xs text-sidebar-primary font-medium">County Government</span>
