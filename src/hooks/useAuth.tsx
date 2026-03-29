@@ -188,8 +188,15 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setSubscribed(null);
   };
 
+  const refreshProfile = async () => {
+    if (user) {
+      const { data } = await supabase.from("profiles").select("*").eq("user_id", user.id).single();
+      if (data) setProfile(data as Profile);
+    }
+  };
+
   return (
-    <AuthContext.Provider value={{ user, session, role, profile, loading, subscribed, checkingSubscription, signOut }}>
+    <AuthContext.Provider value={{ user, session, role, profile, loading, subscribed, checkingSubscription, signOut, refreshProfile }}>
       {children}
     </AuthContext.Provider>
   );
