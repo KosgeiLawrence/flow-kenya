@@ -38,7 +38,7 @@ const CollectionPanel = () => {
     },
   });
 
-  const { data: collections, isLoading } = useQuery({
+  const { data: mainCollections, isLoading: isLoadingMain } = useQuery({
     queryKey: ["collections", user?.id],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -51,6 +51,55 @@ const CollectionPanel = () => {
     },
     enabled: !!user?.id,
   });
+
+  const { data: clientCollections, isLoading: isLoadingClient } = useQuery({
+    queryKey: ["client_collections_for_log", user?.id],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("client_collections")
+        .select("*")
+        .eq("waste_picker_id", user!.id)
+        .order("collection_date", { ascending: false });
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!user?.id,
+  });
+
+  // Merge both sources into a unified list, deduplicating by notes containing "Client:"
+  const collections = (() => {
+    const main = (mainCollections || []).map(c => ({
+      id: c.id,
+      quantity: c.quantity,
+      collected_at: c.collected_at,
+      location_name: c.location_name,
+      batch_id: c.batch_id,
+      notes: c.notes,
+      material_types: (c as any).material_types,
+      source: "collection" as const,
+    }));
+
+    // Find client collections not already synced to main collections
+    const mainNotes = new Set(main.map(m => m.notes).filter(Boolean));
+    const extra = (clientCollections || [])
+      .filter(cc => !mainNotes.has(`Client: ${cc.client_name}`))
+      .map(cc => ({
+        id: cc.id,
+        quantity: cc.quantity_kg,
+        collected_at: cc.collection_date,
+        location_name: cc.location_name,
+        batch_id: null,
+        notes: `Client: ${cc.client_name}`,
+        material_types: { name: cc.material_type, unit: "kg", price_per_unit: cc.unit_price },
+        source: "client" as const,
+      }));
+
+    return [...main, ...extra].sort((a, b) =>
+      new Date(b.collected_at).getTime() - new Date(a.collected_at).getTime()
+    );
+  })();
+
+  const isLoading = isLoadingMain || isLoadingClient;
 
   const addCollection = useMutation({
     mutationFn: async () => {
