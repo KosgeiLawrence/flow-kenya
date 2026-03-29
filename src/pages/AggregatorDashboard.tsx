@@ -25,8 +25,11 @@ import TrainingPanel from "@/components/dashboard/waste-picker/TrainingPanel";
 import CleanupExercisePanel from "@/components/dashboard/shared/CleanupExercisePanel";
 import EarningsExpensesPanel from "@/components/dashboard/shared/EarningsExpensesPanel";
 import CRMPanel from "@/components/dashboard/shared/CRMPanel";
+import AggregatorWorkflowGuidePanel from "@/components/dashboard/aggregator/WorkflowGuidePanel";
+import { HelpCircle } from "lucide-react";
 
 const navItems = [
+  { id: "workflows", label: "How It Works", icon: HelpCircle },
   { id: "pickers", label: "Waste Pickers", icon: Users },
   { id: "inventory", label: "Inventory", icon: Package },
   { id: "marketplace", label: "Marketplace", icon: Store },
