@@ -286,7 +286,7 @@ const ClientCollectionFlow = ({ onBack }: Props) => {
     }
   };
 
-  const canSubmit = clientName && materialType && quantityKg && unitPrice;
+  const canSubmit = (selectedCustomerId && selectedCustomerId !== "__new__" ? true : clientName) && materialType && quantityKg && unitPrice;
 
   return (
     <div className="space-y-4">
