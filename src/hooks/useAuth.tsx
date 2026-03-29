@@ -45,6 +45,7 @@ interface AuthContextType {
   subscribed: boolean | null;
   checkingSubscription: boolean;
   signOut: () => Promise<void>;
+  refreshProfile: () => Promise<void>;
 }
 
 export const AuthContext = createContext<AuthContextType>({
