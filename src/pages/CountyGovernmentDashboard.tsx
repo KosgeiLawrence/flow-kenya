@@ -21,7 +21,7 @@ const navItems = [
 ];
 
 const CountyGovernmentDashboard = () => {
-  const { profile, signOut } = useAuth();
+  const { profile, signOut, displayName, orgLogoUrl } = useAuth();
   const navigate = useNavigate();
   const [activePanel, setActivePanel] = useState("waste-flow");
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -63,15 +63,15 @@ const CountyGovernmentDashboard = () => {
             </Button>
           </div>
           <div className="mt-3 flex items-center gap-2">
-            {profile?.avatar_url ? (
-              <img src={profile.avatar_url} alt={profile.full_name} className="w-8 h-8 rounded-full object-cover" />
+            {orgLogoUrl || profile?.avatar_url ? (
+              <img src={orgLogoUrl || profile?.avatar_url || ""} alt={displayName} className="w-8 h-8 rounded-full object-cover" />
             ) : (
               <div className="w-8 h-8 rounded-full bg-sidebar-accent flex items-center justify-center text-sm font-bold">
-                {profile?.full_name?.charAt(0) || "C"}
+                {displayName?.charAt(0) || "C"}
               </div>
             )}
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium truncate">{profile?.full_name || "County Official"}</p>
+              <p className="text-sm font-medium truncate">{displayName || "County Official"}</p>
               <span className="text-xs text-sidebar-primary font-medium">County Government</span>
             </div>
           </div>

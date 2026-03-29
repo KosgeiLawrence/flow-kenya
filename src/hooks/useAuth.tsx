@@ -41,6 +41,8 @@ interface AuthContextType {
   session: Session | null;
   role: AppRole | null;
   profile: Profile | null;
+  displayName: string;
+  orgLogoUrl: string | null;
   loading: boolean;
   subscribed: boolean | null;
   checkingSubscription: boolean;
@@ -53,6 +55,8 @@ export const AuthContext = createContext<AuthContextType>({
   session: null,
   role: null,
   profile: null,
+  displayName: "",
+  orgLogoUrl: null,
   loading: true,
   subscribed: null,
   checkingSubscription: true,
@@ -70,6 +74,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [session, setSession] = useState<Session | null>(null);
   const [role, setRole] = useState<AppRole | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
+  const [orgName, setOrgName] = useState<string | null>(null);
+  const [orgLogoUrl, setOrgLogoUrl] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [subscribed, setSubscribed] = useState<boolean | null>(null);
   const [checkingSubscription, setCheckingSubscription] = useState(true);
@@ -114,13 +120,32 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         setSession(null);
         setRole(null);
         setProfile(null);
+        setOrgName(null);
+        setOrgLogoUrl(null);
         setSubscribed(null);
         setCheckingSubscription(false);
         return;
       }
 
       if (roleRes.data) setRole(roleRes.data.role as AppRole);
-      if (profileRes.data) setProfile(profileRes.data as Profile);
+      if (profileRes.data) {
+        setProfile(profileRes.data as Profile);
+        // Fetch org name if has organization
+        if (profileRes.data.organization_id) {
+          const { data: orgData } = await supabase
+            .from("organizations")
+            .select("name, logo_url")
+            .eq("id", profileRes.data.organization_id)
+            .single();
+          if (orgData) {
+            setOrgName(orgData.name);
+            setOrgLogoUrl(orgData.logo_url);
+          }
+        } else {
+          setOrgName(null);
+          setOrgLogoUrl(null);
+        }
+      }
     } catch (error) {
       console.error("Error fetching user data:", error);
     }
@@ -185,18 +210,35 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setSession(null);
     setRole(null);
     setProfile(null);
+    setOrgName(null);
+    setOrgLogoUrl(null);
     setSubscribed(null);
   };
 
   const refreshProfile = async () => {
     if (user) {
       const { data } = await supabase.from("profiles").select("*").eq("user_id", user.id).single();
-      if (data) setProfile(data as Profile);
+      if (data) {
+        setProfile(data as Profile);
+        if (data.organization_id) {
+          const { data: orgData } = await supabase
+            .from("organizations")
+            .select("name, logo_url")
+            .eq("id", data.organization_id)
+            .single();
+          if (orgData) {
+            setOrgName(orgData.name);
+            setOrgLogoUrl(orgData.logo_url);
+          }
+        }
+      }
     }
   };
 
+  const displayName = orgName || profile?.full_name || "";
+
   return (
-    <AuthContext.Provider value={{ user, session, role, profile, loading, subscribed, checkingSubscription, signOut, refreshProfile }}>
+    <AuthContext.Provider value={{ user, session, role, profile, displayName, orgLogoUrl, loading, subscribed, checkingSubscription, signOut, refreshProfile }}>
       {children}
     </AuthContext.Provider>
   );

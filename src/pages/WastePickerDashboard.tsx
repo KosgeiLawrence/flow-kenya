@@ -44,7 +44,7 @@ const statusConfig: Record<string, { icon: React.ElementType; label: string; col
 };
 
 const WastePickerDashboard = () => {
-  const { user, profile, signOut } = useAuth();
+  const { user, profile, signOut, displayName, orgLogoUrl } = useAuth();
   const navigate = useNavigate();
   const [activePanel, setActivePanel] = useState("collection");
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -95,15 +95,15 @@ const WastePickerDashboard = () => {
             </Button>
           </div>
           <div className="mt-3 flex items-center gap-2">
-            {profile?.avatar_url ? (
-              <img src={profile.avatar_url} alt={profile.full_name} className="w-8 h-8 rounded-full object-cover" />
+            {orgLogoUrl || profile?.avatar_url ? (
+              <img src={orgLogoUrl || profile?.avatar_url || ""} alt={displayName} className="w-8 h-8 rounded-full object-cover" />
             ) : (
               <div className="w-8 h-8 rounded-full bg-sidebar-accent flex items-center justify-center text-sm font-bold">
-                {profile?.full_name?.charAt(0) || "W"}
+                {displayName?.charAt(0) || "W"}
               </div>
             )}
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium truncate">{profile?.full_name || "Waste Picker"}</p>
+              <p className="text-sm font-medium truncate">{displayName || "Waste Picker"}</p>
               <div className="flex items-center gap-1">
                 <StatusIcon className={cn("w-3 h-3", status.color)} />
                 <span className={cn("text-xs", status.color)}>{status.label}</span>
