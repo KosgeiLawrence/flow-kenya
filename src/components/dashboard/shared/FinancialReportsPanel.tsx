@@ -15,7 +15,8 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import { Download, FileText, FileSpreadsheet, TrendingUp, TrendingDown, DollarSign, Loader2, Plus, Trash2, Edit2 } from "lucide-react";
 import { format, startOfDay, endOfDay, startOfWeek, startOfMonth, endOfMonth, startOfYear, endOfYear } from "date-fns";
 import jsPDF from "jspdf";
-import { addBrandedHeader, addSectionTitle, addDocMeta, drawTableHeader, drawTableRow, drawTotalLine, finalizePdf, PDF_COLORS } from "@/lib/pdfBranding";
+import { addCleanHeader, addSectionTitle, addDocMeta, drawTableHeader, drawTableRow, drawTotalLine, finalizeCleanPdf, PDF_COLORS, buildPdfOrgInfo, loadImageAsBase64 } from "@/lib/pdfBranding";
+import { useOrgInfo } from "@/hooks/useOrgInfo";
 import { toast } from "sonner";
 
 type UserRole = "waste_picker" | "aggregator" | "recycler";
@@ -36,6 +37,7 @@ const SUB_SECTION_OPTIONS = [
 
 const FinancialReportsPanel = ({ role }: Props) => {
   const { user, profile } = useAuth();
+  const { orgInfo } = useOrgInfo();
   const queryClient = useQueryClient();
   const [period, setPeriod] = useState<PeriodType>("monthly");
   const [customFrom, setCustomFrom] = useState(format(startOfMonth(new Date()), "yyyy-MM-dd"));
@@ -317,9 +319,17 @@ const FinancialReportsPanel = ({ role }: Props) => {
     try {
       const doc = new jsPDF();
       const titleMap = { pnl: "Profit & Loss Statement", cashflow: "Cash Flow Statement", balance: "Balance Sheet" };
-      let y = await addBrandedHeader(doc, titleMap[reportType], dateRange.label);
+
+      // Build clean header with user/org branding
+      let logoBase64: string | null = null;
+      if (orgInfo?.orgLogoUrl) {
+        logoBase64 = await loadImageAsBase64(orgInfo.orgLogoUrl);
+      }
+      const pdfOrg = orgInfo ? buildPdfOrgInfo(orgInfo, logoBase64) : null;
+      let y = addCleanHeader(doc, titleMap[reportType], dateRange.label, pdfOrg);
+
       y = addDocMeta(doc, [
-        { label: "Prepared for", value: profile?.full_name || "User" },
+        { label: "Prepared by", value: orgInfo?.orgName || profile?.full_name || "User" },
         { label: "Period", value: dateRange.label },
         { label: "Generated", value: format(new Date(), "MMM d, yyyy h:mm a") },
       ], y);
@@ -442,7 +452,7 @@ const FinancialReportsPanel = ({ role }: Props) => {
         y = drawTotalLine(doc, `Total Liabilities + Equity: KES ${(balanceSheet.totalLiabilities + balanceSheet.totalEquity).toLocaleString()}`, y);
       }
 
-      await finalizePdf(doc);
+      finalizeCleanPdf(doc);
       doc.save(`${reportType}-${format(new Date(), "yyyy-MM-dd")}.pdf`);
     } finally {
       setGenerating(null);
