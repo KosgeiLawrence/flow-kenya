@@ -9,11 +9,11 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Package, Layers, TrendingUp, Users, Plus, ClipboardList, FileText } from "lucide-react";
+import { Package, Layers, TrendingUp, Users, Plus, ClipboardList } from "lucide-react";
 import { toast } from "sonner";
 import { format } from "date-fns";
 import OrdersPanel from "./OrdersPanel";
-import PurchaseInvoicesPanel from "./PurchaseInvoicesPanel";
+import SuppliersPanel from "./SuppliersPanel";
 
 interface InventoryItem {
   name: string;
@@ -145,7 +145,7 @@ const InventoryAccessPanel = () => {
       <TabsList className="grid w-full grid-cols-3">
         <TabsTrigger value="stock"><Package className="w-4 h-4 mr-1.5" />Stock</TabsTrigger>
         <TabsTrigger value="orders"><ClipboardList className="w-4 h-4 mr-1.5" />Orders</TabsTrigger>
-        <TabsTrigger value="invoices"><FileText className="w-4 h-4 mr-1.5" />Invoices</TabsTrigger>
+        <TabsTrigger value="suppliers"><Users className="w-4 h-4 mr-1.5" />Suppliers</TabsTrigger>
       </TabsList>
 
       <TabsContent value="stock" className="space-y-6">
@@ -264,8 +264,8 @@ const InventoryAccessPanel = () => {
         <OrdersPanel />
       </TabsContent>
 
-      <TabsContent value="invoices">
-        <PurchaseInvoicesPanel />
+      <TabsContent value="suppliers">
+        <SuppliersPanel />
       </TabsContent>
     </Tabs>
   );
