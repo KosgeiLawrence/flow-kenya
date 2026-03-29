@@ -8,6 +8,7 @@ import {
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import InventoryAccessPanel from "@/components/dashboard/recycler/InventoryAccessPanel";
 import OrdersPanel from "@/components/dashboard/recycler/OrdersPanel";
 import PurchaseInvoicesPanel from "@/components/dashboard/recycler/PurchaseInvoicesPanel";
