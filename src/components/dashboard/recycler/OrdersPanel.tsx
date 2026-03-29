@@ -246,7 +246,8 @@ const OrdersPanel = () => {
                     <div className="flex items-center gap-2 shrink-0">
                       {o.status === "pending" && <Button variant="ghost" size="sm" onClick={() => updateStatus.mutate({ id: o.id, status: "confirmed" })} className="text-xs">Confirm</Button>}
                       {o.status === "confirmed" && <Button variant="ghost" size="sm" onClick={() => updateStatus.mutate({ id: o.id, status: "delivered" })} className="text-xs">Delivered</Button>}
-                      <Button variant="ghost" size="icon" onClick={() => generateOrderPDF(o)} title="Download PDF"><Download className="w-4 h-4" /></Button>
+                      {o.status === "delivered" && <Button variant="ghost" size="sm" onClick={() => generateGRN(o)} className="text-xs" title="Download Goods Received Note"><FileText className="w-3 h-3 mr-1" />GRN</Button>}
+                      <Button variant="ghost" size="icon" onClick={() => generateOrderPDF(o)} title="Download Order PDF"><Download className="w-4 h-4" /></Button>
                       <Badge variant={s.variant} className="flex items-center gap-1"><SIcon className="w-3 h-3" /> {s.label}</Badge>
                     </div>
                   </div>
