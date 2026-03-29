@@ -432,6 +432,72 @@ export type Database = {
           },
         ]
       }
+      community_training_logs: {
+        Row: {
+          community_name: string | null
+          county: string | null
+          created_at: string
+          description: string | null
+          duration_minutes: number | null
+          id: string
+          impact_notes: string | null
+          num_participants: number
+          num_women: number
+          num_youth: number
+          title: string
+          topics_covered: string | null
+          training_date: string
+          training_type: string
+          trees_planted: number
+          updated_at: string
+          user_id: string
+          venue: string | null
+          waste_collected_kg: number
+        }
+        Insert: {
+          community_name?: string | null
+          county?: string | null
+          created_at?: string
+          description?: string | null
+          duration_minutes?: number | null
+          id?: string
+          impact_notes?: string | null
+          num_participants?: number
+          num_women?: number
+          num_youth?: number
+          title: string
+          topics_covered?: string | null
+          training_date?: string
+          training_type?: string
+          trees_planted?: number
+          updated_at?: string
+          user_id: string
+          venue?: string | null
+          waste_collected_kg?: number
+        }
+        Update: {
+          community_name?: string | null
+          county?: string | null
+          created_at?: string
+          description?: string | null
+          duration_minutes?: number | null
+          id?: string
+          impact_notes?: string | null
+          num_participants?: number
+          num_women?: number
+          num_youth?: number
+          title?: string
+          topics_covered?: string | null
+          training_date?: string
+          training_type?: string
+          trees_planted?: number
+          updated_at?: string
+          user_id?: string
+          venue?: string | null
+          waste_collected_kg?: number
+        }
+        Relationships: []
+      }
       compliance_documents: {
         Row: {
           created_at: string
