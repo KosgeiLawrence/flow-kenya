@@ -125,19 +125,19 @@ const OrdersPanel = () => {
           <CardTitle className="text-lg">Orders & Contracts</CardTitle>
           <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
             <DialogTrigger asChild><Button size="sm"><Plus className="w-4 h-4 mr-1" /> New Order</Button></DialogTrigger>
-            <DialogContent className="max-w-md">
-              <DialogHeader><DialogTitle>Create New Order</DialogTitle></DialogHeader>
-              <div className="space-y-3">
-                <div><Label>Supplier Name</Label><Input value={form.supplier_name} onChange={(e) => setForm({ ...form, supplier_name: e.target.value })} placeholder="e.g. Kibera Aggregators" /></div>
-                <div><Label>Material Type</Label><Input value={form.material_type} onChange={(e) => setForm({ ...form, material_type: e.target.value })} placeholder="e.g. PET Bottles" /></div>
-                <div className="grid grid-cols-2 gap-3">
-                  <div><Label>Quantity</Label><Input type="number" value={form.quantity} onChange={(e) => setForm({ ...form, quantity: e.target.value })} /></div>
-                  <div><Label>Unit</Label><Select value={form.unit} onValueChange={(v) => setForm({ ...form, unit: v })}><SelectTrigger><SelectValue /></SelectTrigger><SelectContent><SelectItem value="kg">kg</SelectItem><SelectItem value="tonnes">tonnes</SelectItem><SelectItem value="pieces">pieces</SelectItem></SelectContent></Select></div>
+            <DialogContent className="max-w-sm max-h-[85vh] overflow-y-auto p-4">
+              <DialogHeader><DialogTitle className="text-base">Create New Order</DialogTitle></DialogHeader>
+              <div className="space-y-2">
+                <div><Label className="text-xs">Supplier Name</Label><Input className="h-8 text-sm" value={form.supplier_name} onChange={(e) => setForm({ ...form, supplier_name: e.target.value })} placeholder="e.g. Kibera Aggregators" /></div>
+                <div><Label className="text-xs">Material Type</Label><Input className="h-8 text-sm" value={form.material_type} onChange={(e) => setForm({ ...form, material_type: e.target.value })} placeholder="e.g. PET Bottles" /></div>
+                <div className="grid grid-cols-2 gap-2">
+                  <div><Label className="text-xs">Quantity</Label><Input className="h-8 text-sm" type="number" value={form.quantity} onChange={(e) => setForm({ ...form, quantity: e.target.value })} /></div>
+                  <div><Label className="text-xs">Unit</Label><Select value={form.unit} onValueChange={(v) => setForm({ ...form, unit: v })}><SelectTrigger className="h-8 text-sm"><SelectValue /></SelectTrigger><SelectContent><SelectItem value="kg">kg</SelectItem><SelectItem value="tonnes">tonnes</SelectItem><SelectItem value="pieces">pieces</SelectItem></SelectContent></Select></div>
                 </div>
-                <div><Label>Unit Price (KES)</Label><Input type="number" value={form.unit_price} onChange={(e) => setForm({ ...form, unit_price: e.target.value })} /></div>
-                <div><Label>Expected Delivery Date</Label><Input type="date" value={form.delivery_date} onChange={(e) => setForm({ ...form, delivery_date: e.target.value })} /></div>
-                <div><Label>Notes</Label><Textarea value={form.notes} onChange={(e) => setForm({ ...form, notes: e.target.value })} placeholder="Contract terms..." rows={2} /></div>
-                <Button className="w-full" onClick={() => createOrder.mutate()} disabled={!form.supplier_name || !form.material_type || !form.quantity || !form.unit_price || createOrder.isPending}>
+                <div><Label className="text-xs">Unit Price (KES)</Label><Input className="h-8 text-sm" type="number" value={form.unit_price} onChange={(e) => setForm({ ...form, unit_price: e.target.value })} /></div>
+                <div><Label className="text-xs">Delivery Date</Label><Input className="h-8 text-sm" type="date" value={form.delivery_date} onChange={(e) => setForm({ ...form, delivery_date: e.target.value })} /></div>
+                <div><Label className="text-xs">Notes</Label><Textarea className="text-sm" value={form.notes} onChange={(e) => setForm({ ...form, notes: e.target.value })} placeholder="Contract terms..." rows={1} /></div>
+                <Button className="w-full h-8 text-sm" onClick={() => createOrder.mutate()} disabled={!form.supplier_name || !form.material_type || !form.quantity || !form.unit_price || createOrder.isPending}>
                   {createOrder.isPending ? "Creating..." : "Create Order"}
                 </Button>
               </div>
