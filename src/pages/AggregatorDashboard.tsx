@@ -71,6 +71,7 @@ const AggregatorDashboard = () => {
 
   const renderPanel = () => {
     switch (activePanel) {
+      case "workflows": return <AggregatorWorkflowGuidePanel />;
       case "pickers": return <WastePickerMgmtPanel />;
       case "earnings-expenses": return <EarningsExpensesPanel role="aggregator" />;
       case "inventory": return <InventoryPanel />;
