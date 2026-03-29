@@ -284,7 +284,7 @@ const ESGPanel = () => {
     const org = await getOrgDetails();
 
     // ── Page 1: Cover ──
-    let y = addOrgHeader(doc, org.name, org.logo, org.contact);
+    let y = await addOrgHeader(doc, org.name, org.logo, org.contact);
 
     // Title block
     y += 4;
@@ -377,7 +377,7 @@ const ESGPanel = () => {
 
     // ── Page 2: Material breakdown & cleanups ──
     doc.addPage();
-    y = addOrgHeader(doc, org.name, org.logo, org.contact);
+    y = await addOrgHeader(doc, org.name, org.logo, org.contact);
     y += 4;
 
     doc.setFontSize(11);
