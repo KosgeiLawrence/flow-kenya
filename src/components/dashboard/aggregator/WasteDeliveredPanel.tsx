@@ -258,7 +258,33 @@ const WasteDeliveredPanel = () => {
       doc.setTextColor(120, 120, 120);
       doc.text(`Delivery Notes: ${po.delivery_notes}`, 15, y);
       doc.setTextColor(30, 30, 30);
+      y += 10;
     }
+
+    // ── Signature Block ──
+    y = Math.max(y + 10, 200);
+    const pageWidth = doc.internal.pageSize.getWidth();
+
+    doc.setDrawColor(200, 200, 200);
+    doc.setLineWidth(0.3);
+
+    // Received By
+    doc.setFontSize(8);
+    doc.setTextColor(120, 120, 120);
+    doc.text("Received By:", 15, y);
+    doc.line(15, y + 18, 90, y + 18);
+    doc.text("Name & Signature", 15, y + 23);
+    doc.line(15, y + 32, 90, y + 32);
+    doc.text("Date", 15, y + 37);
+
+    // Delivered By
+    doc.text("Delivered By:", pageWidth - 95, y);
+    doc.line(pageWidth - 95, y + 18, pageWidth - 15, y + 18);
+    doc.text("Name & Signature", pageWidth - 95, y + 23);
+    doc.line(pageWidth - 95, y + 32, pageWidth - 15, y + 32);
+    doc.text("Date", pageWidth - 95, y + 37);
+
+    doc.setTextColor(30, 30, 30);
 
     finalizeCleanPdf(doc);
     doc.save(`${po.grn_number || "GRN"}.pdf`);
