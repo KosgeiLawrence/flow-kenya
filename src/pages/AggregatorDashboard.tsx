@@ -37,11 +37,8 @@ const navItems = [
   { id: "inventory", label: "Inventory", icon: Package },
   { id: "sales", label: "Sales", icon: ShoppingCart },
   { id: "crm", label: "Customers", icon: Users },
-  { id: "marketplace", label: "Marketplace", icon: Store },
-  
-  
-  
   { id: "earnings-expenses", label: "Earnings & Expenses", icon: TrendingUp },
+  { id: "marketplace", label: "Marketplace", icon: Store },
   { id: "analytics", label: "Profit & Analytics", icon: BarChart3 },
   { id: "esg", label: "ESG & Carbon", icon: Leaf },
   { id: "compliance", label: "Compliance", icon: Shield },
