@@ -66,8 +66,6 @@ const PricingPanel = () => {
                       {mt.name}
                     </span>
                   </TableCell>
-                    </span>
-                  </TableCell>
                   <TableCell><Badge variant="outline">{mt.unit}</Badge></TableCell>
                   <TableCell className="text-right font-semibold text-primary">
                     KES {Number(mt.price_per_unit).toFixed(2)}
