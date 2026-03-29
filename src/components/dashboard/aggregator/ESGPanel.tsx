@@ -434,6 +434,39 @@ const AggregatorESGPanel = () => {
     });
     y += 82;
 
+    // Community Training Section
+    if (filteredTrainings.length > 0) {
+      y += 10;
+      if (y > 230) { doc.addPage(); y = await addOrgHeader(doc, org.name, org.logo, org.contact); y += 6; }
+      doc.setFontSize(11);
+      doc.setTextColor(...PDF_COLORS.forestDeep);
+      doc.text("COMMUNITY TRAINING & SOCIAL IMPACT", 15, y);
+      y += 8;
+      const trainingMetrics = [
+        { value: `${filteredTrainings.length}`, label: "Trainings Conducted", accent: PDF_COLORS.forest },
+        { value: `${trainingParticipants}`, label: "Total Participants", accent: PDF_COLORS.gold },
+        { value: `${trainingWomen}`, label: "Women Reached", accent: [180, 60, 120] as [number, number, number] },
+        { value: `${trainingYouth}`, label: "Youth Reached", accent: [60, 140, 180] as [number, number, number] },
+      ];
+      trainingMetrics.forEach((m, i) => {
+        const mx = 15 + (i % 2) * (metricW + 5);
+        const my = y + Math.floor(i / 2) * 38;
+        drawMetricCard(doc, mx, my, metricW, m.value, m.label, m.accent);
+      });
+      y += 82;
+
+      if (trainingWasteKg > 0 || trainingTrees > 0) {
+        const extraMetrics = [
+          ...(trainingWasteKg > 0 ? [{ value: `${trainingWasteKg.toFixed(0)} kg`, label: "Waste Collected in Trainings", accent: PDF_COLORS.forest }] : []),
+          ...(trainingTrees > 0 ? [{ value: `${trainingTrees}`, label: "Trees Planted", accent: [60, 140, 60] as [number, number, number] }] : []),
+        ];
+        extraMetrics.forEach((m, i) => {
+          drawMetricCard(doc, 15 + i * (metricW + 5), y, metricW, m.value, m.label, m.accent);
+        });
+        y += 40;
+      }
+    }
+
     // Methodology
     doc.setFillColor(248, 250, 248);
     drawRoundedRect(doc, 15, y, pw - 30, 36, 4, "F");
