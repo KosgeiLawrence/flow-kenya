@@ -122,6 +122,53 @@ const OrdersPanel = () => {
     doc.save(`order-${o.id.slice(0, 8)}.pdf`);
   };
 
+  const generateGRN = async (o: any) => {
+    const doc = new jsPDF();
+    const pdfOrg = await getOrgPdfInfo();
+    const entityName = orgInfo?.orgName || profile?.full_name || "Recycler";
+
+    let y = addCleanHeader(doc, "Goods Received Note (GRN)", undefined, pdfOrg);
+    y = addDocMeta(doc, [
+      { label: "GRN Date", value: format(new Date(o.updated_at || o.order_date), "MMM d, yyyy") },
+      { label: "Order Date", value: format(new Date(o.order_date), "MMM d, yyyy") },
+      { label: "Received By", value: entityName },
+      ...(orgInfo?.physicalAddress ? [{ label: "Address", value: orgInfo.physicalAddress }] : []),
+      ...(orgInfo?.contactPhone ? [{ label: "Phone", value: orgInfo.contactPhone }] : []),
+      ...(orgInfo?.contactEmail ? [{ label: "Email", value: orgInfo.contactEmail }] : []),
+      { label: "Supplier", value: o.supplier_name },
+    ], y);
+
+    y = drawTableHeader(doc, [
+      { label: "Material", x: 17 }, { label: "Qty Received", x: 80 }, { label: "Unit", x: 110 }, { label: "Unit Price", x: 135 }, { label: "Total (KES)", x: 165 },
+    ], y, 180);
+
+    drawTableRow(doc, y, 0, 180);
+    doc.setFontSize(8);
+    doc.text(o.material_type, 17, y);
+    doc.text(Number(o.quantity).toFixed(1), 80, y);
+    doc.text(o.unit, 110, y);
+    doc.text(Number(o.unit_price).toFixed(2), 135, y);
+    doc.text(Number(o.total_amount).toLocaleString(), 165, y);
+    y += 10;
+
+    drawTotalLine(doc, `Total Value: KES ${Number(o.total_amount).toLocaleString()}`, y);
+
+    if (o.delivery_date) { y += 10; doc.setFontSize(9); doc.text(`Delivery Date: ${format(new Date(o.delivery_date), "MMM d, yyyy")}`, 15, y); }
+    if (o.notes) { y += 8; doc.setFontSize(9); doc.text(`Notes: ${o.notes}`, 15, y); }
+
+    y += 20;
+    doc.setFontSize(9);
+    doc.setTextColor(80, 80, 80);
+    doc.text("Condition of Goods: ___________________", 15, y);
+    y += 12;
+    doc.text("Received By (Sign): ___________________          Date: _______________", 15, y);
+    y += 12;
+    doc.text("Delivered By (Sign): ___________________          Date: _______________", 15, y);
+
+    finalizeCleanPdf(doc);
+    doc.save(`grn-${o.id.slice(0, 8)}.pdf`);
+  };
+
   const active = orders?.filter((o) => o.status !== "cancelled" && o.status !== "delivered") || [];
   const completed = orders?.filter((o) => o.status === "delivered") || [];
 
