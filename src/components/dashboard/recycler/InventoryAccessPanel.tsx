@@ -141,132 +141,133 @@ const InventoryAccessPanel = () => {
   const totalOrders = deliveredOrders?.length || 0;
 
   return (
-    <div className="space-y-6">
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-        <Card className="shadow-soft">
-          <CardContent className="flex items-center gap-3 p-4">
-            <Package className="w-7 h-7 text-primary" />
-            <div>
-              <p className="text-xl font-bold text-foreground">{totalQty.toFixed(0)} kg</p>
-              <p className="text-xs text-muted-foreground">Available Stock</p>
-            </div>
-          </CardContent>
-        </Card>
-        <Card className="shadow-soft">
-          <CardContent className="flex items-center gap-3 p-4">
-            <Layers className="w-7 h-7 text-accent" />
-            <div>
-              <p className="text-xl font-bold text-foreground">{materialMap.size}</p>
-              <p className="text-xs text-muted-foreground">Material Types</p>
-            </div>
-          </CardContent>
-        </Card>
-        <Card className="shadow-soft">
-          <CardContent className="flex items-center gap-3 p-4">
-            <TrendingUp className="w-7 h-7 text-primary" />
-            <div>
-              <p className="text-xl font-bold text-foreground">KES {totalValue.toLocaleString()}</p>
-              <p className="text-xs text-muted-foreground">Market Value</p>
-            </div>
-          </CardContent>
-        </Card>
-        <Card className="shadow-soft">
-          <CardContent className="flex items-center gap-3 p-4">
-            <ClipboardList className="w-7 h-7 text-muted-foreground" />
-            <div>
-              <p className="text-xl font-bold text-foreground">{totalOrders}</p>
-              <p className="text-xs text-muted-foreground">Delivered Orders</p>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+    <Tabs defaultValue="stock" className="space-y-6">
+      <TabsList className="grid w-full grid-cols-3">
+        <TabsTrigger value="stock"><Package className="w-4 h-4 mr-1.5" />Stock</TabsTrigger>
+        <TabsTrigger value="orders"><ClipboardList className="w-4 h-4 mr-1.5" />Orders</TabsTrigger>
+        <TabsTrigger value="invoices"><FileText className="w-4 h-4 mr-1.5" />Invoices</TabsTrigger>
+      </TabsList>
 
-      {/* Add Inventory Entry */}
-      <Dialog open={open} onOpenChange={setOpen}>
-        <DialogTrigger asChild>
-          <Button><Plus className="w-4 h-4 mr-1" /> Add to Inventory</Button>
-        </DialogTrigger>
-        <DialogContent>
-          <DialogHeader><DialogTitle>Record Material Receipt</DialogTitle></DialogHeader>
-          <div className="space-y-3">
-            <Select value={form.material_type_id} onValueChange={(v) => setForm({ ...form, material_type_id: v })}>
-              <SelectTrigger><SelectValue placeholder="Select material type" /></SelectTrigger>
-              <SelectContent>
-                {materialTypes?.map((mt) => (
-                  <SelectItem key={mt.id} value={mt.id}>{mt.icon || "♻️"} {mt.name} (KES {mt.price_per_unit}/{mt.unit})</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            <Input
-              type="number"
-              placeholder="Quantity (kg)"
-              value={form.quantity}
-              onChange={(e) => setForm({ ...form, quantity: e.target.value })}
-            />
-            <Input
-              placeholder="Source / location (optional)"
-              value={form.location_name}
-              onChange={(e) => setForm({ ...form, location_name: e.target.value })}
-            />
-            <Button
-              className="w-full"
-              onClick={() => addEntry.mutate()}
-              disabled={!form.material_type_id || !form.quantity || addEntry.isPending}
-            >
-              {addEntry.isPending ? "Adding..." : "Add to Inventory"}
-            </Button>
-          </div>
-        </DialogContent>
-      </Dialog>
+      <TabsContent value="stock" className="space-y-6">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+          <Card className="shadow-soft">
+            <CardContent className="flex items-center gap-3 p-4">
+              <Package className="w-7 h-7 text-primary" />
+              <div>
+                <p className="text-xl font-bold text-foreground">{totalQty.toFixed(0)} kg</p>
+                <p className="text-xs text-muted-foreground">Available Stock</p>
+              </div>
+            </CardContent>
+          </Card>
+          <Card className="shadow-soft">
+            <CardContent className="flex items-center gap-3 p-4">
+              <Layers className="w-7 h-7 text-accent" />
+              <div>
+                <p className="text-xl font-bold text-foreground">{materialMap.size}</p>
+                <p className="text-xs text-muted-foreground">Material Types</p>
+              </div>
+            </CardContent>
+          </Card>
+          <Card className="shadow-soft">
+            <CardContent className="flex items-center gap-3 p-4">
+              <TrendingUp className="w-7 h-7 text-primary" />
+              <div>
+                <p className="text-xl font-bold text-foreground">KES {totalValue.toLocaleString()}</p>
+                <p className="text-xs text-muted-foreground">Market Value</p>
+              </div>
+            </CardContent>
+          </Card>
+          <Card className="shadow-soft">
+            <CardContent className="flex items-center gap-3 p-4">
+              <ClipboardList className="w-7 h-7 text-muted-foreground" />
+              <div>
+                <p className="text-xl font-bold text-foreground">{totalOrders}</p>
+                <p className="text-xs text-muted-foreground">Delivered Orders</p>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
 
-      <Card className="shadow-soft">
-        <CardHeader><CardTitle className="text-lg">Inventory Summary</CardTitle></CardHeader>
-        <CardContent>
-          {!materialMap.size ? (
-            <p className="text-sm text-muted-foreground">No inventory data available.</p>
-          ) : (
-            <div className="divide-y divide-border">
-              {Array.from(materialMap.values()).map((m, i) => (
-                <div key={i} className="flex items-center justify-between py-3">
-                  <div className="flex items-center gap-3">
-                    <span className="text-lg">{m.icon}</span>
-                    <div>
-                      <p className="text-sm font-medium text-foreground">{m.name}</p>
-                      <p className="text-xs text-muted-foreground">{m.qty.toFixed(1)} {m.unit} available</p>
+        <Dialog open={open} onOpenChange={setOpen}>
+          <DialogTrigger asChild>
+            <Button><Plus className="w-4 h-4 mr-1" /> Add to Inventory</Button>
+          </DialogTrigger>
+          <DialogContent>
+            <DialogHeader><DialogTitle>Record Material Receipt</DialogTitle></DialogHeader>
+            <div className="space-y-3">
+              <Select value={form.material_type_id} onValueChange={(v) => setForm({ ...form, material_type_id: v })}>
+                <SelectTrigger><SelectValue placeholder="Select material type" /></SelectTrigger>
+                <SelectContent>
+                  {materialTypes?.map((mt) => (
+                    <SelectItem key={mt.id} value={mt.id}>{mt.icon || "♻️"} {mt.name} (KES {mt.price_per_unit}/{mt.unit})</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <Input type="number" placeholder="Quantity (kg)" value={form.quantity} onChange={(e) => setForm({ ...form, quantity: e.target.value })} />
+              <Input placeholder="Source / location (optional)" value={form.location_name} onChange={(e) => setForm({ ...form, location_name: e.target.value })} />
+              <Button className="w-full" onClick={() => addEntry.mutate()} disabled={!form.material_type_id || !form.quantity || addEntry.isPending}>
+                {addEntry.isPending ? "Adding..." : "Add to Inventory"}
+              </Button>
+            </div>
+          </DialogContent>
+        </Dialog>
+
+        <Card className="shadow-soft">
+          <CardHeader><CardTitle className="text-lg">Inventory Summary</CardTitle></CardHeader>
+          <CardContent>
+            {!materialMap.size ? (
+              <p className="text-sm text-muted-foreground">No inventory data available.</p>
+            ) : (
+              <div className="divide-y divide-border">
+                {Array.from(materialMap.values()).map((m, i) => (
+                  <div key={i} className="flex items-center justify-between py-3">
+                    <div className="flex items-center gap-3">
+                      <span className="text-lg">{m.icon}</span>
+                      <div>
+                        <p className="text-sm font-medium text-foreground">{m.name}</p>
+                        <p className="text-xs text-muted-foreground">{m.qty.toFixed(1)} {m.unit} available</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      {m.source === "order" && <Badge variant="secondary" className="text-xs">From Orders</Badge>}
+                      {m.source === "both" && <Badge variant="secondary" className="text-xs">Mixed Sources</Badge>}
+                      <p className="text-sm font-semibold text-foreground">KES {m.value.toLocaleString()}</p>
                     </div>
                   </div>
-                  <div className="flex items-center gap-2">
-                    {m.source === "order" && <Badge variant="secondary" className="text-xs">From Orders</Badge>}
-                    {m.source === "both" && <Badge variant="secondary" className="text-xs">Mixed Sources</Badge>}
-                    <p className="text-sm font-semibold text-foreground">KES {m.value.toLocaleString()}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </CardContent>
-      </Card>
-
-      {/* Recent Delivered Orders */}
-      {deliveredOrders && deliveredOrders.length > 0 && (
-        <Card className="shadow-soft">
-          <CardHeader><CardTitle className="text-lg">Recent Delivered Orders</CardTitle></CardHeader>
-          <CardContent>
-            <div className="divide-y divide-border">
-              {deliveredOrders.slice(0, 10).map((o) => (
-                <div key={o.id} className="flex items-center justify-between py-3">
-                  <div>
-                    <p className="text-sm font-medium text-foreground">{o.material_type} — {Number(o.quantity).toFixed(0)} {o.unit}</p>
-                    <p className="text-xs text-muted-foreground">{o.supplier_name} · {format(new Date(o.order_date), "MMM d, yyyy")}</p>
-                  </div>
-                  <p className="text-sm font-semibold text-foreground">KES {Number(o.total_amount).toLocaleString()}</p>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            )}
           </CardContent>
         </Card>
-      )}
-    </div>
+
+        {deliveredOrders && deliveredOrders.length > 0 && (
+          <Card className="shadow-soft">
+            <CardHeader><CardTitle className="text-lg">Recent Delivered Orders</CardTitle></CardHeader>
+            <CardContent>
+              <div className="divide-y divide-border">
+                {deliveredOrders.slice(0, 10).map((o) => (
+                  <div key={o.id} className="flex items-center justify-between py-3">
+                    <div>
+                      <p className="text-sm font-medium text-foreground">{o.material_type} — {Number(o.quantity).toFixed(0)} {o.unit}</p>
+                      <p className="text-xs text-muted-foreground">{o.supplier_name} · {format(new Date(o.order_date), "MMM d, yyyy")}</p>
+                    </div>
+                    <p className="text-sm font-semibold text-foreground">KES {Number(o.total_amount).toLocaleString()}</p>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        )}
+      </TabsContent>
+
+      <TabsContent value="orders">
+        <OrdersPanel />
+      </TabsContent>
+
+      <TabsContent value="invoices">
+        <PurchaseInvoicesPanel />
+      </TabsContent>
+    </Tabs>
   );
 };
 
