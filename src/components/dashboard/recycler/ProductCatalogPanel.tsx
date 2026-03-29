@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
@@ -11,7 +11,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Package, Plus, Download, Trash2, ShoppingBag, ShoppingCart, FileText, Receipt, CheckCircle2, ArrowRight } from "lucide-react";
+import { Package, Plus, Download, Trash2, ShoppingBag, ShoppingCart, FileText, Receipt, CheckCircle2, ArrowRight, Users, Search } from "lucide-react";
 import { toast } from "sonner";
 import jsPDF from "jspdf";
 import { format } from "date-fns";
@@ -52,6 +52,15 @@ const ProductCatalogPanel = () => {
   const [pendingSales, setPendingSales] = useState<(SaleState & { vat: VatConfig })[]>([]);
   const [form, setForm] = useState({ name: "", description: "", material_source: "", stock_quantity: "", unit: "kg", price_per_unit: "" });
   const [vat, setVat] = useState<VatConfig>(DEFAULT_VAT);
+  const [crmCustomers, setCrmCustomers] = useState<any[]>([]);
+  const [showCrmPicker, setShowCrmPicker] = useState(false);
+  const [crmSearch, setCrmSearch] = useState("");
+
+  useEffect(() => {
+    if (!user) return;
+    supabase.from("customers").select("*").eq("user_id", user.id).order("full_name")
+      .then(({ data }) => { if (data) setCrmCustomers(data); });
+  }, [user]);
 
   const { data: products } = useQuery({
     queryKey: ["recycler_products", user?.id],
@@ -229,12 +238,34 @@ const ProductCatalogPanel = () => {
       transaction_date: new Date().toISOString().split("T")[0],
     });
 
+    // Auto-update CRM customer record
+    if (sale.client_name) {
+      const existing = crmCustomers.find(c => c.full_name.toLowerCase() === sale.client_name.toLowerCase());
+      if (existing) {
+        await supabase.from("customers").update({
+          total_transactions: (existing.total_transactions || 0) + 1,
+          total_revenue: (Number(existing.total_revenue) || 0) + total,
+          last_transaction_date: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+        }).eq("id", existing.id);
+      } else {
+        await supabase.from("customers").insert({
+          user_id: user.id, full_name: sale.client_name,
+          phone: sale.client_phone || null, email: sale.client_email || null,
+          total_transactions: 1, total_revenue: total,
+          last_transaction_date: new Date().toISOString(),
+        });
+      }
+      // Refresh CRM list
+      const { data: refreshed } = await supabase.from("customers").select("*").eq("user_id", user.id).order("full_name");
+      if (refreshed) setCrmCustomers(refreshed);
+    }
+
     // Refresh queries
     queryClient.invalidateQueries({ queryKey: ["recycler_products"] });
     queryClient.invalidateQueries({ queryKey: ["financial_transactions"] });
 
     setSale((s) => ({ ...s, step: "receipt_done" }));
-    // Remove from pending sales if it was resumed
     setPendingSales((prev) => prev.filter((s) => s.refNo !== sale.refNo));
     toast.success("Sale completed! Stock updated & income recorded.");
   };
@@ -417,6 +448,44 @@ const ProductCatalogPanel = () => {
               {/* Step 1: Client Details */}
               {sale.step === "details" && (
                 <div className="space-y-3">
+                  {/* CRM Customer Selector */}
+                  {crmCustomers.length > 0 && !showCrmPicker && (
+                    <Button variant="outline" size="sm" className="w-full gap-2" onClick={() => setShowCrmPicker(true)}>
+                      <Users className="w-4 h-4" /> Select Existing Customer
+                    </Button>
+                  )}
+                  {showCrmPicker && (
+                    <Card className="border-primary/30 bg-primary/5">
+                      <CardContent className="p-3 space-y-2">
+                        <div className="flex items-center justify-between">
+                          <p className="text-xs font-medium text-primary">Select from CRM</p>
+                          <Button variant="ghost" size="sm" className="h-6 text-xs" onClick={() => { setShowCrmPicker(false); setCrmSearch(""); }}>New Client</Button>
+                        </div>
+                        <div className="relative">
+                          <Search className="absolute left-2 top-2 w-3.5 h-3.5 text-muted-foreground" />
+                          <Input placeholder="Search customers..." value={crmSearch} onChange={e => setCrmSearch(e.target.value)} className="pl-7 h-8 text-sm" />
+                        </div>
+                        <div className="max-h-32 overflow-y-auto space-y-1">
+                          {crmCustomers
+                            .filter(c => !crmSearch || c.full_name.toLowerCase().includes(crmSearch.toLowerCase()) || c.phone?.includes(crmSearch) || c.email?.toLowerCase().includes(crmSearch.toLowerCase()))
+                            .map(c => (
+                              <button key={c.id} className="w-full text-left p-2 rounded-md hover:bg-primary/10 transition-colors text-sm" onClick={() => {
+                                setSale(s => ({ ...s, client_name: c.full_name, client_phone: c.phone || "", client_email: c.email || "" }));
+                                setShowCrmPicker(false);
+                                setCrmSearch("");
+                                toast.success(`Selected ${c.full_name}`);
+                              }}>
+                                <p className="font-medium text-xs">{c.full_name}</p>
+                                <p className="text-[10px] text-muted-foreground">{[c.phone, c.email, c.location].filter(Boolean).join(" • ")}</p>
+                              </button>
+                            ))}
+                          {crmCustomers.filter(c => !crmSearch || c.full_name.toLowerCase().includes(crmSearch.toLowerCase())).length === 0 && (
+                            <p className="text-xs text-muted-foreground text-center py-2">No matching customers</p>
+                          )}
+                        </div>
+                      </CardContent>
+                    </Card>
+                  )}
                   <div><Label>Client Name *</Label><Input value={sale.client_name} onChange={(e) => setSale({ ...sale, client_name: e.target.value })} placeholder="Client / company name" /></div>
                   <div><Label>Client Phone</Label><Input value={sale.client_phone} onChange={(e) => setSale({ ...sale, client_phone: e.target.value })} placeholder="0712 345 678" /></div>
                   <div><Label>Client Email</Label><Input type="email" value={sale.client_email} onChange={(e) => setSale({ ...sale, client_email: e.target.value })} placeholder="client@email.com" /></div>
