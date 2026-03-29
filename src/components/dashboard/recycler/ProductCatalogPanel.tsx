@@ -192,7 +192,12 @@ const ProductCatalogPanel = () => {
     setSale((s) => ({ ...s, step: "quotation_sent" }));
   };
 
-  const handleClientAccepts = async () => {
+  const handleSkipToInvoice = async () => {
+    await generatePdf("Invoice");
+    setSale((s) => ({ ...s, step: "invoice_sent" }));
+  };
+
+
     await generatePdf("Invoice");
     setSale((s) => ({ ...s, step: "invoice_sent" }));
   };
