@@ -48,8 +48,9 @@ const statusBadge: Record<string, { label: string; variant: "default" | "seconda
 };
 
 const WasteDeliveredPanel = () => {
-  const { user } = useAuth();
+  const { user, profile } = useAuth();
   const { orgInfo } = useOrgInfo();
+  const queryClient = useQueryClient();
   const [vat, setVat] = useState<VatConfig>(DEFAULT_VAT);
   const [createOpen, setCreateOpen] = useState(false);
   const [grnOpen, setGrnOpen] = useState(false);
