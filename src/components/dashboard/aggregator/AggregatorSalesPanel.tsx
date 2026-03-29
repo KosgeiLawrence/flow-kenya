@@ -377,9 +377,6 @@ const AggregatorSalesPanel = () => {
         <Card className="shadow-soft">
           <CardHeader className="flex flex-row items-center justify-between">
             <CardTitle className="text-lg">Sell from Inventory</CardTitle>
-            <Button size="sm" onClick={() => setShowMaterialPicker(true)}>
-              <Plus className="w-4 h-4 mr-1" /> New Sale
-            </Button>
           </CardHeader>
           <CardContent>
             {/* Material picker dialog for new sale */}
