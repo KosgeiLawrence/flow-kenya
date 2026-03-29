@@ -65,6 +65,7 @@ const WastePickerDashboard = () => {
     switch (activePanel) {
       case "how-it-works": return <WastePickerWorkflowGuidePanel />;
       case "collection": return <CollectionPanel />;
+      case "sales": return <WastePickerSalesPanel />;
       case "my-earnings": return <EarningsExpensesPanel role="waste_picker" />;
       case "pricing": return <PricingPanel />;
       
