@@ -145,7 +145,10 @@ const AggregatorDashboard = () => {
             )}
             <div className="flex-1 min-w-0">
               <p className="text-sm font-medium truncate">{profile?.full_name || "Aggregator"}</p>
-              <div className="flex items-center gap-1">
+              {profile?.email && (
+                <p className="text-xs text-sidebar-foreground/60 truncate">{profile.email}</p>
+              )}
+              <div className="flex items-center gap-1 mt-0.5">
                 <StatusIcon className={cn("w-3 h-3", status.color)} />
                 <span className={cn("text-xs", status.color)}>{status.label}</span>
               </div>
