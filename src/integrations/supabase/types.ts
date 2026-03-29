@@ -357,6 +357,54 @@ export type Database = {
         }
         Relationships: []
       }
+      customers: {
+        Row: {
+          category: string
+          created_at: string
+          email: string | null
+          full_name: string
+          id: string
+          last_transaction_date: string | null
+          location: string | null
+          notes: string | null
+          phone: string | null
+          total_revenue: number
+          total_transactions: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          category?: string
+          created_at?: string
+          email?: string | null
+          full_name: string
+          id?: string
+          last_transaction_date?: string | null
+          location?: string | null
+          notes?: string | null
+          phone?: string | null
+          total_revenue?: number
+          total_transactions?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          email?: string | null
+          full_name?: string
+          id?: string
+          last_transaction_date?: string | null
+          location?: string | null
+          notes?: string | null
+          phone?: string | null
+          total_revenue?: number
+          total_transactions?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       financial_budgets: {
         Row: {
           amount: number
