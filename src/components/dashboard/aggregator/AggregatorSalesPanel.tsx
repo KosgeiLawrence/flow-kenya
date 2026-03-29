@@ -59,6 +59,7 @@ const AggregatorSalesPanel = () => {
   const [crmCustomers, setCrmCustomers] = useState<any[]>([]);
   const [showCrmPicker, setShowCrmPicker] = useState(false);
   const [crmSearch, setCrmSearch] = useState("");
+  const [customerSource, setCustomerSource] = useState<"crm" | "recyclers">("crm");
   const [showMaterialPicker, setShowMaterialPicker] = useState(false);
   const [pendingSales, setPendingSales] = useState<(SaleState & { vat: VatConfig })[]>(() => {
     try {
@@ -85,6 +86,26 @@ const AggregatorSalesPanel = () => {
       if (error) throw error;
       return data;
     },
+  });
+
+  // Fetch platform recyclers
+  const { data: platformRecyclers } = useQuery({
+    queryKey: ["platform_recyclers_for_sale"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("profiles")
+        .select("user_id, full_name, phone_number, email, county")
+        .order("full_name");
+      if (error) throw error;
+      // Filter to only recyclers by checking user_roles
+      const { data: roles } = await supabase
+        .from("user_roles")
+        .select("user_id")
+        .eq("role", "recycler");
+      const recyclerIds = new Set(roles?.map(r => r.user_id) || []);
+      return (data || []).filter(p => recyclerIds.has(p.user_id) && p.user_id !== user?.id);
+    },
+    enabled: !!user,
   });
 
   const { data: collections } = useQuery({
