@@ -391,9 +391,14 @@ const ProductCatalogPanel = () => {
                     </Card>
                   )}
 
-                  <Button className="w-full" onClick={handleSendQuotation} disabled={!sale.client_name || !sale.quantity || Number(sale.quantity) <= 0}>
-                    <FileText className="w-4 h-4 mr-1" /> Generate Quotation
-                  </Button>
+                  <div className="flex gap-2">
+                    <Button className="flex-1" onClick={handleSendQuotation} disabled={!sale.client_name || !sale.quantity || Number(sale.quantity) <= 0}>
+                      <FileText className="w-4 h-4 mr-1" /> Generate Quotation
+                    </Button>
+                    <Button variant="outline" className="flex-1" onClick={handleSkipToInvoice} disabled={!sale.client_name || !sale.quantity || Number(sale.quantity) <= 0}>
+                      <ArrowRight className="w-4 h-4 mr-1" /> Skip to Invoice
+                    </Button>
+                  </div>
                 </div>
               )}
 
