@@ -29,7 +29,8 @@ import CRMPanel from "@/components/dashboard/shared/CRMPanel";
 import AggregatorWorkflowGuidePanel from "@/components/dashboard/aggregator/WorkflowGuidePanel";
 import RecyclerPickupRequestPanel from "@/components/dashboard/aggregator/RecyclerPickupRequestPanel";
 import AggregatorSalesPanel from "@/components/dashboard/aggregator/AggregatorSalesPanel";
-import { HelpCircle } from "lucide-react";
+import WasteDeliveredPanel from "@/components/dashboard/aggregator/WasteDeliveredPanel";
+import { HelpCircle, ClipboardList } from "lucide-react";
 
 const navItems = [
   { id: "workflows", label: "How It Works", icon: HelpCircle },
