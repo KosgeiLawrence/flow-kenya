@@ -622,6 +622,30 @@ const AggregatorSalesPanel = () => {
                   <div><Label>Client Name *</Label><Input value={sale.client_name} onChange={(e) => setSale({ ...sale, client_name: e.target.value })} placeholder="Client / company name" /></div>
                   <div><Label>Client Phone</Label><Input value={sale.client_phone} onChange={(e) => setSale({ ...sale, client_phone: e.target.value })} placeholder="0712 345 678" /></div>
                   <div><Label>Client Email</Label><Input type="email" value={sale.client_email} onChange={(e) => setSale({ ...sale, client_email: e.target.value })} placeholder="client@email.com" /></div>
+                  {sale.client_name && !crmCustomers.some(c => c.full_name.toLowerCase() === sale.client_name.toLowerCase()) && (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="w-full gap-2 border-primary/30 text-primary"
+                      onClick={async () => {
+                        if (!user || !sale.client_name) return;
+                        const { error } = await supabase.from("customers").insert({
+                          user_id: user.id,
+                          full_name: sale.client_name,
+                          phone: sale.client_phone || null,
+                          email: sale.client_email || null,
+                          total_transactions: 0,
+                          total_revenue: 0,
+                        });
+                        if (error) { toast.error("Failed to add customer"); return; }
+                        const { data: refreshed } = await supabase.from("customers").select("*").eq("user_id", user.id).order("full_name");
+                        if (refreshed) setCrmCustomers(refreshed);
+                        toast.success(`${sale.client_name} added to your customers`);
+                      }}
+                    >
+                      <Plus className="w-3.5 h-3.5" /> Add "{sale.client_name}" to Customers
+                    </Button>
+                  )}
                   <div><Label>Quantity ({selectedMaterial.unit}) *</Label><Input type="number" value={sale.quantity} onChange={(e) => setSale({ ...sale, quantity: e.target.value })} max={selectedMaterial.qty} /></div>
                   <div><Label>Notes</Label><Textarea value={sale.notes} onChange={(e) => setSale({ ...sale, notes: e.target.value })} rows={2} /></div>
                   <VatOptions value={vat} onChange={setVat} />
