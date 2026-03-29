@@ -105,6 +105,25 @@ const ClientCollectionFlow = ({ onBack }: Props) => {
       });
       if (error) throw error;
 
+      // Auto-add new client to customers table
+      const { data: existingCustomer } = await supabase
+        .from("customers")
+        .select("id")
+        .eq("user_id", user!.id)
+        .ilike("full_name", clientName.trim())
+        .maybeSingle();
+
+      if (!existingCustomer) {
+        await supabase.from("customers").insert({
+          user_id: user!.id,
+          full_name: clientName.trim(),
+          phone: clientPhone || null,
+          email: clientEmail || null,
+          location: locationName || null,
+          category: "general",
+        });
+      }
+
       // Also log into the main collections table so it appears in Log Collection history
       const { data: matchingType } = await supabase
         .from("material_types")
@@ -125,7 +144,9 @@ const ClientCollectionFlow = ({ onBack }: Props) => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["client_collections"] });
       queryClient.invalidateQueries({ queryKey: ["collections"] });
+      queryClient.invalidateQueries({ queryKey: ["customers"] });
       toast.success("Collection recorded as draft!");
+      setSelectedCustomerId(""); setIsNewClient(false);
       setClientName(""); setClientPhone(""); setClientEmail("");
       setMaterialType(""); setQuantityKg(""); setUnitPrice("");
       setLocationName(""); setNotes(""); setShowForm(false);
