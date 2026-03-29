@@ -28,6 +28,7 @@ import EarningsExpensesPanel from "@/components/dashboard/shared/EarningsExpense
 import CRMPanel from "@/components/dashboard/shared/CRMPanel";
 import AggregatorWorkflowGuidePanel from "@/components/dashboard/aggregator/WorkflowGuidePanel";
 import RecyclerPickupRequestPanel from "@/components/dashboard/aggregator/RecyclerPickupRequestPanel";
+import AggregatorSuppliersPanel from "@/components/dashboard/aggregator/AggregatorSuppliersPanel";
 import AggregatorSalesPanel from "@/components/dashboard/aggregator/AggregatorSalesPanel";
 import WasteDeliveredPanel from "@/components/dashboard/aggregator/WasteDeliveredPanel";
 import { HelpCircle, ClipboardList } from "lucide-react";
