@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import {
@@ -41,7 +42,7 @@ const navItems = [
   { id: "analytics", label: "Profit & Analytics", icon: BarChart3 },
   { id: "esg", label: "ESG & Carbon", icon: Leaf },
   { id: "compliance", label: "Compliance", icon: Shield },
-  { id: "pickup-requests", label: "Pickup Requests", icon: Truck },
+  
   { id: "training", label: "Training", icon: BookOpen },
   { id: "cleanup", label: "Cleanup Exercise", icon: Package },
   { id: "crm", label: "Customers", icon: Users },
@@ -74,7 +75,16 @@ const AggregatorDashboard = () => {
       case "workflows": return <AggregatorWorkflowGuidePanel />;
       case "pickers": return <WastePickerMgmtPanel />;
       case "earnings-expenses": return <EarningsExpensesPanel role="aggregator" />;
-      case "inventory": return <InventoryPanel />;
+      case "inventory": return (
+        <Tabs defaultValue="stock" className="space-y-4">
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="stock"><Package className="w-4 h-4 mr-1.5" />Stock & Collections</TabsTrigger>
+            <TabsTrigger value="pickups"><Truck className="w-4 h-4 mr-1.5" />Pickup Requests</TabsTrigger>
+          </TabsList>
+          <TabsContent value="stock"><InventoryPanel /></TabsContent>
+          <TabsContent value="pickups"><RequestedPickupsPanel /></TabsContent>
+        </Tabs>
+      );
       case "marketplace": return <MarketplacePanel />;
       case "logistics": return <LogisticsPanel />;
       case "payments": return <PaymentsPanel />;
@@ -83,7 +93,7 @@ const AggregatorDashboard = () => {
       case "analytics": return <ProfitAnalyticsPanel />;
       case "esg": return <AggregatorESGPanel />;
       case "compliance": return <CompliancePanel />;
-      case "pickup-requests": return <RequestedPickupsPanel />;
+      
       case "training": return <TrainingPanel viewerRole="aggregator" />;
       case "cleanup": return <CleanupExercisePanel />;
       case "crm": return <CRMPanel role="aggregator" />;
