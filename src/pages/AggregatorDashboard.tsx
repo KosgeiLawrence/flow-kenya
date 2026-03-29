@@ -35,7 +35,7 @@ const navItems = [
   { id: "pickers", label: "Waste Pickers", icon: Users },
   { id: "inventory", label: "Inventory", icon: Package },
   { id: "marketplace", label: "Marketplace", icon: Store },
-  { id: "logistics", label: "Logistics", icon: Truck },
+  
   { id: "payments", label: "Payments", icon: DollarSign },
   { id: "receipts", label: "Bulk Receipts", icon: Printer },
   { id: "invoices", label: "Invoices & Notes", icon: FileText },
