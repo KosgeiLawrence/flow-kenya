@@ -17,6 +17,36 @@ import { cn } from "@/lib/utils";
 import { useOrgInfo } from "@/hooks/useOrgInfo";
 import { PDF_COLORS, loadImageAsBase64 } from "@/lib/pdfBranding";
 
+// ── Logo cache ──
+let _duaraFlowLogoCache: string | null = null;
+let _duaraIntelLogoCache: string | null = null;
+
+const loadSvgAsBase64Cached = (url: string, width: number, height: number, cache: { val: string | null }): Promise<string | null> => {
+  if (cache.val) return Promise.resolve(cache.val);
+  return new Promise((resolve) => {
+    const img = new Image();
+    img.crossOrigin = "anonymous";
+    img.onload = () => {
+      const canvas = document.createElement("canvas");
+      canvas.width = width * 2;
+      canvas.height = height * 2;
+      const ctx = canvas.getContext("2d");
+      if (!ctx) { resolve(null); return; }
+      ctx.drawImage(img, 0, 0, width * 2, height * 2);
+      const result = canvas.toDataURL("image/png");
+      cache.val = result;
+      resolve(result);
+    };
+    img.onerror = () => resolve(null);
+    img.src = url;
+  });
+};
+
+const flowLogoCache = { val: null as string | null };
+const intelLogoCache = { val: null as string | null };
+const getDuaraFlowLogo = () => loadSvgAsBase64Cached("/images/duara-flow-logo.svg", 400, 160, flowLogoCache);
+const getDuaraIntelLogo = () => loadSvgAsBase64Cached("/images/duara-intelligence-logo.svg", 300, 160, intelLogoCache);
+
 const COLORS = ["hsl(152,45%,22%)", "hsl(40,55%,55%)", "hsl(195,60%,50%)", "hsl(25,30%,35%)", "hsl(340,50%,50%)"];
 
 type PeriodOption = "7d" | "30d" | "90d" | "6m" | "1y" | "all" | "custom";
@@ -52,15 +82,21 @@ const drawMetricCard = (doc: jsPDF, x: number, y: number, w: number, value: stri
   doc.text(label, x + 6, y + 22);
 };
 
-// ── PDF Helper: add org header ──
-const addOrgHeader = (doc: jsPDF, orgName: string, logoBase64: string | null, contactDetails: string[]) => {
+// ── PDF Helper: add org header with Duara Flow logo ──
+const addOrgHeader = async (doc: jsPDF, orgName: string, logoBase64: string | null, contactDetails: string[]) => {
   const pw = doc.internal.pageSize.getWidth();
+  const duaraLogo = await getDuaraFlowLogo();
 
   // Top accent band
   doc.setFillColor(...PDF_COLORS.forest);
   doc.rect(0, 0, pw, 6, "F");
   doc.setFillColor(...PDF_COLORS.gold);
   doc.rect(0, 6, pw, 1.5, "F");
+
+  // Duara Flow logo (right side)
+  if (duaraLogo) {
+    try { doc.addImage(duaraLogo, "PNG", pw - 60, 10, 46, 18); } catch {}
+  }
 
   let leftX = 15;
   if (logoBase64) {
@@ -82,19 +118,40 @@ const addOrgHeader = (doc: jsPDF, orgName: string, logoBase64: string | null, co
   return Math.max(cy + 2, 36);
 };
 
-// ── PDF Helper: add clean footer ──
-const addReportFooter = (doc: jsPDF, orgName: string) => {
+// ── PDF Helper: add footer with Duara Intelligence branding ──
+const addReportFooter = async (doc: jsPDF, orgName: string) => {
   const pages = doc.getNumberOfPages();
   const pw = doc.internal.pageSize.getWidth();
   const ph = doc.internal.pageSize.getHeight();
+  const intelLogo = await getDuaraIntelLogo();
+
   for (let i = 1; i <= pages; i++) {
     doc.setPage(i);
+
+    // Separator line
+    const footerY = ph - 20;
+    doc.setDrawColor(...PDF_COLORS.lightGray);
+    doc.setLineWidth(0.3);
+    doc.line(15, footerY, pw - 15, footerY);
+
+    // Duara Intelligence logo (left)
+    if (intelLogo) {
+      try { doc.addImage(intelLogo, "PNG", 15, footerY + 2, 25, 13); } catch {}
+    }
+
+    // Contact info (center)
+    doc.setFontSize(6.5);
+    doc.setTextColor(...PDF_COLORS.mutedText);
+    doc.text(`${orgName}  •  Powered by Duara Flow`, pw / 2, footerY + 6, { align: "center" });
+    doc.text("www.duaraflow.co.ke  •  info@duaraflow.co.ke  •  +254 741 027 140", pw / 2, footerY + 10, { align: "center" });
+
+    // Page number (right)
+    doc.setFontSize(7);
+    doc.text(`Page ${i} of ${pages}`, pw - 15, footerY + 8, { align: "right" });
+
     // Bottom accent band
     doc.setFillColor(...PDF_COLORS.forest);
-    doc.rect(0, ph - 8, pw, 8, "F");
-    doc.setFontSize(6.5);
-    doc.setTextColor(255, 255, 255);
-    doc.text(`${orgName}  •  ESG & Sustainability Report  •  Page ${i} of ${pages}`, pw / 2, ph - 3, { align: "center" });
+    doc.rect(0, ph - 4, pw, 4, "F");
   }
 };
 
@@ -227,7 +284,7 @@ const ESGPanel = () => {
     const org = await getOrgDetails();
 
     // ── Page 1: Cover ──
-    let y = addOrgHeader(doc, org.name, org.logo, org.contact);
+    let y = await addOrgHeader(doc, org.name, org.logo, org.contact);
 
     // Title block
     y += 4;
@@ -320,7 +377,7 @@ const ESGPanel = () => {
 
     // ── Page 2: Material breakdown & cleanups ──
     doc.addPage();
-    y = addOrgHeader(doc, org.name, org.logo, org.contact);
+    y = await addOrgHeader(doc, org.name, org.logo, org.contact);
     y += 4;
 
     doc.setFontSize(11);
@@ -386,7 +443,7 @@ const ESGPanel = () => {
     doc.text("Water savings: 18 liters/kg recycled material", 20, y + 22);
     doc.text("Energy savings: 5.8 kWh/kg recycled material", 20, y + 28);
 
-    addReportFooter(doc, org.name);
+    await addReportFooter(doc, org.name);
     doc.save(`esg-report-${format(new Date(), "yyyy-MM-dd")}.pdf`);
     toast.success("ESG Report downloaded");
   };
@@ -530,6 +587,17 @@ const ESGPanel = () => {
     doc.setTextColor(120, 120, 120);
     doc.text("Authorized Signatory", pw / 2, y, { align: "center" });
 
+    // Duara Flow + Intelligence branding at bottom
+    const duaraLogo = await getDuaraFlowLogo();
+    const intelLogo = await getDuaraIntelLogo();
+
+    if (duaraLogo) {
+      try { doc.addImage(duaraLogo, "PNG", pw / 2 - 22, ph - 38, 44, 17); } catch {}
+    }
+    if (intelLogo) {
+      try { doc.addImage(intelLogo, "PNG", 18, ph - 28, 22, 11); } catch {}
+    }
+
     // Bottom accent
     doc.setFillColor(...PDF_COLORS.gold);
     doc.rect(16, ph - 20, pw - 32, 1, "F");
@@ -538,7 +606,7 @@ const ESGPanel = () => {
 
     doc.setFontSize(6);
     doc.setTextColor(150, 150, 150);
-    doc.text("This certificate is system-generated based on verified platform data.", pw / 2, ph - 24, { align: "center" });
+    doc.text("Verified by Duara Flow  •  www.duaraflow.co.ke  •  Powered by Duara Intelligence", pw / 2, ph - 24, { align: "center" });
 
     doc.save(`sustainability-certificate-${format(new Date(), "yyyy-MM-dd")}.pdf`);
     toast.success("Sustainability certificate downloaded");
