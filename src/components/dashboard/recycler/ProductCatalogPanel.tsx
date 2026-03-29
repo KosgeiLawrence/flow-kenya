@@ -234,6 +234,8 @@ const ProductCatalogPanel = () => {
     queryClient.invalidateQueries({ queryKey: ["financial_transactions"] });
 
     setSale((s) => ({ ...s, step: "receipt_done" }));
+    // Remove from pending sales if it was resumed
+    setPendingSales((prev) => prev.filter((s) => s.refNo !== sale.refNo));
     toast.success("Sale completed! Stock updated & income recorded.");
   };
 
