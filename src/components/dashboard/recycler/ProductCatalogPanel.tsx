@@ -197,7 +197,7 @@ const ProductCatalogPanel = () => {
     setSale((s) => ({ ...s, step: "invoice_sent" }));
   };
 
-
+  const handleClientAccepts = async () => {
     await generatePdf("Invoice");
     setSale((s) => ({ ...s, step: "invoice_sent" }));
   };
