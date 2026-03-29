@@ -59,7 +59,12 @@ const PricingPanel = () => {
             <TableBody>
               {materialTypes?.map(mt => (
                 <TableRow key={mt.id}>
-                  <TableCell className="font-medium">{mt.name}</TableCell>
+                  <TableCell className="font-medium">
+                    <span className="flex items-center gap-2">
+                      <span className="text-lg">{mt.icon || "♻️"}</span>
+                      {mt.name}
+                    </span>
+                  </TableCell>
                   <TableCell><Badge variant="outline">{mt.unit}</Badge></TableCell>
                   <TableCell className="text-right font-semibold text-primary">
                     KES {Number(mt.price_per_unit).toFixed(2)}
