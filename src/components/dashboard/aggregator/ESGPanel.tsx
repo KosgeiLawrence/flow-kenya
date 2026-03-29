@@ -186,6 +186,20 @@ const AggregatorESGPanel = () => {
     enabled: !!user,
   });
 
+  const { data: communityTrainings } = useQuery({
+    queryKey: ["aggregator_esg_community_trainings", user?.id],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("community_training_logs" as any)
+        .select("*")
+        .eq("user_id", user!.id)
+        .order("training_date", { ascending: false });
+      if (error) throw error;
+      return data as any[];
+    },
+    enabled: !!user,
+  });
+
   const filteredCollections = useMemo(() => {
     if (!collections) return [];
     if (!dateRange) return collections;
@@ -204,12 +218,28 @@ const AggregatorESGPanel = () => {
     });
   }, [cleanups, dateRange]);
 
+  const filteredTrainings = useMemo(() => {
+    if (!communityTrainings) return [];
+    if (!dateRange) return communityTrainings;
+    return communityTrainings.filter((t: any) => {
+      const d = new Date(t.training_date);
+      return isWithinInterval(d, { start: startOfDay(dateRange.from), end: endOfDay(dateRange.to) });
+    });
+  }, [communityTrainings, dateRange]);
+
   const collectionKg = filteredCollections.reduce((s, c) => s + Number(c.quantity), 0);
   const cleanupWasteKg = filteredCleanups.reduce((s, c) => s + Number(c.total_waste_kg || 0), 0);
   const cleanupRecyclableKg = filteredCleanups.reduce((s, c) => s + Number(c.recyclable_waste_kg || 0), 0);
   const cleanupVolunteers = filteredCleanups.reduce((s, c) => s + Number(c.num_volunteers || 0), 0);
 
-  const totalKg = collectionKg + cleanupWasteKg;
+  // Community training impact
+  const trainingParticipants = filteredTrainings.reduce((s: number, t: any) => s + Number(t.num_participants || 0), 0);
+  const trainingWomen = filteredTrainings.reduce((s: number, t: any) => s + Number(t.num_women || 0), 0);
+  const trainingYouth = filteredTrainings.reduce((s: number, t: any) => s + Number(t.num_youth || 0), 0);
+  const trainingWasteKg = filteredTrainings.reduce((s: number, t: any) => s + Number(t.waste_collected_kg || 0), 0);
+  const trainingTrees = filteredTrainings.reduce((s: number, t: any) => s + Number(t.trees_planted || 0), 0);
+
+  const totalKg = collectionKg + cleanupWasteKg + trainingWasteKg;
   const co2Saved = totalKg * 2.5;
   const waterSaved = totalKg * 18;
   const energySaved = totalKg * 5.8;
