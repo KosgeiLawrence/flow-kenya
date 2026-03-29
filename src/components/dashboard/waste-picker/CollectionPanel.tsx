@@ -7,10 +7,12 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
-import { Plus, Package, Loader2, Leaf, Droplets, Trash2 } from "lucide-react";
+import { Plus, Package, Loader2, Leaf, Droplets, Trash2, Users } from "lucide-react";
 import { format } from "date-fns";
 import { calculateImpact } from "@/lib/impactUtils";
+import ClientCollectionFlow from "./ClientCollectionFlow";
 
 const CollectionPanel = () => {
   const { user } = useAuth();
@@ -76,8 +78,21 @@ const CollectionPanel = () => {
     }))
   );
 
+  const [activeTab, setActiveTab] = useState("log");
+
   return (
     <div className="space-y-6">
+      <Tabs value={activeTab} onValueChange={setActiveTab}>
+        <TabsList>
+          <TabsTrigger value="log">Log Collection</TabsTrigger>
+          <TabsTrigger value="client">Collect from Client</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="client" className="mt-4">
+          <ClientCollectionFlow onBack={() => setActiveTab("log")} />
+        </TabsContent>
+
+        <TabsContent value="log" className="mt-4 space-y-6">
       {/* Impact summary */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <Card className="shadow-soft">
@@ -196,6 +211,8 @@ const CollectionPanel = () => {
           )}
         </CardContent>
       </Card>
+        </TabsContent>
+      </Tabs>
     </div>
   );
 };
