@@ -39,7 +39,7 @@ const navItems = [
   { id: "forecast", label: "Supply Forecast", icon: BarChart3 },
   { id: "esg", label: "ESG & Carbon", icon: Leaf },
   { id: "compliance", label: "Compliance", icon: Shield },
-  { id: "pickup-requests", label: "Pickup Requests", icon: Truck },
+  
   { id: "training", label: "Training", icon: BookOpen },
   { id: "cleanup", label: "Cleanup Exercise", icon: Package },
   { id: "grants", label: "Grants & Programs", icon: Briefcase },
@@ -86,7 +86,7 @@ const RecyclerDashboard = () => {
       case "forecast": return <SupplyForecastPanel />;
       case "esg": return <ESGPanel />;
       case "compliance": return <ComplianceDocsPanel />;
-      case "pickup-requests": return <RequestedPickupsPanel />;
+      
       case "training": return <TrainingPanel viewerRole="recycler" />;
       case "cleanup": return <CleanupExercisePanel />;
       
