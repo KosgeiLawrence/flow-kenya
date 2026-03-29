@@ -155,6 +155,7 @@ const ProfileSettingsPanel = ({ role }: ProfileSettingsPanelProps) => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["full_profile"] });
+      refreshProfile();
       toast.success("Profile updated successfully");
     },
     onError: (e: Error) => toast.error(e.message),
