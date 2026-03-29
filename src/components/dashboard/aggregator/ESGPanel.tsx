@@ -580,6 +580,9 @@ const AggregatorESGPanel = () => {
       `Aggregated ${collectionKg.toFixed(0)} kg of recyclable materials`,
       `Conducted ${filteredCleanups.length} cleanup exercises with ${cleanupVolunteers} volunteers`,
       `Recovered ${cleanupRecyclableKg.toFixed(0)} kg of recyclable material from cleanups`,
+      ...(filteredTrainings.length > 0 ? [`Trained ${trainingParticipants} community members across ${filteredTrainings.length} sessions`] : []),
+      ...(trainingWomen > 0 ? [`Empowered ${trainingWomen} women and ${trainingYouth} youth through training`] : []),
+      ...(trainingTrees > 0 ? [`Planted ${trainingTrees} trees for environmental restoration`] : []),
     ];
     doc.setFontSize(9);
     impacts.forEach((imp) => {
