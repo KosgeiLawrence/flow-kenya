@@ -6,24 +6,15 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Store, Recycle, ArrowRight, Search, Mail, Phone, Send, Loader2, Plus, Truck } from "lucide-react";
+import { Store, Recycle, ArrowRight, Search, Mail, Phone } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { toast } from "sonner";
 import { format } from "date-fns";
 
 const MarketplacePanel = () => {
   const { user, profile } = useAuth();
-  const queryClient = useQueryClient();
   const [selectedRecycler, setSelectedRecycler] = useState<any>(null);
   const [search, setSearch] = useState("");
-  const [showRequestForm, setShowRequestForm] = useState(false);
-  const [targetUserId, setTargetUserId] = useState("");
-  const [materialType, setMaterialType] = useState("");
-  const [quantityKg, setQuantityKg] = useState("");
-  const [proposedPrice, setProposedPrice] = useState("");
-  const [locationName, setLocationName] = useState("");
-  const [scheduledDate, setScheduledDate] = useState("");
-  const [notes, setNotes] = useState("");
 
   const { data: recyclers } = useQuery({
     queryKey: ["recycler_profiles"],
@@ -55,72 +46,10 @@ const MarketplacePanel = () => {
     },
   });
 
-  // Fetch available recycler products
-  const { data: products } = useQuery({
-    queryKey: ["recycler_products_marketplace"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("recycler_products")
-        .select("*, profiles!recycler_products_user_id_fkey(full_name)")
-        .eq("status", "available");
-      if (error) throw error;
-      return data;
-    },
-  });
-
-  // Fetch aggregator's own sent pickup requests to recyclers
-  const { data: sentRequests, isLoading: sentLoading } = useQuery({
-    queryKey: ["aggregator_sent_requests", user?.id],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("pickup_requests")
-        .select("*")
-        .eq("waste_picker_id", user!.id)
-        .eq("target_role", "recycler")
-        .order("created_at", { ascending: false });
-      if (error) throw error;
-      return data;
-    },
-    enabled: !!user?.id,
-  });
-
-  const sendRequest = useMutation({
-    mutationFn: async () => {
-      const qty = parseFloat(quantityKg);
-      const price = proposedPrice ? parseFloat(proposedPrice) : null;
-      const { error } = await supabase.from("pickup_requests").insert({
-        waste_picker_id: user!.id,
-        target_user_id: targetUserId,
-        target_role: "recycler",
-        material_type: materialType,
-        quantity_kg: qty,
-        proposed_price_per_kg: price,
-        total_amount: price ? qty * price : null,
-        location_name: locationName || null,
-        scheduled_date: scheduledDate ? new Date(scheduledDate).toISOString() : null,
-        notes: notes || null,
-      });
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["aggregator_sent_requests"] });
-      toast.success("Pickup request sent to recycler!");
-      setTargetUserId(""); setMaterialType(""); setQuantityKg("");
-      setProposedPrice(""); setLocationName(""); setScheduledDate("");
-      setNotes(""); setShowRequestForm(false);
-    },
-    onError: (err: Error) => toast.error(err.message),
-  });
-
-  const canSubmit = targetUserId && materialType && quantityKg;
-
   const filteredRecyclers = recyclers?.filter(r =>
     !search || r.full_name?.toLowerCase().includes(search.toLowerCase()) ||
     (r as any).organizations?.name?.toLowerCase().includes(search.toLowerCase())
   ) || [];
-
-  const getRecyclerName = (userId: string) =>
-    recyclers?.find(r => r.user_id === userId)?.full_name || "Unknown";
 
   return (
     <div className="space-y-6">
