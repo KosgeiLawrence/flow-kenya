@@ -33,7 +33,7 @@ const navItems = [
   { id: "transformation", label: "Transformation", icon: Recycle },
   { id: "business-insights", label: "Business Insights", icon: TrendingUp },
   { id: "products", label: "Products & Pricing", icon: ShoppingBag },
-  { id: "receipts", label: "Receipt Confirm", icon: ClipboardCheck },
+  
   { id: "market", label: "Market Insights", icon: TrendingUp },
   { id: "forecast", label: "Supply Forecast", icon: BarChart3 },
   { id: "esg", label: "ESG & Carbon", icon: Leaf },
@@ -73,7 +73,7 @@ const RecyclerDashboard = () => {
       case "transformation": return <MaterialTransformationPanel />;
       case "business-insights": return <EarningsExpensesPanel role="recycler" />;
       case "products": return <ProductCatalogPanel />;
-      case "receipts": return <ReceiptConfirmPanel />;
+      
       case "market": return <MarketInsightsPanel />;
       case "forecast": return <SupplyForecastPanel />;
       case "esg": return <ESGPanel />;
