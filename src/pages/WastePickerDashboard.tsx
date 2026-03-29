@@ -48,7 +48,7 @@ const statusConfig: Record<string, { icon: React.ElementType; label: string; col
 const WastePickerDashboard = () => {
   const { user, profile, signOut, displayName, orgLogoUrl } = useAuth();
   const navigate = useNavigate();
-  const [activePanel, setActivePanel] = useState("collection");
+  const [activePanel, setActivePanel] = useState("how-it-works");
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const status = statusConfig[profile?.approval_status || "pending"];
