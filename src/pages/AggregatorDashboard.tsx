@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import {
   LogOut, Users, Package, Store, Truck, DollarSign, Printer,
   FileText, BarChart3, Shield, Clock, CheckCircle2, AlertTriangle,
-  Menu, X, ChevronRight, Briefcase, Settings, BookOpen, Leaf, TrendingUp
+  Menu, X, ChevronRight, Briefcase, Settings, BookOpen, Leaf, TrendingUp, Send
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
@@ -27,6 +27,7 @@ import CleanupExercisePanel from "@/components/dashboard/shared/CleanupExerciseP
 import EarningsExpensesPanel from "@/components/dashboard/shared/EarningsExpensesPanel";
 import CRMPanel from "@/components/dashboard/shared/CRMPanel";
 import AggregatorWorkflowGuidePanel from "@/components/dashboard/aggregator/WorkflowGuidePanel";
+import RecyclerPickupRequestPanel from "@/components/dashboard/aggregator/RecyclerPickupRequestPanel";
 import { HelpCircle } from "lucide-react";
 
 const navItems = [
