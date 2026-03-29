@@ -49,7 +49,8 @@ const statusBadge: Record<string, { label: string; variant: "default" | "seconda
 
 const WasteDeliveredPanel = () => {
   const { user } = useAuth();
-  const queryClient = useQueryClient();
+  const { orgInfo } = useOrgInfo();
+  const [vat, setVat] = useState<VatConfig>(DEFAULT_VAT);
   const [createOpen, setCreateOpen] = useState(false);
   const [grnOpen, setGrnOpen] = useState(false);
   const [selectedPO, setSelectedPO] = useState<PurchaseOrder | null>(null);
@@ -171,57 +172,96 @@ const WasteDeliveredPanel = () => {
   const pendingOrders = orders?.filter(o => o.status === "sent") || [];
   const deliveredOrders = orders?.filter(o => o.status === "delivered") || [];
 
-  const generatePODocument = (po: PurchaseOrder) => {
-    const content = [
-      `PURCHASE ORDER`,
-      `PO Number: ${po.po_number}`,
-      `Date: ${format(new Date(po.order_date), "MMM d, yyyy")}`,
-      ``,
-      `Supplier: ${po.supplier_name}`,
-      po.supplier_phone ? `Phone: ${po.supplier_phone}` : "",
-      ``,
-      `Material: ${po.material_type}`,
-      `Quantity: ${po.quantity} ${po.unit}`,
-      `Unit Price: KES ${Number(po.unit_price).toLocaleString()}`,
-      `Total Amount: KES ${Number(po.total_amount).toLocaleString()}`,
-      po.expected_delivery_date ? `Expected Delivery: ${format(new Date(po.expected_delivery_date), "MMM d, yyyy")}` : "",
-      po.notes ? `\nNotes: ${po.notes}` : "",
-    ].filter(Boolean).join("\n");
-
-    const blob = new Blob([content], { type: "text/plain" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `${po.po_number}.txt`;
-    a.click();
-    URL.revokeObjectURL(url);
-    toast.success("Purchase Order downloaded");
+  const getOrgPdfInfo = async () => {
+    if (!orgInfo) return null;
+    let logoBase64: string | null = null;
+    if (orgInfo.orgLogoUrl) logoBase64 = await loadImageAsBase64(orgInfo.orgLogoUrl);
+    return buildPdfOrgInfo(orgInfo, logoBase64);
   };
 
-  const generateGRNDocument = (po: PurchaseOrder) => {
-    const content = [
-      `GOODS RECEIVED NOTE`,
-      `GRN Number: ${po.grn_number}`,
-      `PO Number: ${po.po_number}`,
-      `Date Received: ${po.delivered_at ? format(new Date(po.delivered_at), "MMM d, yyyy HH:mm") : "N/A"}`,
-      ``,
-      `Supplier: ${po.supplier_name}`,
-      `Material: ${po.material_type}`,
-      `Ordered Qty: ${po.quantity} ${po.unit}`,
-      `Delivered Qty: ${po.delivered_quantity || po.quantity} ${po.unit}`,
-      `Unit Price: KES ${Number(po.unit_price).toLocaleString()}`,
-      `Total Cost: KES ${(Number(po.delivered_quantity || po.quantity) * Number(po.unit_price)).toLocaleString()}`,
-      po.delivery_notes ? `\nDelivery Notes: ${po.delivery_notes}` : "",
-    ].filter(Boolean).join("\n");
+  const entityName = orgInfo?.orgName || profile?.full_name || "Aggregator";
 
-    const blob = new Blob([content], { type: "text/plain" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `${po.grn_number}.txt`;
-    a.click();
-    URL.revokeObjectURL(url);
-    toast.success("GRN downloaded");
+  const generatePODocument = async (po: PurchaseOrder) => {
+    const doc = new jsPDF();
+    const pdfOrg = await getOrgPdfInfo();
+
+    let y = addCleanHeader(doc, "Purchase Order", undefined, pdfOrg);
+    y = addDocMeta(doc, [
+      { label: "PO Number", value: po.po_number },
+      { label: "Date", value: format(new Date(po.order_date), "MMM d, yyyy") },
+      { label: "Buyer", value: entityName },
+      ...(orgInfo?.contactPhone ? [{ label: "Phone", value: orgInfo.contactPhone }] : []),
+      { label: "Supplier", value: po.supplier_name },
+      ...(po.supplier_phone ? [{ label: "Supplier Phone", value: po.supplier_phone }] : []),
+      ...(po.expected_delivery_date ? [{ label: "Expected Delivery", value: format(new Date(po.expected_delivery_date), "MMM d, yyyy") }] : []),
+    ], y);
+
+    y = drawTableHeader(doc, [
+      { label: "Material", x: 17 }, { label: "Quantity", x: 85 }, { label: "Unit Price (KES)", x: 120 }, { label: "Total (KES)", x: 160 },
+    ], y, 180);
+
+    drawTableRow(doc, y, 0, 180);
+    doc.setFontSize(8);
+    doc.text(po.material_type, 17, y);
+    doc.text(`${po.quantity} ${po.unit}`, 85, y);
+    doc.text(Number(po.unit_price).toLocaleString(), 120, y);
+    doc.text(Number(po.total_amount).toLocaleString(), 160, y);
+    y += 10;
+
+    y = drawVatTotalBlock(doc, Number(po.total_amount), vat.vatPercent, vat.includeVat, y);
+
+    if (po.notes) {
+      doc.setFontSize(9);
+      doc.setTextColor(120, 120, 120);
+      doc.text(`Notes: ${po.notes}`, 15, y);
+      doc.setTextColor(30, 30, 30);
+    }
+
+    finalizeCleanPdf(doc);
+    doc.save(`${po.po_number}.pdf`);
+    toast.success("Purchase Order PDF downloaded");
+  };
+
+  const generateGRNDocument = async (po: PurchaseOrder) => {
+    const doc = new jsPDF();
+    const pdfOrg = await getOrgPdfInfo();
+    const deliveredQty = po.delivered_quantity || po.quantity;
+    const totalCost = deliveredQty * Number(po.unit_price);
+
+    let y = addCleanHeader(doc, "Goods Received Note", undefined, pdfOrg);
+    y = addDocMeta(doc, [
+      { label: "GRN Number", value: po.grn_number || "—" },
+      { label: "PO Number", value: po.po_number },
+      { label: "Date Received", value: po.delivered_at ? format(new Date(po.delivered_at), "MMM d, yyyy HH:mm") : "N/A" },
+      { label: "Receiver", value: entityName },
+      { label: "Supplier", value: po.supplier_name },
+    ], y);
+
+    y = drawTableHeader(doc, [
+      { label: "Material", x: 17 }, { label: "Ordered", x: 75 }, { label: "Delivered", x: 105 }, { label: "Unit Price", x: 135 }, { label: "Total (KES)", x: 165 },
+    ], y, 180);
+
+    drawTableRow(doc, y, 0, 180);
+    doc.setFontSize(8);
+    doc.text(po.material_type, 17, y);
+    doc.text(`${po.quantity} ${po.unit}`, 75, y);
+    doc.text(`${deliveredQty} ${po.unit}`, 105, y);
+    doc.text(Number(po.unit_price).toLocaleString(), 135, y);
+    doc.text(totalCost.toLocaleString(), 165, y);
+    y += 10;
+
+    y = drawVatTotalBlock(doc, totalCost, vat.vatPercent, vat.includeVat, y);
+
+    if (po.delivery_notes) {
+      doc.setFontSize(9);
+      doc.setTextColor(120, 120, 120);
+      doc.text(`Delivery Notes: ${po.delivery_notes}`, 15, y);
+      doc.setTextColor(30, 30, 30);
+    }
+
+    finalizeCleanPdf(doc);
+    doc.save(`${po.grn_number || "GRN"}.pdf`);
+    toast.success("GRN PDF downloaded");
   };
 
   return (
