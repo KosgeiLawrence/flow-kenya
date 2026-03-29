@@ -318,7 +318,7 @@ const AggregatorESGPanel = () => {
 
     // Pillar scores
     const envScore = Math.min(Math.round((totalKg / 5000) * 50 + 30), 100);
-    const socScore = Math.min(Math.round((cleanupVolunteers / 50) * 40 + 40), 100);
+    const socScore = Math.min(Math.round(((cleanupVolunteers + trainingParticipants) / 100) * 40 + 40), 100);
     const govScore = 75;
     const pillars = [
       { label: "Environmental", score: envScore, color: PDF_COLORS.forest },
@@ -742,7 +742,37 @@ const AggregatorESGPanel = () => {
         </Card>
       )}
 
-      {/* Material breakdown */}
+      {/* Community Training Impact */}
+      {filteredTrainings.length > 0 && (
+        <Card className="shadow-soft">
+          <CardHeader><CardTitle className="text-lg">Community Training Impact</CardTitle></CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-2 sm:grid-cols-5 gap-4 text-center">
+              <div>
+                <p className="text-2xl font-bold text-foreground">{filteredTrainings.length}</p>
+                <p className="text-xs text-muted-foreground">Trainings</p>
+              </div>
+              <div>
+                <p className="text-2xl font-bold text-foreground">{trainingParticipants}</p>
+                <p className="text-xs text-muted-foreground">Participants</p>
+              </div>
+              <div>
+                <p className="text-2xl font-bold text-foreground">{trainingWomen}</p>
+                <p className="text-xs text-muted-foreground">Women</p>
+              </div>
+              <div>
+                <p className="text-2xl font-bold text-foreground">{trainingYouth}</p>
+                <p className="text-xs text-muted-foreground">Youth</p>
+              </div>
+              <div>
+                <p className="text-2xl font-bold text-foreground">{trainingTrees}</p>
+                <p className="text-xs text-muted-foreground">Trees Planted</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       <Card className="shadow-soft">
         <CardHeader><CardTitle className="text-lg">Material Recovery Breakdown</CardTitle></CardHeader>
         <CardContent>
