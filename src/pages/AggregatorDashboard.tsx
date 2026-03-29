@@ -39,7 +39,7 @@ const navItems = [
   { id: "crm", label: "Customers", icon: Users },
   { id: "marketplace", label: "Marketplace", icon: Store },
   
-  { id: "payments", label: "Payments", icon: DollarSign },
+  
   { id: "receipts", label: "Bulk Receipts", icon: Printer },
   { id: "invoices", label: "Invoices & Notes", icon: FileText },
   { id: "earnings-expenses", label: "Earnings & Expenses", icon: TrendingUp },
