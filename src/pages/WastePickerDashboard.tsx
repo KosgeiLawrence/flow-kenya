@@ -12,7 +12,7 @@ import ProfilePanel from "@/components/dashboard/waste-picker/ProfilePanel";
 import CollectionPanel from "@/components/dashboard/waste-picker/CollectionPanel";
 import ProfileSettingsPanel from "@/components/dashboard/shared/ProfileSettingsPanel";
 import PricingPanel from "@/components/dashboard/waste-picker/PricingPanel";
-import EarningsPanel from "@/components/dashboard/waste-picker/EarningsPanel";
+
 import SchedulePanel from "@/components/dashboard/waste-picker/SchedulePanel";
 import AnalyticsPanel from "@/components/dashboard/waste-picker/AnalyticsPanel";
 import QRIDPanel from "@/components/dashboard/waste-picker/QRIDPanel";
@@ -26,7 +26,7 @@ const navItems = [
   { id: "collection", label: "Collections", icon: Package },
   { id: "my-earnings", label: "My Earnings", icon: DollarSign },
   { id: "pricing", label: "Live Pricing", icon: DollarSign },
-  { id: "earnings", label: "Earnings", icon: BarChart3 },
+  
   { id: "schedule", label: "Pickups", icon: Calendar },
   { id: "analytics", label: "Analytics", icon: BarChart3 },
   { id: "qr-id", label: "QR ID", icon: QrCode },
@@ -62,7 +62,7 @@ const WastePickerDashboard = () => {
       case "collection": return <CollectionPanel />;
       case "my-earnings": return <EarningsExpensesPanel role="waste_picker" />;
       case "pricing": return <PricingPanel />;
-      case "earnings": return <EarningsPanel />;
+      
       case "schedule": return <SchedulePanel />;
       case "analytics": return <AnalyticsPanel />;
       case "qr-id": return <QRIDPanel />;
