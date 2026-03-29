@@ -14,13 +14,93 @@ import { toast } from "sonner";
 import jsPDF from "jspdf";
 import { format, subDays, subMonths, subYears, startOfDay, endOfDay, isWithinInterval } from "date-fns";
 import { cn } from "@/lib/utils";
+import { useOrgInfo } from "@/hooks/useOrgInfo";
+import { PDF_COLORS, loadImageAsBase64 } from "@/lib/pdfBranding";
 
 const COLORS = ["hsl(152,45%,22%)", "hsl(40,55%,55%)", "hsl(195,60%,50%)", "hsl(25,30%,35%)", "hsl(340,50%,50%)"];
 
 type PeriodOption = "7d" | "30d" | "90d" | "6m" | "1y" | "all" | "custom";
 
+// ── PDF Helper: draw a rounded rect ──
+const drawRoundedRect = (doc: jsPDF, x: number, y: number, w: number, h: number, r: number, style: "F" | "S" | "FD" = "F") => {
+  doc.roundedRect(x, y, w, h, r, r, style);
+};
+
+// ── PDF Helper: draw a progress bar ──
+const drawProgressBar = (doc: jsPDF, x: number, y: number, w: number, h: number, pct: number, fg: [number, number, number], bg: [number, number, number] = [230, 235, 230]) => {
+  doc.setFillColor(...bg);
+  drawRoundedRect(doc, x, y, w, h, h / 2, "F");
+  if (pct > 0) {
+    doc.setFillColor(...fg);
+    drawRoundedRect(doc, x, y, Math.max(w * (pct / 100), h), h, h / 2, "F");
+  }
+};
+
+// ── PDF Helper: draw a metric card ──
+const drawMetricCard = (doc: jsPDF, x: number, y: number, w: number, value: string, label: string, accent: [number, number, number]) => {
+  doc.setFillColor(248, 250, 248);
+  drawRoundedRect(doc, x, y, w, 32, 3, "F");
+  doc.setDrawColor(...accent);
+  doc.setLineWidth(0.8);
+  doc.line(x, y, x, y + 32);
+
+  doc.setFontSize(16);
+  doc.setTextColor(...accent);
+  doc.text(value, x + 6, y + 14);
+  doc.setFontSize(7.5);
+  doc.setTextColor(100, 100, 100);
+  doc.text(label, x + 6, y + 22);
+};
+
+// ── PDF Helper: add org header ──
+const addOrgHeader = (doc: jsPDF, orgName: string, logoBase64: string | null, contactDetails: string[]) => {
+  const pw = doc.internal.pageSize.getWidth();
+
+  // Top accent band
+  doc.setFillColor(...PDF_COLORS.forest);
+  doc.rect(0, 0, pw, 6, "F");
+  doc.setFillColor(...PDF_COLORS.gold);
+  doc.rect(0, 6, pw, 1.5, "F");
+
+  let leftX = 15;
+  if (logoBase64) {
+    try { doc.addImage(logoBase64, "PNG", 15, 12, 24, 18); leftX = 44; } catch {}
+  }
+
+  doc.setFontSize(16);
+  doc.setTextColor(...PDF_COLORS.forestDeep);
+  doc.text(orgName, leftX, 22);
+
+  doc.setFontSize(7);
+  doc.setTextColor(...PDF_COLORS.mutedText);
+  let cy = 27;
+  contactDetails.filter(Boolean).forEach(line => {
+    doc.text(line, leftX, cy);
+    cy += 4;
+  });
+
+  return Math.max(cy + 2, 36);
+};
+
+// ── PDF Helper: add clean footer ──
+const addReportFooter = (doc: jsPDF, orgName: string) => {
+  const pages = doc.getNumberOfPages();
+  const pw = doc.internal.pageSize.getWidth();
+  const ph = doc.internal.pageSize.getHeight();
+  for (let i = 1; i <= pages; i++) {
+    doc.setPage(i);
+    // Bottom accent band
+    doc.setFillColor(...PDF_COLORS.forest);
+    doc.rect(0, ph - 8, pw, 8, "F");
+    doc.setFontSize(6.5);
+    doc.setTextColor(255, 255, 255);
+    doc.text(`${orgName}  •  ESG & Sustainability Report  •  Page ${i} of ${pages}`, pw / 2, ph - 3, { align: "center" });
+  }
+};
+
 const ESGPanel = () => {
   const { user, profile } = useAuth();
+  const { orgInfo } = useOrgInfo();
   const [period, setPeriod] = useState<PeriodOption>("all");
   const [customFrom, setCustomFrom] = useState<Date | undefined>();
   const [customTo, setCustomTo] = useState<Date | undefined>();
@@ -34,11 +114,10 @@ const ESGPanel = () => {
       case "6m": return { from: subMonths(now, 6), to: now };
       case "1y": return { from: subYears(now, 1), to: now };
       case "custom": return { from: customFrom || subYears(now, 5), to: customTo || now };
-      default: return null; // all
+      default: return null;
     }
   }, [period, customFrom, customTo]);
 
-  // Transformation data
   const { data: transformations } = useQuery({
     queryKey: ["recycler_esg_transformations", user?.id],
     queryFn: async () => {
@@ -53,7 +132,6 @@ const ESGPanel = () => {
     enabled: !!user,
   });
 
-  // Cleanup exercises data
   const { data: cleanups } = useQuery({
     queryKey: ["recycler_esg_cleanups", user?.id],
     queryFn: async () => {
@@ -68,7 +146,6 @@ const ESGPanel = () => {
     enabled: !!user,
   });
 
-  // Filter by date range
   const filteredTransformations = useMemo(() => {
     if (!transformations) return [];
     if (!dateRange) return transformations;
@@ -87,21 +164,15 @@ const ESGPanel = () => {
     });
   }, [cleanups, dateRange]);
 
-  // Transformation metrics
-  const transformationInputKg = filteredTransformations.reduce((sum, t) => {
-    return sum + ((t.transformation_inputs as any[])?.reduce((s: number, inp: any) => s + Number(inp.quantity), 0) || 0);
-  }, 0);
+  const transformationInputKg = filteredTransformations.reduce((sum, t) =>
+    sum + ((t.transformation_inputs as any[])?.reduce((s: number, inp: any) => s + Number(inp.quantity), 0) || 0), 0);
+  const transformationOutputKg = filteredTransformations.reduce((sum, t) =>
+    sum + ((t.transformation_outputs as any[])?.reduce((s: number, out: any) => s + Number(out.quantity), 0) || 0), 0);
 
-  const transformationOutputKg = filteredTransformations.reduce((sum, t) => {
-    return sum + ((t.transformation_outputs as any[])?.reduce((s: number, out: any) => s + Number(out.quantity), 0) || 0);
-  }, 0);
-
-  // Cleanup metrics
   const cleanupWasteKg = filteredCleanups.reduce((s, c) => s + Number(c.total_waste_kg || 0), 0);
   const cleanupRecyclableKg = filteredCleanups.reduce((s, c) => s + Number(c.recyclable_waste_kg || 0), 0);
   const cleanupVolunteers = filteredCleanups.reduce((s, c) => s + Number(c.num_volunteers || 0), 0);
 
-  // Combined totals
   const totalKg = transformationInputKg + cleanupWasteKg;
   const co2Saved = totalKg * 2.5;
   const waterSaved = totalKg * 18;
@@ -111,7 +182,6 @@ const ESGPanel = () => {
     ? filteredTransformations.reduce((s, t) => s + (Number(t.yield_percentage) || 0), 0) / filteredTransformations.length
     : 0;
 
-  // Material breakdown from transformations
   const materialMap = new Map<string, number>();
   filteredTransformations.forEach((t) => {
     (t.transformation_inputs as any[])?.forEach((inp: any) => {
@@ -119,7 +189,6 @@ const ESGPanel = () => {
       materialMap.set(name, (materialMap.get(name) || 0) + Number(inp.quantity));
     });
   });
-  // Add cleanup material breakdown
   filteredCleanups.forEach((c) => {
     if (Number(c.pet_bottles_kg) > 0) materialMap.set("PET Bottles", (materialMap.get("PET Bottles") || 0) + Number(c.pet_bottles_kg));
     if (Number(c.hdpe_kg) > 0) materialMap.set("HDPE", (materialMap.get("HDPE") || 0) + Number(c.hdpe_kg));
@@ -137,121 +206,340 @@ const ESGPanel = () => {
     return `${format(dateRange.from, "MMM d, yyyy")} – ${format(dateRange.to, "MMM d, yyyy")}`;
   };
 
-  const downloadESGReport = () => {
-    const doc = new jsPDF();
-    const today = format(new Date(), "MMM d, yyyy");
-
-    doc.setFontSize(22);
-    doc.text("Duara Flow", 20, 22);
-    doc.setFontSize(12);
-    doc.setTextColor(100);
-    doc.text("ESG & Sustainability Impact Report", 20, 32);
-    doc.setTextColor(0);
-
-    doc.setFontSize(10);
-    doc.text(`Generated: ${today}`, 20, 44);
-    doc.text(`Period: ${periodLabel()}`, 20, 51);
-    doc.text(`Recycler: ${profile?.full_name || "—"}`, 20, 58);
-    doc.text(`ESG Score: ${esgScore}/100`, 20, 65);
-
-    doc.setFontSize(14);
-    doc.text("Environmental Impact Summary", 20, 80);
-    doc.setFontSize(10);
-    let y = 90;
-    const metrics = [
-      { label: "Total Material Processed (Transformations)", value: `${transformationInputKg.toFixed(1)} kg` },
-      { label: "Total Output Produced", value: `${transformationOutputKg.toFixed(1)} kg` },
-      { label: "Average Yield", value: `${avgYield.toFixed(1)}%` },
-      { label: "Cleanup Waste Collected", value: `${cleanupWasteKg.toFixed(1)} kg` },
-      { label: "Cleanup Recyclable Waste", value: `${cleanupRecyclableKg.toFixed(1)} kg` },
-      { label: "Cleanup Exercises", value: `${filteredCleanups.length}` },
-      { label: "Volunteers Engaged", value: `${cleanupVolunteers}` },
-      { label: "CO₂ Emissions Saved", value: `${co2Saved.toFixed(1)} kg` },
-      { label: "Water Saved", value: `${waterSaved.toLocaleString()} liters` },
-      { label: "Energy Saved", value: `${energySaved.toFixed(1)} kWh` },
-      { label: "Landfill Diversion", value: `${landfillDiverted.toFixed(1)} kg` },
+  const getOrgDetails = async () => {
+    const name = orgInfo?.orgName || profile?.full_name || "Recycler";
+    let logo: string | null = null;
+    const logoUrl = orgInfo?.orgLogoUrl;
+    if (logoUrl) logo = await loadImageAsBase64(logoUrl);
+    const contact = [
+      [orgInfo?.contactPhone, orgInfo?.contactEmail].filter(Boolean).join("  •  "),
+      [orgInfo?.physicalAddress, orgInfo?.county].filter(Boolean).join(", "),
+      orgInfo?.website || "",
+      [orgInfo?.kraPin ? `KRA: ${orgInfo.kraPin}` : "", orgInfo?.companyRegistration ? `Reg: ${orgInfo.companyRegistration}` : ""].filter(Boolean).join("  •  "),
     ];
-    metrics.forEach((m) => {
-      doc.text(`• ${m.label}: ${m.value}`, 24, y);
+    return { name, logo, contact };
+  };
+
+  const downloadESGReport = async () => {
+    const doc = new jsPDF();
+    const pw = doc.internal.pageSize.getWidth();
+    const today = format(new Date(), "MMMM d, yyyy");
+    const org = await getOrgDetails();
+
+    // ── Page 1: Cover ──
+    let y = addOrgHeader(doc, org.name, org.logo, org.contact);
+
+    // Title block
+    y += 4;
+    doc.setFillColor(245, 248, 245);
+    drawRoundedRect(doc, 15, y, pw - 30, 28, 4, "F");
+    doc.setFontSize(20);
+    doc.setTextColor(...PDF_COLORS.forestDeep);
+    doc.text("ESG & SUSTAINABILITY", 20, y + 12);
+    doc.text("IMPACT REPORT", 20, y + 22);
+    doc.setFontSize(9);
+    doc.setTextColor(...PDF_COLORS.mutedText);
+    doc.text(`Period: ${periodLabel()}`, pw - 20, y + 12, { align: "right" });
+    doc.text(`Generated: ${today}`, pw - 20, y + 18, { align: "right" });
+    y += 36;
+
+    // ESG Score section
+    doc.setFontSize(11);
+    doc.setTextColor(...PDF_COLORS.forestDeep);
+    doc.text("OVERALL ESG SCORE", 15, y);
+    y += 4;
+    drawProgressBar(doc, 15, y, pw - 30, 6, esgScore, PDF_COLORS.forest);
+    doc.setFontSize(10);
+    doc.setTextColor(...PDF_COLORS.forest);
+    doc.text(`${esgScore}/100`, pw - 15, y + 5, { align: "right" });
+    y += 14;
+
+    // Pillar scores
+    const envScore = Math.min(Math.round((totalKg / 5000) * 50 + 30), 100);
+    const socScore = Math.min(Math.round((cleanupVolunteers / 50) * 40 + 40), 100);
+    const govScore = 75;
+    const pillars = [
+      { label: "Environmental", score: envScore, color: PDF_COLORS.forest },
+      { label: "Social", score: socScore, color: [195, 130, 50] as [number, number, number] },
+      { label: "Governance", score: govScore, color: [60, 120, 160] as [number, number, number] },
+    ];
+    const pillarW = (pw - 40) / 3;
+    pillars.forEach((p, i) => {
+      const px = 15 + i * (pillarW + 5);
+      doc.setFillColor(248, 250, 248);
+      drawRoundedRect(doc, px, y, pillarW, 22, 3, "F");
+      doc.setFontSize(8);
+      doc.setTextColor(100, 100, 100);
+      doc.text(p.label, px + 5, y + 7);
+      drawProgressBar(doc, px + 5, y + 10, pillarW - 10, 4, p.score, p.color);
+      doc.setFontSize(9);
+      doc.setTextColor(...p.color);
+      doc.text(`${p.score}`, px + pillarW - 6, y + 7, { align: "right" });
+    });
+    y += 30;
+
+    // Key Metrics (2x2 grid)
+    doc.setFontSize(11);
+    doc.setTextColor(...PDF_COLORS.forestDeep);
+    doc.text("KEY ENVIRONMENTAL METRICS", 15, y);
+    y += 6;
+    const metricW = (pw - 35) / 2;
+    const metricsData = [
+      { value: `${co2Saved.toFixed(0)} kg`, label: "CO₂ Emissions Avoided", accent: PDF_COLORS.forest },
+      { value: `${waterSaved.toLocaleString()} L`, label: "Water Resources Saved", accent: [60, 140, 180] as [number, number, number] },
+      { value: `${energySaved.toFixed(0)} kWh`, label: "Energy Conserved", accent: PDF_COLORS.gold },
+      { value: `${landfillDiverted.toFixed(0)} kg`, label: "Landfill Diversion", accent: [100, 60, 40] as [number, number, number] },
+    ];
+    metricsData.forEach((m, i) => {
+      const mx = 15 + (i % 2) * (metricW + 5);
+      const my = y + Math.floor(i / 2) * 38;
+      drawMetricCard(doc, mx, my, metricW, m.value, m.label, m.accent);
+    });
+    y += 80;
+
+    // Transformation Summary
+    doc.setFontSize(11);
+    doc.setTextColor(...PDF_COLORS.forestDeep);
+    doc.text("RECYCLING & TRANSFORMATION", 15, y);
+    y += 8;
+    doc.setFontSize(9);
+    doc.setTextColor(...PDF_COLORS.darkText);
+    const txRows = [
+      ["Material Processed", `${transformationInputKg.toFixed(1)} kg`],
+      ["Output Produced", `${transformationOutputKg.toFixed(1)} kg`],
+      ["Average Yield", `${avgYield.toFixed(1)}%`],
+      ["Transformations", `${filteredTransformations.length}`],
+    ];
+    txRows.forEach(([lbl, val]) => {
+      doc.setTextColor(100, 100, 100);
+      doc.text(lbl, 20, y);
+      doc.setTextColor(...PDF_COLORS.darkText);
+      doc.text(val, 100, y);
       y += 7;
     });
 
-    y += 6;
-    doc.setFontSize(14);
-    doc.text("Material Recovery Breakdown", 20, y);
-    y += 10;
-    doc.setFontSize(10);
+    // ── Page 2: Material breakdown & cleanups ──
+    doc.addPage();
+    y = addOrgHeader(doc, org.name, org.logo, org.contact);
+    y += 4;
+
+    doc.setFontSize(11);
+    doc.setTextColor(...PDF_COLORS.forestDeep);
+    doc.text("MATERIAL RECOVERY BREAKDOWN", 15, y);
+    y += 8;
+
     if (pieData.length) {
-      pieData.forEach((d) => { doc.text(`• ${d.name}: ${d.value} kg`, 24, y); y += 7; });
+      const barColors: [number, number, number][] = [
+        PDF_COLORS.forest, PDF_COLORS.gold, [60, 150, 180], [100, 60, 40], [180, 60, 80]
+      ];
+      const maxVal = Math.max(...pieData.map(d => d.value), 1);
+      pieData.forEach((d, i) => {
+        doc.setFillColor(248, 248, 248);
+        drawRoundedRect(doc, 15, y, pw - 30, 12, 2, "F");
+        doc.setFontSize(8);
+        doc.setTextColor(60, 60, 60);
+        doc.text(d.name, 20, y + 8);
+        const barW = (pw - 120) * (d.value / maxVal);
+        const bc = barColors[i % barColors.length];
+        doc.setFillColor(...bc);
+        drawRoundedRect(doc, 80, y + 3, Math.max(barW, 4), 6, 3, "F");
+        doc.setTextColor(...bc);
+        doc.text(`${d.value} kg`, pw - 20, y + 8, { align: "right" });
+        y += 16;
+      });
     } else {
-      doc.text("No material data available.", 24, y);
+      doc.setFontSize(9);
+      doc.setTextColor(130, 130, 130);
+      doc.text("No material data available for the selected period.", 20, y);
+      y += 10;
     }
 
+    // Cleanup Section
     y += 10;
-    doc.setFontSize(14);
-    doc.text("Methodology", 20, y);
-    y += 10;
-    doc.setFontSize(8);
-    doc.setTextColor(80);
-    doc.text("CO₂ savings estimated at 2.5 kg CO₂/kg recycled (EPA/IPCC factors).", 24, y); y += 6;
-    doc.text("Water savings estimated at 18 liters/kg recycled material.", 24, y); y += 6;
-    doc.text("Energy savings estimated at 5.8 kWh/kg recycled material.", 24, y);
+    doc.setFontSize(11);
+    doc.setTextColor(...PDF_COLORS.forestDeep);
+    doc.text("COMMUNITY CLEANUP EXERCISES", 15, y);
+    y += 8;
 
+    const cleanupMetrics = [
+      { value: `${filteredCleanups.length}`, label: "Exercises Conducted", accent: PDF_COLORS.forest },
+      { value: `${cleanupWasteKg.toFixed(0)} kg`, label: "Waste Collected", accent: PDF_COLORS.gold },
+      { value: `${cleanupRecyclableKg.toFixed(0)} kg`, label: "Recyclable Material", accent: [60, 140, 180] as [number, number, number] },
+      { value: `${cleanupVolunteers}`, label: "Volunteers Engaged", accent: [100, 60, 40] as [number, number, number] },
+    ];
+    cleanupMetrics.forEach((m, i) => {
+      const mx = 15 + (i % 2) * (metricW + 5);
+      const my = y + Math.floor(i / 2) * 38;
+      drawMetricCard(doc, mx, my, metricW, m.value, m.label, m.accent);
+    });
+    y += 82;
+
+    // Methodology
+    doc.setFillColor(248, 250, 248);
+    drawRoundedRect(doc, 15, y, pw - 30, 36, 4, "F");
+    doc.setFontSize(9);
+    doc.setTextColor(...PDF_COLORS.forestDeep);
+    doc.text("METHODOLOGY & STANDARDS", 20, y + 8);
     doc.setFontSize(7);
-    doc.setTextColor(130);
-    doc.text("System-generated ESG report — Duara Flow", 20, 280);
+    doc.setTextColor(100, 100, 100);
+    doc.text("CO₂ savings: 2.5 kg CO₂/kg recycled (EPA/IPCC factors)", 20, y + 16);
+    doc.text("Water savings: 18 liters/kg recycled material", 20, y + 22);
+    doc.text("Energy savings: 5.8 kWh/kg recycled material", 20, y + 28);
+
+    addReportFooter(doc, org.name);
     doc.save(`esg-report-${format(new Date(), "yyyy-MM-dd")}.pdf`);
     toast.success("ESG Report downloaded");
   };
 
-  const downloadSustainabilityReport = () => {
+  const downloadSustainabilityReport = async () => {
     const doc = new jsPDF();
-    const today = format(new Date(), "MMM d, yyyy");
+    const pw = doc.internal.pageSize.getWidth();
+    const ph = doc.internal.pageSize.getHeight();
+    const today = format(new Date(), "MMMM d, yyyy");
+    const org = await getOrgDetails();
 
-    doc.setFontSize(22);
-    doc.text("Duara Flow", 20, 22);
-    doc.setFontSize(12);
-    doc.setTextColor(100);
-    doc.text("Sustainability Impact Certificate", 20, 32);
-    doc.setTextColor(0);
+    // ── Ornate border ──
+    doc.setDrawColor(...PDF_COLORS.forest);
+    doc.setLineWidth(2.5);
+    doc.rect(8, 8, pw - 16, ph - 16);
+    doc.setLineWidth(0.5);
+    doc.rect(12, 12, pw - 24, ph - 24);
 
+    // Corner ornaments
+    const corners = [[12, 12], [pw - 12, 12], [12, ph - 12], [pw - 12, ph - 12]];
+    corners.forEach(([cx, cy]) => {
+      doc.setFillColor(...PDF_COLORS.gold);
+      doc.circle(cx, cy, 3, "F");
+      doc.setFillColor(...PDF_COLORS.forest);
+      doc.circle(cx, cy, 1.5, "F");
+    });
+
+    // Top accent band
+    doc.setFillColor(...PDF_COLORS.forest);
+    doc.rect(16, 16, pw - 32, 3, "F");
+    doc.setFillColor(...PDF_COLORS.gold);
+    doc.rect(16, 19, pw - 32, 1, "F");
+
+    let y = 30;
+
+    // Org logo centered
+    if (org.logo) {
+      try { doc.addImage(org.logo, "PNG", pw / 2 - 15, y, 30, 22); y += 28; } catch { y += 4; }
+    }
+
+    // Certificate title
     doc.setFontSize(10);
-    doc.text(`Certificate Date: ${today}`, 20, 48);
-    doc.text(`Period: ${periodLabel()}`, 20, 55);
-    doc.text(`Certified To: ${profile?.full_name || "—"}`, 20, 62);
-
-    doc.setFontSize(11);
-    let y = 78;
-    doc.text("This certifies that the above-named recycler has contributed", 20, y); y += 8;
-    doc.text("to the following sustainability outcomes through the Duara Flow platform:", 20, y);
-
-    y += 16;
-    doc.setFontSize(18);
-    doc.setTextColor(34, 87, 62);
-    doc.text(`${totalKg.toFixed(0)} kg`, 90, y, { align: "center" });
-    doc.setFontSize(10);
-    doc.setTextColor(0);
-    y += 8;
-    doc.text("of waste material diverted from landfill and recycled", 90, y, { align: "center" });
-
-    y += 20;
-    const impacts = [
-      `Prevented ${co2Saved.toFixed(0)} kg of CO₂ equivalent greenhouse gas emissions`,
-      `Conserved approximately ${waterSaved.toLocaleString()} liters of water`,
-      `Saved approximately ${energySaved.toFixed(0)} kWh of energy`,
-      `Processed ${filteredTransformations.length} material transformations`,
-      `Conducted ${filteredCleanups.length} cleanup exercises with ${cleanupVolunteers} volunteers`,
-      `Achieved average yield of ${avgYield.toFixed(1)}%`,
-    ];
-    impacts.forEach((imp) => { doc.text(`✓  ${imp}`, 24, y); y += 10; });
-
+    doc.setTextColor(...PDF_COLORS.gold);
+    doc.text("CERTIFICATE OF", pw / 2, y, { align: "center" });
     y += 10;
-    doc.setFontSize(9);
-    doc.text("This certificate is system-generated based on verified platform data.", 20, y);
+    doc.setFontSize(26);
+    doc.setTextColor(...PDF_COLORS.forestDeep);
+    doc.text("SUSTAINABILITY", pw / 2, y, { align: "center" });
+    y += 8;
+    doc.setFontSize(14);
+    doc.text("IMPACT", pw / 2, y, { align: "center" });
 
+    // Decorative line
+    y += 6;
+    doc.setDrawColor(...PDF_COLORS.gold);
+    doc.setLineWidth(0.8);
+    doc.line(pw / 2 - 40, y, pw / 2 + 40, y);
+    doc.setFillColor(...PDF_COLORS.gold);
+    doc.circle(pw / 2, y, 2, "F");
+
+    y += 12;
+    doc.setFontSize(10);
+    doc.setTextColor(100, 100, 100);
+    doc.text("This is to certify that", pw / 2, y, { align: "center" });
+
+    y += 12;
+    doc.setFontSize(20);
+    doc.setTextColor(...PDF_COLORS.forestDeep);
+    doc.text(org.name, pw / 2, y, { align: "center" });
+
+    // Underline
+    y += 3;
+    const nameWidth = doc.getTextWidth(org.name);
+    doc.setDrawColor(...PDF_COLORS.gold);
+    doc.setLineWidth(0.5);
+    doc.line(pw / 2 - nameWidth / 2, y, pw / 2 + nameWidth / 2, y);
+
+    y += 12;
+    doc.setFontSize(9);
+    doc.setTextColor(80, 80, 80);
+    doc.text("has demonstrated measurable environmental stewardship", pw / 2, y, { align: "center" });
+    y += 5;
+    doc.text("through the following verified sustainability outcomes:", pw / 2, y, { align: "center" });
+
+    // Big metric highlight
+    y += 14;
+    doc.setFillColor(245, 250, 245);
+    drawRoundedRect(doc, 40, y, pw - 80, 20, 4, "F");
+    doc.setDrawColor(...PDF_COLORS.forest);
+    doc.setLineWidth(0.5);
+    drawRoundedRect(doc, 40, y, pw - 80, 20, 4, "S");
+    doc.setFontSize(22);
+    doc.setTextColor(...PDF_COLORS.forest);
+    doc.text(`${totalKg.toFixed(0)} kg`, pw / 2, y + 13, { align: "center" });
+    doc.setFontSize(8);
+    doc.setTextColor(100, 100, 100);
+    doc.text("OF WASTE DIVERTED FROM LANDFILL", pw / 2, y + 18, { align: "center" });
+
+    // Impact items with checkmarks
+    y += 30;
+    const impacts = [
+      `Prevented ${co2Saved.toFixed(0)} kg of CO₂ greenhouse gas emissions`,
+      `Conserved ${waterSaved.toLocaleString()} liters of water resources`,
+      `Saved ${energySaved.toFixed(0)} kWh of energy`,
+      `Completed ${filteredTransformations.length} material transformations`,
+      `Conducted ${filteredCleanups.length} cleanup exercises with ${cleanupVolunteers} volunteers`,
+      `Achieved average transformation yield of ${avgYield.toFixed(1)}%`,
+    ];
+    doc.setFontSize(9);
+    impacts.forEach((imp) => {
+      doc.setFillColor(...PDF_COLORS.forest);
+      doc.circle(28, y - 1, 2, "F");
+      doc.setFontSize(6);
+      doc.setTextColor(255, 255, 255);
+      doc.text("✓", 26.8, y);
+      doc.setFontSize(9);
+      doc.setTextColor(50, 50, 50);
+      doc.text(imp, 34, y);
+      y += 9;
+    });
+
+    // Period and date
+    y += 6;
+    doc.setDrawColor(...PDF_COLORS.gold);
+    doc.setLineWidth(0.3);
+    doc.line(40, y, pw - 40, y);
+    y += 8;
+    doc.setFontSize(8);
+    doc.setTextColor(120, 120, 120);
+    doc.text(`Period: ${periodLabel()}`, pw / 2, y, { align: "center" });
+    y += 5;
+    doc.text(`Certificate Date: ${today}`, pw / 2, y, { align: "center" });
+
+    // Signature area
+    y += 12;
+    doc.setDrawColor(180, 180, 180);
+    doc.setLineWidth(0.3);
+    doc.line(pw / 2 - 30, y, pw / 2 + 30, y);
+    y += 5;
     doc.setFontSize(7);
-    doc.setTextColor(130);
-    doc.text("Duara Flow Sustainability Certificate — Verified by Platform Data", 20, 280);
+    doc.setTextColor(120, 120, 120);
+    doc.text("Authorized Signatory", pw / 2, y, { align: "center" });
+
+    // Bottom accent
+    doc.setFillColor(...PDF_COLORS.gold);
+    doc.rect(16, ph - 20, pw - 32, 1, "F");
+    doc.setFillColor(...PDF_COLORS.forest);
+    doc.rect(16, ph - 19, pw - 32, 3, "F");
+
+    doc.setFontSize(6);
+    doc.setTextColor(150, 150, 150);
+    doc.text("This certificate is system-generated based on verified platform data.", pw / 2, ph - 24, { align: "center" });
+
     doc.save(`sustainability-certificate-${format(new Date(), "yyyy-MM-dd")}.pdf`);
     toast.success("Sustainability certificate downloaded");
   };
