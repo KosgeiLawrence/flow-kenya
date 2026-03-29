@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import {
   LogOut, Users, Package, Store, Truck, DollarSign, Printer,
   FileText, BarChart3, Shield, Clock, CheckCircle2, AlertTriangle,
-  Menu, X, ChevronRight, Briefcase, Settings, BookOpen, Leaf, TrendingUp, Send
+  Menu, X, ChevronRight, Briefcase, Settings, BookOpen, Leaf, TrendingUp, Send, Calendar
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
@@ -35,7 +35,7 @@ const navItems = [
   { id: "pickers", label: "Waste Pickers", icon: Users },
   { id: "inventory", label: "Inventory", icon: Package },
   { id: "marketplace", label: "Marketplace", icon: Store },
-  { id: "logistics", label: "Logistics", icon: Truck },
+  
   { id: "payments", label: "Payments", icon: DollarSign },
   { id: "receipts", label: "Bulk Receipts", icon: Printer },
   { id: "invoices", label: "Invoices & Notes", icon: FileText },
@@ -78,13 +78,15 @@ const AggregatorDashboard = () => {
       case "earnings-expenses": return <EarningsExpensesPanel role="aggregator" />;
       case "inventory": return (
         <Tabs defaultValue="stock" className="space-y-4">
-          <TabsList className="grid w-full grid-cols-3">
+          <TabsList className="grid w-full grid-cols-4">
             <TabsTrigger value="stock"><Package className="w-4 h-4 mr-1.5" />Stock & Collections</TabsTrigger>
             <TabsTrigger value="pickups"><Truck className="w-4 h-4 mr-1.5" />Pickup Requests</TabsTrigger>
+            <TabsTrigger value="schedule"><Calendar className="w-4 h-4 mr-1.5" />Schedule Pickup</TabsTrigger>
             <TabsTrigger value="recycler-requests"><Send className="w-4 h-4 mr-1.5" />Request from Recyclers</TabsTrigger>
           </TabsList>
           <TabsContent value="stock"><InventoryPanel /></TabsContent>
           <TabsContent value="pickups"><RequestedPickupsPanel /></TabsContent>
+          <TabsContent value="schedule"><LogisticsPanel /></TabsContent>
           <TabsContent value="recycler-requests"><RecyclerPickupRequestPanel /></TabsContent>
         </Tabs>
       );
