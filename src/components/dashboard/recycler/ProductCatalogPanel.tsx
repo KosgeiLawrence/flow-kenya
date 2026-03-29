@@ -11,7 +11,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Package, Plus, Download, Trash2, ShoppingBag, ShoppingCart, FileText, Receipt, CheckCircle2, ArrowRight, Users, Search } from "lucide-react";
+import { Package, Plus, Download, Trash2, ShoppingBag, ShoppingCart, FileText, Receipt, CheckCircle2, ArrowRight, Users, Search, History } from "lucide-react";
 import { toast } from "sonner";
 import jsPDF from "jspdf";
 import { format } from "date-fns";
@@ -80,6 +80,24 @@ const ProductCatalogPanel = () => {
       if (error) throw error;
       return data;
     },
+  });
+
+  // Sales history from financial_transactions (income entries with "Sale:" in description)
+  const { data: salesHistory } = useQuery({
+    queryKey: ["sales_history", user?.id],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("financial_transactions")
+        .select("*")
+        .eq("user_id", user!.id)
+        .eq("type", "income")
+        .ilike("description", "Sale:%")
+        .order("transaction_date", { ascending: false })
+        .limit(50);
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!user,
     enabled: !!user,
   });
 
