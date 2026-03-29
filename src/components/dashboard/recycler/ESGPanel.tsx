@@ -587,6 +587,17 @@ const ESGPanel = () => {
     doc.setTextColor(120, 120, 120);
     doc.text("Authorized Signatory", pw / 2, y, { align: "center" });
 
+    // Duara Flow + Intelligence branding at bottom
+    const duaraLogo = await getDuaraFlowLogo();
+    const intelLogo = await getDuaraIntelLogo();
+
+    if (duaraLogo) {
+      try { doc.addImage(duaraLogo, "PNG", pw / 2 - 22, ph - 38, 44, 17); } catch {}
+    }
+    if (intelLogo) {
+      try { doc.addImage(intelLogo, "PNG", 18, ph - 28, 22, 11); } catch {}
+    }
+
     // Bottom accent
     doc.setFillColor(...PDF_COLORS.gold);
     doc.rect(16, ph - 20, pw - 32, 1, "F");
@@ -595,7 +606,7 @@ const ESGPanel = () => {
 
     doc.setFontSize(6);
     doc.setTextColor(150, 150, 150);
-    doc.text("This certificate is system-generated based on verified platform data.", pw / 2, ph - 24, { align: "center" });
+    doc.text("Verified by Duara Flow  •  www.duaraflow.co.ke  •  Powered by Duara Intelligence", pw / 2, ph - 24, { align: "center" });
 
     doc.save(`sustainability-certificate-${format(new Date(), "yyyy-MM-dd")}.pdf`);
     toast.success("Sustainability certificate downloaded");
