@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import {
   LogOut, Package, ClipboardList, FileText, ClipboardCheck, TrendingUp,
   BarChart3, Leaf, Shield, Clock, CheckCircle2, AlertTriangle,
-  Menu, X, ChevronRight, ShoppingBag, Briefcase, Settings, Truck, BookOpen
+  Menu, X, ChevronRight, ShoppingBag, Briefcase, Settings, Truck, BookOpen, Recycle
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
@@ -28,7 +28,7 @@ import MaterialTransformationPanel from "@/components/dashboard/recycler/Materia
 
 const navItems = [
   { id: "inventory", label: "Inventory", icon: Package },
-  { id: "transformation", label: "Transformation", icon: Package },
+  { id: "transformation", label: "Transformation", icon: Recycle },
   { id: "business-insights", label: "Business Insights", icon: TrendingUp },
   { id: "products", label: "Products & Pricing", icon: ShoppingBag },
   { id: "orders", label: "Orders & Contracts", icon: ClipboardList },
