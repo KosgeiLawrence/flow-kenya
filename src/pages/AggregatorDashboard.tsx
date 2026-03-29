@@ -36,6 +36,7 @@ const navItems = [
   { id: "pickers", label: "Waste Pickers", icon: Users },
   { id: "inventory", label: "Inventory", icon: Package },
   { id: "sales", label: "Sales", icon: ShoppingCart },
+  { id: "crm", label: "Customers", icon: Users },
   { id: "marketplace", label: "Marketplace", icon: Store },
   
   { id: "payments", label: "Payments", icon: DollarSign },
@@ -48,7 +49,6 @@ const navItems = [
   
   { id: "training", label: "Training", icon: BookOpen },
   { id: "cleanup", label: "Cleanup Exercise", icon: Package },
-  { id: "crm", label: "Customers", icon: Users },
   { id: "grants", label: "Grants & Programs", icon: Briefcase },
   { id: "settings", label: "Profile Settings", icon: Settings },
 ];
