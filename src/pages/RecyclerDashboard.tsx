@@ -33,7 +33,7 @@ const navItems = [
   { id: "transformation", label: "Transformation", icon: Recycle },
   { id: "business-insights", label: "Business Insights", icon: TrendingUp },
   { id: "products", label: "Products & Pricing", icon: ShoppingBag },
-  
+  { id: "crm", label: "Customers", icon: ClipboardList },
   { id: "market", label: "Market Insights", icon: TrendingUp },
   { id: "forecast", label: "Supply Forecast", icon: BarChart3 },
   { id: "esg", label: "ESG & Carbon", icon: Leaf },
@@ -41,7 +41,6 @@ const navItems = [
   { id: "pickup-requests", label: "Pickup Requests", icon: Truck },
   { id: "training", label: "Training", icon: BookOpen },
   { id: "cleanup", label: "Cleanup Exercise", icon: Package },
-  { id: "crm", label: "Customers", icon: ClipboardList },
   { id: "grants", label: "Grants & Programs", icon: Briefcase },
   { id: "settings", label: "Profile Settings", icon: Settings },
 ];
