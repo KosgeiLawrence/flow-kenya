@@ -6,6 +6,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import { Plus, Loader2, User, FileText, ArrowLeft, CheckCircle2, ArrowRight } from "lucide-react";
@@ -45,6 +46,15 @@ const ClientCollectionFlow = ({ onBack }: Props) => {
   const [locationName, setLocationName] = useState("");
   const [notes, setNotes] = useState("");
   const [vat, setVat] = useState<VatConfig>(DEFAULT_VAT);
+
+  const { data: materialTypes } = useQuery({
+    queryKey: ["material_types"],
+    queryFn: async () => {
+      const { data, error } = await supabase.from("material_types").select("*").order("name");
+      if (error) throw error;
+      return data;
+    },
+  });
 
   const { data: collections, isLoading } = useQuery({
     queryKey: ["client_collections", user?.id],
@@ -271,7 +281,18 @@ const ClientCollectionFlow = ({ onBack }: Props) => {
               <Input placeholder="Client Name *" value={clientName} onChange={e => setClientName(e.target.value)} />
               <Input placeholder="Client Phone" value={clientPhone} onChange={e => setClientPhone(e.target.value)} />
               <Input placeholder="Client Email" value={clientEmail} onChange={e => setClientEmail(e.target.value)} />
-              <Input placeholder="Material Type *" value={materialType} onChange={e => setMaterialType(e.target.value)} />
+              <Select value={materialType} onValueChange={(val) => {
+                setMaterialType(val);
+                const mt = materialTypes?.find(m => m.name === val);
+                if (mt) setUnitPrice(String(mt.price_per_unit));
+              }}>
+                <SelectTrigger><SelectValue placeholder="Select material type *" /></SelectTrigger>
+                <SelectContent>
+                  {materialTypes?.map(mt => (
+                    <SelectItem key={mt.id} value={mt.name}>{mt.name} (KES {mt.price_per_unit}/{mt.unit})</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
               <Input placeholder="Quantity (kg) *" type="number" value={quantityKg} onChange={e => setQuantityKg(e.target.value)} />
               <Input placeholder="Unit Price (KES) *" type="number" value={unitPrice} onChange={e => setUnitPrice(e.target.value)} />
               <Input placeholder="Location" value={locationName} onChange={e => setLocationName(e.target.value)} />
