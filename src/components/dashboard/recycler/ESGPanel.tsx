@@ -17,6 +17,36 @@ import { cn } from "@/lib/utils";
 import { useOrgInfo } from "@/hooks/useOrgInfo";
 import { PDF_COLORS, loadImageAsBase64 } from "@/lib/pdfBranding";
 
+// ── Logo cache ──
+let _duaraFlowLogoCache: string | null = null;
+let _duaraIntelLogoCache: string | null = null;
+
+const loadSvgAsBase64Cached = (url: string, width: number, height: number, cache: { val: string | null }): Promise<string | null> => {
+  if (cache.val) return Promise.resolve(cache.val);
+  return new Promise((resolve) => {
+    const img = new Image();
+    img.crossOrigin = "anonymous";
+    img.onload = () => {
+      const canvas = document.createElement("canvas");
+      canvas.width = width * 2;
+      canvas.height = height * 2;
+      const ctx = canvas.getContext("2d");
+      if (!ctx) { resolve(null); return; }
+      ctx.drawImage(img, 0, 0, width * 2, height * 2);
+      const result = canvas.toDataURL("image/png");
+      cache.val = result;
+      resolve(result);
+    };
+    img.onerror = () => resolve(null);
+    img.src = url;
+  });
+};
+
+const flowLogoCache = { val: null as string | null };
+const intelLogoCache = { val: null as string | null };
+const getDuaraFlowLogo = () => loadSvgAsBase64Cached("/images/duara-flow-logo.svg", 400, 160, flowLogoCache);
+const getDuaraIntelLogo = () => loadSvgAsBase64Cached("/images/duara-intelligence-logo.svg", 300, 160, intelLogoCache);
+
 const COLORS = ["hsl(152,45%,22%)", "hsl(40,55%,55%)", "hsl(195,60%,50%)", "hsl(25,30%,35%)", "hsl(340,50%,50%)"];
 
 type PeriodOption = "7d" | "30d" | "90d" | "6m" | "1y" | "all" | "custom";
