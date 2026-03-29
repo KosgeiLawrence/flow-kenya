@@ -337,6 +337,42 @@ const ProductCatalogPanel = () => {
         </CardContent>
       </Card>
 
+      {/* Pending Sales */}
+      {pendingSales.length > 0 && (
+        <Card className="shadow-soft border-accent/30">
+          <CardHeader>
+            <CardTitle className="text-lg flex items-center gap-2">
+              <ShoppingCart className="w-5 h-5 text-accent" /> Pending Sales ({pendingSales.length})
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="divide-y divide-border">
+              {pendingSales.map((ps) => {
+                const prod = products?.find((p) => p.id === ps.productId);
+                const stepLabel = ps.step === "quotation_sent" ? "Awaiting client response" : ps.step === "invoice_sent" ? "Awaiting payment" : ps.step;
+                return (
+                  <div key={ps.refNo} className="flex items-center justify-between py-3 gap-2">
+                    <div className="min-w-0 flex-1">
+                      <p className="text-sm font-medium text-foreground truncate">{ps.client_name}</p>
+                      <p className="text-xs text-muted-foreground">{prod?.name || "Product"} • {ps.quantity} {prod?.unit || "units"}</p>
+                      <Badge variant="outline" className="mt-1 text-[10px]">{stepLabel}</Badge>
+                    </div>
+                    <div className="flex items-center gap-1 shrink-0">
+                      <Button size="sm" onClick={() => resumeSale(ps)}>
+                        <ArrowRight className="w-3 h-3 mr-1" /> Continue
+                      </Button>
+                      <Button variant="ghost" size="icon" onClick={() => removePending(ps.refNo)} title="Remove">
+                        <Trash2 className="w-4 h-4 text-destructive" />
+                      </Button>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       {/* Sales Flow Dialog */}
       <Dialog open={saleDialog} onOpenChange={(open) => { if (!open) closeSale(); }}>
         <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto">
