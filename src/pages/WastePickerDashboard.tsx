@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import {
   LogOut, User, Package, DollarSign, Calendar, BarChart3,
   QrCode, BookOpen, Clock, CheckCircle2, AlertTriangle, Menu, X,
-  ChevronRight, Briefcase, Settings
+  ChevronRight, Briefcase, Settings, ShoppingCart
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
