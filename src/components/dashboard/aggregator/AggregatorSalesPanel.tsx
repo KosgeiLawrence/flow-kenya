@@ -415,7 +415,7 @@ const AggregatorSalesPanel = () => {
             </Dialog>
 
             {!materialStock.size ? (
-              <p className="text-sm text-muted-foreground">No materials in inventory yet. Add collections in the Stock tab, or click "New Sale" to sell directly.</p>
+              <p className="text-sm text-muted-foreground">No materials in inventory yet. Add collections in the Stock tab first.</p>
             ) : (
               <div className="divide-y divide-border">
                 {Array.from(materialStock.entries()).map(([id, m]) => (
