@@ -69,12 +69,38 @@ const OrdersPanel = () => {
   });
 
   const updateStatus = useMutation({
-    mutationFn: async ({ id, status }: { id: string; status: string }) => { const { error } = await supabase.from("recycler_orders").update({ status }).eq("id", id); if (error) throw error; },
-    onSuccess: (_data, variables) => {
+    mutationFn: async ({ id, status }: { id: string; status: string }) => { const { error } = await supabase.from("recycler_orders").update({ status }).eq("id", id); if (error) throw error; return { id, status }; },
+    onSuccess: async (_data, variables) => {
       queryClient.invalidateQueries({ queryKey: ["recycler_orders"] });
       if (variables.status === "delivered") {
         queryClient.invalidateQueries({ queryKey: ["recycler_delivered_orders"] });
         queryClient.invalidateQueries({ queryKey: ["recycler_inventory"] });
+
+        // Auto-log expense in financial_transactions
+        const order = orders?.find(o => o.id === variables.id);
+        if (order && user) {
+          try {
+            const { data: expCats } = await supabase.from("financial_categories").select("id").eq("name", "Material Purchases").eq("is_system", true).limit(1);
+            let categoryId = expCats?.[0]?.id || null;
+            if (!categoryId) {
+              const { data: anyCats } = await supabase.from("financial_categories").select("id").eq("type", "expense").eq("is_system", true).limit(1);
+              categoryId = anyCats?.[0]?.id || null;
+            }
+            await supabase.from("financial_transactions").insert({
+              user_id: user.id,
+              type: "expense",
+              amount: Number(order.total_amount) || 0,
+              description: `Order delivered: ${order.quantity} ${order.unit} of ${order.material_type} from ${order.supplier_name}`,
+              category_id: categoryId,
+              payment_method: "cash",
+              reference_number: order.id.slice(0, 8).toUpperCase(),
+              transaction_date: new Date().toISOString().split("T")[0],
+            });
+          } catch (e) {
+            console.error("Failed to log expense:", e);
+          }
+          queryClient.invalidateQueries({ queryKey: ["financial_transactions"] });
+        }
       }
       toast.success("Status updated");
     },
