@@ -24,9 +24,11 @@ import TrainingPanel from "@/components/dashboard/waste-picker/TrainingPanel";
 import CleanupExercisePanel from "@/components/dashboard/shared/CleanupExercisePanel";
 import EarningsExpensesPanel from "@/components/dashboard/shared/EarningsExpensesPanel";
 import CRMPanel from "@/components/dashboard/shared/CRMPanel";
+import MaterialTransformationPanel from "@/components/dashboard/recycler/MaterialTransformationPanel";
 
 const navItems = [
   { id: "inventory", label: "Inventory", icon: Package },
+  { id: "transformation", label: "Transformation", icon: Package },
   { id: "business-insights", label: "Business Insights", icon: TrendingUp },
   { id: "products", label: "Products & Pricing", icon: ShoppingBag },
   { id: "orders", label: "Orders & Contracts", icon: ClipboardList },
@@ -67,6 +69,7 @@ const RecyclerDashboard = () => {
   const renderPanel = () => {
     switch (activePanel) {
       case "inventory": return <InventoryAccessPanel />;
+      case "transformation": return <MaterialTransformationPanel />;
       case "business-insights": return <EarningsExpensesPanel role="recycler" />;
       case "products": return <ProductCatalogPanel />;
       case "orders": return <OrdersPanel />;
