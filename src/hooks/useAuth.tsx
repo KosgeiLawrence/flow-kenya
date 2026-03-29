@@ -120,13 +120,32 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         setSession(null);
         setRole(null);
         setProfile(null);
+        setOrgName(null);
+        setOrgLogoUrl(null);
         setSubscribed(null);
         setCheckingSubscription(false);
         return;
       }
 
       if (roleRes.data) setRole(roleRes.data.role as AppRole);
-      if (profileRes.data) setProfile(profileRes.data as Profile);
+      if (profileRes.data) {
+        setProfile(profileRes.data as Profile);
+        // Fetch org name if has organization
+        if (profileRes.data.organization_id) {
+          const { data: orgData } = await supabase
+            .from("organizations")
+            .select("name, logo_url")
+            .eq("id", profileRes.data.organization_id)
+            .single();
+          if (orgData) {
+            setOrgName(orgData.name);
+            setOrgLogoUrl(orgData.logo_url);
+          }
+        } else {
+          setOrgName(null);
+          setOrgLogoUrl(null);
+        }
+      }
     } catch (error) {
       console.error("Error fetching user data:", error);
     }
