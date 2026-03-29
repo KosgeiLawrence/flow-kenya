@@ -73,6 +73,33 @@ const WasteDeliveredPanel = () => {
     },
   });
 
+  const { data: savedSuppliers } = useQuery({
+    queryKey: ["suppliers", user?.id],
+    queryFn: async () => {
+      const { data, error } = await supabase.from("suppliers").select("*").eq("user_id", user!.id).order("supplier_name");
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!user,
+  });
+
+  const { data: wastePickers } = useQuery({
+    queryKey: ["waste_picker_profiles"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("profiles")
+        .select("user_id, full_name, phone_number, email")
+        .in("user_id", (await supabase.from("user_roles").select("user_id").eq("role", "waste_picker")).data?.map(r => r.user_id) || [])
+        .eq("approval_status", "approved")
+        .order("full_name");
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!user,
+  });
+
+  const [supplierSource, setSupplierSource] = useState<"manual" | "supplier" | "picker">("manual");
+
   const { data: orders, isLoading } = useQuery({
     queryKey: ["aggregator_purchase_orders", user?.id],
     queryFn: async () => {
