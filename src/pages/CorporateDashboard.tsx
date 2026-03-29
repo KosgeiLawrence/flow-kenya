@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import {
-  LogOut, Shield, Recycle, Award, Leaf, Factory, BookOpen,
+  LogOut, Shield, Recycle, Award, Leaf, BookOpen,
   Clock, CheckCircle2, AlertTriangle, Menu, X, ChevronRight,
   Package, HandCoins, BarChart3, Settings, User
 } from "lucide-react";
@@ -15,8 +15,6 @@ import EPRCompliancePanel from "@/components/dashboard/corporate/EPRCompliancePa
 import PlasticOffsetPanel from "@/components/dashboard/corporate/PlasticOffsetPanel";
 import ImpactCertificatesPanel from "@/components/dashboard/corporate/ImpactCertificatesPanel";
 import ESGAnalyticsPanel from "@/components/dashboard/corporate/ESGAnalyticsPanel";
-import CarbonTrackerPanel from "@/components/dashboard/corporate/CarbonTrackerPanel";
-import SustainabilityReportPanel from "@/components/dashboard/corporate/SustainabilityReportPanel";
 import CorporateSettingsPanel from "@/components/dashboard/corporate/CorporateSettingsPanel";
 import ProfileSettingsPanel from "@/components/dashboard/shared/ProfileSettingsPanel";
 import TrainingManagementPanel from "@/components/dashboard/shared/TrainingManagementPanel";
@@ -29,9 +27,7 @@ const navItems = [
   { id: "epr", label: "EPR Compliance", icon: Shield },
   { id: "offset", label: "Plastic Offset", icon: Recycle },
   { id: "certificates", label: "Impact Certificates", icon: Award },
-  { id: "esg", label: "ESG Analytics", icon: Leaf },
-  { id: "carbon", label: "Carbon Tracker", icon: Factory },
-  { id: "report", label: "Sustainability Report", icon: BookOpen },
+  { id: "esg", label: "ESG & Carbon", icon: Leaf },
   { id: "settings", label: "Settings", icon: Settings },
   { id: "cleanup", label: "Cleanup Exercise", icon: Package },
   { id: "training-mgmt", label: "Training Management", icon: BookOpen },
@@ -67,8 +63,6 @@ const CorporateDashboard = () => {
       case "offset": return <PlasticOffsetPanel />;
       case "certificates": return <ImpactCertificatesPanel />;
       case "esg": return <ESGAnalyticsPanel />;
-      case "carbon": return <CarbonTrackerPanel />;
-      case "report": return <SustainabilityReportPanel />;
       case "settings": return <CorporateSettingsPanel />;
       case "cleanup": return <CleanupExercisePanel />;
       case "training-mgmt": return <TrainingManagementPanel />;
