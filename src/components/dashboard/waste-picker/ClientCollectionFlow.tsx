@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
-import { Plus, Loader2, User, FileText, ArrowLeft } from "lucide-react";
+import { Plus, Loader2, User, FileText, ArrowLeft, CheckCircle2, ArrowRight } from "lucide-react";
 import { format } from "date-fns";
 import jsPDF from "jspdf";
 import {
@@ -20,6 +20,16 @@ import VatOptions, { DEFAULT_VAT, type VatConfig } from "@/components/dashboard/
 interface Props {
   onBack: () => void;
 }
+
+const STATUS_FLOW = ["draft", "quotation", "invoiced", "paid"] as const;
+type DocStatus = typeof STATUS_FLOW[number];
+
+const statusLabels: Record<DocStatus, { label: string; color: string }> = {
+  draft: { label: "Draft", color: "bg-muted text-muted-foreground" },
+  quotation: { label: "Quotation Sent", color: "bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300" },
+  invoiced: { label: "Invoiced", color: "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300" },
+  paid: { label: "Paid", color: "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300" },
+};
 
 const ClientCollectionFlow = ({ onBack }: Props) => {
   const { user, profile } = useAuth();
@@ -65,15 +75,50 @@ const ClientCollectionFlow = ({ onBack }: Props) => {
         total_amount: qty * price,
         location_name: locationName || null,
         notes: notes || null,
+        status: "draft",
       });
       if (error) throw error;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["client_collections"] });
-      toast.success("Collection recorded!");
+      toast.success("Collection recorded as draft!");
       setClientName(""); setClientPhone(""); setClientEmail("");
       setMaterialType(""); setQuantityKg(""); setUnitPrice("");
       setLocationName(""); setNotes(""); setShowForm(false);
+    },
+    onError: (err: Error) => toast.error(err.message),
+  });
+
+  const updateStatus = useMutation({
+    mutationFn: async ({ id, newStatus }: { id: string; newStatus: string }) => {
+      const { error } = await supabase
+        .from("client_collections")
+        .update({ status: newStatus })
+        .eq("id", id);
+      if (error) throw error;
+      return { id, newStatus };
+    },
+    onSuccess: async ({ id, newStatus }) => {
+      queryClient.invalidateQueries({ queryKey: ["client_collections"] });
+
+      // When marked as paid, log income in financial_transactions
+      if (newStatus === "paid") {
+        const item = collections?.find(c => c.id === id);
+        if (item) {
+          await supabase.from("financial_transactions").insert({
+            user_id: user!.id,
+            type: "income",
+            amount: Number(item.total_amount),
+            description: `Client collection: ${item.material_type} from ${item.client_name}`,
+            payment_method: "cash",
+            reference_number: `CC-${item.id.slice(0, 8).toUpperCase()}`,
+          });
+          queryClient.invalidateQueries({ queryKey: ["financial_transactions"] });
+          toast.success("Payment recorded & income logged to My Earnings!");
+        }
+      } else {
+        toast.success(`Status updated to ${statusLabels[newStatus as DocStatus]?.label || newStatus}`);
+      }
     },
     onError: (err: Error) => toast.error(err.message),
   });
@@ -89,8 +134,9 @@ const ClientCollectionFlow = ({ onBack }: Props) => {
     const doc = new jsPDF();
     const title = type === "quotation" ? "Quotation" : type === "invoice" ? "Invoice" : "Receipt";
     const pdfOrg = await getOrgPdfInfo();
+    const refPrefix = type === "quotation" ? "QTN" : type === "invoice" ? "INV" : "RCT";
 
-    let y = addCleanHeader(doc, title, `Ref: ${type.toUpperCase().slice(0, 3)}-${item.id.slice(0, 8).toUpperCase()}`, pdfOrg);
+    let y = addCleanHeader(doc, title, `Ref: ${refPrefix}-${item.id.slice(0, 8).toUpperCase()}`, pdfOrg);
 
     y = addDocMeta(doc, [
       { label: "From", value: orgInfo?.orgName || profile?.full_name || "Waste Picker" },
@@ -131,11 +177,48 @@ const ClientCollectionFlow = ({ onBack }: Props) => {
       doc.setFontSize(8);
       doc.setTextColor(...PDF_COLORS.mutedText);
       doc.text(`Notes: ${item.notes}`, 15, y);
+      y += 8;
+    }
+
+    if (type === "receipt") {
+      y += 4;
+      doc.setFontSize(9);
+      doc.setTextColor(...PDF_COLORS.darkText);
+      doc.text("Payment Status: PAID", 15, y);
+      y += 14;
+      doc.text("Received by: ____________________________", 15, y);
+      y += 12;
+      doc.text("Signature:    ____________________________", 15, y);
+      y += 12;
+      doc.text("Date:            ____________________________", 15, y);
     }
 
     finalizeCleanPdf(doc);
     doc.save(`${title}-${item.id.slice(0, 8)}.pdf`);
     toast.success(`${title} downloaded`);
+  };
+
+  const handleGenerateAndAdvance = async (type: "quotation" | "invoice" | "receipt", item: any) => {
+    await generateDocument(type, item);
+    const nextStatus = type === "quotation" ? "quotation" : type === "invoice" ? "invoiced" : "paid";
+    if (item.status !== nextStatus) {
+      updateStatus.mutate({ id: item.id, newStatus: nextStatus });
+    }
+  };
+
+  const getNextAction = (status: string) => {
+    switch (status) {
+      case "draft":
+        return { actions: ["quotation", "invoice"] as const, skipLabel: "Skip to Invoice" };
+      case "quotation":
+        return { actions: ["invoice"] as const };
+      case "invoiced":
+        return { actions: ["receipt"] as const };
+      case "paid":
+        return { actions: [] as const };
+      default:
+        return { actions: ["quotation"] as const };
+    }
   };
 
   const canSubmit = clientName && materialType && quantityKg && unitPrice;
@@ -149,7 +232,10 @@ const ClientCollectionFlow = ({ onBack }: Props) => {
       <Card className="shadow-soft border-primary/20 bg-primary/5">
         <CardContent className="p-4">
           <p className="text-sm font-medium text-foreground">Collect From Client</p>
-          <p className="text-xs text-muted-foreground">Record waste collected from clients in the field. Generate quotations, invoices, or receipts for them.</p>
+          <p className="text-xs text-muted-foreground">
+            Record waste collected → Generate Quotation (optional) → Invoice → Receipt when paid.
+            Paid collections are logged to your earnings automatically.
+          </p>
         </CardContent>
       </Card>
 
@@ -199,37 +285,74 @@ const ClientCollectionFlow = ({ onBack }: Props) => {
             <p className="text-center py-8 text-sm text-muted-foreground">No collections recorded yet.</p>
           ) : (
             <div className="space-y-3">
-              {collections.map(c => (
-                <div key={c.id} className="p-3 rounded-lg bg-muted/50 space-y-2">
-                  <div className="flex items-start justify-between">
-                    <div>
-                      <div className="flex items-center gap-2">
-                        <User className="w-3.5 h-3.5 text-muted-foreground" />
-                        <p className="text-sm font-medium">{c.client_name}</p>
+              {collections.map(c => {
+                const status = (c.status || "draft") as DocStatus;
+                const { actions } = getNextAction(status);
+                const sLabel = statusLabels[status] || statusLabels.draft;
+
+                return (
+                  <div key={c.id} className="p-3 rounded-lg bg-muted/50 space-y-2">
+                    <div className="flex items-start justify-between">
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <User className="w-3.5 h-3.5 text-muted-foreground" />
+                          <p className="text-sm font-medium">{c.client_name}</p>
+                        </div>
+                        <p className="text-xs text-muted-foreground mt-0.5">
+                          {c.material_type} • {c.quantity_kg} kg • KES {Number(c.total_amount).toLocaleString()}
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          {format(new Date(c.collection_date), "MMM d, yyyy")}
+                          {c.location_name && ` • ${c.location_name}`}
+                        </p>
                       </div>
-                      <p className="text-xs text-muted-foreground mt-0.5">
-                        {c.material_type} • {c.quantity_kg} kg • KES {Number(c.total_amount).toLocaleString()}
-                      </p>
-                      <p className="text-xs text-muted-foreground">
-                        {format(new Date(c.collection_date), "MMM d, yyyy")}
-                        {c.location_name && ` • ${c.location_name}`}
-                      </p>
+                      <Badge className={sLabel.color}>{sLabel.label}</Badge>
                     </div>
-                    <Badge variant="secondary">{c.status}</Badge>
+
+                    {/* Document workflow actions */}
+                    <div className="flex gap-2 flex-wrap items-center">
+                      {status === "draft" && (
+                        <>
+                          <Button size="sm" variant="outline" className="text-xs h-7" onClick={() => handleGenerateAndAdvance("quotation", c)}>
+                            <FileText className="w-3 h-3 mr-1" /> Quotation
+                          </Button>
+                          <span className="text-xs text-muted-foreground">or</span>
+                          <Button size="sm" variant="outline" className="text-xs h-7" onClick={() => handleGenerateAndAdvance("invoice", c)}>
+                            <ArrowRight className="w-3 h-3 mr-1" /> Skip to Invoice
+                          </Button>
+                        </>
+                      )}
+                      {status === "quotation" && (
+                        <Button size="sm" variant="default" className="text-xs h-7" onClick={() => handleGenerateAndAdvance("invoice", c)}>
+                          <FileText className="w-3 h-3 mr-1" /> Generate Invoice
+                        </Button>
+                      )}
+                      {status === "invoiced" && (
+                        <Button size="sm" variant="default" className="text-xs h-7 bg-green-600 hover:bg-green-700" onClick={() => handleGenerateAndAdvance("receipt", c)}>
+                          <CheckCircle2 className="w-3 h-3 mr-1" /> Mark Paid & Receipt
+                        </Button>
+                      )}
+                      {status === "paid" && (
+                        <Button size="sm" variant="ghost" className="text-xs h-7" onClick={() => generateDocument("receipt", c)}>
+                          <FileText className="w-3 h-3 mr-1" /> Re-download Receipt
+                        </Button>
+                      )}
+
+                      {/* Always allow re-downloading previous docs */}
+                      {(status === "quotation" || status === "invoiced" || status === "paid") && (
+                        <Button size="sm" variant="ghost" className="text-xs h-7 text-muted-foreground" onClick={() => generateDocument("quotation", c)}>
+                          Quotation
+                        </Button>
+                      )}
+                      {(status === "invoiced" || status === "paid") && (
+                        <Button size="sm" variant="ghost" className="text-xs h-7 text-muted-foreground" onClick={() => generateDocument("invoice", c)}>
+                          Invoice
+                        </Button>
+                      )}
+                    </div>
                   </div>
-                  <div className="flex gap-2 flex-wrap">
-                    <Button size="sm" variant="outline" className="text-xs h-7" onClick={() => generateDocument("quotation", c)}>
-                      <FileText className="w-3 h-3 mr-1" /> Quotation
-                    </Button>
-                    <Button size="sm" variant="outline" className="text-xs h-7" onClick={() => generateDocument("invoice", c)}>
-                      <FileText className="w-3 h-3 mr-1" /> Invoice
-                    </Button>
-                    <Button size="sm" variant="outline" className="text-xs h-7" onClick={() => generateDocument("receipt", c)}>
-                      <FileText className="w-3 h-3 mr-1" /> Receipt
-                    </Button>
-                  </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           )}
         </CardContent>
