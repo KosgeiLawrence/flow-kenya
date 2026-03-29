@@ -443,7 +443,7 @@ const ESGPanel = () => {
     doc.text("Water savings: 18 liters/kg recycled material", 20, y + 22);
     doc.text("Energy savings: 5.8 kWh/kg recycled material", 20, y + 28);
 
-    addReportFooter(doc, org.name);
+    await addReportFooter(doc, org.name);
     doc.save(`esg-report-${format(new Date(), "yyyy-MM-dd")}.pdf`);
     toast.success("ESG Report downloaded");
   };
