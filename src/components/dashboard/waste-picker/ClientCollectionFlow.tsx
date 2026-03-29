@@ -351,6 +351,8 @@ const ClientCollectionFlow = ({ onBack }: Props) => {
                     <Input placeholder="Client Email" value={clientEmail} onChange={e => setClientEmail(e.target.value)} />
                   </>
                 )}
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <Select value={materialType} onValueChange={(val) => {
                 setMaterialType(val);
                 const mt = materialTypes?.find(m => m.name === val);
