@@ -35,7 +35,6 @@ import { HelpCircle, ClipboardList } from "lucide-react";
 
 const navItems = [
   { id: "workflows", label: "How It Works", icon: HelpCircle },
-  { id: "pickers", label: "Waste Pickers", icon: Users },
   { id: "inventory", label: "Inventory", icon: Package },
   { id: "sales", label: "Sales", icon: ShoppingCart },
   { id: "crm", label: "Customers", icon: Users },
@@ -43,6 +42,7 @@ const navItems = [
   { id: "marketplace", label: "Marketplace", icon: Store },
   
   { id: "esg", label: "ESG & Carbon", icon: Leaf },
+  { id: "pickers", label: "Waste Pickers", icon: Users },
   { id: "compliance", label: "Compliance", icon: Shield },
   
   { id: "training", label: "Training", icon: BookOpen },
