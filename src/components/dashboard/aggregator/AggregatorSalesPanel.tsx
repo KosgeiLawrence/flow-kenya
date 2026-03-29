@@ -59,6 +59,7 @@ const AggregatorSalesPanel = () => {
   const [crmCustomers, setCrmCustomers] = useState<any[]>([]);
   const [showCrmPicker, setShowCrmPicker] = useState(false);
   const [crmSearch, setCrmSearch] = useState("");
+  const [customerSource, setCustomerSource] = useState<"crm" | "recyclers">("crm");
   const [showMaterialPicker, setShowMaterialPicker] = useState(false);
   const [pendingSales, setPendingSales] = useState<(SaleState & { vat: VatConfig })[]>(() => {
     try {
@@ -85,6 +86,26 @@ const AggregatorSalesPanel = () => {
       if (error) throw error;
       return data;
     },
+  });
+
+  // Fetch platform recyclers
+  const { data: platformRecyclers } = useQuery({
+    queryKey: ["platform_recyclers_for_sale"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("profiles")
+        .select("user_id, full_name, phone_number, email, county")
+        .order("full_name");
+      if (error) throw error;
+      // Filter to only recyclers by checking user_roles
+      const { data: roles } = await supabase
+        .from("user_roles")
+        .select("user_id")
+        .eq("role", "recycler");
+      const recyclerIds = new Set(roles?.map(r => r.user_id) || []);
+      return (data || []).filter(p => recyclerIds.has(p.user_id) && p.user_id !== user?.id);
+    },
+    enabled: !!user,
   });
 
   const { data: collections } = useQuery({
@@ -547,34 +568,56 @@ const AggregatorSalesPanel = () => {
               {/* Step 1: Details */}
               {sale.step === "details" && (
                 <div className="space-y-3">
-                  {crmCustomers.length > 0 && !showCrmPicker && (
-                    <Button variant="outline" size="sm" className="w-full gap-2" onClick={() => setShowCrmPicker(true)}>
-                      <Users className="w-4 h-4" /> Select Existing Customer
+                  {!showCrmPicker && (
+                    <Button variant="outline" size="sm" className="w-full gap-2" onClick={() => { setShowCrmPicker(true); setCustomerSource("crm"); }}>
+                      <Users className="w-4 h-4" /> Select Existing Customer or Recycler
                     </Button>
                   )}
                   {showCrmPicker && (
                     <Card className="border-primary/30 bg-primary/5">
                       <CardContent className="p-3 space-y-2">
                         <div className="flex items-center justify-between">
-                          <p className="text-xs font-medium text-primary">Select from CRM</p>
+                          <div className="flex gap-1">
+                            <Button variant={customerSource === "crm" ? "default" : "outline"} size="sm" className="h-6 text-xs px-2" onClick={() => setCustomerSource("crm")}>
+                              My Customers
+                            </Button>
+                            <Button variant={customerSource === "recyclers" ? "default" : "outline"} size="sm" className="h-6 text-xs px-2" onClick={() => setCustomerSource("recyclers")}>
+                              Platform Recyclers
+                            </Button>
+                          </div>
                           <Button variant="ghost" size="sm" className="h-6 text-xs" onClick={() => { setShowCrmPicker(false); setCrmSearch(""); }}>New Client</Button>
                         </div>
                         <div className="relative">
                           <Search className="absolute left-2 top-2 w-3.5 h-3.5 text-muted-foreground" />
-                          <Input placeholder="Search customers..." value={crmSearch} onChange={e => setCrmSearch(e.target.value)} className="pl-7 h-8 text-sm" />
+                          <Input placeholder={customerSource === "crm" ? "Search customers..." : "Search recyclers..."} value={crmSearch} onChange={e => setCrmSearch(e.target.value)} className="pl-7 h-8 text-sm" />
                         </div>
-                        <div className="max-h-32 overflow-y-auto space-y-1">
-                          {crmCustomers
-                            .filter(c => !crmSearch || c.full_name.toLowerCase().includes(crmSearch.toLowerCase()))
-                            .map(c => (
-                              <button key={c.id} className="w-full text-left p-2 rounded-md hover:bg-primary/10 transition-colors text-sm" onClick={() => {
-                                setSale(s => ({ ...s, client_name: c.full_name, client_phone: c.phone || "", client_email: c.email || "" }));
-                                setShowCrmPicker(false); setCrmSearch("");
-                              }}>
-                                <p className="font-medium text-xs">{c.full_name}</p>
-                                <p className="text-[10px] text-muted-foreground">{[c.phone, c.email].filter(Boolean).join(" • ")}</p>
-                              </button>
-                            ))}
+                        <div className="max-h-40 overflow-y-auto space-y-1">
+                          {customerSource === "crm" ? (
+                            crmCustomers.length > 0 ? crmCustomers
+                              .filter(c => !crmSearch || c.full_name.toLowerCase().includes(crmSearch.toLowerCase()))
+                              .map(c => (
+                                <button key={c.id} className="w-full text-left p-2 rounded-md hover:bg-primary/10 transition-colors text-sm" onClick={() => {
+                                  setSale(s => ({ ...s, client_name: c.full_name, client_phone: c.phone || "", client_email: c.email || "" }));
+                                  setShowCrmPicker(false); setCrmSearch("");
+                                }}>
+                                  <p className="font-medium text-xs">{c.full_name}</p>
+                                  <p className="text-[10px] text-muted-foreground">{[c.phone, c.email].filter(Boolean).join(" • ")}</p>
+                                </button>
+                              )) : <p className="text-xs text-muted-foreground text-center py-2">No customers yet</p>
+                          ) : (
+                            platformRecyclers && platformRecyclers.length > 0 ? platformRecyclers
+                              .filter(r => !crmSearch || r.full_name.toLowerCase().includes(crmSearch.toLowerCase()) || r.county?.toLowerCase().includes(crmSearch.toLowerCase()))
+                              .map(r => (
+                                <button key={r.user_id} className="w-full text-left p-2 rounded-md hover:bg-primary/10 transition-colors text-sm" onClick={() => {
+                                  setSale(s => ({ ...s, client_name: r.full_name, client_phone: r.phone_number || "", client_email: r.email || "" }));
+                                  setShowCrmPicker(false); setCrmSearch("");
+                                }}>
+                                  <p className="font-medium text-xs">{r.full_name}</p>
+                                  <p className="text-[10px] text-muted-foreground">{[r.phone_number, r.email, r.county].filter(Boolean).join(" • ")}</p>
+                                  <Badge variant="outline" className="text-[9px] mt-0.5">Recycler</Badge>
+                                </button>
+                              )) : <p className="text-xs text-muted-foreground text-center py-2">No recyclers found</p>
+                          )}
                         </div>
                       </CardContent>
                     </Card>
