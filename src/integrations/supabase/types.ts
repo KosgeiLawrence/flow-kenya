@@ -1340,6 +1340,69 @@ export type Database = {
         }
         Relationships: []
       }
+      suppliers: {
+        Row: {
+          category: string
+          contact_person: string | null
+          created_at: string
+          email: string | null
+          id: string
+          last_order_date: string | null
+          location: string | null
+          material_types: string[] | null
+          notes: string | null
+          payment_terms: string | null
+          phone: string | null
+          platform_role: string | null
+          platform_user_id: string | null
+          supplier_name: string
+          total_orders: number
+          total_spent: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          category?: string
+          contact_person?: string | null
+          created_at?: string
+          email?: string | null
+          id?: string
+          last_order_date?: string | null
+          location?: string | null
+          material_types?: string[] | null
+          notes?: string | null
+          payment_terms?: string | null
+          phone?: string | null
+          platform_role?: string | null
+          platform_user_id?: string | null
+          supplier_name: string
+          total_orders?: number
+          total_spent?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          category?: string
+          contact_person?: string | null
+          created_at?: string
+          email?: string | null
+          id?: string
+          last_order_date?: string | null
+          location?: string | null
+          material_types?: string[] | null
+          notes?: string | null
+          payment_terms?: string | null
+          phone?: string | null
+          platform_role?: string | null
+          platform_user_id?: string | null
+          supplier_name?: string
+          total_orders?: number
+          total_spent?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       training_resources: {
         Row: {
           category: string
