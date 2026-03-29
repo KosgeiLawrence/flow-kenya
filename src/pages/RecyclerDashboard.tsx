@@ -32,8 +32,8 @@ const navItems = [
   { id: "workflows", label: "How It Works", icon: HelpCircle },
   { id: "inventory", label: "Inventory", icon: Package },
   { id: "transformation", label: "Transformation", icon: Recycle },
-  { id: "business-insights", label: "Business Insights", icon: TrendingUp },
   { id: "products", label: "Products & Pricing", icon: ShoppingBag },
+  { id: "business-insights", label: "Business Insights", icon: TrendingUp },
   
   { id: "market", label: "Market Insights", icon: TrendingUp },
   { id: "forecast", label: "Supply Forecast", icon: BarChart3 },
