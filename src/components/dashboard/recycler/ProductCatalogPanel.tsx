@@ -49,6 +49,7 @@ const ProductCatalogPanel = () => {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [saleDialog, setSaleDialog] = useState(false);
   const [sale, setSale] = useState<SaleState>(initialSale);
+  const [pendingSales, setPendingSales] = useState<(SaleState & { vat: VatConfig })[]>([]);
   const [form, setForm] = useState({ name: "", description: "", material_source: "", stock_quantity: "", unit: "kg", price_per_unit: "" });
   const [vat, setVat] = useState<VatConfig>(DEFAULT_VAT);
 
@@ -81,6 +82,37 @@ const ProductCatalogPanel = () => {
 
   const selectedProduct = products?.find((p) => p.id === sale.productId);
 
+  const openSale = (productId: string) => {
+    const ref = `SL-${Date.now().toString(36).toUpperCase()}`;
+    setSale({ ...initialSale, productId, refNo: ref });
+    setVat(DEFAULT_VAT);
+    setSaleDialog(true);
+  };
+
+  const resumeSale = (pending: SaleState & { vat: VatConfig }) => {
+    setSale({ productId: pending.productId, step: pending.step, client_name: pending.client_name, client_email: pending.client_email, client_phone: pending.client_phone, quantity: pending.quantity, notes: pending.notes, refNo: pending.refNo });
+    setVat(pending.vat);
+    setSaleDialog(true);
+  };
+
+  const closeSale = () => {
+    // Save to pending if sale is in progress (not done, and has client info)
+    if (sale.step !== "details" && sale.step !== "receipt_done" && sale.client_name) {
+      setPendingSales((prev) => {
+        const filtered = prev.filter((s) => s.refNo !== sale.refNo);
+        return [...filtered, { ...sale, vat }];
+      });
+      toast.info("Sale saved. You can resume from Pending Sales.");
+    }
+    setSaleDialog(false);
+    setSale(initialSale);
+    setVat(DEFAULT_VAT);
+  };
+
+  const removePending = (refNo: string) => {
+    setPendingSales((prev) => prev.filter((s) => s.refNo !== refNo));
+  };
+
   const getOrgPdfInfo = async () => {
     if (!orgInfo) return null;
     let logoBase64: string | null = null;
@@ -99,18 +131,6 @@ const ProductCatalogPanel = () => {
   };
 
   const calcTotal = () => calcSubtotal() + calcVatAmount();
-
-  const openSale = (productId: string) => {
-    const ref = `SL-${Date.now().toString(36).toUpperCase()}`;
-    setSale({ ...initialSale, productId, refNo: ref });
-    setSaleDialog(true);
-  };
-
-  const closeSale = () => {
-    setSaleDialog(false);
-    setSale(initialSale);
-    setVat(DEFAULT_VAT);
-  };
 
   const generatePdf = async (docType: "Quotation" | "Invoice" | "Receipt") => {
     if (!selectedProduct) return;
@@ -172,6 +192,11 @@ const ProductCatalogPanel = () => {
     setSale((s) => ({ ...s, step: "quotation_sent" }));
   };
 
+  const handleSkipToInvoice = async () => {
+    await generatePdf("Invoice");
+    setSale((s) => ({ ...s, step: "invoice_sent" }));
+  };
+
   const handleClientAccepts = async () => {
     await generatePdf("Invoice");
     setSale((s) => ({ ...s, step: "invoice_sent" }));
@@ -209,6 +234,8 @@ const ProductCatalogPanel = () => {
     queryClient.invalidateQueries({ queryKey: ["financial_transactions"] });
 
     setSale((s) => ({ ...s, step: "receipt_done" }));
+    // Remove from pending sales if it was resumed
+    setPendingSales((prev) => prev.filter((s) => s.refNo !== sale.refNo));
     toast.success("Sale completed! Stock updated & income recorded.");
   };
 
@@ -310,6 +337,42 @@ const ProductCatalogPanel = () => {
         </CardContent>
       </Card>
 
+      {/* Pending Sales */}
+      {pendingSales.length > 0 && (
+        <Card className="shadow-soft border-accent/30">
+          <CardHeader>
+            <CardTitle className="text-lg flex items-center gap-2">
+              <ShoppingCart className="w-5 h-5 text-accent" /> Pending Sales ({pendingSales.length})
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="divide-y divide-border">
+              {pendingSales.map((ps) => {
+                const prod = products?.find((p) => p.id === ps.productId);
+                const stepLabel = ps.step === "quotation_sent" ? "Awaiting client response" : ps.step === "invoice_sent" ? "Awaiting payment" : ps.step;
+                return (
+                  <div key={ps.refNo} className="flex items-center justify-between py-3 gap-2">
+                    <div className="min-w-0 flex-1">
+                      <p className="text-sm font-medium text-foreground truncate">{ps.client_name}</p>
+                      <p className="text-xs text-muted-foreground">{prod?.name || "Product"} • {ps.quantity} {prod?.unit || "units"}</p>
+                      <Badge variant="outline" className="mt-1 text-[10px]">{stepLabel}</Badge>
+                    </div>
+                    <div className="flex items-center gap-1 shrink-0">
+                      <Button size="sm" onClick={() => resumeSale(ps)}>
+                        <ArrowRight className="w-3 h-3 mr-1" /> Continue
+                      </Button>
+                      <Button variant="ghost" size="icon" onClick={() => removePending(ps.refNo)} title="Remove">
+                        <Trash2 className="w-4 h-4 text-destructive" />
+                      </Button>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       {/* Sales Flow Dialog */}
       <Dialog open={saleDialog} onOpenChange={(open) => { if (!open) closeSale(); }}>
         <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto">
@@ -371,9 +434,14 @@ const ProductCatalogPanel = () => {
                     </Card>
                   )}
 
-                  <Button className="w-full" onClick={handleSendQuotation} disabled={!sale.client_name || !sale.quantity || Number(sale.quantity) <= 0}>
-                    <FileText className="w-4 h-4 mr-1" /> Generate Quotation
-                  </Button>
+                  <div className="flex gap-2">
+                    <Button className="flex-1" onClick={handleSendQuotation} disabled={!sale.client_name || !sale.quantity || Number(sale.quantity) <= 0}>
+                      <FileText className="w-4 h-4 mr-1" /> Generate Quotation
+                    </Button>
+                    <Button variant="outline" className="flex-1" onClick={handleSkipToInvoice} disabled={!sale.client_name || !sale.quantity || Number(sale.quantity) <= 0}>
+                      <ArrowRight className="w-4 h-4 mr-1" /> Skip to Invoice
+                    </Button>
+                  </div>
                 </div>
               )}
 
