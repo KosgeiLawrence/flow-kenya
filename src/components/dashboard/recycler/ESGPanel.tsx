@@ -15,29 +15,67 @@ const COLORS = ["hsl(152,45%,22%)", "hsl(40,55%,55%)", "hsl(195,60%,50%)", "hsl(
 const ESGPanel = () => {
   const { user, profile } = useAuth();
 
-  const { data: collections } = useQuery({
-    queryKey: ["recycler_esg", user?.id],
+  // Use transformation data for recyclers
+  const { data: transformations } = useQuery({
+    queryKey: ["recycler_esg_transformations", user?.id],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from("collections")
-        .select("*, material_types(name, unit)")
-        .order("collected_at", { ascending: false });
+        .from("material_transformations")
+        .select("*, transformation_inputs(*), transformation_outputs(*)")
+        .eq("user_id", user!.id)
+        .order("transformation_date", { ascending: false });
       if (error) throw error;
       return data;
     },
     enabled: !!user,
   });
 
-  const totalKg = collections?.reduce((s, c) => s + Number(c.quantity), 0) || 0;
+  // Also fetch recycler products for additional context
+  const { data: products } = useQuery({
+    queryKey: ["recycler_esg_products", user?.id],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("recycler_products")
+        .select("*")
+        .eq("user_id", user!.id);
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!user,
+  });
+
+  // Calculate totals from transformation inputs (raw materials processed)
+  const totalInputKg = transformations?.reduce((sum, t) => {
+    const inputTotal = (t.transformation_inputs as any[])?.reduce(
+      (s: number, inp: any) => s + Number(inp.quantity), 0
+    ) || 0;
+    return sum + inputTotal;
+  }, 0) || 0;
+
+  // Calculate output totals
+  const totalOutputKg = transformations?.reduce((sum, t) => {
+    const outputTotal = (t.transformation_outputs as any[])?.reduce(
+      (s: number, out: any) => s + Number(out.quantity), 0
+    ) || 0;
+    return sum + outputTotal;
+  }, 0) || 0;
+
+  const totalKg = totalInputKg;
   const co2Saved = totalKg * 2.5;
   const waterSaved = totalKg * 18;
   const energySaved = totalKg * 5.8;
   const landfillDiverted = totalKg;
+  const avgYield = transformations?.length
+    ? transformations.reduce((s, t) => s + (Number(t.yield_percentage) || 0), 0) / transformations.length
+    : 0;
 
+  // Material breakdown from transformation inputs
   const materialMap = new Map<string, number>();
-  collections?.forEach((c) => {
-    const name = (c as any).material_types?.name || "Unknown";
-    materialMap.set(name, (materialMap.get(name) || 0) + Number(c.quantity));
+  transformations?.forEach((t) => {
+    (t.transformation_inputs as any[])?.forEach((inp: any) => {
+      const name = inp.material_name || "Unknown";
+      materialMap.set(name, (materialMap.get(name) || 0) + Number(inp.quantity));
+    });
   });
   const pieData = Array.from(materialMap.entries()).map(([name, value]) => ({ name, value: Math.round(value) }));
   const esgScore = Math.min(Math.round((totalKg / 1000) * 25 + 40), 100);
@@ -63,11 +101,14 @@ const ESGPanel = () => {
     doc.setFontSize(10);
     let y = 84;
     const metrics = [
-      { label: "Total Material Recycled", value: `${totalKg.toFixed(1)} kg` },
+      { label: "Total Material Processed", value: `${totalKg.toFixed(1)} kg` },
+      { label: "Total Output Produced", value: `${totalOutputKg.toFixed(1)} kg` },
+      { label: "Average Yield", value: `${avgYield.toFixed(1)}%` },
       { label: "CO₂ Emissions Saved", value: `${co2Saved.toFixed(1)} kg` },
       { label: "Water Saved", value: `${waterSaved.toLocaleString()} liters` },
       { label: "Energy Saved", value: `${energySaved.toFixed(1)} kWh` },
       { label: "Landfill Diversion", value: `${landfillDiverted.toFixed(1)} kg` },
+      { label: "Total Transformations", value: `${transformations?.length || 0}` },
     ];
     metrics.forEach((m) => {
       doc.text(`• ${m.label}: ${m.value}`, 24, y);
@@ -143,7 +184,8 @@ const ESGPanel = () => {
       `Prevented ${co2Saved.toFixed(0)} kg of CO₂ equivalent greenhouse gas emissions`,
       `Conserved approximately ${waterSaved.toLocaleString()} liters of water`,
       `Saved approximately ${energySaved.toFixed(0)} kWh of energy`,
-      `Contributed to ${materialMap.size} distinct material recovery streams`,
+      `Processed ${transformations?.length || 0} material transformations`,
+      `Achieved average yield of ${avgYield.toFixed(1)}%`,
     ];
     impacts.forEach((imp) => {
       doc.text(`✓  ${imp}`, 24, y);
@@ -152,7 +194,7 @@ const ESGPanel = () => {
 
     y += 10;
     doc.setFontSize(9);
-    doc.text("This certificate is system-generated based on verified collection data.", 20, y);
+    doc.text("This certificate is system-generated based on verified transformation data.", 20, y);
 
     doc.setFontSize(7);
     doc.setTextColor(130);
@@ -227,7 +269,7 @@ const ESGPanel = () => {
         <CardHeader><CardTitle className="text-lg">Material Recovery Breakdown</CardTitle></CardHeader>
         <CardContent>
           {!pieData.length ? (
-            <p className="text-sm text-muted-foreground">No data yet.</p>
+            <p className="text-sm text-muted-foreground">No transformation data yet. Record material transformations to see your impact.</p>
           ) : (
             <ResponsiveContainer width="100%" height={240}>
               <PieChart>
