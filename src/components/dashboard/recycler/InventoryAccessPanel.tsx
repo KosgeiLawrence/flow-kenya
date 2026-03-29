@@ -8,9 +8,12 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Package, Layers, TrendingUp, Users, Plus, ClipboardList } from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Package, Layers, TrendingUp, Users, Plus, ClipboardList, FileText } from "lucide-react";
 import { toast } from "sonner";
 import { format } from "date-fns";
+import OrdersPanel from "./OrdersPanel";
+import PurchaseInvoicesPanel from "./PurchaseInvoicesPanel";
 
 interface InventoryItem {
   name: string;
