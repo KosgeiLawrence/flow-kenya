@@ -49,6 +49,7 @@ const ProductCatalogPanel = () => {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [saleDialog, setSaleDialog] = useState(false);
   const [sale, setSale] = useState<SaleState>(initialSale);
+  const [pendingSales, setPendingSales] = useState<(SaleState & { vat: VatConfig })[]>([]);
   const [form, setForm] = useState({ name: "", description: "", material_source: "", stock_quantity: "", unit: "kg", price_per_unit: "" });
   const [vat, setVat] = useState<VatConfig>(DEFAULT_VAT);
 
@@ -81,35 +82,35 @@ const ProductCatalogPanel = () => {
 
   const selectedProduct = products?.find((p) => p.id === sale.productId);
 
-  const getOrgPdfInfo = async () => {
-    if (!orgInfo) return null;
-    let logoBase64: string | null = null;
-    if (orgInfo.orgLogoUrl) logoBase64 = await loadImageAsBase64(orgInfo.orgLogoUrl);
-    return buildPdfOrgInfo(orgInfo, logoBase64);
-  };
-
-  const calcSubtotal = () => {
-    if (!selectedProduct) return 0;
-    return (Number(sale.quantity) || 1) * Number(selectedProduct.price_per_unit);
-  };
-
-  const calcVatAmount = () => {
-    if (!vat.includeVat) return 0;
-    return calcSubtotal() * (vat.vatPercent / 100);
-  };
-
-  const calcTotal = () => calcSubtotal() + calcVatAmount();
-
   const openSale = (productId: string) => {
     const ref = `SL-${Date.now().toString(36).toUpperCase()}`;
     setSale({ ...initialSale, productId, refNo: ref });
+    setVat(DEFAULT_VAT);
+    setSaleDialog(true);
+  };
+
+  const resumeSale = (pending: SaleState & { vat: VatConfig }) => {
+    setSale({ productId: pending.productId, step: pending.step, client_name: pending.client_name, client_email: pending.client_email, client_phone: pending.client_phone, quantity: pending.quantity, notes: pending.notes, refNo: pending.refNo });
+    setVat(pending.vat);
     setSaleDialog(true);
   };
 
   const closeSale = () => {
+    // Save to pending if sale is in progress (not done, and has client info)
+    if (sale.step !== "details" && sale.step !== "receipt_done" && sale.client_name) {
+      setPendingSales((prev) => {
+        const filtered = prev.filter((s) => s.refNo !== sale.refNo);
+        return [...filtered, { ...sale, vat }];
+      });
+      toast.info("Sale saved. You can resume from Pending Sales.");
+    }
     setSaleDialog(false);
     setSale(initialSale);
     setVat(DEFAULT_VAT);
+  };
+
+  const removePending = (refNo: string) => {
+    setPendingSales((prev) => prev.filter((s) => s.refNo !== refNo));
   };
 
   const generatePdf = async (docType: "Quotation" | "Invoice" | "Receipt") => {
