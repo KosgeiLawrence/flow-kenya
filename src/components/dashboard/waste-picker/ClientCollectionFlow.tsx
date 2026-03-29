@@ -281,7 +281,11 @@ const ClientCollectionFlow = ({ onBack }: Props) => {
               <Input placeholder="Client Name *" value={clientName} onChange={e => setClientName(e.target.value)} />
               <Input placeholder="Client Phone" value={clientPhone} onChange={e => setClientPhone(e.target.value)} />
               <Input placeholder="Client Email" value={clientEmail} onChange={e => setClientEmail(e.target.value)} />
-              <Select value={materialType} onValueChange={setMaterialType}>
+              <Select value={materialType} onValueChange={(val) => {
+                setMaterialType(val);
+                const mt = materialTypes?.find(m => m.name === val);
+                if (mt) setUnitPrice(String(mt.price_per_unit));
+              }}>
                 <SelectTrigger><SelectValue placeholder="Select material type *" /></SelectTrigger>
                 <SelectContent>
                   {materialTypes?.map(mt => (
