@@ -80,7 +80,7 @@ const AggregatorDashboard = () => {
         <Tabs defaultValue="stock" className="space-y-4">
           <TabsList className="grid w-full grid-cols-4">
             <TabsTrigger value="stock"><Package className="w-4 h-4 mr-1.5" />Stock</TabsTrigger>
-            <TabsTrigger value="delivered"><ClipboardList className="w-4 h-4 mr-1.5" />Waste Delivered</TabsTrigger>
+            <TabsTrigger value="delivered"><ClipboardList className="w-4 h-4 mr-1.5" />Orders</TabsTrigger>
             <TabsTrigger value="pickups"><Truck className="w-4 h-4 mr-1.5" />Pickup Requests</TabsTrigger>
             <TabsTrigger value="suppliers"><Users className="w-4 h-4 mr-1.5" />Suppliers</TabsTrigger>
           </TabsList>
