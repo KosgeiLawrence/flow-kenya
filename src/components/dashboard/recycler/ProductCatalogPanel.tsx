@@ -11,7 +11,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Package, Plus, Download, Trash2, ShoppingBag, ShoppingCart, FileText, Receipt, CheckCircle2, ArrowRight, Users, Search } from "lucide-react";
+import { Package, Plus, Download, Trash2, ShoppingBag, ShoppingCart, FileText, Receipt, CheckCircle2, ArrowRight, Users, Search, History } from "lucide-react";
 import { toast } from "sonner";
 import jsPDF from "jspdf";
 import { format } from "date-fns";
@@ -77,6 +77,23 @@ const ProductCatalogPanel = () => {
     queryKey: ["recycler_products", user?.id],
     queryFn: async () => {
       const { data, error } = await supabase.from("recycler_products").select("*").eq("user_id", user!.id).order("created_at", { ascending: false });
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  // Sales history from financial_transactions (income entries with "Sale:" in description)
+  const { data: salesHistory } = useQuery({
+    queryKey: ["sales_history", user?.id],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("financial_transactions")
+        .select("*")
+        .eq("user_id", user!.id)
+        .eq("type", "income")
+        .ilike("description", "Sale:%")
+        .order("transaction_date", { ascending: false })
+        .limit(50);
       if (error) throw error;
       return data;
     },
@@ -415,6 +432,43 @@ const ProductCatalogPanel = () => {
           </Card>
         )}
       </div>
+
+      {/* Sales History */}
+      {salesHistory && salesHistory.length > 0 && (
+        <Card className="shadow-soft">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-base flex items-center gap-2">
+              <History className="w-5 h-5 text-primary" /> Sales History
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="divide-y divide-border">
+              {salesHistory.map((tx) => {
+                const desc = tx.description?.replace("Sale: ", "") || "";
+                const parts = desc.split(" to ");
+                const productInfo = parts[0] || "";
+                const customerName = parts[1] || "Unknown";
+                return (
+                  <div key={tx.id} className="flex items-center justify-between py-3 gap-2">
+                    <div className="flex items-start gap-3 flex-1 min-w-0">
+                      <Receipt className="w-4 h-4 text-primary mt-0.5 shrink-0" />
+                      <div className="min-w-0">
+                        <p className="text-sm font-medium text-foreground truncate">{customerName}</p>
+                        <p className="text-xs text-muted-foreground truncate">{productInfo}</p>
+                        <p className="text-[10px] text-muted-foreground">{format(new Date(tx.transaction_date), "MMM d, yyyy")}</p>
+                      </div>
+                    </div>
+                    <div className="text-right shrink-0">
+                      <p className="text-sm font-bold text-primary">KES {Number(tx.amount).toLocaleString()}</p>
+                      {tx.reference_number && <p className="text-[10px] text-muted-foreground">Ref: {tx.reference_number}</p>}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Sales Flow Dialog */}
       <Dialog open={saleDialog} onOpenChange={(open) => { if (!open) closeSale(); }}>
