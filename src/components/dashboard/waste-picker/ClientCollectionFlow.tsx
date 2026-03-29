@@ -78,9 +78,27 @@ const ClientCollectionFlow = ({ onBack }: Props) => {
         status: "draft",
       });
       if (error) throw error;
+
+      // Also log into the main collections table so it appears in Log Collection history
+      const { data: matchingType } = await supabase
+        .from("material_types")
+        .select("id")
+        .ilike("name", materialType.trim())
+        .maybeSingle();
+
+      if (matchingType) {
+        await supabase.from("collections").insert({
+          user_id: user!.id,
+          material_type_id: matchingType.id,
+          quantity: qty,
+          location_name: locationName || null,
+          notes: `Client: ${clientName}${notes ? ` • ${notes}` : ""}`,
+        });
+      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["client_collections"] });
+      queryClient.invalidateQueries({ queryKey: ["collections"] });
       toast.success("Collection recorded as draft!");
       setClientName(""); setClientPhone(""); setClientEmail("");
       setMaterialType(""); setQuantityKg(""); setUnitPrice("");
