@@ -77,12 +77,14 @@ const AggregatorDashboard = () => {
       case "earnings-expenses": return <EarningsExpensesPanel role="aggregator" />;
       case "inventory": return (
         <Tabs defaultValue="stock" className="space-y-4">
-          <TabsList className="grid w-full grid-cols-3">
+          <TabsList className="grid w-full grid-cols-4">
             <TabsTrigger value="stock"><Package className="w-4 h-4 mr-1.5" />Stock</TabsTrigger>
+            <TabsTrigger value="delivered"><ClipboardList className="w-4 h-4 mr-1.5" />Waste Delivered</TabsTrigger>
             <TabsTrigger value="pickups"><Truck className="w-4 h-4 mr-1.5" />Pickup Requests</TabsTrigger>
             <TabsTrigger value="schedule"><Calendar className="w-4 h-4 mr-1.5" />Schedule Pickup</TabsTrigger>
           </TabsList>
           <TabsContent value="stock"><InventoryPanel /></TabsContent>
+          <TabsContent value="delivered"><WasteDeliveredPanel /></TabsContent>
           <TabsContent value="pickups"><RequestedPickupsPanel /></TabsContent>
           <TabsContent value="schedule"><LogisticsPanel /></TabsContent>
         </Tabs>
