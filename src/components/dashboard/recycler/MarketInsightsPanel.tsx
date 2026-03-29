@@ -2,6 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { TrendingUp, TrendingDown, Minus } from "lucide-react";
+import MarketPriceEditor from "@/components/dashboard/shared/MarketPriceEditor";
 
 const MarketInsightsPanel = () => {
   const { data: materials } = useQuery({
@@ -41,9 +42,12 @@ const MarketInsightsPanel = () => {
                         <span className="text-lg">{m.icon || "♻️"}</span>
                         <p className="text-sm font-medium text-foreground">{m.name}</p>
                       </div>
-                      <div className={`flex items-center gap-1 ${trendColor}`}>
-                        <TrendIcon className="w-4 h-4" />
-                        <span className="text-xs font-medium">{m.trend > 0 ? "+" : ""}{m.trend}%</span>
+                      <div className="flex items-center gap-1.5">
+                        <div className={`flex items-center gap-1 ${trendColor}`}>
+                          <TrendIcon className="w-4 h-4" />
+                          <span className="text-xs font-medium">{m.trend > 0 ? "+" : ""}{m.trend}%</span>
+                        </div>
+                        <MarketPriceEditor materialId={m.id} currentPrice={Number(m.price_per_unit)} unit={m.unit} />
                       </div>
                     </div>
                     <p className="text-xl font-bold text-foreground">KES {Number(m.price_per_unit).toFixed(2)}</p>

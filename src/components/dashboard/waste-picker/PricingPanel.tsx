@@ -5,6 +5,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge";
 import { Loader2, TrendingUp, Leaf } from "lucide-react";
 import { format } from "date-fns";
+import MarketPriceEditor from "@/components/dashboard/shared/MarketPriceEditor";
 
 const CO2_FACTORS: Record<string, number> = {
   PET: 3.1, HDPE: 1.8, LDPE: 2.0, PP: 1.7, PS: 3.0,
@@ -34,7 +35,7 @@ const PricingPanel = () => {
           <div>
             <p className="text-sm font-medium text-foreground">Live Market Prices</p>
             <p className="text-xs text-muted-foreground">
-              Prices updated by administrators • Last update: {format(new Date(), "MMM d, yyyy")}
+              Tap the edit icon to update prices • Last update: {format(new Date(), "MMM d, yyyy")}
             </p>
           </div>
         </CardContent>
@@ -49,6 +50,7 @@ const PricingPanel = () => {
                 <TableHead>Material</TableHead>
                 <TableHead>Unit</TableHead>
                 <TableHead className="text-right">Price (KES)</TableHead>
+                <TableHead className="text-center">Edit</TableHead>
                 <TableHead className="text-right">
                   <span className="flex items-center gap-1 justify-end"><Leaf className="w-3.5 h-3.5" /> CO₂/kg</span>
                 </TableHead>
@@ -61,6 +63,9 @@ const PricingPanel = () => {
                   <TableCell><Badge variant="outline">{mt.unit}</Badge></TableCell>
                   <TableCell className="text-right font-semibold text-primary">
                     KES {Number(mt.price_per_unit).toFixed(2)}
+                  </TableCell>
+                  <TableCell className="text-center">
+                    <MarketPriceEditor materialId={mt.id} currentPrice={Number(mt.price_per_unit)} unit={mt.unit} />
                   </TableCell>
                   <TableCell className="text-right text-muted-foreground">
                     {(CO2_FACTORS[mt.name] || 2.0).toFixed(1)} kg

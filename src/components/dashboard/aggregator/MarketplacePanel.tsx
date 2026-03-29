@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Store, Recycle, ArrowRight, Search, Mail, Phone } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import MarketPriceEditor from "@/components/dashboard/shared/MarketPriceEditor";
 
 const MarketplacePanel = () => {
   const { user, profile } = useAuth();
@@ -71,7 +72,10 @@ const MarketplacePanel = () => {
                       <p className="text-xs text-muted-foreground">per {m.unit}</p>
                     </div>
                   </div>
-                  <p className="text-sm font-bold text-primary">KES {Number(m.price_per_unit).toFixed(2)}</p>
+                  <div className="flex items-center gap-2">
+                    <p className="text-sm font-bold text-primary">KES {Number(m.price_per_unit).toFixed(2)}</p>
+                    <MarketPriceEditor materialId={m.id} currentPrice={Number(m.price_per_unit)} unit={m.unit} />
+                  </div>
                 </div>
               ))}
             </div>
