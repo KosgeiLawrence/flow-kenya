@@ -21,7 +21,8 @@ import {
 } from "@/lib/pdfBranding";
 
 const CollectionPanel = () => {
-  const { user } = useAuth();
+  const { user, profile } = useAuth();
+  const { orgInfo } = useOrgInfo();
   const queryClient = useQueryClient();
   const [materialTypeId, setMaterialTypeId] = useState("");
   const [quantity, setQuantity] = useState("");
