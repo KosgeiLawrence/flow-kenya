@@ -98,6 +98,7 @@ const ClientCollectionFlow = ({ onBack }: Props) => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["client_collections"] });
+      queryClient.invalidateQueries({ queryKey: ["collections"] });
       toast.success("Collection recorded as draft!");
       setClientName(""); setClientPhone(""); setClientEmail("");
       setMaterialType(""); setQuantityKg(""); setUnitPrice("");
