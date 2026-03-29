@@ -14,6 +14,78 @@ export type Database = {
   }
   public: {
     Tables: {
+      aggregator_purchase_orders: {
+        Row: {
+          created_at: string
+          delivered_at: string | null
+          delivered_quantity: number | null
+          delivery_notes: string | null
+          expected_delivery_date: string | null
+          grn_number: string | null
+          id: string
+          material_type: string
+          notes: string | null
+          order_date: string
+          po_number: string
+          quantity: number
+          status: string
+          supplier_name: string
+          supplier_phone: string | null
+          supplier_role: string | null
+          total_amount: number
+          unit: string
+          unit_price: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          delivered_at?: string | null
+          delivered_quantity?: number | null
+          delivery_notes?: string | null
+          expected_delivery_date?: string | null
+          grn_number?: string | null
+          id?: string
+          material_type: string
+          notes?: string | null
+          order_date?: string
+          po_number?: string
+          quantity?: number
+          status?: string
+          supplier_name: string
+          supplier_phone?: string | null
+          supplier_role?: string | null
+          total_amount?: number
+          unit?: string
+          unit_price?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          delivered_at?: string | null
+          delivered_quantity?: number | null
+          delivery_notes?: string | null
+          expected_delivery_date?: string | null
+          grn_number?: string | null
+          id?: string
+          material_type?: string
+          notes?: string | null
+          order_date?: string
+          po_number?: string
+          quantity?: number
+          status?: string
+          supplier_name?: string
+          supplier_phone?: string | null
+          supplier_role?: string | null
+          total_amount?: number
+          unit?: string
+          unit_price?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       balance_sheet_items: {
         Row: {
           account_name: string
