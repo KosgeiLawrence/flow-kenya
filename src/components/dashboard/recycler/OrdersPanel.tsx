@@ -11,7 +11,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { ClipboardList, Plus, FileText, CheckCircle2, Clock, XCircle, Truck, Download } from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { ClipboardList, Plus, FileText, CheckCircle2, Clock, XCircle, Truck, Download, Users } from "lucide-react";
 import { toast } from "sonner";
 import { format } from "date-fns";
 import jsPDF from "jspdf";
@@ -30,6 +31,18 @@ const OrdersPanel = () => {
   const queryClient = useQueryClient();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [form, setForm] = useState({ supplier_name: "", material_type: "", quantity: "", unit: "kg", unit_price: "", delivery_date: "", notes: "" });
+  const [supplierMode, setSupplierMode] = useState<"existing" | "manual">("existing");
+
+  // Fetch user's suppliers
+  const { data: suppliers } = useQuery({
+    queryKey: ["suppliers", user?.id],
+    queryFn: async () => {
+      const { data, error } = await supabase.from("suppliers").select("*").eq("user_id", user!.id).order("supplier_name");
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!user,
+  });
 
   const { data: orders } = useQuery({
     queryKey: ["recycler_orders", user?.id],
