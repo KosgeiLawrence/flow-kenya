@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Store, Recycle, ArrowRight, Search, Mail, Phone } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import MarketPriceEditor from "@/components/dashboard/shared/MarketPriceEditor";
+import MaterialIcon from "@/components/dashboard/shared/MaterialIcon";
 
 const MarketplacePanel = () => {
   const { user, profile } = useAuth();
@@ -66,7 +67,7 @@ const MarketplacePanel = () => {
               {materials.map((m) => (
                 <div key={m.id} className="flex items-center justify-between p-3 rounded-lg bg-muted/50 border border-border">
                   <div className="flex items-center gap-2">
-                    <span className="text-lg">{m.icon || "♻️"}</span>
+                    <span className="text-lg"><MaterialIcon iconName={m.icon} className="w-5 h-5 text-primary" /></span>
                     <div>
                       <p className="text-sm font-medium text-foreground">{m.name}</p>
                       <p className="text-xs text-muted-foreground">per {m.unit}</p>

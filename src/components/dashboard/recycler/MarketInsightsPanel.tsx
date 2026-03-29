@@ -3,6 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { TrendingUp, TrendingDown, Minus } from "lucide-react";
 import MarketPriceEditor from "@/components/dashboard/shared/MarketPriceEditor";
+import MaterialIcon from "@/components/dashboard/shared/MaterialIcon";
 
 const MarketInsightsPanel = () => {
   const { data: materials } = useQuery({
@@ -39,7 +40,7 @@ const MarketInsightsPanel = () => {
                   <div key={m.id} className="p-4 rounded-lg bg-muted/30 border border-border">
                     <div className="flex items-center justify-between mb-2">
                       <div className="flex items-center gap-2">
-                        <span className="text-lg">{m.icon || "♻️"}</span>
+                        <MaterialIcon iconName={m.icon} className="w-5 h-5 text-primary" />
                         <p className="text-sm font-medium text-foreground">{m.name}</p>
                       </div>
                       <div className="flex items-center gap-1.5">

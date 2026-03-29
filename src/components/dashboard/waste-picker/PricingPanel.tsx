@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Loader2, TrendingUp, Leaf } from "lucide-react";
 import { format } from "date-fns";
 import MarketPriceEditor from "@/components/dashboard/shared/MarketPriceEditor";
+import MaterialIcon from "@/components/dashboard/shared/MaterialIcon";
 
 const CO2_FACTORS: Record<string, number> = {
   PET: 3.1, HDPE: 1.8, LDPE: 2.0, PP: 1.7, PS: 3.0,
@@ -61,8 +62,10 @@ const PricingPanel = () => {
                 <TableRow key={mt.id}>
                   <TableCell className="font-medium">
                     <span className="flex items-center gap-2">
-                      <span className="text-lg">{mt.icon || "♻️"}</span>
+                      <MaterialIcon iconName={mt.icon} className="w-5 h-5 text-primary" />
                       {mt.name}
+                    </span>
+                  </TableCell>
                     </span>
                   </TableCell>
                   <TableCell><Badge variant="outline">{mt.unit}</Badge></TableCell>
