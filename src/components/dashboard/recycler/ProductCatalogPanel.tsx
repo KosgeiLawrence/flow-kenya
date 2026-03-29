@@ -49,7 +49,18 @@ const ProductCatalogPanel = () => {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [saleDialog, setSaleDialog] = useState(false);
   const [sale, setSale] = useState<SaleState>(initialSale);
-  const [pendingSales, setPendingSales] = useState<(SaleState & { vat: VatConfig })[]>([]);
+  const [pendingSales, setPendingSales] = useState<(SaleState & { vat: VatConfig })[]>(() => {
+    try {
+      const saved = localStorage.getItem(`pending_sales_${user?.id || "anon"}`);
+      return saved ? JSON.parse(saved) : [];
+    } catch { return []; }
+  });
+
+  // Persist pending sales to localStorage
+  useEffect(() => {
+    if (!user) return;
+    localStorage.setItem(`pending_sales_${user.id}`, JSON.stringify(pendingSales));
+  }, [pendingSales, user]);
   const [form, setForm] = useState({ name: "", description: "", material_source: "", stock_quantity: "", unit: "kg", price_per_unit: "" });
   const [vat, setVat] = useState<VatConfig>(DEFAULT_VAT);
   const [crmCustomers, setCrmCustomers] = useState<any[]>([]);
