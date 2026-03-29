@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -55,6 +56,20 @@ const LogisticsPanel = () => {
     mutationFn: async ({ id, status }: { id: string; status: string }) => {
       const { error } = await supabase.from("pickup_schedules").update({ status }).eq("id", id);
       if (error) throw error;
+
+      // When completed, record as expense in financial_transactions
+      if (status === "completed" && user) {
+        const schedule = schedules?.find(s => s.id === id);
+        await supabase.from("financial_transactions").insert({
+          user_id: user.id,
+          type: "expense",
+          amount: 0, // User can update the amount later in Earnings & Expenses
+          description: `Pickup completed: ${schedule?.location_name || "Unknown location"}`,
+          payment_method: "cash",
+          transaction_date: new Date().toISOString().split("T")[0],
+        });
+        queryClient.invalidateQueries({ queryKey: ["financial_transactions"] });
+      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["aggregator_logistics"] });
