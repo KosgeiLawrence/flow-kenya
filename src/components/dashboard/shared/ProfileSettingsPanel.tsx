@@ -56,7 +56,7 @@ const kenyaCounties = [
 ];
 
 const ProfileSettingsPanel = ({ role }: ProfileSettingsPanelProps) => {
-  const { user, profile } = useAuth();
+  const { user, profile, refreshProfile } = useAuth();
   const queryClient = useQueryClient();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
@@ -155,6 +155,7 @@ const ProfileSettingsPanel = ({ role }: ProfileSettingsPanelProps) => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["full_profile"] });
+      refreshProfile();
       toast.success("Profile updated successfully");
     },
     onError: (e: Error) => toast.error(e.message),
@@ -186,6 +187,7 @@ const ProfileSettingsPanel = ({ role }: ProfileSettingsPanelProps) => {
         .eq("user_id", user.id);
 
       queryClient.invalidateQueries({ queryKey: ["full_profile"] });
+      await refreshProfile();
       toast.success("Avatar updated");
     } catch (err: any) {
       toast.error(err.message);
