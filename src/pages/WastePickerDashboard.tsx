@@ -21,8 +21,10 @@ import GrantsDiscoveryPanel from "@/components/dashboard/shared/GrantsDiscoveryP
 import CleanupExercisePanel from "@/components/dashboard/shared/CleanupExercisePanel";
 import EarningsExpensesPanel from "@/components/dashboard/shared/EarningsExpensesPanel";
 import CRMPanel from "@/components/dashboard/shared/CRMPanel";
+import WastePickerWorkflowGuidePanel from "@/components/dashboard/waste-picker/WorkflowGuidePanel";
 
 const navItems = [
+  { id: "how-it-works", label: "How It Works", icon: BookOpen },
   { id: "collection", label: "Collections", icon: Package },
   { id: "my-earnings", label: "My Earnings", icon: DollarSign },
   { id: "pricing", label: "Live Pricing", icon: DollarSign },
