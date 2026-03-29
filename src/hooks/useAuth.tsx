@@ -41,6 +41,8 @@ interface AuthContextType {
   session: Session | null;
   role: AppRole | null;
   profile: Profile | null;
+  displayName: string;
+  orgLogoUrl: string | null;
   loading: boolean;
   subscribed: boolean | null;
   checkingSubscription: boolean;
@@ -53,6 +55,8 @@ export const AuthContext = createContext<AuthContextType>({
   session: null,
   role: null,
   profile: null,
+  displayName: "",
+  orgLogoUrl: null,
   loading: true,
   subscribed: null,
   checkingSubscription: true,
