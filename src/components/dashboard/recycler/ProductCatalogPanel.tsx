@@ -98,7 +98,6 @@ const ProductCatalogPanel = () => {
       return data;
     },
     enabled: !!user,
-    enabled: !!user,
   });
 
   const createProduct = useMutation({
