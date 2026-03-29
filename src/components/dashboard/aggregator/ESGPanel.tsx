@@ -263,7 +263,7 @@ const AggregatorESGPanel = () => {
     if (Number(c.other_materials_kg) > 0) materialMap.set("Other", (materialMap.get("Other") || 0) + Number(c.other_materials_kg));
   });
   const pieData = Array.from(materialMap.entries()).map(([name, value]) => ({ name, value: Math.round(value) }));
-  const esgScore = Math.min(Math.round((totalKg / 1000) * 25 + 40), 100);
+  const esgScore = Math.min(Math.round((totalKg / 1000) * 20 + (trainingParticipants / 50) * 10 + (trainingTrees * 0.5) + 40), 100);
 
   const periodLabel = () => {
     if (!dateRange) return "All Time";
