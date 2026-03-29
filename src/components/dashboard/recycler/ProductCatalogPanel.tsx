@@ -113,6 +113,25 @@ const ProductCatalogPanel = () => {
     setPendingSales((prev) => prev.filter((s) => s.refNo !== refNo));
   };
 
+  const getOrgPdfInfo = async () => {
+    if (!orgInfo) return null;
+    let logoBase64: string | null = null;
+    if (orgInfo.orgLogoUrl) logoBase64 = await loadImageAsBase64(orgInfo.orgLogoUrl);
+    return buildPdfOrgInfo(orgInfo, logoBase64);
+  };
+
+  const calcSubtotal = () => {
+    if (!selectedProduct) return 0;
+    return (Number(sale.quantity) || 1) * Number(selectedProduct.price_per_unit);
+  };
+
+  const calcVatAmount = () => {
+    if (!vat.includeVat) return 0;
+    return calcSubtotal() * (vat.vatPercent / 100);
+  };
+
+  const calcTotal = () => calcSubtotal() + calcVatAmount();
+
   const generatePdf = async (docType: "Quotation" | "Invoice" | "Receipt") => {
     if (!selectedProduct) return;
     const qty = Number(sale.quantity) || 1;
