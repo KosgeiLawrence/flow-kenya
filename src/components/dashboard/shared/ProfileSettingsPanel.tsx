@@ -186,6 +186,7 @@ const ProfileSettingsPanel = ({ role }: ProfileSettingsPanelProps) => {
         .eq("user_id", user.id);
 
       queryClient.invalidateQueries({ queryKey: ["full_profile"] });
+      await refreshProfile();
       toast.success("Avatar updated");
     } catch (err: any) {
       toast.error(err.message);
