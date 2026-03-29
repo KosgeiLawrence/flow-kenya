@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import {
   LogOut, Users, Package, Store, Truck, DollarSign, Printer,
   FileText, BarChart3, Shield, Clock, CheckCircle2, AlertTriangle,
-  Menu, X, ChevronRight, Briefcase, Settings, BookOpen, Leaf, TrendingUp, Send
+  Menu, X, ChevronRight, Briefcase, Settings, BookOpen, Leaf, TrendingUp, Send, Calendar
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
