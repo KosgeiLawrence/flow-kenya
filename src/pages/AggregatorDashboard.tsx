@@ -91,7 +91,7 @@ const AggregatorDashboard = () => {
         </Tabs>
       );
       case "sales": return (
-        <Tabs defaultValue="sell" className="space-y-4">
+        <Tabs key="sales-tabs" defaultValue="sell" className="space-y-4">
           <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="sell"><ShoppingCart className="w-4 h-4 mr-1.5" />Sell Materials</TabsTrigger>
             <TabsTrigger value="recycler-requests"><Send className="w-4 h-4 mr-1.5" />Request from Recyclers</TabsTrigger>
