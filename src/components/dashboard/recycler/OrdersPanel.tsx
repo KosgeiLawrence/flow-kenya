@@ -141,7 +141,28 @@ const OrdersPanel = () => {
             <DialogContent className="max-w-sm max-h-[85vh] overflow-y-auto p-4">
               <DialogHeader><DialogTitle className="text-base">Create New Order</DialogTitle></DialogHeader>
               <div className="space-y-2">
-                <div><Label className="text-xs">Supplier Name</Label><Input className="h-8 text-sm" value={form.supplier_name} onChange={(e) => setForm({ ...form, supplier_name: e.target.value })} placeholder="e.g. Kibera Aggregators" /></div>
+                <div>
+                  <Label className="text-xs">Supplier</Label>
+                  <Tabs value={supplierMode} onValueChange={(v) => setSupplierMode(v as "existing" | "manual")} className="mt-1">
+                    <TabsList className="grid w-full grid-cols-2 h-7">
+                      <TabsTrigger value="existing" className="text-[11px]"><Users className="w-3 h-3 mr-1" />From List</TabsTrigger>
+                      <TabsTrigger value="manual" className="text-[11px]">New Supplier</TabsTrigger>
+                    </TabsList>
+                  </Tabs>
+                  {supplierMode === "existing" ? (
+                    <Select value={form.supplier_name} onValueChange={(v) => setForm({ ...form, supplier_name: v })}>
+                      <SelectTrigger className="h-8 text-sm mt-1"><SelectValue placeholder="Select supplier" /></SelectTrigger>
+                      <SelectContent>
+                        {suppliers?.map((s) => (
+                          <SelectItem key={s.id} value={s.supplier_name}>{s.supplier_name}{s.location ? ` · ${s.location}` : ""}</SelectItem>
+                        ))}
+                        {(!suppliers || suppliers.length === 0) && <SelectItem value="_none" disabled>No suppliers yet</SelectItem>}
+                      </SelectContent>
+                    </Select>
+                  ) : (
+                    <Input className="h-8 text-sm mt-1" value={form.supplier_name} onChange={(e) => setForm({ ...form, supplier_name: e.target.value })} placeholder="e.g. Kibera Aggregators" />
+                  )}
+                </div>
                 <div><Label className="text-xs">Material Type</Label><Input className="h-8 text-sm" value={form.material_type} onChange={(e) => setForm({ ...form, material_type: e.target.value })} placeholder="e.g. PET Bottles" /></div>
                 <div className="grid grid-cols-2 gap-2">
                   <div><Label className="text-xs">Quantity</Label><Input className="h-8 text-sm" type="number" value={form.quantity} onChange={(e) => setForm({ ...form, quantity: e.target.value })} /></div>
