@@ -82,15 +82,21 @@ const drawMetricCard = (doc: jsPDF, x: number, y: number, w: number, value: stri
   doc.text(label, x + 6, y + 22);
 };
 
-// ── PDF Helper: add org header ──
-const addOrgHeader = (doc: jsPDF, orgName: string, logoBase64: string | null, contactDetails: string[]) => {
+// ── PDF Helper: add org header with Duara Flow logo ──
+const addOrgHeader = async (doc: jsPDF, orgName: string, logoBase64: string | null, contactDetails: string[]) => {
   const pw = doc.internal.pageSize.getWidth();
+  const duaraLogo = await getDuaraFlowLogo();
 
   // Top accent band
   doc.setFillColor(...PDF_COLORS.forest);
   doc.rect(0, 0, pw, 6, "F");
   doc.setFillColor(...PDF_COLORS.gold);
   doc.rect(0, 6, pw, 1.5, "F");
+
+  // Duara Flow logo (right side)
+  if (duaraLogo) {
+    try { doc.addImage(duaraLogo, "PNG", pw - 60, 10, 46, 18); } catch {}
+  }
 
   let leftX = 15;
   if (logoBase64) {
@@ -112,19 +118,40 @@ const addOrgHeader = (doc: jsPDF, orgName: string, logoBase64: string | null, co
   return Math.max(cy + 2, 36);
 };
 
-// ── PDF Helper: add clean footer ──
-const addReportFooter = (doc: jsPDF, orgName: string) => {
+// ── PDF Helper: add footer with Duara Intelligence branding ──
+const addReportFooter = async (doc: jsPDF, orgName: string) => {
   const pages = doc.getNumberOfPages();
   const pw = doc.internal.pageSize.getWidth();
   const ph = doc.internal.pageSize.getHeight();
+  const intelLogo = await getDuaraIntelLogo();
+
   for (let i = 1; i <= pages; i++) {
     doc.setPage(i);
+
+    // Separator line
+    const footerY = ph - 20;
+    doc.setDrawColor(...PDF_COLORS.lightGray);
+    doc.setLineWidth(0.3);
+    doc.line(15, footerY, pw - 15, footerY);
+
+    // Duara Intelligence logo (left)
+    if (intelLogo) {
+      try { doc.addImage(intelLogo, "PNG", 15, footerY + 2, 25, 13); } catch {}
+    }
+
+    // Contact info (center)
+    doc.setFontSize(6.5);
+    doc.setTextColor(...PDF_COLORS.mutedText);
+    doc.text(`${orgName}  •  Powered by Duara Flow`, pw / 2, footerY + 6, { align: "center" });
+    doc.text("www.duaraflow.co.ke  •  info@duaraflow.co.ke  •  +254 741 027 140", pw / 2, footerY + 10, { align: "center" });
+
+    // Page number (right)
+    doc.setFontSize(7);
+    doc.text(`Page ${i} of ${pages}`, pw - 15, footerY + 8, { align: "right" });
+
     // Bottom accent band
     doc.setFillColor(...PDF_COLORS.forest);
-    doc.rect(0, ph - 8, pw, 8, "F");
-    doc.setFontSize(6.5);
-    doc.setTextColor(255, 255, 255);
-    doc.text(`${orgName}  •  ESG & Sustainability Report  •  Page ${i} of ${pages}`, pw / 2, ph - 3, { align: "center" });
+    doc.rect(0, ph - 4, pw, 4, "F");
   }
 };
 
