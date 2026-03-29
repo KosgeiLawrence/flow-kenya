@@ -40,8 +40,7 @@ const navItems = [
   { id: "marketplace", label: "Marketplace", icon: Store },
   
   
-  { id: "receipts", label: "Bulk Receipts", icon: Printer },
-  { id: "invoices", label: "Invoices & Notes", icon: FileText },
+  
   { id: "earnings-expenses", label: "Earnings & Expenses", icon: TrendingUp },
   { id: "analytics", label: "Profit & Analytics", icon: BarChart3 },
   { id: "esg", label: "ESG & Carbon", icon: Leaf },
