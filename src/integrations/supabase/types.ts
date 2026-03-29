@@ -529,6 +529,42 @@ export type Database = {
           },
         ]
       }
+      material_transformations: {
+        Row: {
+          created_at: string
+          id: string
+          notes: string | null
+          status: string
+          transformation_date: string
+          transformation_type: string
+          updated_at: string
+          user_id: string
+          yield_percentage: number | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          notes?: string | null
+          status?: string
+          transformation_date?: string
+          transformation_type?: string
+          updated_at?: string
+          user_id: string
+          yield_percentage?: number | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          notes?: string | null
+          status?: string
+          transformation_date?: string
+          transformation_type?: string
+          updated_at?: string
+          user_id?: string
+          yield_percentage?: number | null
+        }
+        Relationships: []
+      }
       material_types: {
         Row: {
           created_at: string
@@ -1363,6 +1399,96 @@ export type Database = {
           venue?: string | null
         }
         Relationships: []
+      }
+      transformation_inputs: {
+        Row: {
+          created_at: string
+          id: string
+          material_name: string
+          material_type_id: string | null
+          quantity: number
+          transformation_id: string
+          unit: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          material_name: string
+          material_type_id?: string | null
+          quantity?: number
+          transformation_id: string
+          unit?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          material_name?: string
+          material_type_id?: string | null
+          quantity?: number
+          transformation_id?: string
+          unit?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "transformation_inputs_material_type_id_fkey"
+            columns: ["material_type_id"]
+            isOneToOne: false
+            referencedRelation: "material_types"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "transformation_inputs_transformation_id_fkey"
+            columns: ["transformation_id"]
+            isOneToOne: false
+            referencedRelation: "material_transformations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      transformation_outputs: {
+        Row: {
+          created_at: string
+          id: string
+          product_id: string | null
+          product_name: string
+          quantity: number
+          transformation_id: string
+          unit: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          product_id?: string | null
+          product_name: string
+          quantity?: number
+          transformation_id: string
+          unit?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          product_id?: string | null
+          product_name?: string
+          quantity?: number
+          transformation_id?: string
+          unit?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "transformation_outputs_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "recycler_products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "transformation_outputs_transformation_id_fkey"
+            columns: ["transformation_id"]
+            isOneToOne: false
+            referencedRelation: "material_transformations"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       user_roles: {
         Row: {
