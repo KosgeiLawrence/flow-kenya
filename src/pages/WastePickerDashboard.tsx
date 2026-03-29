@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import {
   LogOut, User, Package, DollarSign, Calendar, BarChart3,
   QrCode, BookOpen, Clock, CheckCircle2, AlertTriangle, Menu, X,
-  ChevronRight, Briefcase, Settings
+  ChevronRight, Briefcase, Settings, ShoppingCart
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
@@ -22,10 +22,12 @@ import CleanupExercisePanel from "@/components/dashboard/shared/CleanupExerciseP
 import EarningsExpensesPanel from "@/components/dashboard/shared/EarningsExpensesPanel";
 import CRMPanel from "@/components/dashboard/shared/CRMPanel";
 import WastePickerWorkflowGuidePanel from "@/components/dashboard/waste-picker/WorkflowGuidePanel";
+import WastePickerSalesPanel from "@/components/dashboard/waste-picker/WastePickerSalesPanel";
 
 const navItems = [
   { id: "how-it-works", label: "How It Works", icon: BookOpen },
   { id: "collection", label: "Collections", icon: Package },
+  { id: "sales", label: "Sales", icon: ShoppingCart },
   { id: "my-earnings", label: "My Earnings", icon: DollarSign },
   { id: "pricing", label: "Live Pricing", icon: DollarSign },
   
@@ -63,6 +65,7 @@ const WastePickerDashboard = () => {
     switch (activePanel) {
       case "how-it-works": return <WastePickerWorkflowGuidePanel />;
       case "collection": return <CollectionPanel />;
+      case "sales": return <WastePickerSalesPanel />;
       case "my-earnings": return <EarningsExpensesPanel role="waste_picker" />;
       case "pricing": return <PricingPanel />;
       
