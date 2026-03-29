@@ -73,6 +73,33 @@ const WasteDeliveredPanel = () => {
     },
   });
 
+  const { data: savedSuppliers } = useQuery({
+    queryKey: ["suppliers", user?.id],
+    queryFn: async () => {
+      const { data, error } = await supabase.from("suppliers").select("*").eq("user_id", user!.id).order("supplier_name");
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!user,
+  });
+
+  const { data: wastePickers } = useQuery({
+    queryKey: ["waste_picker_profiles"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("profiles")
+        .select("user_id, full_name, phone_number, email")
+        .in("user_id", (await supabase.from("user_roles").select("user_id").eq("role", "waste_picker")).data?.map(r => r.user_id) || [])
+        .eq("approval_status", "approved")
+        .order("full_name");
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!user,
+  });
+
+  const [supplierSource, setSupplierSource] = useState<"manual" | "supplier" | "picker">("manual");
+
   const { data: orders, isLoading } = useQuery({
     queryKey: ["aggregator_purchase_orders", user?.id],
     queryFn: async () => {
@@ -344,8 +371,64 @@ const WasteDeliveredPanel = () => {
         <DialogContent className="max-h-[90vh] overflow-y-auto">
           <DialogHeader><DialogTitle>New Purchase Order</DialogTitle></DialogHeader>
           <div className="space-y-3">
-            <Input placeholder="Supplier name *" value={form.supplier_name} onChange={e => setForm({ ...form, supplier_name: e.target.value })} />
-            <Input placeholder="Supplier phone" value={form.supplier_phone} onChange={e => setForm({ ...form, supplier_phone: e.target.value })} />
+
+            {/* Supplier source selector */}
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-foreground">Select Supplier From</label>
+              <Select value={supplierSource} onValueChange={(v: "manual" | "supplier" | "picker") => {
+                setSupplierSource(v);
+                setForm({ ...form, supplier_name: "", supplier_phone: "" });
+              }}>
+                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="manual">Enter Manually</SelectItem>
+                  <SelectItem value="supplier">My Suppliers</SelectItem>
+                  <SelectItem value="picker">Waste Pickers</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            {supplierSource === "manual" && (
+              <>
+                <Input placeholder="Supplier name *" value={form.supplier_name} onChange={e => setForm({ ...form, supplier_name: e.target.value })} />
+                <Input placeholder="Supplier phone" value={form.supplier_phone} onChange={e => setForm({ ...form, supplier_phone: e.target.value })} />
+              </>
+            )}
+
+            {supplierSource === "supplier" && (
+              <Select value={form.supplier_name} onValueChange={v => {
+                const s = savedSuppliers?.find(s => s.supplier_name === v);
+                setForm({ ...form, supplier_name: v, supplier_phone: s?.phone || "" });
+              }}>
+                <SelectTrigger><SelectValue placeholder="Select a supplier *" /></SelectTrigger>
+                <SelectContent>
+                  {savedSuppliers?.map(s => (
+                    <SelectItem key={s.id} value={s.supplier_name}>{s.supplier_name} {s.phone ? `(${s.phone})` : ""}</SelectItem>
+                  ))}
+                  {(!savedSuppliers || savedSuppliers.length === 0) && (
+                    <SelectItem value="_none" disabled>No suppliers found</SelectItem>
+                  )}
+                </SelectContent>
+              </Select>
+            )}
+
+            {supplierSource === "picker" && (
+              <Select value={form.supplier_name} onValueChange={v => {
+                const p = wastePickers?.find(p => p.full_name === v);
+                setForm({ ...form, supplier_name: v, supplier_phone: p?.phone_number || "" });
+              }}>
+                <SelectTrigger><SelectValue placeholder="Select a waste picker *" /></SelectTrigger>
+                <SelectContent>
+                  {wastePickers?.map(p => (
+                    <SelectItem key={p.user_id} value={p.full_name}>{p.full_name} {p.phone_number ? `(${p.phone_number})` : ""}</SelectItem>
+                  ))}
+                  {(!wastePickers || wastePickers.length === 0) && (
+                    <SelectItem value="_none" disabled>No waste pickers found</SelectItem>
+                  )}
+                </SelectContent>
+              </Select>
+            )}
+
             <Select value={form.material_type} onValueChange={v => setForm({ ...form, material_type: v })}>
               <SelectTrigger><SelectValue placeholder="Select material type *" /></SelectTrigger>
               <SelectContent>
