@@ -80,19 +80,26 @@ const AggregatorDashboard = () => {
       case "earnings-expenses": return <EarningsExpensesPanel role="aggregator" />;
       case "inventory": return (
         <Tabs defaultValue="stock" className="space-y-4">
-          <TabsList className="grid w-full grid-cols-4">
+          <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="stock"><Package className="w-4 h-4 mr-1.5" />Stock</TabsTrigger>
             <TabsTrigger value="pickups"><Truck className="w-4 h-4 mr-1.5" />Pickup Requests</TabsTrigger>
             <TabsTrigger value="schedule"><Calendar className="w-4 h-4 mr-1.5" />Schedule Pickup</TabsTrigger>
-            <TabsTrigger value="recycler-requests"><Send className="w-4 h-4 mr-1.5" />Request from Recyclers</TabsTrigger>
           </TabsList>
           <TabsContent value="stock"><InventoryPanel /></TabsContent>
           <TabsContent value="pickups"><RequestedPickupsPanel /></TabsContent>
           <TabsContent value="schedule"><LogisticsPanel /></TabsContent>
+        </Tabs>
+      );
+      case "sales": return (
+        <Tabs defaultValue="sell" className="space-y-4">
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="sell"><ShoppingCart className="w-4 h-4 mr-1.5" />Sell Materials</TabsTrigger>
+            <TabsTrigger value="recycler-requests"><Send className="w-4 h-4 mr-1.5" />Request from Recyclers</TabsTrigger>
+          </TabsList>
+          <TabsContent value="sell"><AggregatorSalesPanel /></TabsContent>
           <TabsContent value="recycler-requests"><RecyclerPickupRequestPanel /></TabsContent>
         </Tabs>
       );
-      case "sales": return <AggregatorSalesPanel />;
       case "marketplace": return <MarketplacePanel />;
       case "logistics": return <LogisticsPanel />;
       case "payments": return <PaymentsPanel />;
