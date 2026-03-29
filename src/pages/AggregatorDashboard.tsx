@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import {
   LogOut, Users, Package, Store, Truck, DollarSign, Printer,
   FileText, BarChart3, Shield, Clock, CheckCircle2, AlertTriangle,
-  Menu, X, ChevronRight, Briefcase, Settings, BookOpen
+  Menu, X, ChevronRight, Briefcase, Settings, BookOpen, Leaf, TrendingUp
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
@@ -17,6 +17,7 @@ import BulkReceiptsPanel from "@/components/dashboard/aggregator/BulkReceiptsPan
 import InvoicesPanel from "@/components/dashboard/aggregator/InvoicesPanel";
 import ProfitAnalyticsPanel from "@/components/dashboard/aggregator/ProfitAnalyticsPanel";
 import CompliancePanel from "@/components/dashboard/aggregator/CompliancePanel";
+import AggregatorESGPanel from "@/components/dashboard/aggregator/ESGPanel";
 import GrantsDiscoveryPanel from "@/components/dashboard/shared/GrantsDiscoveryPanel";
 import ProfileSettingsPanel from "@/components/dashboard/shared/ProfileSettingsPanel";
 import RequestedPickupsPanel from "@/components/dashboard/shared/RequestedPickupsPanel";
@@ -27,14 +28,15 @@ import CRMPanel from "@/components/dashboard/shared/CRMPanel";
 
 const navItems = [
   { id: "pickers", label: "Waste Pickers", icon: Users },
-  { id: "earnings-expenses", label: "Earnings & Expenses", icon: DollarSign },
   { id: "inventory", label: "Inventory", icon: Package },
   { id: "marketplace", label: "Marketplace", icon: Store },
   { id: "logistics", label: "Logistics", icon: Truck },
   { id: "payments", label: "Payments", icon: DollarSign },
   { id: "receipts", label: "Bulk Receipts", icon: Printer },
   { id: "invoices", label: "Invoices & Notes", icon: FileText },
+  { id: "earnings-expenses", label: "Earnings & Expenses", icon: TrendingUp },
   { id: "analytics", label: "Profit & Analytics", icon: BarChart3 },
+  { id: "esg", label: "ESG & Carbon", icon: Leaf },
   { id: "compliance", label: "Compliance", icon: Shield },
   { id: "pickup-requests", label: "Pickup Requests", icon: Truck },
   { id: "training", label: "Training", icon: BookOpen },
@@ -75,6 +77,7 @@ const AggregatorDashboard = () => {
       case "receipts": return <BulkReceiptsPanel />;
       case "invoices": return <InvoicesPanel />;
       case "analytics": return <ProfitAnalyticsPanel />;
+      case "esg": return <AggregatorESGPanel />;
       case "compliance": return <CompliancePanel />;
       case "pickup-requests": return <RequestedPickupsPanel />;
       case "training": return <TrainingPanel viewerRole="aggregator" />;
