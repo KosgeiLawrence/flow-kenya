@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import {
   LogOut, Users, Package, Store, Truck, DollarSign, Printer,
   FileText, BarChart3, Shield, Clock, CheckCircle2, AlertTriangle,
-  Menu, X, ChevronRight, Briefcase, Settings, BookOpen, Leaf, TrendingUp, Send, Calendar
+  Menu, X, ChevronRight, Briefcase, Settings, BookOpen, Leaf, TrendingUp, Send, Calendar, ShoppingCart
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
@@ -28,6 +28,7 @@ import EarningsExpensesPanel from "@/components/dashboard/shared/EarningsExpense
 import CRMPanel from "@/components/dashboard/shared/CRMPanel";
 import AggregatorWorkflowGuidePanel from "@/components/dashboard/aggregator/WorkflowGuidePanel";
 import RecyclerPickupRequestPanel from "@/components/dashboard/aggregator/RecyclerPickupRequestPanel";
+import AggregatorSalesPanel from "@/components/dashboard/aggregator/AggregatorSalesPanel";
 import { HelpCircle } from "lucide-react";
 
 const navItems = [
@@ -78,13 +79,15 @@ const AggregatorDashboard = () => {
       case "earnings-expenses": return <EarningsExpensesPanel role="aggregator" />;
       case "inventory": return (
         <Tabs defaultValue="stock" className="space-y-4">
-          <TabsList className="grid w-full grid-cols-4">
-            <TabsTrigger value="stock"><Package className="w-4 h-4 mr-1.5" />Stock & Collections</TabsTrigger>
+          <TabsList className="grid w-full grid-cols-5">
+            <TabsTrigger value="stock"><Package className="w-4 h-4 mr-1.5" />Stock</TabsTrigger>
+            <TabsTrigger value="sales"><ShoppingCart className="w-4 h-4 mr-1.5" />Sales</TabsTrigger>
             <TabsTrigger value="pickups"><Truck className="w-4 h-4 mr-1.5" />Pickup Requests</TabsTrigger>
             <TabsTrigger value="schedule"><Calendar className="w-4 h-4 mr-1.5" />Schedule Pickup</TabsTrigger>
             <TabsTrigger value="recycler-requests"><Send className="w-4 h-4 mr-1.5" />Request from Recyclers</TabsTrigger>
           </TabsList>
           <TabsContent value="stock"><InventoryPanel /></TabsContent>
+          <TabsContent value="sales"><AggregatorSalesPanel /></TabsContent>
           <TabsContent value="pickups"><RequestedPickupsPanel /></TabsContent>
           <TabsContent value="schedule"><LogisticsPanel /></TabsContent>
           <TabsContent value="recycler-requests"><RecyclerPickupRequestPanel /></TabsContent>
