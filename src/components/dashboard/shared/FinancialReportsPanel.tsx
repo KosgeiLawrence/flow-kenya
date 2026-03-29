@@ -1,5 +1,5 @@
 import { useState, useMemo } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -10,10 +10,13 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
-import { Download, FileText, FileSpreadsheet, TrendingUp, TrendingDown, DollarSign, Loader2 } from "lucide-react";
-import { format, startOfDay, endOfDay, startOfWeek, startOfMonth, endOfMonth, startOfYear, endOfYear, isWithinInterval, subMonths, subWeeks } from "date-fns";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { Download, FileText, FileSpreadsheet, TrendingUp, TrendingDown, DollarSign, Loader2, Plus, Trash2, Edit2 } from "lucide-react";
+import { format, startOfDay, endOfDay, startOfWeek, startOfMonth, endOfMonth, startOfYear, endOfYear } from "date-fns";
 import jsPDF from "jspdf";
 import { addBrandedHeader, addSectionTitle, addDocMeta, drawTableHeader, drawTableRow, drawTotalLine, finalizePdf, PDF_COLORS } from "@/lib/pdfBranding";
+import { toast } from "sonner";
 
 type UserRole = "waste_picker" | "aggregator" | "recycler";
 
@@ -23,12 +26,23 @@ interface Props {
 
 type PeriodType = "daily" | "weekly" | "monthly" | "yearly" | "custom";
 
+const SUB_SECTION_OPTIONS = [
+  { value: "current_asset", label: "Current Asset", section: "asset" },
+  { value: "non_current_asset", label: "Non-Current Asset", section: "asset" },
+  { value: "current_liability", label: "Current Liability", section: "liability" },
+  { value: "long_term_liability", label: "Long-Term Liability", section: "liability" },
+  { value: "equity", label: "Equity", section: "equity" },
+];
+
 const FinancialReportsPanel = ({ role }: Props) => {
   const { user, profile } = useAuth();
+  const queryClient = useQueryClient();
   const [period, setPeriod] = useState<PeriodType>("monthly");
   const [customFrom, setCustomFrom] = useState(format(startOfMonth(new Date()), "yyyy-MM-dd"));
   const [customTo, setCustomTo] = useState(format(new Date(), "yyyy-MM-dd"));
   const [generating, setGenerating] = useState<string | null>(null);
+  const [bsDialogOpen, setBsDialogOpen] = useState(false);
+  const [newBsItem, setNewBsItem] = useState({ sub_section: "current_asset", account_name: "", amount: "", notes: "" });
 
   const { data: transactions, isLoading } = useQuery({
     queryKey: ["financial_transactions_reports", user?.id],
@@ -42,6 +56,97 @@ const FinancialReportsPanel = ({ role }: Props) => {
       return data as any[];
     },
     enabled: !!user,
+  });
+
+  // Fetch balance sheet manual items
+  const { data: bsItems } = useQuery({
+    queryKey: ["balance_sheet_items", user?.id],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("balance_sheet_items")
+        .select("*")
+        .eq("user_id", user!.id)
+        .order("created_at", { ascending: true });
+      if (error) throw error;
+      return data as any[];
+    },
+    enabled: !!user,
+  });
+
+  // Fetch inventory (recycler products) for stock valuation
+  const { data: products } = useQuery({
+    queryKey: ["recycler_products_bs", user?.id],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("recycler_products")
+        .select("*")
+        .eq("user_id", user!.id);
+      if (error) throw error;
+      return data as any[];
+    },
+    enabled: !!user && role === "recycler",
+  });
+
+  // Fetch orders for accounts payable
+  const { data: orders } = useQuery({
+    queryKey: ["recycler_orders_bs", user?.id],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("recycler_orders")
+        .select("*")
+        .eq("user_id", user!.id);
+      if (error) throw error;
+      return data as any[];
+    },
+    enabled: !!user && role === "recycler",
+  });
+
+  // Fetch customers for accounts receivable (pending sales)
+  const { data: customers } = useQuery({
+    queryKey: ["customers_bs", user?.id],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("customers")
+        .select("*")
+        .eq("user_id", user!.id);
+      if (error) throw error;
+      return data as any[];
+    },
+    enabled: !!user,
+  });
+
+  // Add balance sheet item
+  const addBsItemMutation = useMutation({
+    mutationFn: async () => {
+      const opt = SUB_SECTION_OPTIONS.find(o => o.value === newBsItem.sub_section);
+      const { error } = await supabase.from("balance_sheet_items").insert({
+        user_id: user!.id,
+        section: opt?.section || "asset",
+        sub_section: newBsItem.sub_section,
+        account_name: newBsItem.account_name,
+        amount: Number(newBsItem.amount),
+        notes: newBsItem.notes || null,
+      });
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["balance_sheet_items"] });
+      toast.success("Balance sheet item added");
+      setBsDialogOpen(false);
+      setNewBsItem({ sub_section: "current_asset", account_name: "", amount: "", notes: "" });
+    },
+    onError: () => toast.error("Failed to add item"),
+  });
+
+  const deleteBsItemMutation = useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase.from("balance_sheet_items").delete().eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["balance_sheet_items"] });
+      toast.success("Item removed");
+    },
   });
 
   const now = new Date();
@@ -99,7 +204,6 @@ const FinancialReportsPanel = ({ role }: Props) => {
       byMethod.set(method, entry);
     });
 
-    // Get opening balance (all txs before period start)
     const priorTxs = (transactions || []).filter(t => new Date(t.transaction_date) < dateRange.start);
     const openingBalance = priorTxs.reduce((sum, t) => sum + (t.type === "income" ? Number(t.amount) : -Number(t.amount)), 0);
 
@@ -113,14 +217,14 @@ const FinancialReportsPanel = ({ role }: Props) => {
     };
   }, [filteredTxs, transactions, dateRange, pnl]);
 
-  // Balance Sheet data
+  // ── Comprehensive Balance Sheet ──
   const balanceSheet = useMemo(() => {
     const allTxs = transactions || [];
     const totalIncome = allTxs.filter(t => t.type === "income").reduce((s, t) => s + Number(t.amount), 0);
     const totalExpenses = allTxs.filter(t => t.type === "expense").reduce((s, t) => s + Number(t.amount), 0);
     const cashBalance = totalIncome - totalExpenses;
 
-    // Break down by payment method for assets
+    // Cash by payment method
     const cashByMethod = new Map<string, number>();
     allTxs.forEach(t => {
       const method = t.payment_method || "cash";
@@ -128,18 +232,84 @@ const FinancialReportsPanel = ({ role }: Props) => {
       cashByMethod.set(method, current + (t.type === "income" ? Number(t.amount) : -Number(t.amount)));
     });
 
-    return {
-      assets: Array.from(cashByMethod.entries()).map(([method, amount]) => ({
-        name: method === "mpesa" ? "M-Pesa Balance" : method === "bank" ? "Bank Balance" : method === "cash" ? "Cash in Hand" : `${method} Balance`,
-        amount: Math.max(0, amount),
-      })),
-      totalAssets: Math.max(0, cashBalance),
-      retainedEarnings: cashBalance,
-      totalEquity: cashBalance,
-    };
-  }, [transactions]);
+    // Auto-calculated current assets
+    const autoCashAssets = Array.from(cashByMethod.entries()).map(([method, amount]) => ({
+      name: method === "mpesa" ? "M-Pesa Balance" : method === "bank" ? "Bank Balance" : method === "cash" ? "Cash in Hand" : `${method} Balance`,
+      amount: Math.max(0, amount),
+      isAuto: true,
+    }));
 
-  const methodLabel = (m: string) => m === "mpesa" ? "📱 M-Pesa" : m === "bank" ? "🏦 Bank" : m === "cash" ? "💵 Cash" : m;
+    // Inventory valuation (stock × price)
+    const inventoryValue = (products || []).reduce((s, p) => s + (Number(p.stock_quantity) * Number(p.price_per_unit)), 0);
+
+    // Accounts receivable - pending sales from localStorage
+    let pendingSalesTotal = 0;
+    try {
+      const saved = localStorage.getItem(`pending_sales_${user?.id}`);
+      if (saved) {
+        const pending = JSON.parse(saved);
+        pendingSalesTotal = pending.reduce((s: number, p: any) => s + (Number(p.totalAmount) || 0), 0);
+      }
+    } catch {}
+
+    // Accounts payable - pending/confirmed orders not yet delivered
+    const accountsPayable = (orders || [])
+      .filter(o => o.status === "confirmed" || o.status === "pending")
+      .reduce((s, o) => s + Number(o.total_amount || 0), 0);
+
+    // Manual items from DB
+    const manualItems = bsItems || [];
+    const manualCurrentAssets = manualItems.filter(i => i.sub_section === "current_asset");
+    const manualNonCurrentAssets = manualItems.filter(i => i.sub_section === "non_current_asset");
+    const manualCurrentLiabilities = manualItems.filter(i => i.sub_section === "current_liability");
+    const manualLongTermLiabilities = manualItems.filter(i => i.sub_section === "long_term_liability");
+    const manualEquity = manualItems.filter(i => i.sub_section === "equity");
+
+    // Build sections
+    const currentAssets = [
+      ...autoCashAssets,
+      ...(pendingSalesTotal > 0 ? [{ name: "Accounts Receivable", amount: pendingSalesTotal, isAuto: true }] : []),
+      ...(inventoryValue > 0 ? [{ name: "Inventory (Stock Valuation)", amount: inventoryValue, isAuto: true }] : []),
+      ...manualCurrentAssets.map(i => ({ name: i.account_name, amount: Number(i.amount), isAuto: false, id: i.id })),
+    ];
+
+    const nonCurrentAssets = [
+      ...manualNonCurrentAssets.map(i => ({ name: i.account_name, amount: Number(i.amount), isAuto: false, id: i.id })),
+    ];
+
+    const totalCurrentAssets = currentAssets.reduce((s, a) => s + a.amount, 0);
+    const totalNonCurrentAssets = nonCurrentAssets.reduce((s, a) => s + a.amount, 0);
+    const totalAssets = totalCurrentAssets + totalNonCurrentAssets;
+
+    const currentLiabilities = [
+      ...(accountsPayable > 0 ? [{ name: "Accounts Payable (Pending Orders)", amount: accountsPayable, isAuto: true }] : []),
+      ...manualCurrentLiabilities.map(i => ({ name: i.account_name, amount: Number(i.amount), isAuto: false, id: i.id })),
+    ];
+
+    const longTermLiabilities = [
+      ...manualLongTermLiabilities.map(i => ({ name: i.account_name, amount: Number(i.amount), isAuto: false, id: i.id })),
+    ];
+
+    const totalCurrentLiabilities = currentLiabilities.reduce((s, a) => s + a.amount, 0);
+    const totalLongTermLiabilities = longTermLiabilities.reduce((s, a) => s + a.amount, 0);
+    const totalLiabilities = totalCurrentLiabilities + totalLongTermLiabilities;
+
+    const retainedEarnings = cashBalance;
+    const manualEquityTotal = manualEquity.reduce((s, i) => s + Number(i.amount), 0);
+    const totalEquity = retainedEarnings + manualEquityTotal;
+
+    const equityItems = [
+      { name: "Retained Earnings", amount: retainedEarnings, isAuto: true },
+      ...manualEquity.map(i => ({ name: i.account_name, amount: Number(i.amount), isAuto: false, id: i.id })),
+    ];
+
+    return {
+      currentAssets, nonCurrentAssets, totalCurrentAssets, totalNonCurrentAssets, totalAssets,
+      currentLiabilities, longTermLiabilities, totalCurrentLiabilities, totalLongTermLiabilities, totalLiabilities,
+      equityItems, totalEquity,
+      isBalanced: Math.abs(totalAssets - (totalLiabilities + totalEquity)) < 0.01,
+    };
+  }, [transactions, products, orders, bsItems, user?.id]);
 
   // ── PDF Generation ──
   const generatePDF = async (reportType: "pnl" | "cashflow" | "balance") => {
@@ -200,21 +370,76 @@ const FinancialReportsPanel = ({ role }: Props) => {
       }
 
       if (reportType === "balance") {
-        y = addSectionTitle(doc, "Assets", y);
-        y = drawTableHeader(doc, [{ label: "Asset", x: 17 }, { label: "Amount (KES)", x: 150 }], y, 180);
-        balanceSheet.assets.forEach((a, i) => {
+        // Assets
+        y = addSectionTitle(doc, "ASSETS", y);
+        y = addSectionTitle(doc, "Current Assets", y);
+        y = drawTableHeader(doc, [{ label: "Account", x: 17 }, { label: "Amount (KES)", x: 150 }], y, 180);
+        balanceSheet.currentAssets.forEach((a, i) => {
+          drawTableRow(doc, y, i, 180);
+          doc.setFontSize(9); doc.text(a.name, 17, y); doc.text(a.amount.toLocaleString(), 150, y);
+          y += 8;
+        });
+        doc.setFontSize(9); doc.setTextColor(...PDF_COLORS.forest);
+        y += 2; doc.text(`Total Current Assets: KES ${balanceSheet.totalCurrentAssets.toLocaleString()}`, 110, y); y += 10;
+        doc.setTextColor(...PDF_COLORS.darkText);
+
+        if (balanceSheet.nonCurrentAssets.length > 0) {
+          y = addSectionTitle(doc, "Non-Current Assets", y);
+          y = drawTableHeader(doc, [{ label: "Account", x: 17 }, { label: "Amount (KES)", x: 150 }], y, 180);
+          balanceSheet.nonCurrentAssets.forEach((a, i) => {
+            drawTableRow(doc, y, i, 180);
+            doc.setFontSize(9); doc.text(a.name, 17, y); doc.text(a.amount.toLocaleString(), 150, y);
+            y += 8;
+          });
+          doc.setFontSize(9); doc.setTextColor(...PDF_COLORS.forest);
+          y += 2; doc.text(`Total Non-Current Assets: KES ${balanceSheet.totalNonCurrentAssets.toLocaleString()}`, 100, y); y += 10;
+          doc.setTextColor(...PDF_COLORS.darkText);
+        }
+        doc.setFontSize(10); doc.setTextColor(...PDF_COLORS.forest);
+        doc.text(`TOTAL ASSETS: KES ${balanceSheet.totalAssets.toLocaleString()}`, 110, y); y += 14;
+        doc.setTextColor(...PDF_COLORS.darkText);
+
+        // Liabilities
+        y = addSectionTitle(doc, "LIABILITIES", y);
+        if (balanceSheet.currentLiabilities.length > 0) {
+          y = addSectionTitle(doc, "Current Liabilities", y);
+          y = drawTableHeader(doc, [{ label: "Account", x: 17 }, { label: "Amount (KES)", x: 150 }], y, 180);
+          balanceSheet.currentLiabilities.forEach((a, i) => {
+            drawTableRow(doc, y, i, 180);
+            doc.setFontSize(9); doc.text(a.name, 17, y); doc.text(a.amount.toLocaleString(), 150, y);
+            y += 8;
+          });
+          doc.setFontSize(9); y += 2; doc.text(`Total Current Liabilities: KES ${balanceSheet.totalCurrentLiabilities.toLocaleString()}`, 100, y); y += 10;
+        }
+        if (balanceSheet.longTermLiabilities.length > 0) {
+          y = addSectionTitle(doc, "Long-Term Liabilities", y);
+          y = drawTableHeader(doc, [{ label: "Account", x: 17 }, { label: "Amount (KES)", x: 150 }], y, 180);
+          balanceSheet.longTermLiabilities.forEach((a, i) => {
+            drawTableRow(doc, y, i, 180);
+            doc.setFontSize(9); doc.text(a.name, 17, y); doc.text(a.amount.toLocaleString(), 150, y);
+            y += 8;
+          });
+          doc.setFontSize(9); y += 2; doc.text(`Total Long-Term Liabilities: KES ${balanceSheet.totalLongTermLiabilities.toLocaleString()}`, 95, y); y += 10;
+        }
+        if (balanceSheet.currentLiabilities.length === 0 && balanceSheet.longTermLiabilities.length === 0) {
+          doc.setFontSize(9); doc.text("No liabilities recorded", 17, y); y += 10;
+        }
+        doc.setFontSize(10); doc.setTextColor(...PDF_COLORS.forest);
+        doc.text(`TOTAL LIABILITIES: KES ${balanceSheet.totalLiabilities.toLocaleString()}`, 100, y); y += 14;
+        doc.setTextColor(...PDF_COLORS.darkText);
+
+        // Equity
+        y = addSectionTitle(doc, "EQUITY", y);
+        y = drawTableHeader(doc, [{ label: "Account", x: 17 }, { label: "Amount (KES)", x: 150 }], y, 180);
+        balanceSheet.equityItems.forEach((a, i) => {
           drawTableRow(doc, y, i, 180);
           doc.setFontSize(9); doc.text(a.name, 17, y); doc.text(a.amount.toLocaleString(), 150, y);
           y += 8;
         });
         doc.setFontSize(10); doc.setTextColor(...PDF_COLORS.forest);
-        y += 2; doc.text(`Total Assets: KES ${balanceSheet.totalAssets.toLocaleString()}`, 120, y); y += 14;
+        y += 2; doc.text(`TOTAL EQUITY: KES ${balanceSheet.totalEquity.toLocaleString()}`, 110, y); y += 12;
 
-        doc.setTextColor(...PDF_COLORS.darkText);
-        y = addSectionTitle(doc, "Equity", y);
-        doc.setFontSize(9);
-        doc.text(`Retained Earnings: KES ${balanceSheet.retainedEarnings.toLocaleString()}`, 17, y); y += 10;
-        y = drawTotalLine(doc, `Total Equity: KES ${balanceSheet.totalEquity.toLocaleString()}`, y);
+        y = drawTotalLine(doc, `Total Liabilities + Equity: KES ${(balanceSheet.totalLiabilities + balanceSheet.totalEquity).toLocaleString()}`, y);
       }
 
       await finalizePdf(doc);
@@ -224,7 +449,7 @@ const FinancialReportsPanel = ({ role }: Props) => {
     }
   };
 
-  // ── Excel/CSV Generation ──
+  // ── CSV Generation ──
   const generateCSV = (reportType: "pnl" | "cashflow" | "balance") => {
     setGenerating(`csv-${reportType}`);
     try {
@@ -253,12 +478,24 @@ const FinancialReportsPanel = ({ role }: Props) => {
       }
 
       if (reportType === "balance") {
-        csv += "ASSETS\nAsset,Amount (KES)\n";
-        balanceSheet.assets.forEach(a => { csv += `${a.name},${a.amount}\n`; });
-        csv += `Total Assets,${balanceSheet.totalAssets}\n\n`;
-        csv += "EQUITY\n";
-        csv += `Retained Earnings,${balanceSheet.retainedEarnings}\n`;
-        csv += `Total Equity,${balanceSheet.totalEquity}\n`;
+        csv += "CURRENT ASSETS\nAccount,Amount (KES)\n";
+        balanceSheet.currentAssets.forEach(a => { csv += `${a.name},${a.amount}\n`; });
+        csv += `Total Current Assets,${balanceSheet.totalCurrentAssets}\n\n`;
+        csv += "NON-CURRENT ASSETS\nAccount,Amount (KES)\n";
+        balanceSheet.nonCurrentAssets.forEach(a => { csv += `${a.name},${a.amount}\n`; });
+        csv += `Total Non-Current Assets,${balanceSheet.totalNonCurrentAssets}\n`;
+        csv += `TOTAL ASSETS,${balanceSheet.totalAssets}\n\n`;
+        csv += "CURRENT LIABILITIES\nAccount,Amount (KES)\n";
+        balanceSheet.currentLiabilities.forEach(a => { csv += `${a.name},${a.amount}\n`; });
+        csv += `Total Current Liabilities,${balanceSheet.totalCurrentLiabilities}\n\n`;
+        csv += "LONG-TERM LIABILITIES\nAccount,Amount (KES)\n";
+        balanceSheet.longTermLiabilities.forEach(a => { csv += `${a.name},${a.amount}\n`; });
+        csv += `Total Long-Term Liabilities,${balanceSheet.totalLongTermLiabilities}\n`;
+        csv += `TOTAL LIABILITIES,${balanceSheet.totalLiabilities}\n\n`;
+        csv += "EQUITY\nAccount,Amount (KES)\n";
+        balanceSheet.equityItems.forEach(a => { csv += `${a.name},${a.amount}\n`; });
+        csv += `TOTAL EQUITY,${balanceSheet.totalEquity}\n\n`;
+        csv += `Total Liabilities + Equity,${balanceSheet.totalLiabilities + balanceSheet.totalEquity}\n`;
       }
 
       const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
@@ -272,6 +509,48 @@ const FinancialReportsPanel = ({ role }: Props) => {
       setGenerating(null);
     }
   };
+
+  const renderBsSection = (title: string, items: any[], total: number, colorClass: string) => (
+    <div>
+      <h4 className={`text-xs font-semibold uppercase tracking-wider mb-2 ${colorClass}`}>{title}</h4>
+      {items.length === 0 ? (
+        <p className="text-xs text-muted-foreground py-2 pl-2">No items recorded</p>
+      ) : (
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead className="text-xs h-8">Account</TableHead>
+              <TableHead className="text-xs h-8 text-right">Amount (KES)</TableHead>
+              <TableHead className="text-xs h-8 w-8"></TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {items.map((a: any, i: number) => (
+              <TableRow key={a.id || a.name + i}>
+                <TableCell className="text-xs py-1.5">
+                  {a.name}
+                  {a.isAuto && <Badge variant="outline" className="ml-1.5 text-[9px] px-1 py-0">Auto</Badge>}
+                </TableCell>
+                <TableCell className="text-xs py-1.5 text-right font-medium">{a.amount.toLocaleString()}</TableCell>
+                <TableCell className="text-xs py-1 w-8">
+                  {!a.isAuto && a.id && (
+                    <button onClick={() => deleteBsItemMutation.mutate(a.id)} className="text-muted-foreground hover:text-destructive">
+                      <Trash2 className="w-3 h-3" />
+                    </button>
+                  )}
+                </TableCell>
+              </TableRow>
+            ))}
+            <TableRow className="bg-muted/30 font-semibold">
+              <TableCell className="text-xs py-2">Total {title}</TableCell>
+              <TableCell className="text-xs py-2 text-right">{total.toLocaleString()}</TableCell>
+              <TableCell></TableCell>
+            </TableRow>
+          </TableBody>
+        </Table>
+      )}
+    </div>
+  );
 
   if (isLoading) {
     return <div className="flex justify-center py-12"><Loader2 className="w-6 h-6 animate-spin text-muted-foreground" /></div>;
@@ -324,7 +603,6 @@ const FinancialReportsPanel = ({ role }: Props) => {
               </div>
             </CardHeader>
             <CardContent className="space-y-4">
-              {/* Income section */}
               <div>
                 <h4 className="text-xs font-semibold text-primary uppercase tracking-wider mb-2 flex items-center gap-1.5">
                   <TrendingUp className="w-3.5 h-3.5" /> Revenue / Income
@@ -344,7 +622,6 @@ const FinancialReportsPanel = ({ role }: Props) => {
                 )}
               </div>
 
-              {/* Expenses section */}
               <div>
                 <h4 className="text-xs font-semibold text-destructive uppercase tracking-wider mb-2 flex items-center gap-1.5">
                   <TrendingDown className="w-3.5 h-3.5" /> Expenses
@@ -364,7 +641,6 @@ const FinancialReportsPanel = ({ role }: Props) => {
                 )}
               </div>
 
-              {/* Net Profit */}
               <Card className={`border-2 ${pnl.netProfit >= 0 ? "border-primary/30 bg-primary/5" : "border-destructive/30 bg-destructive/5"}`}>
                 <CardContent className="p-3 flex items-center justify-between">
                   <span className="text-sm font-semibold">Net Profit / (Loss)</span>
@@ -394,13 +670,11 @@ const FinancialReportsPanel = ({ role }: Props) => {
               </div>
             </CardHeader>
             <CardContent className="space-y-4">
-              {/* Opening balance */}
               <div className="flex items-center justify-between p-2 rounded-md bg-muted/50">
                 <span className="text-xs font-medium">Opening Balance</span>
                 <span className="text-sm font-bold">KES {cashFlow.openingBalance.toLocaleString()}</span>
               </div>
 
-              {/* By method */}
               <Table>
                 <TableHeader>
                   <TableRow>
@@ -424,7 +698,6 @@ const FinancialReportsPanel = ({ role }: Props) => {
                 </TableBody>
               </Table>
 
-              {/* Summary cards */}
               <div className="grid grid-cols-3 gap-2">
                 <div className="p-2 rounded-md bg-primary/5 text-center">
                   <p className="text-[10px] text-muted-foreground">Inflow</p>
@@ -440,7 +713,6 @@ const FinancialReportsPanel = ({ role }: Props) => {
                 </div>
               </div>
 
-              {/* Closing balance */}
               <Card className="border-2 border-primary/30 bg-primary/5">
                 <CardContent className="p-3 flex items-center justify-between">
                   <span className="text-sm font-semibold">Closing Balance</span>
@@ -458,6 +730,46 @@ const FinancialReportsPanel = ({ role }: Props) => {
               <div className="flex items-center justify-between">
                 <CardTitle className="text-sm">Balance Sheet</CardTitle>
                 <div className="flex gap-1">
+                  <Dialog open={bsDialogOpen} onOpenChange={setBsDialogOpen}>
+                    <DialogTrigger asChild>
+                      <Button size="sm" variant="secondary" className="h-7 text-xs gap-1">
+                        <Plus className="w-3 h-3" /> Add Item
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent className="max-w-sm">
+                      <DialogHeader>
+                        <DialogTitle className="text-base">Add Balance Sheet Item</DialogTitle>
+                      </DialogHeader>
+                      <div className="space-y-3">
+                        <div>
+                          <Label className="text-xs">Category *</Label>
+                          <Select value={newBsItem.sub_section} onValueChange={v => setNewBsItem(p => ({ ...p, sub_section: v }))}>
+                            <SelectTrigger><SelectValue /></SelectTrigger>
+                            <SelectContent>
+                              {SUB_SECTION_OPTIONS.map(o => (
+                                <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        <div>
+                          <Label className="text-xs">Account Name *</Label>
+                          <Input placeholder="e.g. Office Equipment, Bank Loan" value={newBsItem.account_name} onChange={e => setNewBsItem(p => ({ ...p, account_name: e.target.value }))} />
+                        </div>
+                        <div>
+                          <Label className="text-xs">Amount (KES) *</Label>
+                          <Input type="number" placeholder="0" value={newBsItem.amount} onChange={e => setNewBsItem(p => ({ ...p, amount: e.target.value }))} />
+                        </div>
+                        <div>
+                          <Label className="text-xs">Notes (optional)</Label>
+                          <Input placeholder="Depreciation, corrections etc." value={newBsItem.notes} onChange={e => setNewBsItem(p => ({ ...p, notes: e.target.value }))} />
+                        </div>
+                        <Button className="w-full" onClick={() => addBsItemMutation.mutate()} disabled={!newBsItem.account_name || !newBsItem.amount || addBsItemMutation.isPending}>
+                          {addBsItemMutation.isPending ? "Saving..." : "Add Item"}
+                        </Button>
+                      </div>
+                    </DialogContent>
+                  </Dialog>
                   <Button size="sm" variant="outline" className="h-7 text-xs gap-1" onClick={() => generatePDF("balance")} disabled={!!generating}>
                     {generating === "pdf-balance" ? <Loader2 className="w-3 h-3 animate-spin" /> : <Download className="w-3 h-3" />} PDF
                   </Button>
@@ -471,38 +783,62 @@ const FinancialReportsPanel = ({ role }: Props) => {
               <p className="text-[10px] text-muted-foreground">As at {format(new Date(), "MMM d, yyyy")}</p>
 
               {/* Assets */}
-              <div>
-                <h4 className="text-xs font-semibold text-primary uppercase tracking-wider mb-2">Assets</h4>
-                <Table>
-                  <TableHeader><TableRow><TableHead className="text-xs h-8">Account</TableHead><TableHead className="text-xs h-8 text-right">Amount (KES)</TableHead></TableRow></TableHeader>
-                  <TableBody>
-                    {balanceSheet.assets.map(a => (
-                      <TableRow key={a.name}><TableCell className="text-xs py-1.5">{a.name}</TableCell><TableCell className="text-xs py-1.5 text-right font-medium">{a.amount.toLocaleString()}</TableCell></TableRow>
-                    ))}
-                    <TableRow className="bg-primary/5 font-semibold"><TableCell className="text-xs py-2">Total Assets</TableCell><TableCell className="text-xs py-2 text-right text-primary">{balanceSheet.totalAssets.toLocaleString()}</TableCell></TableRow>
-                  </TableBody>
-                </Table>
-              </div>
+              <Accordion type="multiple" defaultValue={["assets", "liabilities", "equity"]} className="space-y-2">
+                <AccordionItem value="assets" className="border rounded-lg px-3">
+                  <AccordionTrigger className="text-sm font-bold text-primary py-2">ASSETS</AccordionTrigger>
+                  <AccordionContent className="space-y-4 pb-3">
+                    {renderBsSection("Current Assets", balanceSheet.currentAssets, balanceSheet.totalCurrentAssets, "text-primary")}
+                    {renderBsSection("Non-Current Assets", balanceSheet.nonCurrentAssets, balanceSheet.totalNonCurrentAssets, "text-primary/80")}
+                    <Card className="border-primary/30 bg-primary/5">
+                      <CardContent className="p-2 flex items-center justify-between">
+                        <span className="text-xs font-bold">TOTAL ASSETS</span>
+                        <span className="text-sm font-bold text-primary">KES {balanceSheet.totalAssets.toLocaleString()}</span>
+                      </CardContent>
+                    </Card>
+                  </AccordionContent>
+                </AccordionItem>
 
-              {/* Equity */}
-              <div>
-                <h4 className="text-xs font-semibold text-foreground uppercase tracking-wider mb-2">Equity</h4>
-                <Table>
-                  <TableHeader><TableRow><TableHead className="text-xs h-8">Account</TableHead><TableHead className="text-xs h-8 text-right">Amount (KES)</TableHead></TableRow></TableHeader>
-                  <TableBody>
-                    <TableRow><TableCell className="text-xs py-1.5">Retained Earnings</TableCell><TableCell className="text-xs py-1.5 text-right font-medium">{balanceSheet.retainedEarnings.toLocaleString()}</TableCell></TableRow>
-                    <TableRow className="bg-muted/50 font-semibold"><TableCell className="text-xs py-2">Total Equity</TableCell><TableCell className="text-xs py-2 text-right">{balanceSheet.totalEquity.toLocaleString()}</TableCell></TableRow>
-                  </TableBody>
-                </Table>
-              </div>
+                <AccordionItem value="liabilities" className="border rounded-lg px-3">
+                  <AccordionTrigger className="text-sm font-bold text-destructive py-2">LIABILITIES</AccordionTrigger>
+                  <AccordionContent className="space-y-4 pb-3">
+                    {renderBsSection("Current Liabilities", balanceSheet.currentLiabilities, balanceSheet.totalCurrentLiabilities, "text-destructive")}
+                    {renderBsSection("Long-Term Liabilities", balanceSheet.longTermLiabilities, balanceSheet.totalLongTermLiabilities, "text-destructive/80")}
+                    <Card className="border-destructive/30 bg-destructive/5">
+                      <CardContent className="p-2 flex items-center justify-between">
+                        <span className="text-xs font-bold">TOTAL LIABILITIES</span>
+                        <span className="text-sm font-bold text-destructive">KES {balanceSheet.totalLiabilities.toLocaleString()}</span>
+                      </CardContent>
+                    </Card>
+                  </AccordionContent>
+                </AccordionItem>
+
+                <AccordionItem value="equity" className="border rounded-lg px-3">
+                  <AccordionTrigger className="text-sm font-bold text-foreground py-2">EQUITY</AccordionTrigger>
+                  <AccordionContent className="space-y-4 pb-3">
+                    {renderBsSection("Equity", balanceSheet.equityItems, balanceSheet.totalEquity, "text-foreground")}
+                  </AccordionContent>
+                </AccordionItem>
+              </Accordion>
 
               {/* Balance check */}
-              <div className={`p-3 rounded-lg text-center ${balanceSheet.totalAssets === balanceSheet.totalEquity ? "bg-primary/5" : "bg-destructive/5"}`}>
-                <Badge variant={balanceSheet.totalAssets === balanceSheet.totalEquity ? "default" : "destructive"}>
-                  {balanceSheet.totalAssets === balanceSheet.totalEquity ? "✅ Balanced" : "⚠️ Imbalanced"}
-                </Badge>
-                <p className="text-[10px] text-muted-foreground mt-1">Assets = Equity</p>
-              </div>
+              <Card className={`border-2 ${balanceSheet.isBalanced ? "border-primary/30 bg-primary/5" : "border-destructive/30 bg-destructive/5"}`}>
+                <CardContent className="p-3">
+                  <div className="flex items-center justify-between mb-1">
+                    <span className="text-xs font-medium">Total Assets</span>
+                    <span className="text-sm font-bold">KES {balanceSheet.totalAssets.toLocaleString()}</span>
+                  </div>
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-xs font-medium">Total Liabilities + Equity</span>
+                    <span className="text-sm font-bold">KES {(balanceSheet.totalLiabilities + balanceSheet.totalEquity).toLocaleString()}</span>
+                  </div>
+                  <div className="text-center">
+                    <Badge variant={balanceSheet.isBalanced ? "default" : "destructive"}>
+                      {balanceSheet.isBalanced ? "✅ Balanced" : "⚠️ Imbalanced"}
+                    </Badge>
+                    <p className="text-[10px] text-muted-foreground mt-1">Assets = Liabilities + Equity</p>
+                  </div>
+                </CardContent>
+              </Card>
             </CardContent>
           </Card>
         </TabsContent>
