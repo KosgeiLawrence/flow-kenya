@@ -56,7 +56,7 @@ const kenyaCounties = [
 ];
 
 const ProfileSettingsPanel = ({ role }: ProfileSettingsPanelProps) => {
-  const { user, profile } = useAuth();
+  const { user, profile, refreshProfile } = useAuth();
   const queryClient = useQueryClient();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
