@@ -433,6 +433,43 @@ const ProductCatalogPanel = () => {
         )}
       </div>
 
+      {/* Sales History */}
+      {salesHistory && salesHistory.length > 0 && (
+        <Card className="shadow-soft">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-base flex items-center gap-2">
+              <History className="w-5 h-5 text-primary" /> Sales History
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="divide-y divide-border">
+              {salesHistory.map((tx) => {
+                const desc = tx.description?.replace("Sale: ", "") || "";
+                const parts = desc.split(" to ");
+                const productInfo = parts[0] || "";
+                const customerName = parts[1] || "Unknown";
+                return (
+                  <div key={tx.id} className="flex items-center justify-between py-3 gap-2">
+                    <div className="flex items-start gap-3 flex-1 min-w-0">
+                      <Receipt className="w-4 h-4 text-primary mt-0.5 shrink-0" />
+                      <div className="min-w-0">
+                        <p className="text-sm font-medium text-foreground truncate">{customerName}</p>
+                        <p className="text-xs text-muted-foreground truncate">{productInfo}</p>
+                        <p className="text-[10px] text-muted-foreground">{format(new Date(tx.transaction_date), "MMM d, yyyy")}</p>
+                      </div>
+                    </div>
+                    <div className="text-right shrink-0">
+                      <p className="text-sm font-bold text-primary">KES {Number(tx.amount).toLocaleString()}</p>
+                      {tx.reference_number && <p className="text-[10px] text-muted-foreground">Ref: {tx.reference_number}</p>}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       {/* Sales Flow Dialog */}
       <Dialog open={saleDialog} onOpenChange={(open) => { if (!open) closeSale(); }}>
         <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto">
