@@ -85,6 +85,70 @@ const CollectionPanel = () => {
     }))
   );
 
+  const generateCollectionReceipt = async (c: any) => {
+    const doc = new jsPDF();
+    const mt = c.material_types;
+    const refNo = `RCT-${c.batch_id || c.id.slice(0, 8).toUpperCase()}`;
+
+    let pdfOrg = null;
+    if (orgInfo?.orgLogoUrl) {
+      const logoBase64 = await loadImageAsBase64(orgInfo.orgLogoUrl);
+      pdfOrg = buildPdfOrgInfo(orgInfo, logoBase64);
+    } else if (orgInfo) {
+      pdfOrg = buildPdfOrgInfo(orgInfo, null);
+    }
+
+    let y = addCleanHeader(doc, "Collection Receipt", `Ref: ${refNo}`, pdfOrg);
+
+    y = addDocMeta(doc, [
+      { label: "Collected by", value: orgInfo?.orgName || profile?.full_name || "Waste Picker" },
+      { label: "Phone", value: orgInfo?.contactPhone || profile?.phone_number || "N/A" },
+      { label: "Email", value: orgInfo?.contactEmail || profile?.email || "N/A" },
+    ], y);
+
+    y += 4;
+    y = addDocMeta(doc, [
+      { label: "Date", value: format(new Date(c.collected_at), "MMM d, yyyy • h:mm a") },
+      { label: "Location", value: c.location_name || "N/A" },
+      { label: "Batch ID", value: c.batch_id || "N/A" },
+    ], y);
+
+    const cols = [
+      { label: "Material", x: 17 },
+      { label: "Quantity", x: 80 },
+      { label: "Unit", x: 110 },
+      { label: "Price/Unit", x: 140 },
+    ];
+    y = drawTableHeader(doc, cols, y, 178);
+    drawTableRow(doc, y, 0, 178);
+    doc.setFontSize(8);
+    doc.text(mt?.name || "Unknown", 17, y);
+    doc.text(`${Number(c.quantity).toFixed(1)}`, 80, y);
+    doc.text(mt?.unit || "kg", 110, y);
+    doc.text(`KES ${Number(mt?.price_per_unit || 0).toLocaleString()}`, 140, y);
+    y += 12;
+
+    const total = Number(c.quantity) * Number(mt?.price_per_unit || 0);
+    doc.setFontSize(10);
+    doc.setFont("helvetica", "bold");
+    doc.setTextColor(...PDF_COLORS.forest);
+    doc.text(`Total Value: KES ${total.toLocaleString()}`, 15, y);
+    doc.setFont("helvetica", "normal");
+    y += 16;
+
+    doc.setFontSize(9);
+    doc.setTextColor(...PDF_COLORS.darkText);
+    doc.text("Received by: ____________________________", 15, y);
+    y += 12;
+    doc.text("Signature:    ____________________________", 15, y);
+    y += 12;
+    doc.text("Date:            ____________________________", 15, y);
+
+    finalizeCleanPdf(doc);
+    doc.save(`collection-receipt-${refNo}.pdf`);
+    toast.success("Receipt downloaded");
+  };
+
   const [activeTab, setActiveTab] = useState("log");
 
   return (
