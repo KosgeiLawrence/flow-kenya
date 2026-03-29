@@ -11,7 +11,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { ShoppingCart, FileText, Receipt, CheckCircle2, ArrowRight, Users, Search, History, Trash2, Download, Package } from "lucide-react";
+import { ShoppingCart, FileText, Receipt, CheckCircle2, ArrowRight, Users, Search, History, Trash2, Download, Package, Plus } from "lucide-react";
 import { toast } from "sonner";
 import jsPDF from "jspdf";
 import { format } from "date-fns";
@@ -59,6 +59,7 @@ const AggregatorSalesPanel = () => {
   const [crmCustomers, setCrmCustomers] = useState<any[]>([]);
   const [showCrmPicker, setShowCrmPicker] = useState(false);
   const [crmSearch, setCrmSearch] = useState("");
+  const [showMaterialPicker, setShowMaterialPicker] = useState(false);
   const [pendingSales, setPendingSales] = useState<(SaleState & { vat: VatConfig })[]>(() => {
     try {
       const saved = localStorage.getItem(`pending_agg_sales_${user?.id || "anon"}`);
@@ -353,12 +354,50 @@ const AggregatorSalesPanel = () => {
       {/* Material Stock for Sale */}
       <div className={`grid gap-6 ${pendingSales.length > 0 ? "grid-cols-1 lg:grid-cols-[1fr_340px]" : "grid-cols-1"}`}>
         <Card className="shadow-soft">
-          <CardHeader>
+          <CardHeader className="flex flex-row items-center justify-between">
             <CardTitle className="text-lg">Sell from Inventory</CardTitle>
+            <Button size="sm" onClick={() => setShowMaterialPicker(true)}>
+              <Plus className="w-4 h-4 mr-1" /> New Sale
+            </Button>
           </CardHeader>
           <CardContent>
+            {/* Material picker dialog for new sale */}
+            <Dialog open={showMaterialPicker} onOpenChange={setShowMaterialPicker}>
+              <DialogContent className="max-w-sm">
+                <DialogHeader><DialogTitle>Select Material to Sell</DialogTitle></DialogHeader>
+                <div className="space-y-2 max-h-64 overflow-y-auto">
+                  {materialStock.size > 0 ? (
+                    Array.from(materialStock.entries()).map(([id, m]) => (
+                      <button
+                        key={id}
+                        className="w-full text-left p-3 rounded-lg border border-border hover:bg-primary/10 transition-colors"
+                        onClick={() => { setShowMaterialPicker(false); openSale(id); }}
+                        disabled={m.qty <= 0}
+                      >
+                        <p className="text-sm font-medium">{m.icon} {m.name}</p>
+                        <p className="text-xs text-muted-foreground">Stock: {m.qty.toFixed(1)} {m.unit} • KES {m.pricePerUnit.toFixed(2)}/{m.unit}</p>
+                      </button>
+                    ))
+                  ) : materialTypes?.length ? (
+                    materialTypes.map((mt) => (
+                      <button
+                        key={mt.id}
+                        className="w-full text-left p-3 rounded-lg border border-border hover:bg-primary/10 transition-colors"
+                        onClick={() => { setShowMaterialPicker(false); openSale(mt.id); }}
+                      >
+                        <p className="text-sm font-medium">{mt.icon || "♻️"} {mt.name}</p>
+                        <p className="text-xs text-muted-foreground">KES {mt.price_per_unit}/{mt.unit}</p>
+                      </button>
+                    ))
+                  ) : (
+                    <p className="text-sm text-muted-foreground text-center py-4">No materials available.</p>
+                  )}
+                </div>
+              </DialogContent>
+            </Dialog>
+
             {!materialStock.size ? (
-              <p className="text-sm text-muted-foreground">No materials in inventory. Add collections first.</p>
+              <p className="text-sm text-muted-foreground">No materials in inventory yet. Add collections in the Stock tab, or click "New Sale" to sell directly.</p>
             ) : (
               <div className="divide-y divide-border">
                 {Array.from(materialStock.entries()).map(([id, m]) => (
