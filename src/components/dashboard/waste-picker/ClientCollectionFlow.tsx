@@ -37,6 +37,8 @@ const ClientCollectionFlow = ({ onBack }: Props) => {
   const { orgInfo } = useOrgInfo();
   const queryClient = useQueryClient();
   const [showForm, setShowForm] = useState(false);
+  const [selectedCustomerId, setSelectedCustomerId] = useState("");
+  const [isNewClient, setIsNewClient] = useState(false);
   const [clientName, setClientName] = useState("");
   const [clientPhone, setClientPhone] = useState("");
   const [clientEmail, setClientEmail] = useState("");
@@ -46,6 +48,20 @@ const ClientCollectionFlow = ({ onBack }: Props) => {
   const [locationName, setLocationName] = useState("");
   const [notes, setNotes] = useState("");
   const [vat, setVat] = useState<VatConfig>(DEFAULT_VAT);
+
+  const { data: customers } = useQuery({
+    queryKey: ["customers", user?.id],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("customers")
+        .select("*")
+        .eq("user_id", user!.id)
+        .order("full_name");
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!user?.id,
+  });
 
   const { data: materialTypes } = useQuery({
     queryKey: ["material_types"],
