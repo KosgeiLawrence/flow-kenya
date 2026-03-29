@@ -14,6 +14,45 @@ export type Database = {
   }
   public: {
     Tables: {
+      balance_sheet_items: {
+        Row: {
+          account_name: string
+          amount: number
+          created_at: string
+          id: string
+          is_auto: boolean
+          notes: string | null
+          section: string
+          sub_section: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          account_name: string
+          amount?: number
+          created_at?: string
+          id?: string
+          is_auto?: boolean
+          notes?: string | null
+          section?: string
+          sub_section?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          account_name?: string
+          amount?: number
+          created_at?: string
+          id?: string
+          is_auto?: boolean
+          notes?: string | null
+          section?: string
+          sub_section?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       cleanup_exercises: {
         Row: {
           after_photos: string[] | null
