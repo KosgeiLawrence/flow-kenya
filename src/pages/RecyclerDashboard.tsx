@@ -8,6 +8,7 @@ import {
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import InventoryAccessPanel from "@/components/dashboard/recycler/InventoryAccessPanel";
 import OrdersPanel from "@/components/dashboard/recycler/OrdersPanel";
 import PurchaseInvoicesPanel from "@/components/dashboard/recycler/PurchaseInvoicesPanel";
@@ -33,7 +34,7 @@ const navItems = [
   { id: "transformation", label: "Transformation", icon: Recycle },
   { id: "business-insights", label: "Business Insights", icon: TrendingUp },
   { id: "products", label: "Products & Pricing", icon: ShoppingBag },
-  { id: "crm", label: "Customers", icon: ClipboardList },
+  
   { id: "market", label: "Market Insights", icon: TrendingUp },
   { id: "forecast", label: "Supply Forecast", icon: BarChart3 },
   { id: "esg", label: "ESG & Carbon", icon: Leaf },
@@ -71,8 +72,16 @@ const RecyclerDashboard = () => {
       case "inventory": return <InventoryAccessPanel />;
       case "transformation": return <MaterialTransformationPanel />;
       case "business-insights": return <EarningsExpensesPanel role="recycler" />;
-      case "products": return <ProductCatalogPanel />;
-      
+      case "products": return (
+        <Tabs defaultValue="catalog" className="space-y-4">
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="catalog"><ShoppingBag className="w-4 h-4 mr-1.5" />Products & Pricing</TabsTrigger>
+            <TabsTrigger value="customers"><ClipboardList className="w-4 h-4 mr-1.5" />Customers</TabsTrigger>
+          </TabsList>
+          <TabsContent value="catalog"><ProductCatalogPanel /></TabsContent>
+          <TabsContent value="customers"><CRMPanel role="recycler" /></TabsContent>
+        </Tabs>
+      );
       case "market": return <MarketInsightsPanel />;
       case "forecast": return <SupplyForecastPanel />;
       case "esg": return <ESGPanel />;
@@ -80,7 +89,7 @@ const RecyclerDashboard = () => {
       case "pickup-requests": return <RequestedPickupsPanel />;
       case "training": return <TrainingPanel viewerRole="recycler" />;
       case "cleanup": return <CleanupExercisePanel />;
-      case "crm": return <CRMPanel role="recycler" />;
+      
       case "grants": return <GrantsDiscoveryPanel userRole="recycler" />;
       case "settings": return <ProfileSettingsPanel role="recycler" />;
       default: return <InventoryAccessPanel />;
