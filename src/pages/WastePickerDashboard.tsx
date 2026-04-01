@@ -4,15 +4,13 @@ import { Button } from "@/components/ui/button";
 import {
   LogOut, User, Package, DollarSign, Calendar, BarChart3,
   QrCode, BookOpen, Clock, CheckCircle2, AlertTriangle, Menu, X,
-  ChevronRight, Briefcase, Settings, ShoppingCart
+  ChevronRight, Briefcase, Settings, ShoppingCart, Store, Leaf, Shield
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
-import ProfilePanel from "@/components/dashboard/waste-picker/ProfilePanel";
 import CollectionPanel from "@/components/dashboard/waste-picker/CollectionPanel";
 import ProfileSettingsPanel from "@/components/dashboard/shared/ProfileSettingsPanel";
 import PricingPanel from "@/components/dashboard/waste-picker/PricingPanel";
-
 import SchedulePanel from "@/components/dashboard/waste-picker/SchedulePanel";
 import AnalyticsPanel from "@/components/dashboard/waste-picker/AnalyticsPanel";
 import QRIDPanel from "@/components/dashboard/waste-picker/QRIDPanel";
@@ -23,20 +21,26 @@ import EarningsExpensesPanel from "@/components/dashboard/shared/EarningsExpense
 import CRMPanel from "@/components/dashboard/shared/CRMPanel";
 import WastePickerWorkflowGuidePanel from "@/components/dashboard/waste-picker/WorkflowGuidePanel";
 import WastePickerSalesPanel from "@/components/dashboard/waste-picker/WastePickerSalesPanel";
+import RequestedPickupsPanel from "@/components/dashboard/shared/RequestedPickupsPanel";
+import MarketplacePanel from "@/components/dashboard/aggregator/MarketplacePanel";
+import ESGPanel from "@/components/dashboard/aggregator/ESGPanel";
+import CompliancePanel from "@/components/dashboard/aggregator/CompliancePanel";
 
 const navItems = [
   { id: "how-it-works", label: "How It Works", icon: BookOpen },
   { id: "collection", label: "Collections", icon: Package },
   { id: "sales", label: "Sales", icon: ShoppingCart },
+  { id: "schedule", label: "Request Pickup", icon: Calendar },
   { id: "my-earnings", label: "My Earnings", icon: DollarSign },
+  { id: "crm", label: "My Clients", icon: User },
+  { id: "marketplace", label: "Marketplace", icon: Store },
+  { id: "training", label: "Training", icon: BookOpen },
+  { id: "esg", label: "ESG & Carbon", icon: Leaf },
+  { id: "compliance", label: "Compliance", icon: Shield },
+  { id: "cleanup", label: "Cleanup Exercise", icon: Package },
   { id: "pricing", label: "Live Pricing", icon: DollarSign },
-  
-  { id: "schedule", label: "Pickups", icon: Calendar },
   { id: "analytics", label: "Analytics", icon: BarChart3 },
   { id: "qr-id", label: "QR ID", icon: QrCode },
-  { id: "training", label: "Training", icon: BookOpen },
-  { id: "cleanup", label: "Cleanup Exercise", icon: Package },
-  { id: "crm", label: "My Clients", icon: User },
   { id: "grants", label: "Grants & Programs", icon: Briefcase },
   { id: "settings", label: "Profile Settings", icon: Settings },
 ];
@@ -66,15 +70,17 @@ const WastePickerDashboard = () => {
       case "how-it-works": return <WastePickerWorkflowGuidePanel />;
       case "collection": return <CollectionPanel />;
       case "sales": return <WastePickerSalesPanel />;
-      case "my-earnings": return <EarningsExpensesPanel role="waste_picker" />;
-      case "pricing": return <PricingPanel />;
-      
       case "schedule": return <SchedulePanel />;
+      case "my-earnings": return <EarningsExpensesPanel role="waste_picker" />;
+      case "crm": return <CRMPanel role="waste_picker" />;
+      case "marketplace": return <MarketplacePanel />;
+      case "training": return <TrainingPanel viewerRole="waste_picker" />;
+      case "esg": return <ESGPanel />;
+      case "compliance": return <CompliancePanel />;
+      case "cleanup": return <CleanupExercisePanel />;
+      case "pricing": return <PricingPanel />;
       case "analytics": return <AnalyticsPanel />;
       case "qr-id": return <QRIDPanel />;
-      case "training": return <TrainingPanel viewerRole="waste_picker" />;
-      case "cleanup": return <CleanupExercisePanel />;
-      case "crm": return <CRMPanel role="waste_picker" />;
       case "grants": return <GrantsDiscoveryPanel userRole="waste_picker" />;
       case "settings": return <ProfileSettingsPanel role="waste_picker" />;
       default: return <CollectionPanel />;
