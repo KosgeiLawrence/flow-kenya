@@ -203,6 +203,20 @@ const ESGPanel = () => {
     enabled: !!user,
   });
 
+  const { data: communityTrainings } = useQuery({
+    queryKey: ["recycler_esg_community_trainings", user?.id],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("community_training_logs" as any)
+        .select("*")
+        .eq("user_id", user!.id)
+        .order("training_date", { ascending: false });
+      if (error) throw error;
+      return data as any[];
+    },
+    enabled: !!user,
+  });
+
   const filteredTransformations = useMemo(() => {
     if (!transformations) return [];
     if (!dateRange) return transformations;
@@ -221,6 +235,15 @@ const ESGPanel = () => {
     });
   }, [cleanups, dateRange]);
 
+  const filteredTrainings = useMemo(() => {
+    if (!communityTrainings) return [];
+    if (!dateRange) return communityTrainings;
+    return communityTrainings.filter((t: any) => {
+      const d = new Date(t.training_date);
+      return isWithinInterval(d, { start: startOfDay(dateRange.from), end: endOfDay(dateRange.to) });
+    });
+  }, [communityTrainings, dateRange]);
+
   const transformationInputKg = filteredTransformations.reduce((sum, t) =>
     sum + ((t.transformation_inputs as any[])?.reduce((s: number, inp: any) => s + Number(inp.quantity), 0) || 0), 0);
   const transformationOutputKg = filteredTransformations.reduce((sum, t) =>
@@ -230,7 +253,13 @@ const ESGPanel = () => {
   const cleanupRecyclableKg = filteredCleanups.reduce((s, c) => s + Number(c.recyclable_waste_kg || 0), 0);
   const cleanupVolunteers = filteredCleanups.reduce((s, c) => s + Number(c.num_volunteers || 0), 0);
 
-  const totalKg = transformationInputKg + cleanupWasteKg;
+  const trainingParticipants = filteredTrainings.reduce((s: number, t: any) => s + Number(t.num_participants || 0), 0);
+  const trainingWomen = filteredTrainings.reduce((s: number, t: any) => s + Number(t.num_women || 0), 0);
+  const trainingYouth = filteredTrainings.reduce((s: number, t: any) => s + Number(t.num_youth || 0), 0);
+  const trainingWasteKg = filteredTrainings.reduce((s: number, t: any) => s + Number(t.waste_collected_kg || 0), 0);
+  const trainingTrees = filteredTrainings.reduce((s: number, t: any) => s + Number(t.trees_planted || 0), 0);
+
+  const totalKg = transformationInputKg + cleanupWasteKg + trainingWasteKg;
   const co2Saved = totalKg * 2.5;
   const waterSaved = totalKg * 18;
   const energySaved = totalKg * 5.8;
@@ -256,7 +285,7 @@ const ESGPanel = () => {
     if (Number(c.other_materials_kg) > 0) materialMap.set("Other", (materialMap.get("Other") || 0) + Number(c.other_materials_kg));
   });
   const pieData = Array.from(materialMap.entries()).map(([name, value]) => ({ name, value: Math.round(value) }));
-  const esgScore = Math.min(Math.round((totalKg / 1000) * 25 + 40), 100);
+  const esgScore = Math.min(Math.round((totalKg / 1000) * 25 + ((cleanupVolunteers + trainingParticipants) / 50) * 10 + (trainingTrees * 0.5) + 40), 100);
 
   const periodLabel = () => {
     if (!dateRange) return "All Time";
@@ -313,7 +342,7 @@ const ESGPanel = () => {
 
     // Pillar scores
     const envScore = Math.min(Math.round((totalKg / 5000) * 50 + 30), 100);
-    const socScore = Math.min(Math.round((cleanupVolunteers / 50) * 40 + 40), 100);
+    const socScore = Math.min(Math.round(((cleanupVolunteers + trainingParticipants) / 100) * 40 + 40), 100);
     const govScore = 75;
     const pillars = [
       { label: "Environmental", score: envScore, color: PDF_COLORS.forest },
@@ -551,6 +580,9 @@ const ESGPanel = () => {
       `Completed ${filteredTransformations.length} material transformations`,
       `Conducted ${filteredCleanups.length} cleanup exercises with ${cleanupVolunteers} volunteers`,
       `Achieved average transformation yield of ${avgYield.toFixed(1)}%`,
+      ...(filteredTrainings.length > 0 ? [`Trained ${trainingParticipants} community members across ${filteredTrainings.length} sessions`] : []),
+      ...(trainingWomen > 0 ? [`Reached ${trainingWomen} women and ${trainingYouth} youth through community trainings`] : []),
+      ...(trainingTrees > 0 ? [`Planted ${trainingTrees} trees through community impact programs`] : []),
     ];
     doc.setFontSize(9);
     impacts.forEach((imp) => {
@@ -683,7 +715,7 @@ const ESGPanel = () => {
             <Leaf className="w-8 h-8 text-primary" />
             <div>
               <p className="text-lg font-semibold text-foreground">ESG Score</p>
-              <p className="text-xs text-muted-foreground">Based on recycling volume, cleanups, and environmental impact</p>
+              <p className="text-xs text-muted-foreground">Based on recycling volume, cleanups, community training, and environmental impact</p>
             </div>
           </div>
           <div className="flex items-center gap-4">
@@ -748,6 +780,48 @@ const ESGPanel = () => {
                 <p className="text-xs text-muted-foreground">Volunteers</p>
               </div>
             </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {filteredTrainings.length > 0 && (
+        <Card className="shadow-soft">
+          <CardHeader><CardTitle className="text-lg">Community Training Impact</CardTitle></CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-2 sm:grid-cols-5 gap-4 text-center">
+              <div>
+                <p className="text-2xl font-bold text-foreground">{filteredTrainings.length}</p>
+                <p className="text-xs text-muted-foreground">Trainings</p>
+              </div>
+              <div>
+                <p className="text-2xl font-bold text-foreground">{trainingParticipants}</p>
+                <p className="text-xs text-muted-foreground">Participants</p>
+              </div>
+              <div>
+                <p className="text-2xl font-bold text-foreground">{trainingWomen}</p>
+                <p className="text-xs text-muted-foreground">Women</p>
+              </div>
+              <div>
+                <p className="text-2xl font-bold text-foreground">{trainingYouth}</p>
+                <p className="text-xs text-muted-foreground">Youth</p>
+              </div>
+              <div>
+                <p className="text-2xl font-bold text-foreground">{trainingTrees}</p>
+                <p className="text-xs text-muted-foreground">Trees Planted</p>
+              </div>
+            </div>
+            {(trainingWasteKg > 0 || trainingTrees > 0) && (
+              <div className="grid grid-cols-2 gap-4 text-center mt-4 pt-4 border-t border-border">
+                <div>
+                  <p className="text-2xl font-bold text-foreground">{trainingWasteKg.toFixed(0)}</p>
+                  <p className="text-xs text-muted-foreground">kg Waste Collected</p>
+                </div>
+                <div>
+                  <p className="text-2xl font-bold text-foreground">{trainingTrees}</p>
+                  <p className="text-xs text-muted-foreground">Trees Planted</p>
+                </div>
+              </div>
+            )}
           </CardContent>
         </Card>
       )}
