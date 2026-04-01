@@ -119,6 +119,21 @@ const WastePickerSalesPanel = () => {
     enabled: !!user,
   });
 
+  // Also fetch client collections
+  const { data: clientCollections } = useQuery({
+    queryKey: ["wp_client_collections_for_sale", user?.id],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("client_collections")
+        .select("*")
+        .eq("waste_picker_id", user!.id)
+        .order("collection_date", { ascending: false });
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!user,
+  });
+
   const { data: salesHistory } = useQuery({
     queryKey: ["wp_sales_history", user?.id],
     queryFn: async () => {
@@ -136,7 +151,7 @@ const WastePickerSalesPanel = () => {
     enabled: !!user,
   });
 
-  // Build material stock from collections
+  // Build material stock from both collections AND client_collections
   const materialStock = new Map<string, { name: string; qty: number; unit: string; pricePerUnit: number; icon: string }>();
   collections?.forEach((c) => {
     const mt = (c as any).material_types;
@@ -152,6 +167,26 @@ const WastePickerSalesPanel = () => {
         pricePerUnit: Number(mt?.price_per_unit || 0),
         icon: mt?.icon || "♻️",
       });
+    }
+  });
+
+  // Merge client collections into stock by matching material_type name to material_types
+  clientCollections?.forEach((cc) => {
+    const matchedMt = materialTypes?.find(mt => mt.name === cc.material_type);
+    if (matchedMt) {
+      const key = matchedMt.id;
+      const existing = materialStock.get(key);
+      if (existing) {
+        existing.qty += Number(cc.quantity_kg);
+      } else {
+        materialStock.set(key, {
+          name: matchedMt.name,
+          qty: Number(cc.quantity_kg),
+          unit: matchedMt.unit || "kg",
+          pricePerUnit: Number(matchedMt.price_per_unit || 0),
+          icon: matchedMt.icon || "♻️",
+        });
+      }
     }
   });
 
