@@ -134,6 +134,23 @@ const WastePickerSalesPanel = () => {
     enabled: !!user,
   });
 
+  const { data: salesHistory } = useQuery({
+    queryKey: ["wp_sales_history", user?.id],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("financial_transactions")
+        .select("*")
+        .eq("user_id", user!.id)
+        .eq("type", "income")
+        .ilike("description", "Material Sale:%")
+        .order("transaction_date", { ascending: false })
+        .limit(50);
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!user,
+  });
+
   // Build material stock from both collections AND client_collections
   const materialStock = new Map<string, { name: string; qty: number; unit: string; pricePerUnit: number; icon: string }>();
   collections?.forEach((c) => {
