@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
-import { LogOut, Users, BarChart3, DollarSign, ShieldAlert, FileText, Settings, MapPin, Menu, X, ChevronRight, User, BookOpen, Mail, Eye, Trash2 } from "lucide-react";
+import { LogOut, Users, BarChart3, DollarSign, ShieldAlert, FileText, Settings, MapPin, Menu, X, ChevronRight, User, BookOpen, Mail, Eye, EyeOff, Trash2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import UserVerificationPanel from "@/components/dashboard/admin/UserVerificationPanel";
@@ -16,6 +16,7 @@ import TrainingManagementPanel from "@/components/dashboard/shared/TrainingManag
 import CleanupExercisePanel from "@/components/dashboard/shared/CleanupExercisePanel";
 import InviteUsersPanel from "@/components/dashboard/admin/InviteUsersPanel";
 import ViewUserDashboardPanel from "@/components/dashboard/admin/ViewUserDashboardPanel";
+import UserVisibilityPanel from "@/components/dashboard/admin/UserVisibilityPanel";
 import TrashPanel from "@/components/dashboard/shared/TrashPanel";
 
 const navItems = [
@@ -27,6 +28,7 @@ const navItems = [
   { id: "fraud", label: "Fraud Detection", icon: ShieldAlert },
   { id: "audit", label: "Audit Logs", icon: FileText },
   { id: "county-flow", label: "County Waste Flow", icon: MapPin },
+  { id: "visibility", label: "User Visibility", icon: EyeOff },
   { id: "settings", label: "System Settings", icon: Settings },
   { id: "cleanup", label: "All Cleanups", icon: MapPin },
   { id: "training-mgmt", label: "Training Management", icon: BookOpen },
@@ -55,6 +57,7 @@ const AdminDashboard = () => {
       case "fraud": return <FraudDetectionPanel />;
       case "audit": return <AuditLogsPanel />;
       case "county-flow": return <CountyWasteFlowPanel />;
+      case "visibility": return <UserVisibilityPanel />;
       case "settings": return <SystemSettingsPanel />;
       case "cleanup": return <CleanupExercisePanel isAdmin />;
       case "training-mgmt": return <TrainingManagementPanel />;
