@@ -1147,6 +1147,7 @@ export type Database = {
           gender: string | null
           id: string
           industry_sector: string | null
+          is_globally_visible: boolean
           is_independent: boolean | null
           kra_pin: string | null
           monthly_capacity_kg: number | null
@@ -1179,6 +1180,7 @@ export type Database = {
           gender?: string | null
           id?: string
           industry_sector?: string | null
+          is_globally_visible?: boolean
           is_independent?: boolean | null
           kra_pin?: string | null
           monthly_capacity_kg?: number | null
@@ -1211,6 +1213,7 @@ export type Database = {
           gender?: string | null
           id?: string
           industry_sector?: string | null
+          is_globally_visible?: boolean
           is_independent?: boolean | null
           kra_pin?: string | null
           monthly_capacity_kg?: number | null
