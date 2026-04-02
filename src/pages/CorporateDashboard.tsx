@@ -31,6 +31,7 @@ const navItems = [
   { id: "esg", label: "ESG & Carbon", icon: Leaf },
   { id: "settings", label: "Settings", icon: Settings },
   { id: "cleanup", label: "Cleanup Exercise", icon: Package },
+  { id: "trash", label: "Trash", icon: Trash2 },
   { id: "training-mgmt", label: "Training Management", icon: BookOpen },
   { id: "profile-settings", label: "Profile Settings", icon: User },
 ];
