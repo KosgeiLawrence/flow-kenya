@@ -25,6 +25,8 @@ import RequestedPickupsPanel from "@/components/dashboard/shared/RequestedPickup
 import MarketplacePanel from "@/components/dashboard/aggregator/MarketplacePanel";
 import ESGPanel from "@/components/dashboard/aggregator/ESGPanel";
 import CompliancePanel from "@/components/dashboard/aggregator/CompliancePanel";
+import TrashPanel from "@/components/dashboard/shared/TrashPanel";
+import { Trash2 } from "lucide-react";
 
 const navItems = [
   { id: "how-it-works", label: "How It Works", icon: BookOpen },
