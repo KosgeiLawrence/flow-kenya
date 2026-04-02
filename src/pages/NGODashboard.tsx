@@ -3,7 +3,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import {
   LogOut, Heart, BarChart3, Briefcase, FileText, Package,
-  Clock, CheckCircle2, AlertTriangle, Menu, X, ChevronRight, Settings, BookOpen
+  Clock, CheckCircle2, AlertTriangle, Menu, X, ChevronRight, Settings, BookOpen, Trash2
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
