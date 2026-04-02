@@ -540,7 +540,7 @@ const FinancialReportsPanel = ({ role }: Props) => {
                 <TableCell className="text-xs py-1.5 text-right font-medium">{a.amount.toLocaleString()}</TableCell>
                 <TableCell className="text-xs py-1 w-8">
                   {!a.isAuto && a.id && (
-                    <button onClick={() => deleteBsItemMutation.mutate(a.id)} className="text-muted-foreground hover:text-destructive">
+                    <button onClick={() => handleDeleteBsItem(a)} className="text-muted-foreground hover:text-destructive">
                       <Trash2 className="w-3 h-3" />
                     </button>
                   )}

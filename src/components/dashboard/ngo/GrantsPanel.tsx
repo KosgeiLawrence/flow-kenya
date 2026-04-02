@@ -285,7 +285,7 @@ const GrantsPanel = () => {
                     <div key={d.id} className="flex items-center gap-2 text-xs">
                       <FileText className="w-3 h-3 text-muted-foreground" />
                       <a href={d.file_url} target="_blank" rel="noreferrer" className="text-primary hover:underline truncate">{d.name}</a>
-                      <button onClick={() => deleteDoc.mutate(d.id)} className="text-destructive hover:text-destructive/80 ml-auto shrink-0">
+                      <button onClick={() => handleDeleteDoc(d)} className="text-destructive hover:text-destructive/80 ml-auto shrink-0">
                         <Trash2 className="w-3 h-3" />
                       </button>
                     </div>
