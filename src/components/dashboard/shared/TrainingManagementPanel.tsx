@@ -237,29 +237,17 @@ const TrainingManagementPanel = () => {
     onError: (e: Error) => toast.error(e.message),
   });
 
-  const deleteMutation = useMutation({
-    mutationFn: async (id: string) => {
-      const { error } = await supabase.from("training_resources").delete().eq("id", id);
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      toast.success("Training deleted");
-      queryClient.invalidateQueries({ queryKey: ["training_resources_managed"] });
-    },
-    onError: (e: Error) => toast.error(e.message),
-  });
+  const { softDelete } = useTrash();
 
-  const deleteCommunityMutation = useMutation({
-    mutationFn: async (id: string) => {
-      const { error } = await supabase.from("community_training_logs" as any).delete().eq("id", id);
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      toast.success("Training log deleted");
-      queryClient.invalidateQueries({ queryKey: ["community_training_logs"] });
-    },
-    onError: (e: Error) => toast.error(e.message),
-  });
+  const handleDeleteTraining = async (t: any) => {
+    const success = await softDelete("training_resources", t.id, t, t.title);
+    if (success) queryClient.invalidateQueries({ queryKey: ["training_resources_managed"] });
+  };
+
+  const handleDeleteCommunityLog = async (t: any) => {
+    const success = await softDelete("community_training_logs", t.id, t, t.title);
+    if (success) queryClient.invalidateQueries({ queryKey: ["community_training_logs"] });
+  };
 
   const openEdit = (t: any) => {
     setEditingId(t.id);
