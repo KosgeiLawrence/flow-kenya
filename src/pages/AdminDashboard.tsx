@@ -16,6 +16,7 @@ import TrainingManagementPanel from "@/components/dashboard/shared/TrainingManag
 import CleanupExercisePanel from "@/components/dashboard/shared/CleanupExercisePanel";
 import InviteUsersPanel from "@/components/dashboard/admin/InviteUsersPanel";
 import ViewUserDashboardPanel from "@/components/dashboard/admin/ViewUserDashboardPanel";
+import TrashPanel from "@/components/dashboard/shared/TrashPanel";
 
 const navItems = [
   { id: "users", label: "User Verification", icon: Users },
