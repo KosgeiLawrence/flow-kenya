@@ -41,6 +41,7 @@ interface CRMPanelProps {
 
 const CRMPanel = ({ role }: CRMPanelProps) => {
   const { user } = useAuth();
+  const { softDelete } = useTrash();
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
