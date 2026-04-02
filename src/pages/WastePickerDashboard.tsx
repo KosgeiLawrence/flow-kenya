@@ -85,6 +85,7 @@ const WastePickerDashboard = () => {
       case "analytics": return <AnalyticsPanel />;
       case "qr-id": return <QRIDPanel />;
       case "grants": return <GrantsDiscoveryPanel userRole="waste_picker" />;
+      case "trash": return <TrashPanel />;
       case "settings": return <ProfileSettingsPanel role="waste_picker" />;
       default: return <CollectionPanel />;
     }
