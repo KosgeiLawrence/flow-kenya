@@ -134,29 +134,19 @@ const EarningsExpensesPanel = ({ role }: Props) => {
     onError: () => toast.error("Failed to save budget"),
   });
 
-  // Delete transaction
-  const deleteTxMutation = useMutation({
-    mutationFn: async (id: string) => {
-      const { error } = await supabase.from("financial_transactions").delete().eq("id", id);
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["financial_transactions"] });
-      toast.success("Entry deleted");
-    },
-  });
+  const { softDelete } = useTrash();
 
-  // Delete budget
-  const deleteBudgetMutation = useMutation({
-    mutationFn: async (id: string) => {
-      const { error } = await supabase.from("financial_budgets").delete().eq("id", id);
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["financial_budgets"] });
-      toast.success("Budget removed");
-    },
-  });
+  // Delete transaction (soft)
+  const handleDeleteTx = async (tx: any) => {
+    const success = await softDelete("financial_transactions", tx.id, tx, `${tx.type === "income" ? "Income" : "Expense"}: KES ${Number(tx.amount).toLocaleString()}`);
+    if (success) queryClient.invalidateQueries({ queryKey: ["financial_transactions"] });
+  };
+
+  // Delete budget (soft)
+  const handleDeleteBudget = async (budget: any) => {
+    const success = await softDelete("financial_budgets", budget.id, budget, `Budget: KES ${Number(budget.amount).toLocaleString()}`);
+    if (success) queryClient.invalidateQueries({ queryKey: ["financial_budgets"] });
+  };
 
   // Computed summaries
   const now = new Date();
