@@ -412,7 +412,7 @@ const EarningsExpensesPanel = ({ role }: Props) => {
                   <span className="font-medium">{bp.financial_categories?.icon} {bp.financial_categories?.name || "Overall"} ({bp.period_type})</span>
                   <div className="flex items-center gap-2">
                     <span className="text-muted-foreground">KES {bp.spent.toLocaleString()} / {Number(bp.amount).toLocaleString()}</span>
-                    <button onClick={() => deleteBudgetMutation.mutate(bp.id)} className="text-muted-foreground hover:text-destructive">
+                    <button onClick={() => handleDeleteBudget(bp)} className="text-muted-foreground hover:text-destructive">
                       <Trash2 className="w-3 h-3" />
                     </button>
                   </div>
