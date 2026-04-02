@@ -14,6 +14,7 @@ import ReportsPanel from "@/components/dashboard/ngo/ReportsPanel";
 import ProfileSettingsPanel from "@/components/dashboard/shared/ProfileSettingsPanel";
 import TrainingManagementPanel from "@/components/dashboard/shared/TrainingManagementPanel";
 import CleanupExercisePanel from "@/components/dashboard/shared/CleanupExercisePanel";
+import TrashPanel from "@/components/dashboard/shared/TrashPanel";
 
 const navItems = [
   { id: "sponsorship", label: "Community & Pickers", icon: Heart },
