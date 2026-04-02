@@ -706,6 +706,77 @@ export type Database = {
           },
         ]
       }
+      form_responses: {
+        Row: {
+          answers: Json
+          created_at: string
+          form_id: string
+          id: string
+          respondent_email: string | null
+          respondent_name: string | null
+        }
+        Insert: {
+          answers?: Json
+          created_at?: string
+          form_id: string
+          id?: string
+          respondent_email?: string | null
+          respondent_name?: string | null
+        }
+        Update: {
+          answers?: Json
+          created_at?: string
+          form_id?: string
+          id?: string
+          respondent_email?: string | null
+          respondent_name?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "form_responses_form_id_fkey"
+            columns: ["form_id"]
+            isOneToOne: false
+            referencedRelation: "forms"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      forms: {
+        Row: {
+          created_at: string
+          description: string | null
+          fields: Json
+          id: string
+          is_active: boolean
+          share_token: string
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          fields?: Json
+          id?: string
+          is_active?: boolean
+          share_token?: string
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          fields?: Json
+          id?: string
+          is_active?: boolean
+          share_token?: string
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       material_transformations: {
         Row: {
           created_at: string
