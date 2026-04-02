@@ -27,6 +27,7 @@ import EarningsExpensesPanel from "@/components/dashboard/shared/EarningsExpense
 import CRMPanel from "@/components/dashboard/shared/CRMPanel";
 import MaterialTransformationPanel from "@/components/dashboard/recycler/MaterialTransformationPanel";
 import WorkflowGuidePanel from "@/components/dashboard/recycler/WorkflowGuidePanel";
+import TrashPanel from "@/components/dashboard/shared/TrashPanel";
 
 const navItems = [
   { id: "workflows", label: "How It Works", icon: HelpCircle },
