@@ -141,16 +141,11 @@ const FinancialReportsPanel = ({ role }: Props) => {
     onError: () => toast.error("Failed to add item"),
   });
 
-  const deleteBsItemMutation = useMutation({
-    mutationFn: async (id: string) => {
-      const { error } = await supabase.from("balance_sheet_items").delete().eq("id", id);
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["balance_sheet_items"] });
-      toast.success("Item removed");
-    },
-  });
+  const { softDelete } = useTrash();
+  const handleDeleteBsItem = async (item: any) => {
+    const success = await softDelete("balance_sheet_items", item.id, item, item.account_name);
+    if (success) queryClient.invalidateQueries({ queryKey: ["balance_sheet_items"] });
+  };
 
   const now = new Date();
 
