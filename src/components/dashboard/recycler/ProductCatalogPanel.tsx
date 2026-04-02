@@ -113,10 +113,11 @@ const ProductCatalogPanel = () => {
     onError: () => toast.error("Failed to add product"),
   });
 
-  const deleteProduct = useMutation({
-    mutationFn: async (id: string) => { const { error } = await supabase.from("recycler_products").delete().eq("id", id); if (error) throw error; },
-    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ["recycler_products"] }); toast.success("Product removed"); },
-  });
+  const { softDelete } = useTrash();
+  const handleDeleteProduct = async (product: any) => {
+    const success = await softDelete("recycler_products", product.id, product, product.name);
+    if (success) queryClient.invalidateQueries({ queryKey: ["recycler_products"] });
+  };
 
   const selectedProduct = products?.find((p) => p.id === sale.productId);
 
