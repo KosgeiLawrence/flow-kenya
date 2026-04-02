@@ -132,11 +132,10 @@ const CRMPanel = ({ role }: CRMPanelProps) => {
     fetchCustomers();
   };
 
-  const handleDelete = async (id: string) => {
-    if (!confirm("Delete this customer?")) return;
-    await supabase.from("customers").delete().eq("id", id);
-    toast.success("Customer deleted");
-    fetchCustomers();
+  const handleDelete = async (c: Customer) => {
+    if (!confirm("Move this customer to trash?")) return;
+    const success = await softDelete("customers", c.id, c as any, c.full_name);
+    if (success) fetchCustomers();
   };
 
   const handleImport = async (e: React.ChangeEvent<HTMLInputElement>) => {
