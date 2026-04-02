@@ -856,7 +856,7 @@ const CleanupExercisePanel = ({ isAdmin = false }: Props) => {
                       <ClipboardList className="w-4 h-4" />
                     </Button>
                     {!isAdmin && (
-                      <Button variant="ghost" size="icon" onClick={() => deleteMutation.mutate(c.id)} title="Delete" className="text-destructive hover:text-destructive">
+                      <Button variant="ghost" size="icon" onClick={() => handleDeleteCleanup(c)} title="Delete" className="text-destructive hover:text-destructive">
                         <Trash2 className="w-4 h-4" />
                       </Button>
                     )}
