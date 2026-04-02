@@ -49,6 +49,7 @@ const navItems = [
   { id: "training", label: "Training", icon: BookOpen },
   { id: "cleanup", label: "Cleanup Exercise", icon: Package },
   { id: "grants", label: "Grants & Programs", icon: Briefcase },
+  { id: "trash", label: "Trash", icon: Trash2 },
   { id: "settings", label: "Profile Settings", icon: Settings },
 ];
 
