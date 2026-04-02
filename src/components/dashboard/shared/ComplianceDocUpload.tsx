@@ -205,7 +205,7 @@ const ComplianceDocUpload = ({ documentTypes, title = "Compliance Documents" }: 
                     size="icon"
                     variant="ghost"
                     className="h-8 w-8 text-destructive"
-                    onClick={() => deleteMutation.mutate({ id: doc.id, file_url: doc.file_url })}
+                    onClick={() => handleDeleteDoc(doc)}
                   >
                     <Trash2 className="w-4 h-4" />
                   </Button>

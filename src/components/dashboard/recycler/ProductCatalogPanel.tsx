@@ -387,7 +387,7 @@ const ProductCatalogPanel = () => {
                       <Button size="sm" onClick={() => openSale(p.id)} disabled={Number(p.stock_quantity) <= 0}>
                         <ShoppingCart className="w-3 h-3 mr-1" /> Sell
                       </Button>
-                      <Button variant="ghost" size="icon" onClick={() => deleteProduct.mutate(p.id)} title="Remove">
+                      <Button variant="ghost" size="icon" onClick={() => handleDeleteProduct(p)} title="Remove">
                         <Trash2 className="w-4 h-4 text-destructive" />
                       </Button>
                     </div>
