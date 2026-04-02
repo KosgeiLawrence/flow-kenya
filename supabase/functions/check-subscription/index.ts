@@ -28,10 +28,10 @@ serve(async (req) => {
     const token = authHeader.replace("Bearer ", "");
     const { data: userData, error: userError } = await supabaseClient.auth.getUser(token);
     if (userError || !userData?.user) {
-      // User no longer exists (e.g. deleted during reset) — return 401 so frontend can sign out
+      // User no longer exists — return 200 with subscribed:false so frontend can handle gracefully
       return new Response(JSON.stringify({ error: "user_not_found", subscribed: false }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
-        status: 401,
+        status: 200,
       });
     }
     const user = userData.user;
