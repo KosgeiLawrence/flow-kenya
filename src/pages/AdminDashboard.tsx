@@ -30,6 +30,7 @@ const navItems = [
   { id: "settings", label: "System Settings", icon: Settings },
   { id: "cleanup", label: "All Cleanups", icon: MapPin },
   { id: "training-mgmt", label: "Training Management", icon: BookOpen },
+  { id: "trash", label: "Trash", icon: Trash2 },
   { id: "profile-settings", label: "Profile Settings", icon: User },
 ];
 
