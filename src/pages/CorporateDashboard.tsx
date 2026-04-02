@@ -68,6 +68,7 @@ const CorporateDashboard = () => {
       case "settings": return <CorporateSettingsPanel />;
       case "cleanup": return <CleanupExercisePanel />;
       case "training-mgmt": return <TrainingManagementPanel />;
+      case "trash": return <TrashPanel />;
       case "profile-settings": return <ProfileSettingsPanel role="corporate" />;
       default: return <PlasticFootprintPanel />;
     }

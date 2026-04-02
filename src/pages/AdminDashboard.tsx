@@ -58,6 +58,7 @@ const AdminDashboard = () => {
       case "settings": return <SystemSettingsPanel />;
       case "cleanup": return <CleanupExercisePanel isAdmin />;
       case "training-mgmt": return <TrainingManagementPanel />;
+      case "trash": return <TrashPanel />;
       case "profile-settings": return <ProfileSettingsPanel role="admin" />;
       default: return <UserVerificationPanel />;
     }

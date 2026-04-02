@@ -40,6 +40,7 @@ const CountyGovernmentDashboard = () => {
       case "reports": return <CountyReportsPanel />;
       case "regulatory": return <RegulatoryPanel />;
       case "training-mgmt": return <TrainingManagementPanel />;
+      case "trash": return <TrashPanel />;
       case "settings": return <ProfileSettingsPanel role="county_government" />;
       default: return <WasteFlowPanel />;
     }

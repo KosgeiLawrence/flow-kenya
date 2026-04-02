@@ -55,6 +55,7 @@ const NGODashboard = () => {
       case "reports": return <ReportsPanel />;
       case "cleanup": return <CleanupExercisePanel />;
       case "training-mgmt": return <TrainingManagementPanel />;
+      case "trash": return <TrashPanel />;
       case "settings": return <ProfileSettingsPanel role="ngo" />;
       default: return <SponsorshipPanel />;
     }
