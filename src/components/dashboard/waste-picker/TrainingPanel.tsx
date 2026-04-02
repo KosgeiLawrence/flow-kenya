@@ -136,17 +136,11 @@ const TrainingPanel = ({ viewerRole }: TrainingPanelProps) => {
     onError: (e: Error) => toast.error(e.message),
   });
 
-  const deleteCommunityMutation = useMutation({
-    mutationFn: async (id: string) => {
-      const { error } = await supabase.from("community_training_logs" as any).delete().eq("id", id);
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      toast.success("Training log deleted");
-      queryClient.invalidateQueries({ queryKey: ["community_training_logs"] });
-    },
-    onError: (e: Error) => toast.error(e.message),
-  });
+  const { softDelete } = useTrash();
+  const handleDeleteCommunityLog = async (t: any) => {
+    const success = await softDelete("community_training_logs", t.id, t, t.title);
+    if (success) queryClient.invalidateQueries({ queryKey: ["community_training_logs"] });
+  };
 
   const openEditCommunity = (t: any) => {
     setEditingCommunityId(t.id);
