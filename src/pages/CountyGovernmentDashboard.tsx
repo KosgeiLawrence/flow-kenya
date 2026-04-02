@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
-import { LogOut, MapPin, BarChart3, FileText, Scale, Menu, X, ChevronRight, Settings, BookOpen } from "lucide-react";
+import { LogOut, MapPin, BarChart3, FileText, Scale, Menu, X, ChevronRight, Settings, BookOpen, Trash2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import WasteFlowPanel from "@/components/dashboard/county/WasteFlowPanel";
@@ -10,6 +10,7 @@ import RegulatoryPanel from "@/components/dashboard/county/RegulatoryPanel";
 import CountyAnalyticsPanel from "@/components/dashboard/county/CountyAnalyticsPanel";
 import ProfileSettingsPanel from "@/components/dashboard/shared/ProfileSettingsPanel";
 import TrainingManagementPanel from "@/components/dashboard/shared/TrainingManagementPanel";
+import TrashPanel from "@/components/dashboard/shared/TrashPanel";
 
 const navItems = [
   { id: "waste-flow", label: "Waste Flow Dashboard", icon: MapPin },
@@ -17,6 +18,7 @@ const navItems = [
   { id: "reports", label: "Monthly Reports", icon: FileText },
   { id: "regulatory", label: "Regulatory Reporting", icon: Scale },
   { id: "training-mgmt", label: "Training Management", icon: BookOpen },
+  { id: "trash", label: "Trash", icon: Trash2 },
   { id: "settings", label: "Profile Settings", icon: Settings },
 ];
 
@@ -38,6 +40,7 @@ const CountyGovernmentDashboard = () => {
       case "reports": return <CountyReportsPanel />;
       case "regulatory": return <RegulatoryPanel />;
       case "training-mgmt": return <TrainingManagementPanel />;
+      case "trash": return <TrashPanel />;
       case "settings": return <ProfileSettingsPanel role="county_government" />;
       default: return <WasteFlowPanel />;
     }

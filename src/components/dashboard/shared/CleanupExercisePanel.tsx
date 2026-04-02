@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
+import { useTrash } from "@/hooks/useTrash";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
@@ -320,17 +321,12 @@ const CleanupExercisePanel = ({ isAdmin = false }: Props) => {
     onError: (e: Error) => toast.error(e.message),
   });
 
-  const deleteMutation = useMutation({
-    mutationFn: async (id: string) => {
-      const { error } = await supabase.from("cleanup_exercises").delete().eq("id", id);
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["cleanup-exercises"] });
-      toast.success("Cleanup deleted");
-    },
-    onError: (e: Error) => toast.error(e.message),
-  });
+  const { softDelete } = useTrash();
+
+  const handleDeleteCleanup = async (cleanup: any) => {
+    const success = await softDelete("cleanup_exercises", cleanup.id, cleanup, cleanup.title || "Cleanup Exercise");
+    if (success) queryClient.invalidateQueries({ queryKey: ["cleanup-exercises"] });
+  };
 
   const detectLocation = () => {
     if (!navigator.geolocation) {
@@ -860,7 +856,7 @@ const CleanupExercisePanel = ({ isAdmin = false }: Props) => {
                       <ClipboardList className="w-4 h-4" />
                     </Button>
                     {!isAdmin && (
-                      <Button variant="ghost" size="icon" onClick={() => deleteMutation.mutate(c.id)} title="Delete" className="text-destructive hover:text-destructive">
+                      <Button variant="ghost" size="icon" onClick={() => handleDeleteCleanup(c)} title="Delete" className="text-destructive hover:text-destructive">
                         <Trash2 className="w-4 h-4" />
                       </Button>
                     )}

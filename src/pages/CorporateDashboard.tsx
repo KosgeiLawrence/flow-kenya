@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import {
   LogOut, Shield, Recycle, Award, Leaf, BookOpen,
   Clock, CheckCircle2, AlertTriangle, Menu, X, ChevronRight,
-  Package, HandCoins, BarChart3, Settings, User
+  Package, HandCoins, BarChart3, Settings, User, Trash2
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
@@ -19,6 +19,7 @@ import CorporateSettingsPanel from "@/components/dashboard/corporate/CorporateSe
 import ProfileSettingsPanel from "@/components/dashboard/shared/ProfileSettingsPanel";
 import TrainingManagementPanel from "@/components/dashboard/shared/TrainingManagementPanel";
 import CleanupExercisePanel from "@/components/dashboard/shared/CleanupExercisePanel";
+import TrashPanel from "@/components/dashboard/shared/TrashPanel";
 
 const navItems = [
   { id: "footprint", label: "Plastic Footprint", icon: Package },
@@ -30,6 +31,7 @@ const navItems = [
   { id: "esg", label: "ESG & Carbon", icon: Leaf },
   { id: "settings", label: "Settings", icon: Settings },
   { id: "cleanup", label: "Cleanup Exercise", icon: Package },
+  { id: "trash", label: "Trash", icon: Trash2 },
   { id: "training-mgmt", label: "Training Management", icon: BookOpen },
   { id: "profile-settings", label: "Profile Settings", icon: User },
 ];
@@ -66,6 +68,7 @@ const CorporateDashboard = () => {
       case "settings": return <CorporateSettingsPanel />;
       case "cleanup": return <CleanupExercisePanel />;
       case "training-mgmt": return <TrainingManagementPanel />;
+      case "trash": return <TrashPanel />;
       case "profile-settings": return <ProfileSettingsPanel role="corporate" />;
       default: return <PlasticFootprintPanel />;
     }

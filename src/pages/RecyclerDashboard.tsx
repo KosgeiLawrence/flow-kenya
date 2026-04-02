@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import {
   LogOut, Package, ClipboardList, FileText, ClipboardCheck, TrendingUp,
   BarChart3, Leaf, Shield, Clock, CheckCircle2, AlertTriangle,
-  Menu, X, ChevronRight, ShoppingBag, Briefcase, Settings, Truck, BookOpen, Recycle, HelpCircle
+  Menu, X, ChevronRight, ShoppingBag, Briefcase, Settings, Truck, BookOpen, Recycle, HelpCircle, Trash2
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
@@ -27,6 +27,7 @@ import EarningsExpensesPanel from "@/components/dashboard/shared/EarningsExpense
 import CRMPanel from "@/components/dashboard/shared/CRMPanel";
 import MaterialTransformationPanel from "@/components/dashboard/recycler/MaterialTransformationPanel";
 import WorkflowGuidePanel from "@/components/dashboard/recycler/WorkflowGuidePanel";
+import TrashPanel from "@/components/dashboard/shared/TrashPanel";
 
 const navItems = [
   { id: "workflows", label: "How It Works", icon: HelpCircle },
@@ -43,6 +44,7 @@ const navItems = [
   { id: "training", label: "Training", icon: BookOpen },
   { id: "cleanup", label: "Cleanup Exercise", icon: Package },
   { id: "grants", label: "Grants & Programs", icon: Briefcase },
+  { id: "trash", label: "Trash", icon: Trash2 },
   { id: "settings", label: "Profile Settings", icon: Settings },
 ];
 
@@ -91,6 +93,7 @@ const RecyclerDashboard = () => {
       case "cleanup": return <CleanupExercisePanel />;
       
       case "grants": return <GrantsDiscoveryPanel userRole="recycler" />;
+      case "trash": return <TrashPanel />;
       case "settings": return <ProfileSettingsPanel role="recycler" />;
       default: return <InventoryAccessPanel />;
     }

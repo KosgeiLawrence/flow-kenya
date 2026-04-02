@@ -2,6 +2,7 @@ import { useState, useMemo } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
+import { useTrash } from "@/hooks/useTrash";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -140,16 +141,11 @@ const FinancialReportsPanel = ({ role }: Props) => {
     onError: () => toast.error("Failed to add item"),
   });
 
-  const deleteBsItemMutation = useMutation({
-    mutationFn: async (id: string) => {
-      const { error } = await supabase.from("balance_sheet_items").delete().eq("id", id);
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["balance_sheet_items"] });
-      toast.success("Item removed");
-    },
-  });
+  const { softDelete } = useTrash();
+  const handleDeleteBsItem = async (item: any) => {
+    const success = await softDelete("balance_sheet_items", item.id, item, item.account_name);
+    if (success) queryClient.invalidateQueries({ queryKey: ["balance_sheet_items"] });
+  };
 
   const now = new Date();
 
@@ -544,7 +540,7 @@ const FinancialReportsPanel = ({ role }: Props) => {
                 <TableCell className="text-xs py-1.5 text-right font-medium">{a.amount.toLocaleString()}</TableCell>
                 <TableCell className="text-xs py-1 w-8">
                   {!a.isAuto && a.id && (
-                    <button onClick={() => deleteBsItemMutation.mutate(a.id)} className="text-muted-foreground hover:text-destructive">
+                    <button onClick={() => handleDeleteBsItem(a)} className="text-muted-foreground hover:text-destructive">
                       <Trash2 className="w-3 h-3" />
                     </button>
                   )}

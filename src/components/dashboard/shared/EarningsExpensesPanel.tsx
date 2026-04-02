@@ -2,6 +2,7 @@ import { useState, useMemo } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
+import { useTrash } from "@/hooks/useTrash";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -133,29 +134,19 @@ const EarningsExpensesPanel = ({ role }: Props) => {
     onError: () => toast.error("Failed to save budget"),
   });
 
-  // Delete transaction
-  const deleteTxMutation = useMutation({
-    mutationFn: async (id: string) => {
-      const { error } = await supabase.from("financial_transactions").delete().eq("id", id);
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["financial_transactions"] });
-      toast.success("Entry deleted");
-    },
-  });
+  const { softDelete } = useTrash();
 
-  // Delete budget
-  const deleteBudgetMutation = useMutation({
-    mutationFn: async (id: string) => {
-      const { error } = await supabase.from("financial_budgets").delete().eq("id", id);
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["financial_budgets"] });
-      toast.success("Budget removed");
-    },
-  });
+  // Delete transaction (soft)
+  const handleDeleteTx = async (tx: any) => {
+    const success = await softDelete("financial_transactions", tx.id, tx, `${tx.type === "income" ? "Income" : "Expense"}: KES ${Number(tx.amount).toLocaleString()}`);
+    if (success) queryClient.invalidateQueries({ queryKey: ["financial_transactions"] });
+  };
+
+  // Delete budget (soft)
+  const handleDeleteBudget = async (budget: any) => {
+    const success = await softDelete("financial_budgets", budget.id, budget, `Budget: KES ${Number(budget.amount).toLocaleString()}`);
+    if (success) queryClient.invalidateQueries({ queryKey: ["financial_budgets"] });
+  };
 
   // Computed summaries
   const now = new Date();
@@ -421,7 +412,7 @@ const EarningsExpensesPanel = ({ role }: Props) => {
                   <span className="font-medium">{bp.financial_categories?.icon} {bp.financial_categories?.name || "Overall"} ({bp.period_type})</span>
                   <div className="flex items-center gap-2">
                     <span className="text-muted-foreground">KES {bp.spent.toLocaleString()} / {Number(bp.amount).toLocaleString()}</span>
-                    <button onClick={() => deleteBudgetMutation.mutate(bp.id)} className="text-muted-foreground hover:text-destructive">
+                    <button onClick={() => handleDeleteBudget(bp)} className="text-muted-foreground hover:text-destructive">
                       <Trash2 className="w-3 h-3" />
                     </button>
                   </div>
@@ -498,7 +489,7 @@ const EarningsExpensesPanel = ({ role }: Props) => {
                   <span className={`text-sm font-bold ${tx.type === "income" ? "text-primary" : "text-destructive"}`}>
                     {tx.type === "income" ? "+" : "-"}KES {Number(tx.amount).toLocaleString()}
                   </span>
-                  <button onClick={() => deleteTxMutation.mutate(tx.id)} className="text-muted-foreground hover:text-destructive p-1">
+                  <button onClick={() => handleDeleteTx(tx)} className="text-muted-foreground hover:text-destructive p-1">
                     <Trash2 className="w-3.5 h-3.5" />
                   </button>
                 </div>

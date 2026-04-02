@@ -3,7 +3,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import {
   LogOut, Heart, BarChart3, Briefcase, FileText, Package,
-  Clock, CheckCircle2, AlertTriangle, Menu, X, ChevronRight, Settings, BookOpen
+  Clock, CheckCircle2, AlertTriangle, Menu, X, ChevronRight, Settings, BookOpen, Trash2
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
@@ -14,6 +14,7 @@ import ReportsPanel from "@/components/dashboard/ngo/ReportsPanel";
 import ProfileSettingsPanel from "@/components/dashboard/shared/ProfileSettingsPanel";
 import TrainingManagementPanel from "@/components/dashboard/shared/TrainingManagementPanel";
 import CleanupExercisePanel from "@/components/dashboard/shared/CleanupExercisePanel";
+import TrashPanel from "@/components/dashboard/shared/TrashPanel";
 
 const navItems = [
   { id: "sponsorship", label: "Community & Pickers", icon: Heart },
@@ -22,6 +23,7 @@ const navItems = [
   { id: "reports", label: "Reports", icon: FileText },
   { id: "cleanup", label: "Cleanup Exercise", icon: Package },
   { id: "training-mgmt", label: "Training Management", icon: BookOpen },
+  { id: "trash", label: "Trash", icon: Trash2 },
   { id: "settings", label: "Profile Settings", icon: Settings },
 ];
 
@@ -53,6 +55,7 @@ const NGODashboard = () => {
       case "reports": return <ReportsPanel />;
       case "cleanup": return <CleanupExercisePanel />;
       case "training-mgmt": return <TrainingManagementPanel />;
+      case "trash": return <TrashPanel />;
       case "settings": return <ProfileSettingsPanel role="ngo" />;
       default: return <SponsorshipPanel />;
     }

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
-import { LogOut, Users, BarChart3, DollarSign, ShieldAlert, FileText, Settings, MapPin, Menu, X, ChevronRight, User, BookOpen, Mail, Eye } from "lucide-react";
+import { LogOut, Users, BarChart3, DollarSign, ShieldAlert, FileText, Settings, MapPin, Menu, X, ChevronRight, User, BookOpen, Mail, Eye, Trash2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import UserVerificationPanel from "@/components/dashboard/admin/UserVerificationPanel";
@@ -16,6 +16,7 @@ import TrainingManagementPanel from "@/components/dashboard/shared/TrainingManag
 import CleanupExercisePanel from "@/components/dashboard/shared/CleanupExercisePanel";
 import InviteUsersPanel from "@/components/dashboard/admin/InviteUsersPanel";
 import ViewUserDashboardPanel from "@/components/dashboard/admin/ViewUserDashboardPanel";
+import TrashPanel from "@/components/dashboard/shared/TrashPanel";
 
 const navItems = [
   { id: "users", label: "User Verification", icon: Users },
@@ -29,6 +30,7 @@ const navItems = [
   { id: "settings", label: "System Settings", icon: Settings },
   { id: "cleanup", label: "All Cleanups", icon: MapPin },
   { id: "training-mgmt", label: "Training Management", icon: BookOpen },
+  { id: "trash", label: "Trash", icon: Trash2 },
   { id: "profile-settings", label: "Profile Settings", icon: User },
 ];
 
@@ -56,6 +58,7 @@ const AdminDashboard = () => {
       case "settings": return <SystemSettingsPanel />;
       case "cleanup": return <CleanupExercisePanel isAdmin />;
       case "training-mgmt": return <TrainingManagementPanel />;
+      case "trash": return <TrashPanel />;
       case "profile-settings": return <ProfileSettingsPanel role="admin" />;
       default: return <UserVerificationPanel />;
     }

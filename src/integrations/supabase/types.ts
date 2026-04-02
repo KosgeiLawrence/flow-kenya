@@ -1730,6 +1730,45 @@ export type Database = {
           },
         ]
       }
+      trash_items: {
+        Row: {
+          created_at: string
+          deleted_at: string
+          expires_at: string
+          id: string
+          item_label: string
+          original_data: Json
+          original_id: string
+          original_table: string
+          restored_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          deleted_at?: string
+          expires_at?: string
+          id?: string
+          item_label: string
+          original_data: Json
+          original_id: string
+          original_table: string
+          restored_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          deleted_at?: string
+          expires_at?: string
+          id?: string
+          item_label?: string
+          original_data?: Json
+          original_id?: string
+          original_table?: string
+          restored_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           id: string

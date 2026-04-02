@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
+import { useTrash } from "@/hooks/useTrash";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -135,17 +136,11 @@ const TrainingPanel = ({ viewerRole }: TrainingPanelProps) => {
     onError: (e: Error) => toast.error(e.message),
   });
 
-  const deleteCommunityMutation = useMutation({
-    mutationFn: async (id: string) => {
-      const { error } = await supabase.from("community_training_logs" as any).delete().eq("id", id);
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      toast.success("Training log deleted");
-      queryClient.invalidateQueries({ queryKey: ["community_training_logs"] });
-    },
-    onError: (e: Error) => toast.error(e.message),
-  });
+  const { softDelete } = useTrash();
+  const handleDeleteCommunityLog = async (t: any) => {
+    const success = await softDelete("community_training_logs", t.id, t, t.title);
+    if (success) queryClient.invalidateQueries({ queryKey: ["community_training_logs"] });
+  };
 
   const openEditCommunity = (t: any) => {
     setEditingCommunityId(t.id);
@@ -405,7 +400,7 @@ const TrainingPanel = ({ viewerRole }: TrainingPanelProps) => {
                     <Button size="sm" variant="outline" className="gap-1" onClick={() => openEditCommunity(t)}>
                       <Pencil className="w-3 h-3" /> Edit
                     </Button>
-                    <Button size="sm" variant="outline" className="gap-1 text-destructive hover:text-destructive" onClick={() => deleteCommunityMutation.mutate(t.id)}>
+                    <Button size="sm" variant="outline" className="gap-1 text-destructive hover:text-destructive" onClick={() => handleDeleteCommunityLog(t)}>
                       <Trash2 className="w-3 h-3" /> Delete
                     </Button>
                   </div>

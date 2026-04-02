@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
+import { useTrash } from "@/hooks/useTrash";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -40,6 +41,7 @@ interface CRMPanelProps {
 
 const CRMPanel = ({ role }: CRMPanelProps) => {
   const { user } = useAuth();
+  const { softDelete } = useTrash();
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
@@ -130,11 +132,10 @@ const CRMPanel = ({ role }: CRMPanelProps) => {
     fetchCustomers();
   };
 
-  const handleDelete = async (id: string) => {
-    if (!confirm("Delete this customer?")) return;
-    await supabase.from("customers").delete().eq("id", id);
-    toast.success("Customer deleted");
-    fetchCustomers();
+  const handleDelete = async (c: Customer) => {
+    if (!confirm("Move this customer to trash?")) return;
+    const success = await softDelete("customers", c.id, c as any, c.full_name);
+    if (success) fetchCustomers();
   };
 
   const handleImport = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -394,7 +395,7 @@ const CRMPanel = ({ role }: CRMPanelProps) => {
                     <Button size="icon" variant="ghost" className="h-7 w-7" onClick={() => openEdit(c)}>
                       <Edit2 className="w-3 h-3" />
                     </Button>
-                    <Button size="icon" variant="ghost" className="h-7 w-7 text-destructive" onClick={() => handleDelete(c.id)}>
+                    <Button size="icon" variant="ghost" className="h-7 w-7 text-destructive" onClick={() => handleDelete(c)}>
                       <Trash2 className="w-3 h-3" />
                     </Button>
                   </div>

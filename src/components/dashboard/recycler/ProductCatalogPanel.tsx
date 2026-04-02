@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
+import { useTrash } from "@/hooks/useTrash";
 import { useOrgInfo } from "@/hooks/useOrgInfo";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -112,10 +113,11 @@ const ProductCatalogPanel = () => {
     onError: () => toast.error("Failed to add product"),
   });
 
-  const deleteProduct = useMutation({
-    mutationFn: async (id: string) => { const { error } = await supabase.from("recycler_products").delete().eq("id", id); if (error) throw error; },
-    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ["recycler_products"] }); toast.success("Product removed"); },
-  });
+  const { softDelete } = useTrash();
+  const handleDeleteProduct = async (product: any) => {
+    const success = await softDelete("recycler_products", product.id, product, product.name);
+    if (success) queryClient.invalidateQueries({ queryKey: ["recycler_products"] });
+  };
 
   const selectedProduct = products?.find((p) => p.id === sale.productId);
 
@@ -385,7 +387,7 @@ const ProductCatalogPanel = () => {
                       <Button size="sm" onClick={() => openSale(p.id)} disabled={Number(p.stock_quantity) <= 0}>
                         <ShoppingCart className="w-3 h-3 mr-1" /> Sell
                       </Button>
-                      <Button variant="ghost" size="icon" onClick={() => deleteProduct.mutate(p.id)} title="Remove">
+                      <Button variant="ghost" size="icon" onClick={() => handleDeleteProduct(p)} title="Remove">
                         <Trash2 className="w-4 h-4 text-destructive" />
                       </Button>
                     </div>

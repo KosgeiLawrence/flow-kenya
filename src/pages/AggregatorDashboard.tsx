@@ -31,7 +31,8 @@ import RecyclerPickupRequestPanel from "@/components/dashboard/aggregator/Recycl
 import AggregatorSuppliersPanel from "@/components/dashboard/aggregator/AggregatorSuppliersPanel";
 import AggregatorSalesPanel from "@/components/dashboard/aggregator/AggregatorSalesPanel";
 import WasteDeliveredPanel from "@/components/dashboard/aggregator/WasteDeliveredPanel";
-import { HelpCircle, ClipboardList } from "lucide-react";
+import TrashPanel from "@/components/dashboard/shared/TrashPanel";
+import { HelpCircle, ClipboardList, Trash2 } from "lucide-react";
 
 const navItems = [
   { id: "workflows", label: "How It Works", icon: HelpCircle },
@@ -48,6 +49,7 @@ const navItems = [
   { id: "training", label: "Training", icon: BookOpen },
   { id: "cleanup", label: "Cleanup Exercise", icon: Package },
   { id: "grants", label: "Grants & Programs", icon: Briefcase },
+  { id: "trash", label: "Trash", icon: Trash2 },
   { id: "settings", label: "Profile Settings", icon: Settings },
 ];
 
@@ -113,6 +115,7 @@ const AggregatorDashboard = () => {
       case "cleanup": return <CleanupExercisePanel />;
       case "crm": return <CRMPanel role="aggregator" />;
       case "grants": return <GrantsDiscoveryPanel userRole="aggregator" />;
+      case "trash": return <TrashPanel />;
       case "settings": return <ProfileSettingsPanel role="aggregator" />;
       default: return <WastePickerMgmtPanel />;
     }

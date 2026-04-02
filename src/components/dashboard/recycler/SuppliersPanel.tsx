@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
+import { useTrash } from "@/hooks/useTrash";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -115,16 +116,11 @@ const SuppliersPanel = () => {
     onError: () => toast.error("Failed to save supplier"),
   });
 
-  const deleteMutation = useMutation({
-    mutationFn: async (id: string) => {
-      const { error } = await supabase.from("suppliers").delete().eq("id", id);
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["suppliers"] });
-      toast.success("Supplier removed");
-    },
-  });
+  const { softDelete } = useTrash();
+  const handleDeleteSupplier = async (s: any) => {
+    const success = await softDelete("suppliers", s.id, s, s.supplier_name);
+    if (success) queryClient.invalidateQueries({ queryKey: ["suppliers"] });
+  };
 
   const openEdit = (s: any) => {
     setForm({
@@ -315,7 +311,7 @@ const SuppliersPanel = () => {
                     </div>
                     <div className="flex items-center gap-1 shrink-0">
                       <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => openEdit(s)}><Edit2 className="w-3.5 h-3.5" /></Button>
-                      <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive" onClick={() => deleteMutation.mutate(s.id)}><Trash2 className="w-3.5 h-3.5" /></Button>
+                      <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive" onClick={() => handleDeleteSupplier(s)}><Trash2 className="w-3.5 h-3.5" /></Button>
                     </div>
                   </div>
                 </div>

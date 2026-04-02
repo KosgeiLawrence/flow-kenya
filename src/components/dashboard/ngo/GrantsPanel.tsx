@@ -2,6 +2,7 @@ import { useState, useRef } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
+import { useTrash } from "@/hooks/useTrash";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -116,16 +117,11 @@ const GrantsPanel = () => {
     }
   };
 
-  const deleteDoc = useMutation({
-    mutationFn: async (docId: string) => {
-      const { error } = await supabase.from("ngo_program_documents").delete().eq("id", docId);
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["ngo_program_docs"] });
-      toast.success("Document removed");
-    },
-  });
+  const { softDelete } = useTrash();
+  const handleDeleteDoc = async (d: any) => {
+    const success = await softDelete("ngo_program_documents", d.id, d, d.name);
+    if (success) queryClient.invalidateQueries({ queryKey: ["ngo_program_docs"] });
+  };
 
   const totalBudget = programs?.reduce((s, p) => s + Number(p.budget), 0) || 0;
   const totalSpent = programs?.reduce((s, p) => s + Number(p.spent), 0) || 0;
@@ -289,7 +285,7 @@ const GrantsPanel = () => {
                     <div key={d.id} className="flex items-center gap-2 text-xs">
                       <FileText className="w-3 h-3 text-muted-foreground" />
                       <a href={d.file_url} target="_blank" rel="noreferrer" className="text-primary hover:underline truncate">{d.name}</a>
-                      <button onClick={() => deleteDoc.mutate(d.id)} className="text-destructive hover:text-destructive/80 ml-auto shrink-0">
+                      <button onClick={() => handleDeleteDoc(d)} className="text-destructive hover:text-destructive/80 ml-auto shrink-0">
                         <Trash2 className="w-3 h-3" />
                       </button>
                     </div>

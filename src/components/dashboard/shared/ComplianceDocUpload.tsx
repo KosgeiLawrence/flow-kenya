@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
+import { useTrash } from "@/hooks/useTrash";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -41,22 +42,19 @@ const ComplianceDocUpload = ({ documentTypes, title = "Compliance Documents" }: 
     enabled: !!user,
   });
 
-  const deleteMutation = useMutation({
-    mutationFn: async (doc: { id: string; file_url: string }) => {
-      // Extract path from URL for storage deletion
+  const { softDelete } = useTrash();
+
+  const handleDeleteDoc = async (doc: any) => {
+    const success = await softDelete("compliance_documents", doc.id, doc, doc.document_name);
+    if (success) {
+      // Also remove from storage
       const urlParts = doc.file_url.split("/compliance-documents/");
       if (urlParts[1]) {
         await supabase.storage.from("compliance-documents").remove([urlParts[1]]);
       }
-      const { error } = await supabase.from("compliance_documents").delete().eq("id", doc.id);
-      if (error) throw error;
-    },
-    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["compliance_documents"] });
-      toast.success("Document deleted");
-    },
-    onError: () => toast.error("Failed to delete document"),
-  });
+    }
+  };
 
   const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -207,7 +205,7 @@ const ComplianceDocUpload = ({ documentTypes, title = "Compliance Documents" }: 
                     size="icon"
                     variant="ghost"
                     className="h-8 w-8 text-destructive"
-                    onClick={() => deleteMutation.mutate({ id: doc.id, file_url: doc.file_url })}
+                    onClick={() => handleDeleteDoc(doc)}
                   >
                     <Trash2 className="w-4 h-4" />
                   </Button>

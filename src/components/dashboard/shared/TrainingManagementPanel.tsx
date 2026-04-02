@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
+import { useTrash } from "@/hooks/useTrash";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -236,29 +237,17 @@ const TrainingManagementPanel = () => {
     onError: (e: Error) => toast.error(e.message),
   });
 
-  const deleteMutation = useMutation({
-    mutationFn: async (id: string) => {
-      const { error } = await supabase.from("training_resources").delete().eq("id", id);
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      toast.success("Training deleted");
-      queryClient.invalidateQueries({ queryKey: ["training_resources_managed"] });
-    },
-    onError: (e: Error) => toast.error(e.message),
-  });
+  const { softDelete } = useTrash();
 
-  const deleteCommunityMutation = useMutation({
-    mutationFn: async (id: string) => {
-      const { error } = await supabase.from("community_training_logs" as any).delete().eq("id", id);
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      toast.success("Training log deleted");
-      queryClient.invalidateQueries({ queryKey: ["community_training_logs"] });
-    },
-    onError: (e: Error) => toast.error(e.message),
-  });
+  const handleDeleteTraining = async (t: any) => {
+    const success = await softDelete("training_resources", t.id, t, t.title);
+    if (success) queryClient.invalidateQueries({ queryKey: ["training_resources_managed"] });
+  };
+
+  const handleDeleteCommunityLog = async (t: any) => {
+    const success = await softDelete("community_training_logs", t.id, t, t.title);
+    if (success) queryClient.invalidateQueries({ queryKey: ["community_training_logs"] });
+  };
 
   const openEdit = (t: any) => {
     setEditingId(t.id);
@@ -451,7 +440,7 @@ const TrainingManagementPanel = () => {
                     <Button size="sm" variant="outline" className="gap-1" onClick={() => openEdit(t)}>
                       <Pencil className="w-3 h-3" /> Edit
                     </Button>
-                    <Button size="sm" variant="outline" className="gap-1 text-destructive hover:text-destructive" onClick={() => deleteMutation.mutate(t.id)}>
+                    <Button size="sm" variant="outline" className="gap-1 text-destructive hover:text-destructive" onClick={() => handleDeleteTraining(t)}>
                       <Trash2 className="w-3 h-3" /> Delete
                     </Button>
                   </div>
@@ -636,7 +625,7 @@ const TrainingManagementPanel = () => {
                     <Button size="sm" variant="outline" className="gap-1" onClick={() => openEditCommunity(t)}>
                       <Pencil className="w-3 h-3" /> Edit
                     </Button>
-                    <Button size="sm" variant="outline" className="gap-1 text-destructive hover:text-destructive" onClick={() => deleteCommunityMutation.mutate(t.id)}>
+                    <Button size="sm" variant="outline" className="gap-1 text-destructive hover:text-destructive" onClick={() => handleDeleteCommunityLog(t)}>
                       <Trash2 className="w-3 h-3" /> Delete
                     </Button>
                   </div>
