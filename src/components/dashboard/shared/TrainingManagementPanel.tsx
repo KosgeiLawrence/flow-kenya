@@ -440,7 +440,7 @@ const TrainingManagementPanel = () => {
                     <Button size="sm" variant="outline" className="gap-1" onClick={() => openEdit(t)}>
                       <Pencil className="w-3 h-3" /> Edit
                     </Button>
-                    <Button size="sm" variant="outline" className="gap-1 text-destructive hover:text-destructive" onClick={() => deleteMutation.mutate(t.id)}>
+                    <Button size="sm" variant="outline" className="gap-1 text-destructive hover:text-destructive" onClick={() => handleDeleteTraining(t)}>
                       <Trash2 className="w-3 h-3" /> Delete
                     </Button>
                   </div>
