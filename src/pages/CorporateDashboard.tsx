@@ -19,6 +19,7 @@ import CorporateSettingsPanel from "@/components/dashboard/corporate/CorporateSe
 import ProfileSettingsPanel from "@/components/dashboard/shared/ProfileSettingsPanel";
 import TrainingManagementPanel from "@/components/dashboard/shared/TrainingManagementPanel";
 import CleanupExercisePanel from "@/components/dashboard/shared/CleanupExercisePanel";
+import TrashPanel from "@/components/dashboard/shared/TrashPanel";
 
 const navItems = [
   { id: "footprint", label: "Plastic Footprint", icon: Package },
