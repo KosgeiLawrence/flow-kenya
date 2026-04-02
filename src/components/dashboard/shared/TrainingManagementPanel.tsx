@@ -625,7 +625,7 @@ const TrainingManagementPanel = () => {
                     <Button size="sm" variant="outline" className="gap-1" onClick={() => openEditCommunity(t)}>
                       <Pencil className="w-3 h-3" /> Edit
                     </Button>
-                    <Button size="sm" variant="outline" className="gap-1 text-destructive hover:text-destructive" onClick={() => deleteCommunityMutation.mutate(t.id)}>
+                    <Button size="sm" variant="outline" className="gap-1 text-destructive hover:text-destructive" onClick={() => handleDeleteCommunityLog(t)}>
                       <Trash2 className="w-3 h-3" /> Delete
                     </Button>
                   </div>
