@@ -489,7 +489,7 @@ const EarningsExpensesPanel = ({ role }: Props) => {
                   <span className={`text-sm font-bold ${tx.type === "income" ? "text-primary" : "text-destructive"}`}>
                     {tx.type === "income" ? "+" : "-"}KES {Number(tx.amount).toLocaleString()}
                   </span>
-                  <button onClick={() => deleteTxMutation.mutate(tx.id)} className="text-muted-foreground hover:text-destructive p-1">
+                  <button onClick={() => handleDeleteTx(tx)} className="text-muted-foreground hover:text-destructive p-1">
                     <Trash2 className="w-3.5 h-3.5" />
                   </button>
                 </div>
