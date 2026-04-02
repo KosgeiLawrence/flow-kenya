@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
-import { LogOut, Users, BarChart3, DollarSign, ShieldAlert, FileText, Settings, MapPin, Menu, X, ChevronRight, User, BookOpen, Mail, Eye, EyeOff, Trash2 } from "lucide-react";
+import { LogOut, Users, BarChart3, DollarSign, ShieldAlert, FileText, Settings, MapPin, Menu, X, ChevronRight, User, BookOpen, Mail, Eye, EyeOff, Trash2, ClipboardList } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import UserVerificationPanel from "@/components/dashboard/admin/UserVerificationPanel";
@@ -18,6 +18,7 @@ import InviteUsersPanel from "@/components/dashboard/admin/InviteUsersPanel";
 import ViewUserDashboardPanel from "@/components/dashboard/admin/ViewUserDashboardPanel";
 import UserVisibilityPanel from "@/components/dashboard/admin/UserVisibilityPanel";
 import TrashPanel from "@/components/dashboard/shared/TrashPanel";
+import FormBuilderPanel from "@/components/dashboard/admin/FormBuilderPanel";
 
 const navItems = [
   { id: "users", label: "User Verification", icon: Users },
@@ -32,6 +33,7 @@ const navItems = [
   { id: "settings", label: "System Settings", icon: Settings },
   { id: "cleanup", label: "All Cleanups", icon: MapPin },
   { id: "training-mgmt", label: "Training Management", icon: BookOpen },
+  { id: "forms", label: "Form Builder", icon: ClipboardList },
   { id: "trash", label: "Trash", icon: Trash2 },
   { id: "profile-settings", label: "Profile Settings", icon: User },
 ];
@@ -61,6 +63,7 @@ const AdminDashboard = () => {
       case "settings": return <SystemSettingsPanel />;
       case "cleanup": return <CleanupExercisePanel isAdmin />;
       case "training-mgmt": return <TrainingManagementPanel />;
+      case "forms": return <FormBuilderPanel />;
       case "trash": return <TrashPanel />;
       case "profile-settings": return <ProfileSettingsPanel role="admin" />;
       default: return <UserVerificationPanel />;

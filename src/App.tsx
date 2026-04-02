@@ -29,6 +29,7 @@ import Terms from "./pages/Terms";
 import Contact from "./pages/Contact";
 import PublicReport from "./pages/PublicReport";
 import CleanupRegister from "./pages/CleanupRegister";
+import PublicForm from "./pages/PublicForm";
 import PWAInstallPrompt from "./components/PWAInstallPrompt";
 import BiometricLockScreen from "./components/auth/BiometricLockScreen";
 import BiometricSetupPrompt from "./components/auth/BiometricSetupPrompt";
@@ -202,6 +203,7 @@ const App = () => {
                 <Route path="/contact" element={<Contact />} />
                 <Route path="/report/:id" element={<PublicReport />} />
                 <Route path="/cleanup/:id/register" element={<CleanupRegister />} />
+                <Route path="/form/:token" element={<PublicForm />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </BiometricGate>
