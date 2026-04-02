@@ -10,6 +10,7 @@ import RegulatoryPanel from "@/components/dashboard/county/RegulatoryPanel";
 import CountyAnalyticsPanel from "@/components/dashboard/county/CountyAnalyticsPanel";
 import ProfileSettingsPanel from "@/components/dashboard/shared/ProfileSettingsPanel";
 import TrainingManagementPanel from "@/components/dashboard/shared/TrainingManagementPanel";
+import TrashPanel from "@/components/dashboard/shared/TrashPanel";
 
 const navItems = [
   { id: "waste-flow", label: "Waste Flow Dashboard", icon: MapPin },
