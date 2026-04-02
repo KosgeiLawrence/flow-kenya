@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import {
   LogOut, Shield, Recycle, Award, Leaf, BookOpen,
   Clock, CheckCircle2, AlertTriangle, Menu, X, ChevronRight,
-  Package, HandCoins, BarChart3, Settings, User
+  Package, HandCoins, BarChart3, Settings, User, Trash2
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
