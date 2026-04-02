@@ -23,6 +23,7 @@ const navItems = [
   { id: "reports", label: "Reports", icon: FileText },
   { id: "cleanup", label: "Cleanup Exercise", icon: Package },
   { id: "training-mgmt", label: "Training Management", icon: BookOpen },
+  { id: "trash", label: "Trash", icon: Trash2 },
   { id: "settings", label: "Profile Settings", icon: Settings },
 ];
 
