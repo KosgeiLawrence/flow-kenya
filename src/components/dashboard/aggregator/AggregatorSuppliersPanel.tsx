@@ -115,16 +115,11 @@ const AggregatorSuppliersPanel = () => {
     onError: () => toast.error("Failed to save supplier"),
   });
 
-  const deleteMutation = useMutation({
-    mutationFn: async (id: string) => {
-      const { error } = await supabase.from("suppliers").delete().eq("id", id);
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["suppliers"] });
-      toast.success("Supplier removed");
-    },
-  });
+  const { softDelete } = useTrash();
+  const handleDeleteSupplier = async (s: any) => {
+    const success = await softDelete("suppliers", s.id, s, s.supplier_name);
+    if (success) queryClient.invalidateQueries({ queryKey: ["suppliers"] });
+  };
 
   const openEdit = (s: any) => {
     setForm({
