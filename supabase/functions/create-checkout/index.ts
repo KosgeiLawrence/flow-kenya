@@ -49,9 +49,10 @@ serve(async (req) => {
     const periodLabel = billingPeriod === "monthly" ? "Monthly" : billingPeriod === "yearly" ? "Yearly" : "Lifetime";
     const roleName = role.replace(/_/g, " ");
 
-    const response = await fetch("https://payment.intasend.com/api/v1/checkout/", {
+    const response = await fetch("https://api.intasend.com/api/v1/checkout/", {
       method: "POST",
       headers: {
+        "accept": "application/json",
         "Content-Type": "application/json",
         "X-IntaSend-Public-API-Key": publishableKey,
       },
