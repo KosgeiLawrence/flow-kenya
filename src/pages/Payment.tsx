@@ -5,7 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { PLAN_PRICE_MAP, isFreePlan } from "@/lib/stripePlans";
+import { PLAN_AMOUNT_MAP, isFreePlan } from "@/lib/stripePlans";
 import { pricingData, isPromoValidForRole } from "@/components/auth/PricingPlans";
 
 const Payment = () => {
@@ -33,7 +33,6 @@ const Payment = () => {
       return;
     }
 
-    // If free plan or valid promo, redirect to dashboard
     if (freePlan || promoValid) {
       if (role) {
         navigate(`/dashboard/${role.replace("_", "-")}`, { replace: true });
@@ -42,7 +41,6 @@ const Payment = () => {
       return;
     }
 
-    // Check if already subscribed
     const checkSub = async () => {
       try {
         const { data, error } = await supabase.functions.invoke("check-subscription");
@@ -61,13 +59,18 @@ const Payment = () => {
   }, [user, role, freePlan, promoValid, navigate]);
 
   const handleCheckout = async () => {
-    const priceId = PLAN_PRICE_MAP[selectedPlan];
-    if (!priceId) return;
+    const amount = PLAN_AMOUNT_MAP[selectedPlan];
+    if (!amount || amount <= 0) return;
 
     setLoading(true);
     try {
       const { data, error } = await supabase.functions.invoke("create-checkout", {
-        body: { priceId, promoCode },
+        body: {
+          amount,
+          planId: selectedPlan,
+          planName: planDetails?.name || selectedPlan,
+          promoCode,
+        },
       });
       if (error) throw error;
       if (data?.url) {
@@ -88,6 +91,9 @@ const Payment = () => {
     );
   }
 
+  const amount = PLAN_AMOUNT_MAP[selectedPlan];
+  const hasPaidPlan = amount !== undefined && amount > 0;
+
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-6">
       <Card className="w-full max-w-md">
@@ -95,7 +101,7 @@ const Payment = () => {
           <CreditCard className="w-12 h-12 mx-auto text-primary mb-2" />
           <CardTitle className="text-2xl font-display">Complete Your Subscription</CardTitle>
           <CardDescription>
-            Activate your plan to access your dashboard
+            Pay via M-Pesa or Card to activate your plan
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
@@ -135,15 +141,15 @@ const Payment = () => {
 
           <Button
             onClick={handleCheckout}
-            disabled={loading || !PLAN_PRICE_MAP[selectedPlan]}
+            disabled={loading || !hasPaidPlan}
             className="w-full gap-2"
             size="lg"
           >
             {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <CreditCard className="w-4 h-4" />}
-            Pay with Stripe
+            Pay with IntaSend
           </Button>
 
-          {!PLAN_PRICE_MAP[selectedPlan] && (
+          {!hasPaidPlan && (
             <p className="text-center text-sm text-muted-foreground">
               This plan requires custom pricing. Please contact us.
             </p>

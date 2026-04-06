@@ -1,5 +1,4 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
-import Stripe from "https://esm.sh/stripe@18.5.0";
 import { createClient } from "npm:@supabase/supabase-js@2.57.2";
 
 const corsHeaders = {
@@ -19,16 +18,12 @@ serve(async (req) => {
   );
 
   try {
-    const stripeKey = Deno.env.get("STRIPE_SECRET_KEY");
-    if (!stripeKey) throw new Error("STRIPE_SECRET_KEY is not set");
-
     const authHeader = req.headers.get("Authorization");
     if (!authHeader) throw new Error("No authorization header");
 
     const token = authHeader.replace("Bearer ", "");
     const { data: userData, error: userError } = await supabaseClient.auth.getUser(token);
     if (userError || !userData?.user) {
-      // User no longer exists — return 200 with subscribed:false so frontend can handle gracefully
       return new Response(JSON.stringify({ error: "user_not_found", subscribed: false }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
         status: 200,
@@ -37,7 +32,7 @@ serve(async (req) => {
     const user = userData.user;
     if (!user?.email) throw new Error("User not authenticated");
 
-    // Specific accounts bypass payment
+    // Bypass emails
     const bypassEmails = [
       "kplowren@yahoo.com",
       "wastepicker@email.com",
@@ -56,7 +51,7 @@ serve(async (req) => {
 
     const meta = user.user_metadata;
 
-    // Check if user has a free plan (waste_picker basic or enterprise/custom plans)
+    // Check free plans
     const selectedPlan = meta?.selected_plan;
     const freePlans = ["wp_basic", "agg_enterprise", "rec_enterprise", "county_smart"];
     if (freePlans.includes(selectedPlan)) {
@@ -65,7 +60,7 @@ serve(async (req) => {
       });
     }
 
-    // Check promo code in user metadata (role-aware)
+    // Check promo code
     const promoCode = meta?.promo_code;
     const userRole = meta?.role;
     const generalPromos = ["PILOT2026", "COASTALPARTNER", "EARLYADOPTER", "MOMBASAPILOT"];
@@ -77,7 +72,6 @@ serve(async (req) => {
       const isValid = ngoCorpCountyRoles.includes(userRole)
         ? ngoCorpCountyPromos.includes(upper)
         : generalPromos.includes(upper);
-
       if (isValid) {
         return new Response(JSON.stringify({ subscribed: true, promo: true }), {
           headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -85,36 +79,31 @@ serve(async (req) => {
       }
     }
 
-    const stripe = new Stripe(stripeKey, { apiVersion: "2025-08-27.basil" });
-    const customers = await stripe.customers.list({ email: user.email, limit: 1 });
+    // Check subscriptions table for active subscription
+    const { data: subs } = await supabaseClient
+      .from("subscriptions")
+      .select("*")
+      .eq("user_id", user.id)
+      .eq("status", "active")
+      .order("created_at", { ascending: false })
+      .limit(1);
 
-    if (customers.data.length === 0) {
-      return new Response(JSON.stringify({ subscribed: false }), {
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
+    if (subs && subs.length > 0) {
+      const sub = subs[0];
+      // Check if not expired
+      if (!sub.expires_at || new Date(sub.expires_at) > new Date()) {
+        return new Response(JSON.stringify({
+          subscribed: true,
+          plan_name: sub.plan_name,
+          plan_tier: sub.plan_tier,
+          subscription_end: sub.expires_at,
+        }), {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
     }
 
-    const subscriptions = await stripe.subscriptions.list({
-      customer: customers.data[0].id,
-      status: "active",
-      limit: 1,
-    });
-
-    const hasActiveSub = subscriptions.data.length > 0;
-    let subscriptionEnd = null;
-    let productId = null;
-
-    if (hasActiveSub) {
-      const sub = subscriptions.data[0];
-      subscriptionEnd = new Date(sub.current_period_end * 1000).toISOString();
-      productId = sub.items.data[0].price.product;
-    }
-
-    return new Response(JSON.stringify({
-      subscribed: hasActiveSub,
-      product_id: productId,
-      subscription_end: subscriptionEnd,
-    }), {
+    return new Response(JSON.stringify({ subscribed: false }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (error) {

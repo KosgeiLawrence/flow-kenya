@@ -1,29 +1,34 @@
-// Mapping from internal plan IDs to Stripe price IDs
-export const PLAN_PRICE_MAP: Record<string, string> = {
+// Mapping from internal plan IDs to their KES amounts for IntaSend checkout
+export const PLAN_AMOUNT_MAP: Record<string, number> = {
   // Waste Picker
-  wp_basic: "", // Free plan, no Stripe price
-  wp_pro: "price_1T76J4Lnfj5R7qp8Xeop5xnO",
+  wp_basic: 0, // Free plan
+  wp_pro: 500,
   // Aggregator
-  agg_standard: "price_1T76JLLnfj5R7qp82gd8UV8X",
-  agg_premium: "price_1T76JdLnfj5R7qp8LB8ngAK0",
-  agg_enterprise: "", // Custom
-  // Recycler (reuse aggregator prices for same tiers)
-  rec_standard: "price_1T76JLLnfj5R7qp82gd8UV8X",
-  rec_premium: "price_1T76JdLnfj5R7qp8LB8ngAK0",
-  rec_enterprise: "", // Custom
+  agg_standard: 5000,
+  agg_premium: 15000,
+  agg_enterprise: 0, // Custom
+  // Recycler
+  rec_standard: 5000,
+  rec_premium: 15000,
+  rec_enterprise: 0, // Custom
   // NGO
-  ngo_basic: "price_1T76JLLnfj5R7qp82gd8UV8X",
-  ngo_pro: "price_1T76JdLnfj5R7qp8LB8ngAK0",
+  ngo_basic: 10000,
+  ngo_pro: 25000,
   // Corporate
-  corp_basic: "price_1T76JjLnfj5R7qp8bRIuHfOn",
-  corp_esg: "price_1T76JlLnfj5R7qp8zgnBjNSz",
-  corp_enterprise: "price_1T76JmLnfj5R7qp8K6eaJ8rO",
+  corp_basic: 30000,
+  corp_esg: 75000,
+  corp_enterprise: 150000,
   // County Government
-  county_pilot: "price_1T76JnLnfj5R7qp8NVMANGI4",
-  county_full: "", // Custom pricing 2M-5M
-  county_smart: "", // Custom
+  county_pilot: 750000,
+  county_full: 0, // Custom pricing
+  county_smart: 0, // Custom
 };
 
 export const FREE_PLANS = ["wp_basic", "agg_enterprise", "rec_enterprise", "county_smart", "county_full"];
 
 export const isFreePlan = (planId: string) => FREE_PLANS.includes(planId);
+
+export const isPaidPlan = (planId: string) => {
+  const amount = PLAN_AMOUNT_MAP[planId];
+  return amount !== undefined && amount > 0;
+};

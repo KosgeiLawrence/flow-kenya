@@ -1,5 +1,4 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
-import Stripe from "https://esm.sh/stripe@18.5.0";
 import { createClient } from "npm:@supabase/supabase-js@2.57.2";
 
 const corsHeaders = {
@@ -24,51 +23,48 @@ serve(async (req) => {
     const user = data.user;
     if (!user?.email) throw new Error("User not authenticated");
 
-    const { priceId, promoCode } = await req.json();
-    if (!priceId) throw new Error("priceId is required");
+    const { amount, planId, planName, promoCode } = await req.json();
+    if (!amount || !planId) throw new Error("amount and planId are required");
 
-    const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY") || "", { apiVersion: "2025-08-27.basil" });
+    const publishableKey = Deno.env.get("INTASEND_PUBLISHABLE_KEY");
+    if (!publishableKey) throw new Error("INTASEND_PUBLISHABLE_KEY is not set");
 
-    const customers = await stripe.customers.list({ email: user.email, limit: 1 });
-    let customerId;
-    if (customers.data.length > 0) {
-      customerId = customers.data[0].id;
+    const origin = req.headers.get("origin") || "https://flow-kenya-trace.lovable.app";
+
+    // Create IntaSend checkout
+    const response = await fetch("https://payment.intasend.com/api/v1/checkout/", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-IntaSend-Public-API-Key": publishableKey,
+      },
+      body: JSON.stringify({
+        amount: amount,
+        currency: "KES",
+        email: user.email,
+        first_name: user.user_metadata?.full_name?.split(" ")[0] || "",
+        last_name: user.user_metadata?.full_name?.split(" ").slice(1).join(" ") || "",
+        api_ref: `${planId}__${user.id}`,
+        comment: `Subscription: ${planName || planId}`,
+        redirect_url: `${origin}/dashboard?payment=success&plan=${planId}`,
+        mobile_tarrif: "BUSINESS-PAYS",
+        card_tarrif: "BUSINESS-PAYS",
+      }),
+    });
+
+    const checkoutData = await response.json();
+
+    if (!response.ok) {
+      console.error("IntaSend error:", JSON.stringify(checkoutData));
+      throw new Error(`IntaSend checkout failed [${response.status}]: ${JSON.stringify(checkoutData)}`);
     }
 
-    const userRole = user.user_metadata?.role;
-    const generalPromos = ["PILOT2026", "COASTALPARTNER", "EARLYADOPTER", "MOMBASAPILOT"];
-    const ngoCorpCountyPromos = ["SOCIALCHANGE10", "CIRCULARNGO20"];
-    const ngoCorpCountyRoles = ["ngo", "corporate", "county_government"];
-    
-    let couponId: string | undefined;
-    if (promoCode) {
-      const upper = promoCode.toUpperCase();
-      const isValid = ngoCorpCountyRoles.includes(userRole)
-        ? ngoCorpCountyPromos.includes(upper)
-        : generalPromos.includes(upper);
-      if (isValid) couponId = "HuT8IFwn";
-    }
-
-    const sessionParams: any = {
-      customer: customerId,
-      customer_email: customerId ? undefined : user.email,
-      line_items: [{ price: priceId, quantity: 1 }],
-      mode: "subscription",
-      success_url: `${req.headers.get("origin")}/dashboard?payment=success`,
-      cancel_url: `${req.headers.get("origin")}/payment?cancelled=true`,
-    };
-
-    if (couponId) {
-      sessionParams.discounts = [{ coupon: couponId }];
-    }
-
-    const session = await stripe.checkout.sessions.create(sessionParams);
-
-    return new Response(JSON.stringify({ url: session.url }), {
+    return new Response(JSON.stringify({ url: checkoutData.url }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
       status: 200,
     });
   } catch (error) {
+    console.error("Checkout error:", error.message);
     return new Response(JSON.stringify({ error: error.message }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
       status: 500,
