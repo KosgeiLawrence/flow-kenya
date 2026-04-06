@@ -44,7 +44,7 @@ serve(async (req) => {
     const publishableKey = Deno.env.get("INTASEND_PUBLISHABLE_KEY");
     if (!publishableKey) throw new Error("INTASEND_PUBLISHABLE_KEY is not set");
 
-    const origin = req.headers.get("origin") || "https://flow-kenya-trace.lovable.app";
+    const origin = "https://flow-kenya-trace.lovable.app";
 
     const periodLabel = billingPeriod === "monthly" ? "Monthly" : billingPeriod === "yearly" ? "Yearly" : "Lifetime";
     const roleName = role.replace(/_/g, " ");
