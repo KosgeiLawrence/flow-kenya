@@ -19,14 +19,24 @@ const contactInfo = [
 const Contact = () => {
   const [sending, setSending] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setSending(true);
-    setTimeout(() => {
-      setSending(false);
+    const form = e.target as HTMLFormElement;
+    const formData = new FormData(form);
+    const { error } = await supabase.from("contact_messages").insert({
+      full_name: formData.get("name") as string,
+      email: formData.get("email") as string,
+      subject: formData.get("subject") as string,
+      message: formData.get("message") as string,
+    });
+    setSending(false);
+    if (error) {
+      toast.error("Failed to send message. Please try again.");
+    } else {
       toast.success("Message sent! We'll get back to you shortly.");
-      (e.target as HTMLFormElement).reset();
-    }, 1200);
+      form.reset();
+    }
   };
 
   return (
