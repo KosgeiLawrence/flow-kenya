@@ -11,7 +11,7 @@ import { toast } from "sonner";
 
 const contactInfo = [
   { icon: Mail, label: "Email", value: "hello@duaraflow.co.ke", href: "mailto:hello@duaraflow.co.ke" },
-  { icon: Phone, label: "Phone", value: "+254 700 000 000", href: "tel:+254700000000" },
+  { icon: Phone, label: "Phone", value: "+254 741 027 140", href: "tel:+254741027140" },
   { icon: MapPin, label: "Office", value: "Nairobi, Kenya", href: null },
 ];
 
