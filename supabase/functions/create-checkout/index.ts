@@ -62,6 +62,8 @@ serve(async (req) => {
         email: user.email,
         first_name: user.user_metadata?.full_name?.split(" ")[0] || "",
         last_name: user.user_metadata?.full_name?.split(" ").slice(1).join(" ") || "",
+        host: origin,
+        channel: "WEBSITE",
         api_ref: `${role}__${billingPeriod}__${user.id}`,
         comment: `Duara Flow ${periodLabel} - ${roleName}`,
         redirect_url: `${origin}/payment`,
