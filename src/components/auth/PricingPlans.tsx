@@ -78,8 +78,6 @@ const PricingPlans = ({
   promoValid,
 }: PricingPlansProps) => {
   const pricing = ROLE_PRICING[role];
-  if (!pricing) return null;
-
   const amount = getAmount(role, billingPeriod);
   const savings = getSavingsPercent(role, billingPeriod);
   const features = ROLE_FEATURES[role] || [];
@@ -91,6 +89,8 @@ const PricingPlans = ({
       onSelectPlan(planId);
     }
   }, [planId, selectedPlan, onSelectPlan]);
+
+  if (!pricing) return null;
 
   const periods: { id: BillingPeriod; label: string }[] = [
     { id: "monthly", label: "Monthly" },
