@@ -37,6 +37,7 @@ const Signup = () => {
   // Step 2: Plan
   const [searchParams] = useSearchParams();
   const [selectedPlan, setSelectedPlan] = useState<string | null>(null);
+  const [billingPeriod, setBillingPeriod] = useState<"monthly" | "yearly" | "one_time">("monthly");
   const [promoCode, setPromoCode] = useState("");
   const promoValid = isPromoValidForRole(promoCode, role);
 
@@ -96,6 +97,7 @@ const Signup = () => {
             org_type: isIndependent ? null : orgType || "private_company",
             org_description: isIndependent ? null : orgDescription || null,
             selected_plan: selectedPlan,
+            billing_period: billingPeriod,
             promo_code: promoCode || null,
           },
         },
@@ -192,6 +194,8 @@ const Signup = () => {
                   role={role}
                   selectedPlan={selectedPlan}
                   onSelectPlan={setSelectedPlan}
+                  billingPeriod={billingPeriod}
+                  onBillingPeriodChange={setBillingPeriod}
                   promoCode={promoCode}
                   onPromoCodeChange={setPromoCode}
                   promoValid={promoValid}
