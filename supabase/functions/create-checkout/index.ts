@@ -63,7 +63,7 @@ serve(async (req) => {
         last_name: user.user_metadata?.full_name?.split(" ").slice(1).join(" ") || "",
         api_ref: `${role}__${billingPeriod}__${user.id}`,
         comment: `Duara Flow ${periodLabel} - ${roleName}`,
-        redirect_url: `${origin}/dashboard?payment=success&billing=${billingPeriod}`,
+        redirect_url: `${origin}/payment`,
         mobile_tarrif: "BUSINESS-PAYS",
         card_tarrif: "BUSINESS-PAYS",
       }),
