@@ -44,6 +44,12 @@ serve(async (req) => {
     const publishableKey = Deno.env.get("INTASEND_PUBLISHABLE_KEY");
     if (!publishableKey) throw new Error("INTASEND_PUBLISHABLE_KEY is not set");
 
+    console.log("IntaSend publishable key debug:", JSON.stringify({
+      length: publishableKey.length,
+      prefix: publishableKey.slice(0, 10),
+      env: publishableKey.toLowerCase().includes("test") ? "test" : publishableKey.toLowerCase().includes("live") ? "live" : "unknown",
+    }));
+
     const origin = "https://flow-kenya-trace.lovable.app";
 
     const periodLabel = billingPeriod === "monthly" ? "Monthly" : billingPeriod === "yearly" ? "Yearly" : "Lifetime";
