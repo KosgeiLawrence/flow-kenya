@@ -8,6 +8,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { useState } from "react";
 import { Footer } from "@/components/CTASection";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 
 const contactInfo = [
   { icon: Mail, label: "Email", value: "hello@duaraflow.co.ke", href: "mailto:hello@duaraflow.co.ke" },
@@ -18,14 +19,24 @@ const contactInfo = [
 const Contact = () => {
   const [sending, setSending] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setSending(true);
-    setTimeout(() => {
-      setSending(false);
+    const form = e.target as HTMLFormElement;
+    const formData = new FormData(form);
+    const { error } = await supabase.from("contact_messages").insert({
+      full_name: formData.get("name") as string,
+      email: formData.get("email") as string,
+      subject: formData.get("subject") as string,
+      message: formData.get("message") as string,
+    });
+    setSending(false);
+    if (error) {
+      toast.error("Failed to send message. Please try again.");
+    } else {
       toast.success("Message sent! We'll get back to you shortly.");
-      (e.target as HTMLFormElement).reset();
-    }, 1200);
+      form.reset();
+    }
   };
 
   return (
@@ -83,20 +94,20 @@ const Contact = () => {
                 <div className="grid sm:grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label htmlFor="name">Full Name</Label>
-                    <Input id="name" placeholder="Jane Wanjiku" required />
+                    <Input id="name" name="name" placeholder="Jane Wanjiku" required />
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="email">Email</Label>
-                    <Input id="email" type="email" placeholder="jane@example.com" required />
+                    <Input id="email" name="email" type="email" placeholder="jane@example.com" required />
                   </div>
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="subject">Subject</Label>
-                  <Input id="subject" placeholder="How can we help?" required />
+                  <Input id="subject" name="subject" placeholder="How can we help?" required />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="message">Message</Label>
-                  <Textarea id="message" placeholder="Tell us more..." rows={5} required />
+                  <Textarea id="message" name="message" placeholder="Tell us more..." rows={5} required />
                 </div>
                 <Button type="submit" className="w-full" disabled={sending}>
                   {sending ? "Sending…" : <><Send className="mr-2 h-4 w-4" /> Send Message</>}

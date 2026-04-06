@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
-import { LogOut, Users, BarChart3, DollarSign, ShieldAlert, FileText, Settings, MapPin, Menu, X, ChevronRight, User, BookOpen, Mail, Eye, EyeOff, Trash2, ClipboardList } from "lucide-react";
+import { LogOut, Users, BarChart3, DollarSign, ShieldAlert, FileText, Settings, MapPin, Menu, X, ChevronRight, User, BookOpen, Mail, Eye, EyeOff, Trash2, ClipboardList, MessageSquare } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import UserVerificationPanel from "@/components/dashboard/admin/UserVerificationPanel";
@@ -19,6 +19,7 @@ import ViewUserDashboardPanel from "@/components/dashboard/admin/ViewUserDashboa
 import UserVisibilityPanel from "@/components/dashboard/admin/UserVisibilityPanel";
 import TrashPanel from "@/components/dashboard/shared/TrashPanel";
 import FormBuilderPanel from "@/components/dashboard/admin/FormBuilderPanel";
+import ContactMessagesPanel from "@/components/dashboard/admin/ContactMessagesPanel";
 
 const navItems = [
   { id: "users", label: "User Verification", icon: Users },
@@ -34,6 +35,7 @@ const navItems = [
   { id: "cleanup", label: "All Cleanups", icon: MapPin },
   { id: "training-mgmt", label: "Training Management", icon: BookOpen },
   { id: "forms", label: "Form Builder", icon: ClipboardList },
+  { id: "messages", label: "Contact Messages", icon: MessageSquare },
   { id: "trash", label: "Trash", icon: Trash2 },
   { id: "profile-settings", label: "Profile Settings", icon: User },
 ];
@@ -64,6 +66,7 @@ const AdminDashboard = () => {
       case "cleanup": return <CleanupExercisePanel isAdmin />;
       case "training-mgmt": return <TrainingManagementPanel />;
       case "forms": return <FormBuilderPanel />;
+      case "messages": return <ContactMessagesPanel />;
       case "trash": return <TrashPanel />;
       case "profile-settings": return <ProfileSettingsPanel role="admin" />;
       default: return <UserVerificationPanel />;
