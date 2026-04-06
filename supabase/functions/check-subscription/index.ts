@@ -35,7 +35,6 @@ serve(async (req) => {
     // Bypass emails
     const bypassEmails = [
       "kplowren@yahoo.com",
-      "wastepicker@email.com",
       "aggregator@email.com",
       "recycler@email.com",
       "ngo@email.com",
