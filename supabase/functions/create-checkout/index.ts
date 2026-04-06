@@ -44,14 +44,21 @@ serve(async (req) => {
     const publishableKey = Deno.env.get("INTASEND_PUBLISHABLE_KEY");
     if (!publishableKey) throw new Error("INTASEND_PUBLISHABLE_KEY is not set");
 
+    console.log("IntaSend publishable key debug:", JSON.stringify({
+      length: publishableKey.length,
+      prefix: publishableKey.slice(0, 10),
+      env: publishableKey.toLowerCase().includes("test") ? "test" : publishableKey.toLowerCase().includes("live") ? "live" : "unknown",
+    }));
+
     const origin = "https://flow-kenya-trace.lovable.app";
 
     const periodLabel = billingPeriod === "monthly" ? "Monthly" : billingPeriod === "yearly" ? "Yearly" : "Lifetime";
     const roleName = role.replace(/_/g, " ");
 
-    const response = await fetch("https://payment.intasend.com/api/v1/checkout/", {
+    const response = await fetch("https://api.intasend.com/api/v1/checkout/", {
       method: "POST",
       headers: {
+        "accept": "application/json",
         "Content-Type": "application/json",
         "X-IntaSend-Public-API-Key": publishableKey,
       },
@@ -61,9 +68,11 @@ serve(async (req) => {
         email: user.email,
         first_name: user.user_metadata?.full_name?.split(" ")[0] || "",
         last_name: user.user_metadata?.full_name?.split(" ").slice(1).join(" ") || "",
+        host: origin,
+        channel: "WEBSITE",
         api_ref: `${role}__${billingPeriod}__${user.id}`,
         comment: `Duara Flow ${periodLabel} - ${roleName}`,
-        redirect_url: `${origin}/dashboard?payment=success&billing=${billingPeriod}`,
+        redirect_url: `${origin}/payment`,
         mobile_tarrif: "BUSINESS-PAYS",
         card_tarrif: "BUSINESS-PAYS",
       }),
