@@ -8,6 +8,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { useState } from "react";
 import { Footer } from "@/components/CTASection";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 
 const contactInfo = [
   { icon: Mail, label: "Email", value: "hello@duaraflow.co.ke", href: "mailto:hello@duaraflow.co.ke" },
