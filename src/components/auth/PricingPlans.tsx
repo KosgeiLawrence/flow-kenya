@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { motion } from "framer-motion";
 import { Check, Tag, Crown, Zap, Clock } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -85,9 +86,11 @@ const PricingPlans = ({
   const planId = `${role}_${billingPeriod}`;
 
   // Auto-select plan when role/period changes
-  if (selectedPlan !== planId) {
-    onSelectPlan(planId);
-  }
+  useEffect(() => {
+    if (selectedPlan !== planId) {
+      onSelectPlan(planId);
+    }
+  }, [planId, selectedPlan, onSelectPlan]);
 
   const periods: { id: BillingPeriod; label: string }[] = [
     { id: "monthly", label: "Monthly" },
