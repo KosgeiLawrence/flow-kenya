@@ -51,15 +51,6 @@ serve(async (req) => {
 
     const meta = user.user_metadata;
 
-    // Check free plans
-    const selectedPlan = meta?.selected_plan;
-    const freePlans = ["wp_basic", "agg_enterprise", "rec_enterprise", "county_smart"];
-    if (freePlans.includes(selectedPlan)) {
-      return new Response(JSON.stringify({ subscribed: true, free_plan: true }), {
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
-    }
-
     // Check promo code
     const promoCode = meta?.promo_code;
     const userRole = meta?.role;
@@ -90,17 +81,34 @@ serve(async (req) => {
 
     if (subs && subs.length > 0) {
       const sub = subs[0];
-      // Check if not expired
+      // one_time plans never expire
+      if (sub.plan_tier === "one_time") {
+        return new Response(JSON.stringify({
+          subscribed: true,
+          plan_name: sub.plan_name,
+          plan_tier: sub.plan_tier,
+          billing_period: "one_time",
+        }), {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+      // Monthly/yearly: check expiry
       if (!sub.expires_at || new Date(sub.expires_at) > new Date()) {
         return new Response(JSON.stringify({
           subscribed: true,
           plan_name: sub.plan_name,
           plan_tier: sub.plan_tier,
+          billing_period: sub.plan_tier,
           subscription_end: sub.expires_at,
         }), {
           headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
       }
+      // Subscription expired — mark as expired
+      await supabaseClient
+        .from("subscriptions")
+        .update({ status: "expired" })
+        .eq("id", sub.id);
     }
 
     return new Response(JSON.stringify({ subscribed: false }), {

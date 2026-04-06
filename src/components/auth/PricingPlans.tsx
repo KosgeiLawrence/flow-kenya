@@ -1,178 +1,35 @@
-import { useState } from "react";
+import { useEffect } from "react";
 import { motion } from "framer-motion";
-import { Check, Sparkles, Tag } from "lucide-react";
+import { Check, Tag, Crown, Zap, Clock } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
+import {
+  ROLE_PRICING,
+  BillingPeriod,
+  getAmount,
+  getSavingsPercent,
+  BILLING_LABELS,
+} from "@/lib/stripePlans";
 
 type AppRole = "waste_picker" | "aggregator" | "recycler" | "ngo" | "corporate" | "county_government";
 
-interface Plan {
-  id: string;
-  name: string;
-  price: string;
-  priceValue: number;
-  period: string;
-  features: string[];
-  popular?: boolean;
-}
-
-const pricingData: Record<AppRole, Plan[]> = {
-  waste_picker: [
-    {
-      id: "wp_basic",
-      name: "Basic",
-      price: "Free",
-      priceValue: 0,
-      period: "",
-      features: ["Collection logging", "Payment tracking", "Basic analytics"],
-    },
-    {
-      id: "wp_pro",
-      name: "Pro",
-      price: "KES 500",
-      priceValue: 500,
-      period: "/month",
-      features: ["Advanced analytics", "Income insights", "Priority marketplace listing", "All Basic features"],
-      popular: true,
-    },
-  ],
-  aggregator: [
-    {
-      id: "agg_standard",
-      name: "Standard",
-      price: "KES 5,000",
-      priceValue: 5000,
-      period: "/month",
-      features: ["Inventory tracking", "Waste picker management", "Batch tracking"],
-    },
-    {
-      id: "agg_premium",
-      name: "Premium",
-      price: "KES 15,000",
-      priceValue: 15000,
-      period: "/month",
-      features: ["Marketplace access", "Compliance tools", "Analytics dashboard", "Logistics coordination", "All Standard features"],
-      popular: true,
-    },
-    {
-      id: "agg_enterprise",
-      name: "Enterprise",
-      price: "Custom",
-      priceValue: 0,
-      period: "",
-      features: ["API integration", "Multi-branch access", "Automated reporting", "All Premium features"],
-    },
-  ],
-  recycler: [
-    {
-      id: "rec_standard",
-      name: "Standard",
-      price: "KES 5,000",
-      priceValue: 5000,
-      period: "/month",
-      features: ["Inventory management", "Order tracking", "Basic analytics"],
-    },
-    {
-      id: "rec_premium",
-      name: "Premium",
-      price: "KES 15,000",
-      priceValue: 15000,
-      period: "/month",
-      features: ["Supply forecasting", "ESG reporting", "Market insights", "All Standard features"],
-      popular: true,
-    },
-    {
-      id: "rec_enterprise",
-      name: "Enterprise",
-      price: "Custom",
-      priceValue: 0,
-      period: "",
-      features: ["API integration", "Custom reporting", "All Premium features"],
-    },
-  ],
-  ngo: [
-    {
-      id: "ngo_basic",
-      name: "Basic",
-      price: "KES 10,000",
-      priceValue: 10000,
-      period: "/month",
-      features: ["Program management", "Impact tracking", "Basic reporting"],
-    },
-    {
-      id: "ngo_pro",
-      name: "Pro",
-      price: "KES 25,000",
-      priceValue: 25000,
-      period: "/month",
-      features: ["Grant management", "Sponsorship tracking", "Advanced impact reports", "All Basic features"],
-      popular: true,
-    },
-  ],
-  corporate: [
-    {
-      id: "corp_basic",
-      name: "Compliance Basic",
-      price: "KES 30,000",
-      priceValue: 30000,
-      period: "/month",
-      features: ["Supplier tracking", "Waste volume reporting"],
-    },
-    {
-      id: "corp_esg",
-      name: "ESG Pro",
-      price: "KES 75,000",
-      priceValue: 75000,
-      period: "/month",
-      features: ["Full traceability", "Downloadable ESG reports", "Certification access", "All Basic features"],
-      popular: true,
-    },
-    {
-      id: "corp_enterprise",
-      name: "Enterprise",
-      price: "KES 150,000+",
-      priceValue: 150000,
-      period: "/month",
-      features: ["API integration", "Custom reporting", "Audit-ready documentation", "All ESG Pro features"],
-    },
-  ],
-  county_government: [
-    {
-      id: "county_pilot",
-      name: "Pilot (6 Months)",
-      price: "KES 750,000",
-      priceValue: 750000,
-      period: "",
-      features: ["Limited wards", "Performance analytics"],
-    },
-    {
-      id: "county_full",
-      name: "Full County License",
-      price: "KES 2M – 5M",
-      priceValue: 2000000,
-      period: "/year",
-      features: ["Full dashboard access", "Ward-level intelligence", "Compliance reporting"],
-      popular: true,
-    },
-    {
-      id: "county_smart",
-      name: "Smart City Package",
-      price: "Custom",
-      priceValue: 0,
-      period: "",
-      features: ["Route optimization", "Predictive waste modeling", "Integration with county systems", "All Full License features"],
-    },
-  ],
+const ROLE_FEATURES: Record<AppRole, string[]> = {
+  waste_picker: ["Collection logging", "Payment tracking", "Analytics", "Marketplace listing", "Income insights"],
+  aggregator: ["Inventory tracking", "Waste picker management", "Batch tracking", "Marketplace access", "Analytics dashboard"],
+  recycler: ["Inventory management", "Order tracking", "Supply forecasting", "ESG reporting", "Market insights"],
+  ngo: ["Program management", "Impact tracking", "Grant management", "Sponsorship tracking", "Advanced reports"],
+  corporate: ["Supplier tracking", "Full traceability", "ESG reports", "Certification access", "Audit-ready docs"],
+  county_government: ["Full dashboard access", "Ward-level intelligence", "Compliance reporting", "Route optimization", "Predictive modeling"],
 };
 
 const GENERAL_PROMOS = ["PILOT2026", "COASTALPARTNER", "EARLYADOPTER", "MOMBASAPILOT"];
 const NGO_CORP_COUNTY_PROMOS = ["SOCIALCHANGE10", "CIRCULARNGO20"];
 const NGO_CORP_COUNTY_ROLES: AppRole[] = ["ngo", "corporate", "county_government"];
 
-const VALID_PROMOS = [...GENERAL_PROMOS, ...NGO_CORP_COUNTY_PROMOS];
+export const VALID_PROMOS = [...GENERAL_PROMOS, ...NGO_CORP_COUNTY_PROMOS];
 
-const isPromoValidForRole = (code: string, role: AppRole | null): boolean => {
+export const isPromoValidForRole = (code: string, role: AppRole | null): boolean => {
   if (!code || !role) return false;
   const upper = code.toUpperCase();
   if (NGO_CORP_COUNTY_ROLES.includes(role)) {
@@ -190,83 +47,151 @@ const roleColors: Record<AppRole, string> = {
   county_government: "border-amber-500/30 bg-amber-500/5",
 };
 
-const roleAccents: Record<AppRole, string> = {
-  waste_picker: "bg-emerald-500",
-  aggregator: "bg-blue-500",
-  recycler: "bg-blue-500",
-  ngo: "bg-rose-500",
-  corporate: "bg-purple-500",
-  county_government: "bg-amber-500",
+const periodIcons: Record<BillingPeriod, typeof Zap> = {
+  monthly: Zap,
+  yearly: Crown,
+  one_time: Clock,
 };
 
 interface PricingPlansProps {
   role: AppRole;
   selectedPlan: string | null;
   onSelectPlan: (planId: string) => void;
+  billingPeriod: BillingPeriod;
+  onBillingPeriodChange: (period: BillingPeriod) => void;
   promoCode: string;
   onPromoCodeChange: (code: string) => void;
   promoValid: boolean;
 }
 
-const PricingPlans = ({ role, selectedPlan, onSelectPlan, promoCode, onPromoCodeChange, promoValid }: PricingPlansProps) => {
-  const plans = pricingData[role] || [];
+const formatKES = (amount: number) =>
+  `KES ${amount.toLocaleString("en-KE")}`;
+
+const PricingPlans = ({
+  role,
+  selectedPlan,
+  onSelectPlan,
+  billingPeriod,
+  onBillingPeriodChange,
+  promoCode,
+  onPromoCodeChange,
+  promoValid,
+}: PricingPlansProps) => {
+  const pricing = ROLE_PRICING[role];
+  const amount = getAmount(role, billingPeriod);
+  const savings = getSavingsPercent(role, billingPeriod);
+  const features = ROLE_FEATURES[role] || [];
+  const planId = `${role}_${billingPeriod}`;
+
+  // Auto-select plan when role/period changes
+  useEffect(() => {
+    if (selectedPlan !== planId) {
+      onSelectPlan(planId);
+    }
+  }, [planId, selectedPlan, onSelectPlan]);
+
+  if (!pricing) return null;
+
+  const periods: { id: BillingPeriod; label: string }[] = [
+    { id: "monthly", label: "Monthly" },
+    { id: "yearly", label: "Yearly" },
+    { id: "one_time", label: "One-Time" },
+  ];
 
   return (
     <div className="space-y-5">
-      <div className={cn("grid gap-3", plans.length === 3 ? "grid-cols-1 sm:grid-cols-3" : "grid-cols-1 sm:grid-cols-2")}>
-        {plans.map((plan, i) => {
-          const isSelected = selectedPlan === plan.id;
+      {/* Billing period selector */}
+      <div className="grid grid-cols-3 gap-2 p-1 rounded-lg bg-muted/50 border border-border">
+        {periods.map((p) => {
+          const isActive = billingPeriod === p.id;
+          const Icon = periodIcons[p.id];
+          const periodSavings = getSavingsPercent(role, p.id);
           return (
-            <motion.button
-              key={plan.id}
+            <button
+              key={p.id}
               type="button"
-              initial={{ opacity: 0, y: 12 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: i * 0.08 }}
-              onClick={() => onSelectPlan(plan.id)}
+              onClick={() => onBillingPeriodChange(p.id)}
               className={cn(
-                "relative flex flex-col p-4 rounded-xl border-2 text-left transition-all",
-                isSelected
-                  ? `border-primary shadow-soft ${roleColors[role]}`
-                  : "border-border hover:border-primary/40"
+                "relative flex flex-col items-center gap-0.5 py-2.5 px-2 rounded-md text-xs font-medium transition-all",
+                isActive
+                  ? "bg-background shadow-sm text-foreground border border-primary/30"
+                  : "text-muted-foreground hover:text-foreground"
               )}
             >
-              {plan.popular && (
-                <Badge className="absolute -top-2.5 right-3 bg-primary text-primary-foreground text-[10px] px-2 py-0.5 gap-1">
-                  <Sparkles className="w-3 h-3" /> Popular
+              <Icon className="w-3.5 h-3.5" />
+              {p.label}
+              {periodSavings > 0 && (
+                <Badge variant="secondary" className="text-[9px] px-1 py-0 bg-emerald-500/10 text-emerald-600 border-0">
+                  Save {periodSavings}%
                 </Badge>
               )}
-              <span className="text-sm font-semibold text-foreground">{plan.name}</span>
-              <div className="mt-1 mb-3">
-                <span className="text-xl font-bold text-foreground">
-                  {promoValid && plan.priceValue > 0 ? (
-                    <>
-                      <span className="line-through text-muted-foreground text-sm mr-1">{plan.price}</span>
-                      <span className="text-emerald-600">Free</span>
-                    </>
-                  ) : (
-                    plan.price
-                  )}
-                </span>
-                {plan.period && !promoValid && (
-                  <span className="text-xs text-muted-foreground">{plan.period}</span>
-                )}
-              </div>
-              <ul className="space-y-1.5 flex-1">
-                {plan.features.map((f) => (
-                  <li key={f} className="flex items-start gap-1.5 text-xs text-muted-foreground">
-                    <Check className={cn("w-3.5 h-3.5 mt-0.5 shrink-0", isSelected ? "text-primary" : "text-muted-foreground/60")} />
-                    {f}
-                  </li>
-                ))}
-              </ul>
-              {isSelected && (
-                <div className={cn("absolute top-2 left-2 w-2.5 h-2.5 rounded-full", roleAccents[role])} />
-              )}
-            </motion.button>
+            </button>
           );
         })}
       </div>
+
+      {/* Plan card */}
+      <motion.div
+        key={`${role}-${billingPeriod}`}
+        initial={{ opacity: 0, y: 8 }}
+        animate={{ opacity: 1, y: 0 }}
+        className={cn(
+          "relative flex flex-col p-5 rounded-xl border-2 text-left transition-all",
+          `border-primary shadow-soft ${roleColors[role]}`
+        )}
+      >
+        <div className="flex justify-between items-start">
+          <div>
+            <span className="text-sm font-semibold text-foreground capitalize">
+              {role.replace(/_/g, " ")}
+            </span>
+            <div className="mt-1">
+              {promoValid ? (
+                <div className="flex items-center gap-2">
+                  <span className="line-through text-muted-foreground text-sm">{formatKES(amount)}</span>
+                  <span className="text-xl font-bold text-emerald-600">Free</span>
+                </div>
+              ) : (
+                <div>
+                  <span className="text-2xl font-bold text-foreground">{formatKES(amount)}</span>
+                  <span className="text-xs text-muted-foreground ml-1">
+                    {BILLING_LABELS[billingPeriod]}
+                  </span>
+                </div>
+              )}
+            </div>
+            {billingPeriod === "yearly" && (
+              <p className="text-xs text-muted-foreground mt-0.5">
+                ≈ {formatKES(Math.round(pricing.yearly / 12))}/month
+              </p>
+            )}
+            {billingPeriod === "one_time" && (
+              <p className="text-xs text-emerald-600 mt-0.5 font-medium">
+                Lifetime access — no renewals
+              </p>
+            )}
+            {billingPeriod === "monthly" && (
+              <p className="text-xs text-muted-foreground mt-0.5">
+                Renews every month
+              </p>
+            )}
+          </div>
+          {savings > 0 && (
+            <Badge className="bg-emerald-500 text-white text-[10px] px-2">
+              {savings}% OFF
+            </Badge>
+          )}
+        </div>
+
+        <ul className="mt-4 space-y-1.5">
+          {features.map((f) => (
+            <li key={f} className="flex items-start gap-1.5 text-xs text-muted-foreground">
+              <Check className="w-3.5 h-3.5 mt-0.5 shrink-0 text-primary" />
+              {f}
+            </li>
+          ))}
+        </ul>
+      </motion.div>
 
       {/* Promo Code */}
       <motion.div
@@ -294,5 +219,4 @@ const PricingPlans = ({ role, selectedPlan, onSelectPlan, promoCode, onPromoCode
   );
 };
 
-export { pricingData, VALID_PROMOS, isPromoValidForRole };
 export default PricingPlans;

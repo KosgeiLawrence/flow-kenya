@@ -6,6 +6,15 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
+const ROLE_PRICING: Record<string, { monthly: number; yearly: number; one_time: number }> = {
+  waste_picker: { monthly: 250, yearly: 2550, one_time: 5800 },
+  aggregator: { monthly: 250, yearly: 2550, one_time: 5800 },
+  recycler: { monthly: 300, yearly: 3060, one_time: 7000 },
+  ngo: { monthly: 650, yearly: 6600, one_time: 14500 },
+  corporate: { monthly: 1300, yearly: 13200, one_time: 29000 },
+  county_government: { monthly: 25000, yearly: 255000, one_time: 510000 },
+};
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -23,15 +32,23 @@ serve(async (req) => {
     const user = data.user;
     if (!user?.email) throw new Error("User not authenticated");
 
-    const { amount, planId, planName, promoCode } = await req.json();
-    if (!amount || !planId) throw new Error("amount and planId are required");
+    const { amount, role, billingPeriod, promoCode } = await req.json();
+    if (!amount || !role || !billingPeriod) throw new Error("amount, role, and billingPeriod are required");
+
+    // Validate amount matches expected pricing
+    const pricing = ROLE_PRICING[role];
+    if (!pricing) throw new Error("Invalid role");
+    const expectedAmount = pricing[billingPeriod as keyof typeof pricing];
+    if (expectedAmount !== amount) throw new Error("Amount mismatch");
 
     const publishableKey = Deno.env.get("INTASEND_PUBLISHABLE_KEY");
     if (!publishableKey) throw new Error("INTASEND_PUBLISHABLE_KEY is not set");
 
     const origin = req.headers.get("origin") || "https://flow-kenya-trace.lovable.app";
 
-    // Create IntaSend checkout
+    const periodLabel = billingPeriod === "monthly" ? "Monthly" : billingPeriod === "yearly" ? "Yearly" : "Lifetime";
+    const roleName = role.replace(/_/g, " ");
+
     const response = await fetch("https://payment.intasend.com/api/v1/checkout/", {
       method: "POST",
       headers: {
@@ -44,9 +61,9 @@ serve(async (req) => {
         email: user.email,
         first_name: user.user_metadata?.full_name?.split(" ")[0] || "",
         last_name: user.user_metadata?.full_name?.split(" ").slice(1).join(" ") || "",
-        api_ref: `${planId}__${user.id}`,
-        comment: `Subscription: ${planName || planId}`,
-        redirect_url: `${origin}/dashboard?payment=success&plan=${planId}`,
+        api_ref: `${role}__${billingPeriod}__${user.id}`,
+        comment: `Duara Flow ${periodLabel} - ${roleName}`,
+        redirect_url: `${origin}/dashboard?payment=success&billing=${billingPeriod}`,
         mobile_tarrif: "BUSINESS-PAYS",
         card_tarrif: "BUSINESS-PAYS",
       }),
