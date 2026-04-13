@@ -931,9 +931,60 @@ const EarningsExpensesPanel = ({ role }: Props) => {
             </TabsContent>
           </Tabs>
 
+          {/* Export Dialog */}
+          <Dialog open={exportDialogOpen} onOpenChange={setExportDialogOpen}>
+            <DialogContent className="max-w-sm">
+              <DialogHeader>
+                <DialogTitle className="flex items-center gap-2"><Download className="w-5 h-5" /> Export Transactions</DialogTitle>
+              </DialogHeader>
+              <div className="space-y-3">
+                <div>
+                  <Label>Type</Label>
+                  <Select value={exportRange.type} onValueChange={v => setExportRange(p => ({ ...p, type: v as any }))}>
+                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All (Income & Expenses)</SelectItem>
+                      <SelectItem value="income">Income Only</SelectItem>
+                      <SelectItem value="expense">Expenses Only</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="grid grid-cols-2 gap-2">
+                  <div>
+                    <Label>From</Label>
+                    <Input type="date" value={exportRange.start} onChange={e => setExportRange(p => ({ ...p, start: e.target.value }))} />
+                  </div>
+                  <div>
+                    <Label>To</Label>
+                    <Input type="date" value={exportRange.end} onChange={e => setExportRange(p => ({ ...p, end: e.target.value }))} />
+                  </div>
+                </div>
+                <div className="text-xs text-muted-foreground">
+                  {(() => {
+                    const count = getFilteredExportTxs().length;
+                    return `${count} entr${count === 1 ? "y" : "ies"} found for this period`;
+                  })()}
+                </div>
+                <div className="grid grid-cols-2 gap-2">
+                  <Button variant="outline" className="gap-2" onClick={exportTxCSV}>
+                    <FileSpreadsheet className="w-4 h-4" /> CSV
+                  </Button>
+                  <Button className="gap-2" onClick={exportTxPDF}>
+                    <FileText className="w-4 h-4" /> PDF
+                  </Button>
+                </div>
+              </div>
+            </DialogContent>
+          </Dialog>
+
           <Card className="shadow-soft">
             <CardHeader className="pb-2">
-              <CardTitle className="text-sm flex items-center gap-2"><Receipt className="w-4 h-4" /> Recent Entries</CardTitle>
+              <div className="flex items-center justify-between">
+                <CardTitle className="text-sm flex items-center gap-2"><Receipt className="w-4 h-4" /> Recent Entries</CardTitle>
+                <Button variant="ghost" size="sm" className="gap-1 text-xs h-7" onClick={() => setExportDialogOpen(true)}>
+                  <Download className="w-3.5 h-3.5" /> Export
+                </Button>
+              </div>
             </CardHeader>
             <CardContent>
               {(!transactions || transactions.length === 0) ? (
