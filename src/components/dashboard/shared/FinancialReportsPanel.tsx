@@ -151,10 +151,10 @@ const FinancialReportsPanel = ({ role }: Props) => {
 
   const dateRange = useMemo(() => {
     if (period === "daily") return { start: startOfDay(now), end: endOfDay(now), label: format(now, "MMM d, yyyy") };
-    if (period === "weekly") return { start: startOfWeek(now, { weekStartsOn: 1 }), end: now, label: `Week of ${format(startOfWeek(now, { weekStartsOn: 1 }), "MMM d")}` };
+    if (period === "weekly") return { start: startOfWeek(now, { weekStartsOn: 1 }), end: now, label: `Week of ${format(startOfWeek(now, { weekStartsOn: 1 }), "MMM d, yyyy")}` };
     if (period === "monthly") return { start: startOfMonth(now), end: endOfMonth(now), label: format(now, "MMMM yyyy") };
     if (period === "yearly") return { start: startOfYear(now), end: endOfYear(now), label: format(now, "yyyy") };
-    return { start: new Date(customFrom), end: endOfDay(new Date(customTo)), label: `${format(new Date(customFrom), "MMM d")} – ${format(new Date(customTo), "MMM d, yyyy")}` };
+    return { start: new Date(customFrom), end: endOfDay(new Date(customTo)), label: `${format(new Date(customFrom), "MMM d, yyyy")} – ${format(new Date(customTo), "MMM d, yyyy")}` };
   }, [period, customFrom, customTo]);
 
   const filteredTxs = useMemo(() => {
