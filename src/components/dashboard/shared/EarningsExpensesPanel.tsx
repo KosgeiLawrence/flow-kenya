@@ -64,6 +64,12 @@ const EarningsExpensesPanel = ({ role }: Props) => {
   const [viewPeriod, setViewPeriod] = useState<"daily" | "weekly" | "monthly" | "yearly" | "all">("weekly");
   const [newTx, setNewTx] = useState({ type: "income" as "income" | "expense", amount: "", category_id: "", description: "", payment_method: "cash", transaction_date: format(new Date(), "yyyy-MM-dd") });
 
+  // New category inline creation
+  const [newCatName, setNewCatName] = useState("");
+  const [newCatType, setNewCatType] = useState<"income" | "expense">("expense");
+  const [showNewCatInput, setShowNewCatInput] = useState(false);
+  const [showNewBudgetCatInput, setShowNewBudgetCatInput] = useState(false);
+
   // Budget form state - enhanced
   const currentYear = getYear(new Date());
   const currentMonth = getMonth(new Date());
