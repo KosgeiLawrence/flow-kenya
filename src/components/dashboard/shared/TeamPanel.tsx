@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Users, Mail, Send, Clock, CheckCircle2, XCircle, UserMinus, Loader2, Shield } from "lucide-react";
+import { Users, Mail, Send, Clock, CheckCircle2, XCircle, UserMinus, Loader2, Shield, RefreshCw } from "lucide-react";
 import { toast } from "sonner";
 import { format } from "date-fns";
 
@@ -126,6 +126,23 @@ const TeamPanel = ({ role, navItems }: TeamPanelProps) => {
     }
   };
 
+  const [resendingId, setResendingId] = useState<string | null>(null);
+
+  const handleResendInvite = async (inviteId: string, inviteToken: string, inviteEmail: string) => {
+    setResendingId(inviteId);
+    try {
+      const { data, error } = await supabase.functions.invoke("send-team-invite", {
+        body: { resend_token: inviteToken },
+      });
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+      toast.success("Invitation resent!", { description: `Resent to ${inviteEmail}` });
+    } catch (err: any) {
+      toast.error("Failed to resend", { description: err.message });
+    }
+    setResendingId(null);
+  };
+
   const pendingInvites = invitations.filter((i: any) => i.status === "pending");
   const acceptedInvites = invitations.filter((i: any) => i.status === "accepted");
 
@@ -219,8 +236,22 @@ const TeamPanel = ({ role, navItems }: TeamPanelProps) => {
                   </div>
                   <div className="flex items-center gap-2 shrink-0">
                     <span className="text-xs text-muted-foreground">
-                      Sent {format(new Date(inv.created_at), "dd MMM")}
+                      Sent {format(new Date(inv.created_at), "dd MMM, yyyy")}
                     </span>
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      className="h-7 px-2 text-xs gap-1"
+                      disabled={resendingId === inv.id}
+                      onClick={() => handleResendInvite(inv.id, inv.invite_token, inv.email)}
+                    >
+                      {resendingId === inv.id ? (
+                        <Loader2 className="w-3 h-3 animate-spin" />
+                      ) : (
+                        <RefreshCw className="w-3 h-3" />
+                      )}
+                      Resend
+                    </Button>
                     <Badge variant="secondary" className="text-[10px]">Pending</Badge>
                   </div>
                 </div>
