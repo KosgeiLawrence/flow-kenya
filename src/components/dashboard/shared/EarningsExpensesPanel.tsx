@@ -362,6 +362,36 @@ const EarningsExpensesPanel = ({ role }: Props) => {
   const activeBudgets = budgetProgress.filter(b => b.status !== "archived" && !b.isExpired);
   const historyBudgets = budgetProgress.filter(b => b.status === "archived" || b.isExpired);
 
+  // Group budgets by shared period_start + period_end (they were created together)
+  const groupBudgets = (list: typeof budgetProgress) => {
+    const groups = new Map<string, typeof budgetProgress>();
+    list.forEach(b => {
+      const key = `${b.period_start}|${b.period_end || ""}|${b.period_type}`;
+      if (!groups.has(key)) groups.set(key, []);
+      groups.get(key)!.push(b);
+    });
+    return Array.from(groups.entries()).map(([key, items]) => {
+      const first = items[0];
+      const totalBudgeted = items.reduce((s, i) => s + Number(i.amount), 0);
+      const totalSpent = items.reduce((s, i) => s + i.spent, 0);
+      const pct = totalBudgeted > 0 ? Math.min((totalSpent / totalBudgeted) * 100, 150) : 0;
+      // Derive a clean group name (strip " – Category" suffix)
+      const baseName = (first.name || "").replace(/\s–\s.+$/, "") || first.periodLabel + " Budget";
+      return { key, items, baseName, totalBudgeted, totalSpent, pct, first };
+    });
+  };
+
+  const activeGroups = groupBudgets(activeBudgets);
+  const historyGroups = groupBudgets(historyBudgets);
+
+  const toggleBudgetGroup = (key: string) => {
+    setExpandedBudgetGroups(prev => {
+      const next = new Set(prev);
+      if (next.has(key)) next.delete(key); else next.add(key);
+      return next;
+    });
+  };
+
   // Budget summary stats
   const budgetSummary = useMemo(() => {
     const active = activeBudgets;
