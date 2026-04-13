@@ -824,16 +824,6 @@ const EarningsExpensesPanel = ({ role }: Props) => {
               </CardContent>
             </Card>
           </div>
-
-          {/* Export & Create budget buttons */}
-          <div className="flex gap-2">
-            <Button variant="outline" size="sm" className="gap-1.5" onClick={() => exportBudgetsCSV()}>
-              <FileSpreadsheet className="w-3.5 h-3.5" /> CSV
-            </Button>
-            <Button variant="outline" size="sm" className="gap-1.5" onClick={() => exportBudgetsPDF()}>
-              <FileText className="w-3.5 h-3.5" /> PDF
-            </Button>
-          </div>
           <Dialog open={budgetDialogOpen} onOpenChange={setBudgetDialogOpen}>
             <DialogTrigger asChild>
               <Button className="w-full gap-2"><Plus className="w-4 h-4" /> Create New Budget</Button>
