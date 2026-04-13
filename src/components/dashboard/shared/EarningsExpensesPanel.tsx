@@ -17,7 +17,7 @@ import { toast } from "sonner";
 import {
   Plus, TrendingUp, TrendingDown, Wallet, ArrowUpCircle, ArrowDownCircle,
   Calendar, Target, AlertTriangle, CheckCircle2, Trash2, Receipt, FileBarChart,
-  Clock, Archive, BarChart3, ChevronLeft, ChevronRight, Edit2, Download, FileText, FileSpreadsheet
+  Clock, Archive, BarChart3, ChevronLeft, ChevronRight, Edit2, Download, FileText, FileSpreadsheet, ChevronDown as ChevronDownIcon
 } from "lucide-react";
 import jsPDF from "jspdf";
 import { addBrandedHeader, addDocMeta, addSectionTitle, finalizePdf } from "@/lib/pdfBranding";
