@@ -175,27 +175,40 @@ const EarningsExpensesPanel = ({ role }: Props) => {
     enabled: !!user,
   });
 
-  // Add transaction
+  // Add transaction - supports multiple category line items
   const addTxMutation = useMutation({
     mutationFn: async () => {
-      const { error } = await supabase.from("financial_transactions").insert({
-        user_id: user!.id,
-        type: newTx.type,
-        amount: Number(newTx.amount),
-        category_id: newTx.category_id || null,
-        description: newTx.description || null,
-        payment_method: newTx.payment_method,
-        transaction_date: newTx.transaction_date,
+      const rows: any[] = [];
+
+      // Multi-line entries
+      Object.entries(txLines).forEach(([catId, line]) => {
+        if (line.amount && Number(line.amount) > 0) {
+          rows.push({
+            user_id: user!.id,
+            type: newTx.type,
+            amount: Number(line.amount),
+            category_id: catId,
+            description: line.description || null,
+            payment_method: newTx.payment_method,
+            transaction_date: newTx.transaction_date,
+          });
+        }
       });
+
+      if (rows.length === 0) throw new Error("Add at least one entry");
+
+      const { error } = await supabase.from("financial_transactions").insert(rows);
       if (error) throw error;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["financial_transactions"] });
-      toast.success(newTx.type === "income" ? "Income added! 💰" : "Expense recorded! 📋");
+      const count = Object.values(txLines).filter(l => l.amount && Number(l.amount) > 0).length;
+      toast.success(newTx.type === "income" ? `${count} income entr${count > 1 ? "ies" : "y"} added! 💰` : `${count} expense${count > 1 ? "s" : ""} recorded! 📋`);
       setAddDialogOpen(false);
       setNewTx({ type: "income", amount: "", category_id: "", description: "", payment_method: "cash", transaction_date: format(new Date(), "yyyy-MM-dd") });
+      setTxLines({});
     },
-    onError: () => toast.error("Failed to save entry"),
+    onError: (e: any) => toast.error(e?.message || "Failed to save entry"),
   });
 
   // Add budget - supports multiple category line items
