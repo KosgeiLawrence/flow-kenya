@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
+import { CompactList } from "@/components/ui/compact-list";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { toast } from "sonner";
@@ -366,8 +367,11 @@ const CRMPanel = ({ role }: CRMPanelProps) => {
           <p className="text-muted-foreground">No customers yet. Add your first customer!</p>
         </Card>
       ) : (
-        <div className="space-y-2">
-          {filtered.map(c => (
+        <CompactList
+          items={filtered}
+          initialCount={8}
+          stepCount={10}
+          renderItem={(c: any) => (
             <Card key={c.id} className="p-3 hover:bg-muted/30 transition-colors cursor-pointer" onClick={() => openView(c)}>
               <div className="flex items-center justify-between">
                 <div className="flex-1 min-w-0">
@@ -401,8 +405,8 @@ const CRMPanel = ({ role }: CRMPanelProps) => {
                 </div>
               </div>
             </Card>
-          ))}
-        </div>
+          )}
+        />
       )}
 
       {/* Add/Edit Dialog */}
