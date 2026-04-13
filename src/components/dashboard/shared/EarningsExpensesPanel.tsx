@@ -17,8 +17,10 @@ import { toast } from "sonner";
 import {
   Plus, TrendingUp, TrendingDown, Wallet, ArrowUpCircle, ArrowDownCircle,
   Calendar, Target, AlertTriangle, CheckCircle2, Trash2, Receipt, FileBarChart,
-  Clock, Archive, BarChart3, ChevronLeft, ChevronRight, Edit2
+  Clock, Archive, BarChart3, ChevronLeft, ChevronRight, Edit2, Download, FileText, FileSpreadsheet
 } from "lucide-react";
+import jsPDF from "jspdf";
+import { addBrandedHeader, addDocMeta, addSectionTitle, finalizePdf } from "@/lib/pdfBranding";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
 import {
   format, subDays, startOfWeek, startOfMonth, endOfMonth, startOfDay, endOfDay,
@@ -628,7 +630,15 @@ const EarningsExpensesPanel = ({ role }: Props) => {
             </Card>
           </div>
 
-          {/* Create budget button */}
+          {/* Export & Create budget buttons */}
+          <div className="flex gap-2">
+            <Button variant="outline" size="sm" className="gap-1.5" onClick={() => exportBudgetsCSV()}>
+              <FileSpreadsheet className="w-3.5 h-3.5" /> CSV
+            </Button>
+            <Button variant="outline" size="sm" className="gap-1.5" onClick={() => exportBudgetsPDF()}>
+              <FileText className="w-3.5 h-3.5" /> PDF
+            </Button>
+          </div>
           <Dialog open={budgetDialogOpen} onOpenChange={setBudgetDialogOpen}>
             <DialogTrigger asChild>
               <Button className="w-full gap-2"><Plus className="w-4 h-4" /> Create New Budget</Button>
