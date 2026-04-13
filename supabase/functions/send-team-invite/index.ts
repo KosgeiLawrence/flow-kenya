@@ -71,13 +71,66 @@ Deno.serve(async (req) => {
       return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } })
     }
 
-    const { email, feature_permissions } = await req.json()
+    const { email, feature_permissions, resend_token } = await req.json()
+
+    const adminClient = createClient(supabaseUrl, supabaseServiceKey)
+
+    // --- RESEND MODE: re-send email for an existing pending invitation ---
+    if (resend_token) {
+      const { data: existing, error: fetchErr } = await adminClient
+        .from('team_invitations')
+        .select('*')
+        .eq('invite_token', resend_token)
+        .eq('invited_by', user.id)
+        .eq('status', 'pending')
+        .single()
+
+      if (fetchErr || !existing) {
+        return new Response(JSON.stringify({ error: 'Invitation not found or already accepted' }), { status: 404, headers: { ...corsHeaders, 'Content-Type': 'application/json' } })
+      }
+
+      // Get inviter profile & org
+      const { data: profileData } = await adminClient.from('profiles').select('full_name, organization_id').eq('user_id', user.id).single()
+      let orgName = ''
+      if (profileData?.organization_id) {
+        const { data: orgData } = await adminClient.from('organizations').select('name').eq('id', profileData.organization_id).single()
+        orgName = orgData?.name || ''
+      }
+
+      const SITE_URL = 'https://duaraflow.co.ke'
+      const joinUrl = `${SITE_URL}/join-team?token=${existing.invite_token}`
+
+      const html = await renderAsync(
+        React.createElement(TeamInviteEmail, {
+          inviterName: profileData?.full_name || user.email || 'A team member',
+          orgName,
+          role: existing.role,
+          joinUrl,
+          siteName: 'Duara Flow',
+        })
+      )
+
+      const transporter = createTransporter()
+      const info = await transporter.sendMail({
+        from: 'Duara Flow <info@duaraflow.co.ke>',
+        to: existing.email,
+        subject: `Reminder: You've been invited to join a team on Duara Flow`,
+        html,
+      })
+
+      console.log('Team invite resent', { messageId: info.messageId, to: existing.email })
+      return new Response(
+        JSON.stringify({ success: true, message_id: info.messageId }),
+        { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      )
+    }
+
+    // --- NEW INVITE MODE ---
     if (!email || typeof email !== 'string') {
       return new Response(JSON.stringify({ error: 'Email is required' }), { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } })
     }
 
     // Get inviter's role and profile
-    const adminClient = createClient(supabaseUrl, supabaseServiceKey)
     const [{ data: roleData }, { data: profileData }] = await Promise.all([
       adminClient.from('user_roles').select('role').eq('user_id', user.id).single(),
       adminClient.from('profiles').select('full_name, organization_id').eq('user_id', user.id).single(),
