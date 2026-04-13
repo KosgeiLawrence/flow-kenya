@@ -60,8 +60,11 @@ const TrashPanel = () => {
           <p className="text-muted-foreground">Trash is empty</p>
         </Card>
       ) : (
-        <div className="space-y-2">
-          {trashItems.map((item) => (
+        <CompactList
+          items={trashItems}
+          initialCount={5}
+          stepCount={10}
+          renderItem={(item: any) => (
             <Card key={item.id} className="p-3">
               <div className="flex items-center justify-between gap-2">
                 <div className="flex-1 min-w-0">
@@ -99,8 +102,8 @@ const TrashPanel = () => {
                 </div>
               </div>
             </Card>
-          ))}
-        </div>
+          )}
+        />
       )}
 
       {/* Empty trash confirmation */}
