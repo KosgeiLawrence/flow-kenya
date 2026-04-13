@@ -63,16 +63,7 @@ const DigitalIDPanel = () => {
   };
 
   const profileUrl = `${window.location.origin}/profile/${user?.id}`;
-  const qrData = JSON.stringify({
-    platform: "duara-flow",
-    duaraId,
-    userId: user?.id,
-    name: profile?.full_name,
-    role: role,
-    status: profile?.approval_status,
-    totalKg: impact.totalKg,
-    profileUrl,
-  });
+  const qrData = profileUrl;
 
   const handleDownload = async () => {
     if (!cardRef.current) return;

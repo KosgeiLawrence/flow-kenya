@@ -31,6 +31,7 @@ import PublicReport from "./pages/PublicReport";
 import CleanupRegister from "./pages/CleanupRegister";
 import PublicForm from "./pages/PublicForm";
 import JoinTeam from "./pages/JoinTeam";
+import PublicProfile from "./pages/PublicProfile";
 import PWAInstallPrompt from "./components/PWAInstallPrompt";
 import BiometricLockScreen from "./components/auth/BiometricLockScreen";
 import BiometricSetupPrompt from "./components/auth/BiometricSetupPrompt";
@@ -206,6 +207,7 @@ const App = () => {
                 <Route path="/cleanup/:id/register" element={<CleanupRegister />} />
                 <Route path="/form/:token" element={<PublicForm />} />
                 <Route path="/join-team" element={<JoinTeam />} />
+                <Route path="/profile/:userId" element={<PublicProfile />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </BiometricGate>
