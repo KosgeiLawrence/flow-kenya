@@ -47,19 +47,11 @@ const ContactMessagesPanel = () => {
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["contact-messages"] }),
   });
 
-  const deleteMsg = useMutation({
-    mutationFn: async (id: string) => {
-      const { error } = await supabase
-        .from("contact_messages")
-        .delete()
-        .eq("id", id);
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["contact-messages"] });
-      toast.success("Message deleted");
-    },
-  });
+  const { softDelete } = useTrash();
+  const handleDeleteMsg = async (msg: any) => {
+    const success = await softDelete("contact_messages", msg.id, msg, `${msg.subject} — ${msg.full_name}`);
+    if (success) queryClient.invalidateQueries({ queryKey: ["contact-messages"] });
+  };
 
   const openMessage = (msg: ContactMessage) => {
     setSelected(msg);

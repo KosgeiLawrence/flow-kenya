@@ -142,16 +142,11 @@ const FormBuilderPanel = () => {
     },
   });
 
-  const deleteMutation = useMutation({
-    mutationFn: async (id: string) => {
-      const { error } = await supabase.from("forms").delete().eq("id", id);
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["admin-forms"] });
-      toast.success("Form deleted");
-    },
-  });
+  const { softDelete } = useTrash();
+  const handleDeleteForm = async (form: any) => {
+    const success = await softDelete("forms", form.id, form, form.title);
+    if (success) queryClient.invalidateQueries({ queryKey: ["admin-forms"] });
+  };
 
   const resetEditor = () => {
     setTitle("");
