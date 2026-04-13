@@ -219,7 +219,7 @@ const EarningsExpensesPanel = ({ role }: Props) => {
       const transportExp = periodTxs.filter(t => t.type === "expense" && t.financial_categories?.name === "Transport").reduce((s, t) => s + Number(t.amount), 0);
       if (transportExp > 0) {
         const pct = Math.round((transportExp / totalExpenses) * 100);
-        msgs.push(`🚛 You spent ${pct}% on transport this ${viewPeriod === "daily" ? "day" : viewPeriod === "weekly" ? "week" : "month"}`);
+        msgs.push(`🚛 You spent ${pct}% on transport this ${viewPeriod === "daily" ? "day" : viewPeriod === "weekly" ? "week" : viewPeriod === "monthly" ? "month" : viewPeriod === "yearly" ? "year" : "period"}`);
       }
     }
     if (netProfit > 0) msgs.push(`✅ You're making a profit of KES ${netProfit.toLocaleString()}`);
