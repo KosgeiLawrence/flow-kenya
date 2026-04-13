@@ -29,7 +29,8 @@ import MaterialTransformationPanel from "@/components/dashboard/recycler/Materia
 import WorkflowGuidePanel from "@/components/dashboard/recycler/WorkflowGuidePanel";
 import TrashPanel from "@/components/dashboard/shared/TrashPanel";
 import TeamPanel from "@/components/dashboard/shared/TeamPanel";
-import { Users as UsersIcon } from "lucide-react";
+import DigitalIDPanel from "@/components/dashboard/waste-picker/DigitalIDPanel";
+import { Users as UsersIcon, CreditCard } from "lucide-react";
 
 const navItems = [
   { id: "workflows", label: "How It Works", icon: HelpCircle },
