@@ -836,21 +836,70 @@ const EarningsExpensesPanel = ({ role }: Props) => {
                   </div>
                 )}
 
-                <div>
-                  <Label>Budget Amount (KES) *</Label>
-                  <Input type="number" placeholder="e.g. 50,000" value={newBudget.amount} onChange={e => setNewBudget(p => ({ ...p, amount: e.target.value }))} className="text-lg" />
-                </div>
-
-                <div>
-                  <Label>Category (optional – leave blank for overall expenses)</Label>
-                  <Select value={newBudget.category_id} onValueChange={v => setNewBudget(p => ({ ...p, category_id: v }))}>
-                    <SelectTrigger><SelectValue placeholder="All expenses" /></SelectTrigger>
-                    <SelectContent>
-                      {expenseCategories.map(c => (
-                        <SelectItem key={c.id} value={c.id}>{c.icon} {c.name}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                {/* Multi-category budget lines */}
+                <div className="space-y-2">
+                  <Label>Budget Categories & Amounts *</Label>
+                  <p className="text-[10px] text-muted-foreground">Select categories and set individual amounts for each</p>
+                  <div className="space-y-2 max-h-48 overflow-y-auto border rounded-md p-2">
+                    {expenseCategories.map(c => {
+                      const isSelected = budgetLines[c.id] !== undefined;
+                      return (
+                        <div key={c.id} className="flex items-center gap-2">
+                          <input
+                            type="checkbox"
+                            checked={isSelected}
+                            onChange={e => {
+                              setBudgetLines(prev => {
+                                const next = { ...prev };
+                                if (e.target.checked) { next[c.id] = ""; } else { delete next[c.id]; }
+                                return next;
+                              });
+                            }}
+                            className="rounded border-border"
+                          />
+                          <span className="text-sm flex-1 truncate">{c.icon} {c.name}</span>
+                          {isSelected && (
+                            <Input
+                              type="number"
+                              placeholder="KES"
+                              value={budgetLines[c.id]}
+                              onChange={e => setBudgetLines(prev => ({ ...prev, [c.id]: e.target.value }))}
+                              className="w-28 h-8 text-sm"
+                            />
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                  {/* Overall option */}
+                  <div className="flex items-center gap-2 pt-1">
+                    <input
+                      type="checkbox"
+                      checked={includeOverall}
+                      onChange={e => setIncludeOverall(e.target.checked)}
+                      className="rounded border-border"
+                    />
+                    <span className="text-sm flex-1">📊 Overall Budget (all expenses)</span>
+                    {includeOverall && (
+                      <Input
+                        type="number"
+                        placeholder="KES"
+                        value={overallAmount}
+                        onChange={e => setOverallAmount(e.target.value)}
+                        className="w-28 h-8 text-sm"
+                      />
+                    )}
+                  </div>
+                  {/* Total summary */}
+                  {(Object.values(budgetLines).some(v => v) || (includeOverall && overallAmount)) && (
+                    <div className="text-xs text-muted-foreground pt-1 border-t">
+                      Total: KES {(
+                        Object.values(budgetLines).reduce((s, v) => s + (Number(v) || 0), 0) +
+                        (includeOverall ? Number(overallAmount) || 0 : 0)
+                      ).toLocaleString()}
+                      {" · "}{Object.values(budgetLines).filter(v => v && Number(v) > 0).length + (includeOverall && Number(overallAmount) > 0 ? 1 : 0)} line(s)
+                    </div>
+                  )}
                 </div>
 
                 <div>
@@ -858,7 +907,9 @@ const EarningsExpensesPanel = ({ role }: Props) => {
                   <Textarea placeholder="Budget notes, goals, or context..." value={newBudget.notes} onChange={e => setNewBudget(p => ({ ...p, notes: e.target.value }))} rows={2} />
                 </div>
 
-                <Button className="w-full" onClick={() => addBudgetMutation.mutate()} disabled={!newBudget.amount || addBudgetMutation.isPending}>
+                <Button className="w-full" onClick={() => addBudgetMutation.mutate()} disabled={
+                  (!Object.values(budgetLines).some(v => v && Number(v) > 0) && !(includeOverall && Number(overallAmount) > 0)) || addBudgetMutation.isPending
+                }>
                   {addBudgetMutation.isPending ? "Creating..." : "Create Budget 🎯"}
                 </Button>
               </div>
