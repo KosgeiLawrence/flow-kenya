@@ -60,6 +60,8 @@ const EarningsExpensesPanel = ({ role }: Props) => {
 
   const [addDialogOpen, setAddDialogOpen] = useState(false);
   const [budgetDialogOpen, setBudgetDialogOpen] = useState(false);
+  const [exportDialogOpen, setExportDialogOpen] = useState(false);
+  const [exportRange, setExportRange] = useState({ start: format(startOfMonth(new Date()), "yyyy-MM-dd"), end: format(new Date(), "yyyy-MM-dd"), type: "all" as "all" | "income" | "expense" });
   const [budgetViewTab, setBudgetViewTab] = useState<"active" | "history">("active");
   const [expandedBudgetGroups, setExpandedBudgetGroups] = useState<Set<string>>(new Set());
   const [viewPeriod, setViewPeriod] = useState<"daily" | "weekly" | "monthly" | "yearly" | "all">("weekly");
