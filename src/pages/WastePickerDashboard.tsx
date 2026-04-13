@@ -13,7 +13,7 @@ import ProfileSettingsPanel from "@/components/dashboard/shared/ProfileSettingsP
 import PricingPanel from "@/components/dashboard/waste-picker/PricingPanel";
 import SchedulePanel from "@/components/dashboard/waste-picker/SchedulePanel";
 import AnalyticsPanel from "@/components/dashboard/waste-picker/AnalyticsPanel";
-import QRIDPanel from "@/components/dashboard/waste-picker/QRIDPanel";
+import DigitalIDPanel from "@/components/dashboard/waste-picker/DigitalIDPanel";
 import TrainingPanel from "@/components/dashboard/waste-picker/TrainingPanel";
 import GrantsDiscoveryPanel from "@/components/dashboard/shared/GrantsDiscoveryPanel";
 import CleanupExercisePanel from "@/components/dashboard/shared/CleanupExercisePanel";
@@ -43,7 +43,7 @@ const navItems = [
   { id: "cleanup", label: "Cleanup Exercise", icon: Package },
   { id: "pricing", label: "Live Pricing", icon: DollarSign },
   { id: "analytics", label: "Analytics", icon: BarChart3 },
-  { id: "qr-id", label: "QR ID", icon: QrCode },
+  { id: "digital-id", label: "Digital ID", icon: QrCode },
   { id: "grants", label: "Grants & Programs", icon: Briefcase },
   { id: "team", label: "My Team", icon: UsersIcon },
   { id: "trash", label: "Trash", icon: Trash2 },
@@ -85,7 +85,7 @@ const WastePickerDashboard = () => {
       case "cleanup": return <CleanupExercisePanel />;
       case "pricing": return <PricingPanel />;
       case "analytics": return <AnalyticsPanel />;
-      case "qr-id": return <QRIDPanel />;
+      case "digital-id": return <DigitalIDPanel />;
       case "grants": return <GrantsDiscoveryPanel userRole="waste_picker" />;
       case "team": return <TeamPanel role="waste_picker" navItems={navItems} />;
       case "trash": return <TrashPanel />;
