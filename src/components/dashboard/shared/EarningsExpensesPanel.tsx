@@ -17,7 +17,7 @@ import { toast } from "sonner";
 import {
   Plus, TrendingUp, TrendingDown, Wallet, ArrowUpCircle, ArrowDownCircle,
   Calendar, Target, AlertTriangle, CheckCircle2, Trash2, Receipt, FileBarChart,
-  Clock, Archive, BarChart3, ChevronLeft, ChevronRight, Edit2, Download, FileText, FileSpreadsheet
+  Clock, Archive, BarChart3, ChevronLeft, ChevronRight, Edit2, Download, FileText, FileSpreadsheet, ChevronDown as ChevronDownIcon
 } from "lucide-react";
 import jsPDF from "jspdf";
 import { addBrandedHeader, addDocMeta, addSectionTitle, finalizePdf } from "@/lib/pdfBranding";
@@ -61,6 +61,7 @@ const EarningsExpensesPanel = ({ role }: Props) => {
   const [addDialogOpen, setAddDialogOpen] = useState(false);
   const [budgetDialogOpen, setBudgetDialogOpen] = useState(false);
   const [budgetViewTab, setBudgetViewTab] = useState<"active" | "history">("active");
+  const [expandedBudgetGroups, setExpandedBudgetGroups] = useState<Set<string>>(new Set());
   const [viewPeriod, setViewPeriod] = useState<"daily" | "weekly" | "monthly" | "yearly" | "all">("weekly");
   const [newTx, setNewTx] = useState({ type: "income" as "income" | "expense", amount: "", category_id: "", description: "", payment_method: "cash", transaction_date: format(new Date(), "yyyy-MM-dd") });
 
@@ -361,6 +362,36 @@ const EarningsExpensesPanel = ({ role }: Props) => {
   const activeBudgets = budgetProgress.filter(b => b.status !== "archived" && !b.isExpired);
   const historyBudgets = budgetProgress.filter(b => b.status === "archived" || b.isExpired);
 
+  // Group budgets by shared period_start + period_end (they were created together)
+  const groupBudgets = (list: typeof budgetProgress) => {
+    const groups = new Map<string, typeof budgetProgress>();
+    list.forEach(b => {
+      const key = `${b.period_start}|${b.period_end || ""}|${b.period_type}`;
+      if (!groups.has(key)) groups.set(key, []);
+      groups.get(key)!.push(b);
+    });
+    return Array.from(groups.entries()).map(([key, items]) => {
+      const first = items[0];
+      const totalBudgeted = items.reduce((s, i) => s + Number(i.amount), 0);
+      const totalSpent = items.reduce((s, i) => s + i.spent, 0);
+      const pct = totalBudgeted > 0 ? Math.min((totalSpent / totalBudgeted) * 100, 150) : 0;
+      // Derive a clean group name (strip " – Category" suffix)
+      const baseName = (first.name || "").replace(/\s–\s.+$/, "") || first.periodLabel + " Budget";
+      return { key, items, baseName, totalBudgeted, totalSpent, pct, first };
+    });
+  };
+
+  const activeGroups = groupBudgets(activeBudgets);
+  const historyGroups = groupBudgets(historyBudgets);
+
+  const toggleBudgetGroup = (key: string) => {
+    setExpandedBudgetGroups(prev => {
+      const next = new Set(prev);
+      if (next.has(key)) next.delete(key); else next.add(key);
+      return next;
+    });
+  };
+
   // Budget summary stats
   const budgetSummary = useMemo(() => {
     const active = activeBudgets;
@@ -467,49 +498,81 @@ const EarningsExpensesPanel = ({ role }: Props) => {
   const activeCats = newTx.type === "income" ? incomeCategories : expenseCategories;
 
   const renderBudgetCard = (bp: any, showActions = true) => (
-    <div key={bp.id} className="p-3 rounded-lg border bg-card space-y-2">
+    <div key={bp.id} className="p-3 rounded-lg border bg-card/50 space-y-2">
       <div className="flex items-start justify-between">
         <div className="min-w-0 flex-1">
-          <p className="text-sm font-semibold truncate">{bp.name || bp.financial_categories?.name || "Overall Budget"}</p>
-          <div className="flex items-center gap-2 mt-0.5 flex-wrap">
-            <Badge variant="outline" className="text-[10px]">{bp.period_type}</Badge>
-            <span className="text-[10px] text-muted-foreground">{bp.periodLabel}</span>
-            {bp.financial_categories?.name && (
-              <Badge variant="secondary" className="text-[10px]">{bp.financial_categories.icon} {bp.financial_categories.name}</Badge>
-            )}
-          </div>
+          <p className="text-xs font-medium truncate">{bp.financial_categories?.name || "Overall Budget"}</p>
         </div>
         {showActions && (
           <div className="flex gap-1 shrink-0">
             {!bp.isExpired && bp.status !== "archived" && (
-              <button onClick={() => archiveBudgetMutation.mutate(bp.id)} className="text-muted-foreground hover:text-foreground p-1" title="Archive">
-                <Archive className="w-3.5 h-3.5" />
+              <button onClick={(e) => { e.stopPropagation(); archiveBudgetMutation.mutate(bp.id); }} className="text-muted-foreground hover:text-foreground p-1" title="Archive">
+                <Archive className="w-3 h-3" />
               </button>
             )}
-            <button onClick={() => handleDeleteBudget(bp)} className="text-muted-foreground hover:text-destructive p-1" title="Delete">
-              <Trash2 className="w-3.5 h-3.5" />
+            <button onClick={(e) => { e.stopPropagation(); handleDeleteBudget(bp); }} className="text-muted-foreground hover:text-destructive p-1" title="Delete">
+              <Trash2 className="w-3 h-3" />
             </button>
           </div>
         )}
       </div>
-
       <div className="flex items-center justify-between text-xs">
-        <span className="text-muted-foreground">KES {bp.spent.toLocaleString()} spent of {Number(bp.amount).toLocaleString()}</span>
+        <span className="text-muted-foreground">KES {bp.spent.toLocaleString()} / {Number(bp.amount).toLocaleString()}</span>
         <span className={`font-bold ${bp.pct > 100 ? "text-destructive" : bp.pct >= 80 ? "text-yellow-600" : "text-primary"}`}>
           {Math.round(bp.pct)}%
         </span>
       </div>
-      <Progress value={Math.min(bp.pct, 100)} className={`h-2.5 ${bp.pct > 100 ? "[&>div]:bg-destructive" : bp.pct >= 80 ? "[&>div]:bg-yellow-500" : ""}`} />
-
-      <div className="flex justify-between text-[10px] text-muted-foreground">
-        <span>Remaining: KES {Math.max(0, Number(bp.amount) - bp.spent).toLocaleString()}</span>
-        {bp.pct > 100 && <span className="text-destructive font-medium">Over by KES {(bp.spent - Number(bp.amount)).toLocaleString()}</span>}
-        {bp.isExpired && <Badge variant="outline" className="text-[9px] h-4">Ended</Badge>}
-      </div>
-
-      {bp.notes && <p className="text-[10px] text-muted-foreground italic">{bp.notes}</p>}
+      <Progress value={Math.min(bp.pct, 100)} className={`h-2 ${bp.pct > 100 ? "[&>div]:bg-destructive" : bp.pct >= 80 ? "[&>div]:bg-yellow-500" : ""}`} />
     </div>
   );
+
+  const renderBudgetGroup = (group: ReturnType<typeof groupBudgets>[0], showActions = true) => {
+    const isExpanded = expandedBudgetGroups.has(group.key);
+    const remaining = Math.max(0, group.totalBudgeted - group.totalSpent);
+    const first = group.first;
+
+    return (
+      <div key={group.key} className="rounded-lg border bg-card overflow-hidden">
+        <button
+          onClick={() => toggleBudgetGroup(group.key)}
+          className="w-full p-3 text-left hover:bg-muted/50 transition-colors"
+        >
+          <div className="flex items-start justify-between">
+            <div className="min-w-0 flex-1">
+              <p className="text-sm font-semibold truncate">{group.baseName}</p>
+              <div className="flex items-center gap-2 mt-0.5 flex-wrap">
+                <Badge variant="outline" className="text-[10px]">{first.period_type}</Badge>
+                <span className="text-[10px] text-muted-foreground">{first.periodLabel}</span>
+                <Badge variant="secondary" className="text-[10px]">{group.items.length} {group.items.length === 1 ? "item" : "items"}</Badge>
+              </div>
+            </div>
+            <ChevronDownIcon className={`w-4 h-4 text-muted-foreground shrink-0 transition-transform duration-200 ${isExpanded ? "rotate-180" : ""}`} />
+          </div>
+
+          <div className="flex items-center justify-between text-xs mt-2">
+            <span className="text-muted-foreground">KES {group.totalSpent.toLocaleString()} spent of {group.totalBudgeted.toLocaleString()}</span>
+            <span className={`font-bold ${group.pct > 100 ? "text-destructive" : group.pct >= 80 ? "text-yellow-600" : "text-primary"}`}>
+              {Math.round(group.pct)}%
+            </span>
+          </div>
+          <Progress value={Math.min(group.pct, 100)} className={`h-2.5 mt-1 ${group.pct > 100 ? "[&>div]:bg-destructive" : group.pct >= 80 ? "[&>div]:bg-yellow-500" : ""}`} />
+
+          <div className="flex justify-between text-[10px] text-muted-foreground mt-1">
+            <span>Remaining: KES {remaining.toLocaleString()}</span>
+            {group.pct > 100 && <span className="text-destructive font-medium">Over by KES {(group.totalSpent - group.totalBudgeted).toLocaleString()}</span>}
+            {first.isExpired && <Badge variant="outline" className="text-[9px] h-4">Ended</Badge>}
+          </div>
+        </button>
+
+        {isExpanded && (
+          <div className="border-t px-3 pb-3 pt-2 space-y-2 bg-muted/30">
+            {first.notes && <p className="text-[10px] text-muted-foreground italic mb-2">📝 {first.notes}</p>}
+            {group.items.map(bp => renderBudgetCard(bp, showActions))}
+          </div>
+        )}
+      </div>
+    );
+  };
 
   return (
     <Tabs defaultValue="tracking" className="w-full">
@@ -971,16 +1034,16 @@ const EarningsExpensesPanel = ({ role }: Props) => {
           {/* Active / History tabs */}
           <div className="flex gap-1 bg-muted rounded-lg p-1">
             <button onClick={() => setBudgetViewTab("active")} className={`flex-1 px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${budgetViewTab === "active" ? "bg-card text-foreground shadow-sm" : "text-muted-foreground"}`}>
-              ✅ Active ({activeBudgets.length})
+              ✅ Active ({activeGroups.length})
             </button>
             <button onClick={() => setBudgetViewTab("history")} className={`flex-1 px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${budgetViewTab === "history" ? "bg-card text-foreground shadow-sm" : "text-muted-foreground"}`}>
-              📜 History ({historyBudgets.length})
+              📜 History ({historyGroups.length})
             </button>
           </div>
 
           {budgetViewTab === "active" && (
             <div className="space-y-3">
-              {activeBudgets.length === 0 ? (
+              {activeGroups.length === 0 ? (
                 <Card className="shadow-soft">
                   <CardContent className="p-6 text-center">
                     <Target className="w-10 h-10 text-muted-foreground mx-auto mb-2" />
@@ -988,14 +1051,14 @@ const EarningsExpensesPanel = ({ role }: Props) => {
                   </CardContent>
                 </Card>
               ) : (
-                activeBudgets.map(bp => renderBudgetCard(bp))
+                activeGroups.map(g => renderBudgetGroup(g))
               )}
             </div>
           )}
 
           {budgetViewTab === "history" && (
             <div className="space-y-3">
-              {historyBudgets.length === 0 ? (
+              {historyGroups.length === 0 ? (
                 <Card className="shadow-soft">
                   <CardContent className="p-6 text-center">
                     <Clock className="w-10 h-10 text-muted-foreground mx-auto mb-2" />
@@ -1003,23 +1066,23 @@ const EarningsExpensesPanel = ({ role }: Props) => {
                   </CardContent>
                 </Card>
               ) : (
-                historyBudgets.map(bp => renderBudgetCard(bp, true))
+                historyGroups.map(g => renderBudgetGroup(g, true))
               )}
             </div>
           )}
 
           {/* Budget vs Actual comparison chart */}
-          {activeBudgets.length > 0 && (
+          {activeGroups.length > 0 && (
             <Card className="shadow-soft">
               <CardHeader className="pb-2">
                 <CardTitle className="text-sm flex items-center gap-2"><BarChart3 className="w-4 h-4" /> Budget vs Actual</CardTitle>
               </CardHeader>
               <CardContent>
                 <ResponsiveContainer width="100%" height={220}>
-                  <BarChart data={activeBudgets.slice(0, 6).map(b => ({
-                    name: (b.name || b.financial_categories?.name || "Overall").substring(0, 12),
-                    budget: Number(b.amount),
-                    spent: b.spent,
+                  <BarChart data={activeGroups.slice(0, 6).map(g => ({
+                    name: g.baseName.substring(0, 12),
+                    budget: g.totalBudgeted,
+                    spent: g.totalSpent,
                   }))}>
                     <XAxis dataKey="name" tick={{ fontSize: 10 }} />
                     <YAxis tick={{ fontSize: 10 }} />
