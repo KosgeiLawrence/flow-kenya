@@ -548,14 +548,27 @@ const EarningsExpensesPanel = ({ role }: Props) => {
                   </div>
                   <div>
                     <Label>Category</Label>
-                    <Select value={newTx.category_id} onValueChange={v => setNewTx(p => ({ ...p, category_id: v }))}>
+                    <Select value={newTx.category_id} onValueChange={v => {
+                      if (v === "__new__") { setShowNewCatInput(true); setNewCatType(newTx.type); return; }
+                      setNewTx(p => ({ ...p, category_id: v }));
+                    }}>
                       <SelectTrigger><SelectValue placeholder="Select category" /></SelectTrigger>
                       <SelectContent>
                         {activeCats.map(c => (
                           <SelectItem key={c.id} value={c.id}>{c.icon} {c.name}</SelectItem>
                         ))}
+                        <SelectItem value="__new__">➕ Add New Category</SelectItem>
                       </SelectContent>
                     </Select>
+                    {showNewCatInput && (
+                      <div className="flex gap-2 mt-2">
+                        <Input placeholder="Category name" value={newCatName} onChange={e => setNewCatName(e.target.value)} className="h-8 text-sm" />
+                        <Button size="sm" variant="outline" disabled={!newCatName.trim() || addCategoryMutation.isPending} onClick={() => addCategoryMutation.mutate({ name: newCatName.trim(), type: newTx.type })}>
+                          {addCategoryMutation.isPending ? "..." : "Add"}
+                        </Button>
+                        <Button size="sm" variant="ghost" onClick={() => { setShowNewCatInput(false); setNewCatName(""); }}>✕</Button>
+                      </div>
+                    )}
                   </div>
                   <div>
                     <Label>Description</Label>
@@ -895,6 +908,20 @@ const EarningsExpensesPanel = ({ role }: Props) => {
                         </div>
                       );
                     })}
+                    {/* Add new category inline */}
+                    {!showNewBudgetCatInput ? (
+                      <button onClick={() => { setShowNewBudgetCatInput(true); setNewCatName(""); setNewCatType("expense"); }} className="text-xs text-primary hover:underline flex items-center gap-1 py-1">
+                        <Plus className="w-3 h-3" /> Add new category
+                      </button>
+                    ) : (
+                      <div className="flex gap-2 items-center py-1">
+                        <Input placeholder="Category name" value={newCatName} onChange={e => setNewCatName(e.target.value)} className="h-7 text-xs flex-1" />
+                        <Button size="sm" variant="outline" className="h-7 text-xs px-2" disabled={!newCatName.trim() || addCategoryMutation.isPending} onClick={() => addCategoryMutation.mutate({ name: newCatName.trim(), type: "expense" })}>
+                          {addCategoryMutation.isPending ? "..." : "Add"}
+                        </Button>
+                        <Button size="sm" variant="ghost" className="h-7 px-1" onClick={() => { setShowNewBudgetCatInput(false); setNewCatName(""); }}>✕</Button>
+                      </div>
+                    )}
                   </div>
                   {/* Overall option */}
                   <div className="flex items-center gap-2 pt-1">
