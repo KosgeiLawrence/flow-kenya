@@ -64,6 +64,8 @@ const EarningsExpensesPanel = ({ role }: Props) => {
   const [expandedBudgetGroups, setExpandedBudgetGroups] = useState<Set<string>>(new Set());
   const [viewPeriod, setViewPeriod] = useState<"daily" | "weekly" | "monthly" | "yearly" | "all">("weekly");
   const [newTx, setNewTx] = useState({ type: "income" as "income" | "expense", amount: "", category_id: "", description: "", payment_method: "cash", transaction_date: format(new Date(), "yyyy-MM-dd") });
+  // Multi-line transaction entries: { [categoryId]: { amount, description } }
+  const [txLines, setTxLines] = useState<Record<string, { amount: string; description: string }>>({});
 
   // New category inline creation
   const [newCatName, setNewCatName] = useState("");
@@ -173,27 +175,40 @@ const EarningsExpensesPanel = ({ role }: Props) => {
     enabled: !!user,
   });
 
-  // Add transaction
+  // Add transaction - supports multiple category line items
   const addTxMutation = useMutation({
     mutationFn: async () => {
-      const { error } = await supabase.from("financial_transactions").insert({
-        user_id: user!.id,
-        type: newTx.type,
-        amount: Number(newTx.amount),
-        category_id: newTx.category_id || null,
-        description: newTx.description || null,
-        payment_method: newTx.payment_method,
-        transaction_date: newTx.transaction_date,
+      const rows: any[] = [];
+
+      // Multi-line entries
+      Object.entries(txLines).forEach(([catId, line]) => {
+        if (line.amount && Number(line.amount) > 0) {
+          rows.push({
+            user_id: user!.id,
+            type: newTx.type,
+            amount: Number(line.amount),
+            category_id: catId,
+            description: line.description || null,
+            payment_method: newTx.payment_method,
+            transaction_date: newTx.transaction_date,
+          });
+        }
       });
+
+      if (rows.length === 0) throw new Error("Add at least one entry");
+
+      const { error } = await supabase.from("financial_transactions").insert(rows);
       if (error) throw error;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["financial_transactions"] });
-      toast.success(newTx.type === "income" ? "Income added! 💰" : "Expense recorded! 📋");
+      const count = Object.values(txLines).filter(l => l.amount && Number(l.amount) > 0).length;
+      toast.success(newTx.type === "income" ? `${count} income entr${count > 1 ? "ies" : "y"} added! 💰` : `${count} expense${count > 1 ? "s" : ""} recorded! 📋`);
       setAddDialogOpen(false);
       setNewTx({ type: "income", amount: "", category_id: "", description: "", payment_method: "cash", transaction_date: format(new Date(), "yyyy-MM-dd") });
+      setTxLines({});
     },
-    onError: () => toast.error("Failed to save entry"),
+    onError: (e: any) => toast.error(e?.message || "Failed to save entry"),
   });
 
   // Add budget - supports multiple category line items
@@ -587,16 +602,16 @@ const EarningsExpensesPanel = ({ role }: Props) => {
           <div className="flex flex-wrap gap-2">
             <Dialog open={addDialogOpen} onOpenChange={setAddDialogOpen}>
               <DialogTrigger asChild>
-                <Button className="gap-2" onClick={() => setNewTx(p => ({ ...p, type: "income" }))}>
+                <Button className="gap-2" onClick={() => { setNewTx(p => ({ ...p, type: "income" })); setTxLines({}); }}>
                   <ArrowUpCircle className="w-4 h-4" /> {config.simple ? "Add Earning" : "Add Income"}
                 </Button>
               </DialogTrigger>
               <DialogTrigger asChild>
-                <Button variant="outline" className="gap-2" onClick={() => setNewTx(p => ({ ...p, type: "expense" }))}>
+                <Button variant="outline" className="gap-2" onClick={() => { setNewTx(p => ({ ...p, type: "expense" })); setTxLines({}); }}>
                   <ArrowDownCircle className="w-4 h-4" /> Add Expense
                 </Button>
               </DialogTrigger>
-              <DialogContent className="max-w-sm">
+              <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto">
                 <DialogHeader>
                   <DialogTitle className="flex items-center gap-2">
                     {newTx.type === "income" ? <ArrowUpCircle className="w-5 h-5 text-primary" /> : <ArrowDownCircle className="w-5 h-5 text-destructive" />}
@@ -604,38 +619,6 @@ const EarningsExpensesPanel = ({ role }: Props) => {
                   </DialogTitle>
                 </DialogHeader>
                 <div className="space-y-3">
-                  <div>
-                    <Label>Amount (KES) *</Label>
-                    <Input type="number" placeholder="e.g. 500" value={newTx.amount} onChange={e => setNewTx(p => ({ ...p, amount: e.target.value }))} className="text-lg" />
-                  </div>
-                  <div>
-                    <Label>Category</Label>
-                    <Select value={newTx.category_id} onValueChange={v => {
-                      if (v === "__new__") { setShowNewCatInput(true); setNewCatType(newTx.type); return; }
-                      setNewTx(p => ({ ...p, category_id: v }));
-                    }}>
-                      <SelectTrigger><SelectValue placeholder="Select category" /></SelectTrigger>
-                      <SelectContent>
-                        {activeCats.map(c => (
-                          <SelectItem key={c.id} value={c.id}>{c.icon} {c.name}</SelectItem>
-                        ))}
-                        <SelectItem value="__new__">➕ Add New Category</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    {showNewCatInput && (
-                      <div className="flex gap-2 mt-2">
-                        <Input placeholder="Category name" value={newCatName} onChange={e => setNewCatName(e.target.value)} className="h-8 text-sm" />
-                        <Button size="sm" variant="outline" disabled={!newCatName.trim() || addCategoryMutation.isPending} onClick={() => addCategoryMutation.mutate({ name: newCatName.trim(), type: newTx.type })}>
-                          {addCategoryMutation.isPending ? "..." : "Add"}
-                        </Button>
-                        <Button size="sm" variant="ghost" onClick={() => { setShowNewCatInput(false); setNewCatName(""); }}>✕</Button>
-                      </div>
-                    )}
-                  </div>
-                  <div>
-                    <Label>Description</Label>
-                    <Input placeholder="What was this for?" value={newTx.description} onChange={e => setNewTx(p => ({ ...p, description: e.target.value }))} />
-                  </div>
                   <div className="grid grid-cols-2 gap-2">
                     <div>
                       <Label>Payment</Label>
@@ -654,8 +637,70 @@ const EarningsExpensesPanel = ({ role }: Props) => {
                       <Input type="date" value={newTx.transaction_date} onChange={e => setNewTx(p => ({ ...p, transaction_date: e.target.value }))} />
                     </div>
                   </div>
-                  <Button className="w-full" onClick={() => addTxMutation.mutate()} disabled={!newTx.amount || addTxMutation.isPending}>
-                    {addTxMutation.isPending ? "Saving..." : "Save Entry"}
+
+                  <div>
+                    <Label className="text-sm font-semibold">
+                      {newTx.type === "income" ? "Income" : "Expense"} by Category
+                    </Label>
+                    <p className="text-xs text-muted-foreground mb-2">Enter amounts for each category you want to record</p>
+                    <div className="space-y-2 max-h-52 overflow-y-auto border rounded-md p-2">
+                      {activeCats.map(cat => (
+                        <div key={cat.id} className="space-y-1">
+                          <div className="flex items-center gap-2">
+                            <span className="text-sm min-w-0 truncate flex-1">{cat.icon} {cat.name}</span>
+                            <Input
+                              type="number"
+                              placeholder="KES"
+                              className="w-28 h-8 text-sm"
+                              value={txLines[cat.id]?.amount || ""}
+                              onChange={e => setTxLines(prev => ({
+                                ...prev,
+                                [cat.id]: { ...prev[cat.id], amount: e.target.value, description: prev[cat.id]?.description || "" }
+                              }))}
+                            />
+                          </div>
+                          {txLines[cat.id]?.amount && Number(txLines[cat.id]?.amount) > 0 && (
+                            <Input
+                              placeholder="Description (optional)"
+                              className="h-7 text-xs ml-4"
+                              value={txLines[cat.id]?.description || ""}
+                              onChange={e => setTxLines(prev => ({
+                                ...prev,
+                                [cat.id]: { ...prev[cat.id], description: e.target.value }
+                              }))}
+                            />
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                    {showNewCatInput ? (
+                      <div className="flex gap-2 mt-2">
+                        <Input placeholder="New category name" value={newCatName} onChange={e => setNewCatName(e.target.value)} className="h-8 text-sm" />
+                        <Button size="sm" variant="outline" disabled={!newCatName.trim() || addCategoryMutation.isPending} onClick={() => addCategoryMutation.mutate({ name: newCatName.trim(), type: newTx.type })}>
+                          {addCategoryMutation.isPending ? "..." : "Add"}
+                        </Button>
+                        <Button size="sm" variant="ghost" onClick={() => { setShowNewCatInput(false); setNewCatName(""); }}>✕</Button>
+                      </div>
+                    ) : (
+                      <Button variant="ghost" size="sm" className="mt-1 text-xs gap-1" onClick={() => { setShowNewCatInput(true); setNewCatType(newTx.type); }}>
+                        <Plus className="w-3 h-3" /> Add New Category
+                      </Button>
+                    )}
+                  </div>
+
+                  {(() => {
+                    const totalAmount = Object.values(txLines).reduce((s, l) => s + (Number(l.amount) || 0), 0);
+                    const lineCount = Object.values(txLines).filter(l => l.amount && Number(l.amount) > 0).length;
+                    return totalAmount > 0 ? (
+                      <div className="bg-muted rounded-md p-2 text-sm">
+                        <span className="font-semibold">Total: KES {totalAmount.toLocaleString()}</span>
+                        <span className="text-muted-foreground ml-2">({lineCount} {lineCount === 1 ? "entry" : "entries"})</span>
+                      </div>
+                    ) : null;
+                  })()}
+
+                  <Button className="w-full" onClick={() => addTxMutation.mutate()} disabled={Object.values(txLines).filter(l => l.amount && Number(l.amount) > 0).length === 0 || addTxMutation.isPending}>
+                    {addTxMutation.isPending ? "Saving..." : "Save Entries"}
                   </Button>
                 </div>
               </DialogContent>
