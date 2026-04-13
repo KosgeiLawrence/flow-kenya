@@ -13,7 +13,7 @@ import ProfileSettingsPanel from "@/components/dashboard/shared/ProfileSettingsP
 import PricingPanel from "@/components/dashboard/waste-picker/PricingPanel";
 import SchedulePanel from "@/components/dashboard/waste-picker/SchedulePanel";
 import AnalyticsPanel from "@/components/dashboard/waste-picker/AnalyticsPanel";
-import QRIDPanel from "@/components/dashboard/waste-picker/QRIDPanel";
+import DigitalIDPanel from "@/components/dashboard/waste-picker/DigitalIDPanel";
 import TrainingPanel from "@/components/dashboard/waste-picker/TrainingPanel";
 import GrantsDiscoveryPanel from "@/components/dashboard/shared/GrantsDiscoveryPanel";
 import CleanupExercisePanel from "@/components/dashboard/shared/CleanupExercisePanel";
