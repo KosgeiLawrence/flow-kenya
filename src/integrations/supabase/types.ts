@@ -618,8 +618,12 @@ export type Database = {
           category_id: string | null
           created_at: string
           id: string
+          name: string | null
+          notes: string | null
+          period_end: string | null
           period_start: string
           period_type: string
+          status: string
           updated_at: string
           user_id: string
         }
@@ -628,8 +632,12 @@ export type Database = {
           category_id?: string | null
           created_at?: string
           id?: string
+          name?: string | null
+          notes?: string | null
+          period_end?: string | null
           period_start?: string
           period_type?: string
+          status?: string
           updated_at?: string
           user_id: string
         }
@@ -638,8 +646,12 @@ export type Database = {
           category_id?: string | null
           created_at?: string
           id?: string
+          name?: string | null
+          notes?: string | null
+          period_end?: string | null
           period_start?: string
           period_type?: string
+          status?: string
           updated_at?: string
           user_id?: string
         }
