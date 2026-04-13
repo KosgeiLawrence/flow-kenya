@@ -62,7 +62,7 @@ const DigitalIDPanel = () => {
     admin: "Administrator",
   };
 
-  const profileUrl = `https://flow-kenya-trace.lovable.app/profile/${user?.id}`;
+  const profileUrl = `https://duaraflow.co.ke/profile/${user?.id}`;
   const qrData = profileUrl;
 
   const handleDownload = async () => {
