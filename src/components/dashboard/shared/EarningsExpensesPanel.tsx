@@ -42,7 +42,7 @@ const EarningsExpensesPanel = ({ role }: Props) => {
 
   const [addDialogOpen, setAddDialogOpen] = useState(false);
   const [budgetDialogOpen, setBudgetDialogOpen] = useState(false);
-  const [viewPeriod, setViewPeriod] = useState<"daily" | "weekly" | "monthly">("weekly");
+  const [viewPeriod, setViewPeriod] = useState<"daily" | "weekly" | "monthly" | "yearly" | "all">("weekly");
   const [newTx, setNewTx] = useState({ type: "income" as "income" | "expense", amount: "", category_id: "", description: "", payment_method: "cash", transaction_date: format(new Date(), "yyyy-MM-dd") });
   const [newBudget, setNewBudget] = useState({ category_id: "", period_type: "monthly", amount: "" });
 
@@ -156,11 +156,16 @@ const EarningsExpensesPanel = ({ role }: Props) => {
   const monthStart = startOfMonth(now);
   const monthEnd = endOfMonth(now);
 
-  const filterByPeriod = (txs: any[], period: "daily" | "weekly" | "monthly") => {
+  const yearStart = startOfYear(now);
+  const yearEnd = endOfYear(now);
+
+  const filterByPeriod = (txs: any[], period: "daily" | "weekly" | "monthly" | "yearly" | "all") => {
+    if (period === "all") return txs || [];
     return (txs || []).filter(t => {
       const d = new Date(t.transaction_date);
       if (period === "daily") return isWithinInterval(d, { start: todayStart, end: todayEnd });
       if (period === "weekly") return d >= weekStart && d <= now;
+      if (period === "yearly") return d >= yearStart && d <= yearEnd;
       return d >= monthStart && d <= monthEnd;
     });
   };
@@ -362,10 +367,10 @@ const EarningsExpensesPanel = ({ role }: Props) => {
       )}
 
       {/* Period selector */}
-      <div className="flex gap-1 bg-muted rounded-lg p-1">
-        {(["daily", "weekly", "monthly"] as const).map(p => (
-          <button key={p} onClick={() => setViewPeriod(p)} className={`flex-1 px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${viewPeriod === p ? "bg-card text-foreground shadow-sm" : "text-muted-foreground"}`}>
-            {p === "daily" ? "📅 Today" : p === "weekly" ? "📆 This Week" : "🗓️ This Month"}
+      <div className="flex gap-1 bg-muted rounded-lg p-1 overflow-x-auto">
+        {(["daily", "weekly", "monthly", "yearly", "all"] as const).map(p => (
+          <button key={p} onClick={() => setViewPeriod(p)} className={`flex-1 px-2 py-1.5 text-xs font-medium rounded-md transition-colors whitespace-nowrap ${viewPeriod === p ? "bg-card text-foreground shadow-sm" : "text-muted-foreground"}`}>
+            {p === "daily" ? "📅 Today" : p === "weekly" ? "📆 This Week" : p === "monthly" ? "🗓️ This Month" : p === "yearly" ? "📊 This Year" : "🌐 All Time"}
           </button>
         ))}
       </div>
