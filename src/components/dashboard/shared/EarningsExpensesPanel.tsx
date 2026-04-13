@@ -577,7 +577,7 @@ const EarningsExpensesPanel = ({ role }: Props) => {
 
     txs.forEach(t => {
       if (y > 270) { doc.addPage(); y = 20; }
-      doc.text(format(new Date(t.transaction_date), "MMM d"), 14, y);
+      doc.text(format(new Date(t.transaction_date), "MMM d, yyyy"), 14, y);
       doc.text(t.type === "income" ? "Income" : "Expense", 40, y);
       doc.text((t.financial_categories?.name || "—").substring(0, 18), 60, y);
       doc.text((t.description || "—").substring(0, 25), 100, y);
@@ -998,7 +998,7 @@ const EarningsExpensesPanel = ({ role }: Props) => {
                     <span className="text-lg">{tx.financial_categories?.icon || (tx.type === "income" ? "💰" : "📋")}</span>
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-medium truncate">{tx.description || tx.financial_categories?.name || (tx.type === "income" ? "Income" : "Expense")}</p>
-                      <p className="text-[10px] text-muted-foreground">{format(new Date(tx.transaction_date), "MMM d")} · {tx.payment_method === "mpesa" ? "📱 M-Pesa" : tx.payment_method === "bank" ? "🏦 Bank" : "💵 Cash"}</p>
+                      <p className="text-[10px] text-muted-foreground">{format(new Date(tx.transaction_date), "MMM d, yyyy")} · {tx.payment_method === "mpesa" ? "📱 M-Pesa" : tx.payment_method === "bank" ? "🏦 Bank" : "💵 Cash"}</p>
                     </div>
                     <span className={`text-sm font-bold ${tx.type === "income" ? "text-primary" : "text-destructive"}`}>
                       {tx.type === "income" ? "+" : "-"}KES {Number(tx.amount).toLocaleString()}
@@ -1120,7 +1120,7 @@ const EarningsExpensesPanel = ({ role }: Props) => {
                     <Label>Week Starting</Label>
                     <Input type="date" value={newBudget.week_start} onChange={e => setNewBudget(p => ({ ...p, week_start: e.target.value }))} />
                     <p className="text-[10px] text-muted-foreground mt-1">
-                      {newBudget.week_start && `${format(new Date(newBudget.week_start), "MMM d")} – ${format(endOfWeek(new Date(newBudget.week_start), { weekStartsOn: 1 }), "MMM d, yyyy")}`}
+                      {newBudget.week_start && `${format(new Date(newBudget.week_start), "MMM d, yyyy")} – ${format(endOfWeek(new Date(newBudget.week_start), { weekStartsOn: 1 }), "MMM d, yyyy")}`}
                     </p>
                   </div>
                 )}
