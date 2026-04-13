@@ -1072,17 +1072,17 @@ const EarningsExpensesPanel = ({ role }: Props) => {
           )}
 
           {/* Budget vs Actual comparison chart */}
-          {activeBudgets.length > 0 && (
+          {activeGroups.length > 0 && (
             <Card className="shadow-soft">
               <CardHeader className="pb-2">
                 <CardTitle className="text-sm flex items-center gap-2"><BarChart3 className="w-4 h-4" /> Budget vs Actual</CardTitle>
               </CardHeader>
               <CardContent>
                 <ResponsiveContainer width="100%" height={220}>
-                  <BarChart data={activeBudgets.slice(0, 6).map(b => ({
-                    name: (b.name || b.financial_categories?.name || "Overall").substring(0, 12),
-                    budget: Number(b.amount),
-                    spent: b.spent,
+                  <BarChart data={activeGroups.slice(0, 6).map(g => ({
+                    name: g.baseName.substring(0, 12),
+                    budget: g.totalBudgeted,
+                    spent: g.totalSpent,
                   }))}>
                     <XAxis dataKey="name" tick={{ fontSize: 10 }} />
                     <YAxis tick={{ fontSize: 10 }} />
