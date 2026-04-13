@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { useTrash } from "@/hooks/useTrash";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -117,7 +118,7 @@ const ContactMessagesPanel = () => {
                         size="icon"
                         variant="ghost"
                         className="text-destructive"
-                        onClick={() => deleteMsg.mutate(msg.id)}
+                        onClick={() => handleDeleteMsg(msg)}
                       >
                         <Trash2 className="h-4 w-4" />
                       </Button>
