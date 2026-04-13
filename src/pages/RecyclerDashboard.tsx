@@ -29,7 +29,8 @@ import MaterialTransformationPanel from "@/components/dashboard/recycler/Materia
 import WorkflowGuidePanel from "@/components/dashboard/recycler/WorkflowGuidePanel";
 import TrashPanel from "@/components/dashboard/shared/TrashPanel";
 import TeamPanel from "@/components/dashboard/shared/TeamPanel";
-import { Users as UsersIcon } from "lucide-react";
+import DigitalIDPanel from "@/components/dashboard/waste-picker/DigitalIDPanel";
+import { Users as UsersIcon, CreditCard } from "lucide-react";
 
 const navItems = [
   { id: "workflows", label: "How It Works", icon: HelpCircle },
@@ -46,6 +47,7 @@ const navItems = [
   { id: "training", label: "Training", icon: BookOpen },
   { id: "cleanup", label: "Cleanup Exercise", icon: Package },
   { id: "grants", label: "Grants & Programs", icon: Briefcase },
+  { id: "digital-id", label: "Digital ID", icon: CreditCard },
   { id: "team", label: "My Team", icon: UsersIcon },
   { id: "trash", label: "Trash", icon: Trash2 },
   { id: "settings", label: "Profile Settings", icon: Settings },
@@ -96,6 +98,7 @@ const RecyclerDashboard = () => {
       case "cleanup": return <CleanupExercisePanel />;
       
       case "grants": return <GrantsDiscoveryPanel userRole="recycler" />;
+      case "digital-id": return <DigitalIDPanel />;
       case "team": return <TeamPanel role="recycler" navItems={navItems} />;
       case "trash": return <TrashPanel />;
       case "settings": return <ProfileSettingsPanel role="recycler" />;
