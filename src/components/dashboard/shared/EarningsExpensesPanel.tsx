@@ -123,6 +123,25 @@ const EarningsExpensesPanel = ({ role }: Props) => {
     enabled: !!user,
   });
 
+  // Add new category mutation
+  const addCategoryMutation = useMutation({
+    mutationFn: async ({ name, type }: { name: string; type: "income" | "expense" }) => {
+      const { data, error } = await supabase.from("financial_categories").insert({
+        name, type, user_id: user!.id, is_system: false,
+      }).select().single();
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ["financial_categories"] });
+      toast.success(`Category "${data.name}" added!`);
+      setNewCatName("");
+      setShowNewCatInput(false);
+      setShowNewBudgetCatInput(false);
+    },
+    onError: () => toast.error("Failed to add category"),
+  });
+
   // Fetch transactions
   const { data: transactions } = useQuery({
     queryKey: ["financial_transactions", user?.id],
