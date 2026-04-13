@@ -62,7 +62,7 @@ const DigitalIDPanel = () => {
     admin: "Administrator",
   };
 
-  const profileUrl = `${window.location.origin}/profile/${user?.id}`;
+  const profileUrl = `https://flow-kenya-trace.lovable.app/profile/${user?.id}`;
   const qrData = profileUrl;
 
   const handleDownload = async () => {
