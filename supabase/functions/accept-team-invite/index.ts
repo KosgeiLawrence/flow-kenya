@@ -39,7 +39,10 @@ Deno.serve(async (req) => {
       return new Response(JSON.stringify({ error: 'This invitation has expired' }), { status: 410, headers: { ...corsHeaders, 'Content-Type': 'application/json' } })
     }
 
-    // Create user via admin API
+    let userId: string
+    let isExistingUser = false
+
+    // Try to create user via admin API
     const { data: newUser, error: createErr } = await admin.auth.admin.createUser({
       email: invitation.email,
       password,
@@ -53,39 +56,74 @@ Deno.serve(async (req) => {
     })
 
     if (createErr) {
-      console.error('Create user error:', createErr)
-      return new Response(JSON.stringify({ error: createErr.message || 'Failed to create account' }), { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } })
+      // If user already exists, find them and link to team instead
+      if (createErr.message?.includes('already been registered') || (createErr as any).code === 'email_exists') {
+        console.log('User already exists, linking to team:', invitation.email)
+
+        // Look up the existing user
+        const { data: { users }, error: listErr } = await admin.auth.admin.listUsers()
+        if (listErr) {
+          console.error('List users error:', listErr)
+          return new Response(JSON.stringify({ error: 'Failed to find existing user' }), { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } })
+        }
+
+        const existingUser = users?.find((u: any) => u.email === invitation.email)
+        if (!existingUser) {
+          return new Response(JSON.stringify({ error: 'Could not find user account. Please contact support.' }), { status: 404, headers: { ...corsHeaders, 'Content-Type': 'application/json' } })
+        }
+
+        userId = existingUser.id
+        isExistingUser = true
+
+        // Update their password if they're accepting the invite
+        await admin.auth.admin.updateUser(userId, { password })
+      } else {
+        console.error('Create user error:', createErr)
+        return new Response(JSON.stringify({ error: createErr.message || 'Failed to create account' }), { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } })
+      }
+    } else {
+      userId = newUser.user.id
     }
 
-    const userId = newUser.user.id
-
-    // Link to organization if applicable
+    // Update profile: link to organization and approve
     if (invitation.organization_id) {
       await admin.from('profiles').update({
         organization_id: invitation.organization_id,
         approval_status: 'approved',
+        ...(isExistingUser ? { full_name } : {}),
       }).eq('user_id', userId)
     } else {
       await admin.from('profiles').update({
         approval_status: 'approved',
+        ...(isExistingUser ? { full_name } : {}),
       }).eq('user_id', userId)
     }
 
-    // Create team member record
-    await admin.from('team_members').insert({
-      user_id: userId,
-      invited_by: invitation.invited_by,
-      organization_id: invitation.organization_id,
-      role: invitation.role,
-      feature_permissions: invitation.feature_permissions,
-    })
+    // Check if already a team member to avoid duplicates
+    const { data: existingMember } = await admin
+      .from('team_members')
+      .select('id')
+      .eq('user_id', userId)
+      .eq('invited_by', invitation.invited_by)
+      .maybeSingle()
+
+    if (!existingMember) {
+      // Create team member record
+      await admin.from('team_members').insert({
+        user_id: userId,
+        invited_by: invitation.invited_by,
+        organization_id: invitation.organization_id,
+        role: invitation.role,
+        feature_permissions: invitation.feature_permissions,
+      })
+    }
 
     // Mark invitation as accepted
     await admin.from('team_invitations').update({ status: 'accepted' }).eq('id', invitation.id)
 
-    console.log('Team member created', { userId, role: invitation.role, invitedBy: invitation.invited_by })
+    console.log('Team member created', { userId, role: invitation.role, invitedBy: invitation.invited_by, isExistingUser })
 
-    return new Response(JSON.stringify({ success: true, user_id: userId }), {
+    return new Response(JSON.stringify({ success: true, user_id: userId, existing_user: isExistingUser }), {
       status: 200,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     })
