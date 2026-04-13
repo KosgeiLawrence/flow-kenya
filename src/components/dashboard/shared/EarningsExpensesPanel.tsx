@@ -498,49 +498,81 @@ const EarningsExpensesPanel = ({ role }: Props) => {
   const activeCats = newTx.type === "income" ? incomeCategories : expenseCategories;
 
   const renderBudgetCard = (bp: any, showActions = true) => (
-    <div key={bp.id} className="p-3 rounded-lg border bg-card space-y-2">
+    <div key={bp.id} className="p-3 rounded-lg border bg-card/50 space-y-2">
       <div className="flex items-start justify-between">
         <div className="min-w-0 flex-1">
-          <p className="text-sm font-semibold truncate">{bp.name || bp.financial_categories?.name || "Overall Budget"}</p>
-          <div className="flex items-center gap-2 mt-0.5 flex-wrap">
-            <Badge variant="outline" className="text-[10px]">{bp.period_type}</Badge>
-            <span className="text-[10px] text-muted-foreground">{bp.periodLabel}</span>
-            {bp.financial_categories?.name && (
-              <Badge variant="secondary" className="text-[10px]">{bp.financial_categories.icon} {bp.financial_categories.name}</Badge>
-            )}
-          </div>
+          <p className="text-xs font-medium truncate">{bp.financial_categories?.name || "Overall Budget"}</p>
         </div>
         {showActions && (
           <div className="flex gap-1 shrink-0">
             {!bp.isExpired && bp.status !== "archived" && (
-              <button onClick={() => archiveBudgetMutation.mutate(bp.id)} className="text-muted-foreground hover:text-foreground p-1" title="Archive">
-                <Archive className="w-3.5 h-3.5" />
+              <button onClick={(e) => { e.stopPropagation(); archiveBudgetMutation.mutate(bp.id); }} className="text-muted-foreground hover:text-foreground p-1" title="Archive">
+                <Archive className="w-3 h-3" />
               </button>
             )}
-            <button onClick={() => handleDeleteBudget(bp)} className="text-muted-foreground hover:text-destructive p-1" title="Delete">
-              <Trash2 className="w-3.5 h-3.5" />
+            <button onClick={(e) => { e.stopPropagation(); handleDeleteBudget(bp); }} className="text-muted-foreground hover:text-destructive p-1" title="Delete">
+              <Trash2 className="w-3 h-3" />
             </button>
           </div>
         )}
       </div>
-
       <div className="flex items-center justify-between text-xs">
-        <span className="text-muted-foreground">KES {bp.spent.toLocaleString()} spent of {Number(bp.amount).toLocaleString()}</span>
+        <span className="text-muted-foreground">KES {bp.spent.toLocaleString()} / {Number(bp.amount).toLocaleString()}</span>
         <span className={`font-bold ${bp.pct > 100 ? "text-destructive" : bp.pct >= 80 ? "text-yellow-600" : "text-primary"}`}>
           {Math.round(bp.pct)}%
         </span>
       </div>
-      <Progress value={Math.min(bp.pct, 100)} className={`h-2.5 ${bp.pct > 100 ? "[&>div]:bg-destructive" : bp.pct >= 80 ? "[&>div]:bg-yellow-500" : ""}`} />
-
-      <div className="flex justify-between text-[10px] text-muted-foreground">
-        <span>Remaining: KES {Math.max(0, Number(bp.amount) - bp.spent).toLocaleString()}</span>
-        {bp.pct > 100 && <span className="text-destructive font-medium">Over by KES {(bp.spent - Number(bp.amount)).toLocaleString()}</span>}
-        {bp.isExpired && <Badge variant="outline" className="text-[9px] h-4">Ended</Badge>}
-      </div>
-
-      {bp.notes && <p className="text-[10px] text-muted-foreground italic">{bp.notes}</p>}
+      <Progress value={Math.min(bp.pct, 100)} className={`h-2 ${bp.pct > 100 ? "[&>div]:bg-destructive" : bp.pct >= 80 ? "[&>div]:bg-yellow-500" : ""}`} />
     </div>
   );
+
+  const renderBudgetGroup = (group: ReturnType<typeof groupBudgets>[0], showActions = true) => {
+    const isExpanded = expandedBudgetGroups.has(group.key);
+    const remaining = Math.max(0, group.totalBudgeted - group.totalSpent);
+    const first = group.first;
+
+    return (
+      <div key={group.key} className="rounded-lg border bg-card overflow-hidden">
+        <button
+          onClick={() => toggleBudgetGroup(group.key)}
+          className="w-full p-3 text-left hover:bg-muted/50 transition-colors"
+        >
+          <div className="flex items-start justify-between">
+            <div className="min-w-0 flex-1">
+              <p className="text-sm font-semibold truncate">{group.baseName}</p>
+              <div className="flex items-center gap-2 mt-0.5 flex-wrap">
+                <Badge variant="outline" className="text-[10px]">{first.period_type}</Badge>
+                <span className="text-[10px] text-muted-foreground">{first.periodLabel}</span>
+                <Badge variant="secondary" className="text-[10px]">{group.items.length} {group.items.length === 1 ? "item" : "items"}</Badge>
+              </div>
+            </div>
+            <ChevronDownIcon className={`w-4 h-4 text-muted-foreground shrink-0 transition-transform duration-200 ${isExpanded ? "rotate-180" : ""}`} />
+          </div>
+
+          <div className="flex items-center justify-between text-xs mt-2">
+            <span className="text-muted-foreground">KES {group.totalSpent.toLocaleString()} spent of {group.totalBudgeted.toLocaleString()}</span>
+            <span className={`font-bold ${group.pct > 100 ? "text-destructive" : group.pct >= 80 ? "text-yellow-600" : "text-primary"}`}>
+              {Math.round(group.pct)}%
+            </span>
+          </div>
+          <Progress value={Math.min(group.pct, 100)} className={`h-2.5 mt-1 ${group.pct > 100 ? "[&>div]:bg-destructive" : group.pct >= 80 ? "[&>div]:bg-yellow-500" : ""}`} />
+
+          <div className="flex justify-between text-[10px] text-muted-foreground mt-1">
+            <span>Remaining: KES {remaining.toLocaleString()}</span>
+            {group.pct > 100 && <span className="text-destructive font-medium">Over by KES {(group.totalSpent - group.totalBudgeted).toLocaleString()}</span>}
+            {first.isExpired && <Badge variant="outline" className="text-[9px] h-4">Ended</Badge>}
+          </div>
+        </button>
+
+        {isExpanded && (
+          <div className="border-t px-3 pb-3 pt-2 space-y-2 bg-muted/30">
+            {first.notes && <p className="text-[10px] text-muted-foreground italic mb-2">📝 {first.notes}</p>}
+            {group.items.map(bp => renderBudgetCard(bp, showActions))}
+          </div>
+        )}
+      </div>
+    );
+  };
 
   return (
     <Tabs defaultValue="tracking" className="w-full">
