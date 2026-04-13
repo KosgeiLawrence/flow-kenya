@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { useTrash } from "@/hooks/useTrash";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -47,19 +48,11 @@ const ContactMessagesPanel = () => {
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["contact-messages"] }),
   });
 
-  const deleteMsg = useMutation({
-    mutationFn: async (id: string) => {
-      const { error } = await supabase
-        .from("contact_messages")
-        .delete()
-        .eq("id", id);
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["contact-messages"] });
-      toast.success("Message deleted");
-    },
-  });
+  const { softDelete } = useTrash();
+  const handleDeleteMsg = async (msg: any) => {
+    const success = await softDelete("contact_messages", msg.id, msg, `${msg.subject} — ${msg.full_name}`);
+    if (success) queryClient.invalidateQueries({ queryKey: ["contact-messages"] });
+  };
 
   const openMessage = (msg: ContactMessage) => {
     setSelected(msg);
@@ -125,7 +118,7 @@ const ContactMessagesPanel = () => {
                         size="icon"
                         variant="ghost"
                         className="text-destructive"
-                        onClick={() => deleteMsg.mutate(msg.id)}
+                        onClick={() => handleDeleteMsg(msg)}
                       >
                         <Trash2 className="h-4 w-4" />
                       </Button>

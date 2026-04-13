@@ -33,9 +33,13 @@ const TABLE_LABELS: Record<string, string> = {
   balance_sheet_items: "Balance Sheet Item",
   ngo_programs: "Program",
   ngo_sponsorships: "Sponsorship",
+  ngo_program_documents: "Program Document",
   plastic_declarations: "Declaration",
   recovery_commitments: "Recovery Commitment",
   community_training_logs: "Training Log",
+  training_resources: "Training Resource",
+  forms: "Form",
+  contact_messages: "Contact Message",
 };
 
 export const getTableLabel = (table: string) => TABLE_LABELS[table] || table;

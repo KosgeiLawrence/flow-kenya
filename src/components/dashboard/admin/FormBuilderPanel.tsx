@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
+import { useTrash } from "@/hooks/useTrash";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -142,16 +143,11 @@ const FormBuilderPanel = () => {
     },
   });
 
-  const deleteMutation = useMutation({
-    mutationFn: async (id: string) => {
-      const { error } = await supabase.from("forms").delete().eq("id", id);
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["admin-forms"] });
-      toast.success("Form deleted");
-    },
-  });
+  const { softDelete } = useTrash();
+  const handleDeleteForm = async (form: any) => {
+    const success = await softDelete("forms", form.id, form, form.title);
+    if (success) queryClient.invalidateQueries({ queryKey: ["admin-forms"] });
+  };
 
   const resetEditor = () => {
     setTitle("");
@@ -397,7 +393,7 @@ const FormBuilderPanel = () => {
                   <Button size="sm" variant="outline" onClick={() => window.open(getShareUrl(form.share_token), "_blank")}>
                     <Eye className="w-3 h-3 mr-1" /> Preview
                   </Button>
-                  <Button size="sm" variant="destructive" onClick={() => deleteMutation.mutate(form.id)}>
+                  <Button size="sm" variant="destructive" onClick={() => handleDeleteForm(form)}>
                     <Trash2 className="w-3 h-3 mr-1" /> Delete
                   </Button>
                 </div>
