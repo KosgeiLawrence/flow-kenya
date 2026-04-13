@@ -133,7 +133,6 @@ const CRMPanel = ({ role }: CRMPanelProps) => {
   };
 
   const handleDelete = async (c: Customer) => {
-    if (!confirm("Move this customer to trash?")) return;
     const success = await softDelete("customers", c.id, c as any, c.full_name);
     if (success) fetchCustomers();
   };
