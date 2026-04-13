@@ -60,6 +60,8 @@ const EarningsExpensesPanel = ({ role }: Props) => {
 
   const [addDialogOpen, setAddDialogOpen] = useState(false);
   const [budgetDialogOpen, setBudgetDialogOpen] = useState(false);
+  const [exportDialogOpen, setExportDialogOpen] = useState(false);
+  const [exportRange, setExportRange] = useState({ start: format(startOfMonth(new Date()), "yyyy-MM-dd"), end: format(new Date(), "yyyy-MM-dd"), type: "all" as "all" | "income" | "expense" });
   const [budgetViewTab, setBudgetViewTab] = useState<"active" | "history">("active");
   const [expandedBudgetGroups, setExpandedBudgetGroups] = useState<Set<string>>(new Set());
   const [viewPeriod, setViewPeriod] = useState<"daily" | "weekly" | "monthly" | "yearly" | "all">("weekly");
@@ -499,6 +501,119 @@ const EarningsExpensesPanel = ({ role }: Props) => {
     toast.success("Budget exported as PDF");
   };
 
+  // ── Income & Expenses Export Functions ──
+  const getFilteredExportTxs = () => {
+    const start = startOfDay(new Date(exportRange.start));
+    const end = endOfDay(new Date(exportRange.end));
+    return (transactions || []).filter(t => {
+      const d = new Date(t.transaction_date);
+      const inRange = d >= start && d <= end;
+      if (exportRange.type === "all") return inRange;
+      return inRange && t.type === exportRange.type;
+    });
+  };
+
+  const exportTxCSV = () => {
+    const txs = getFilteredExportTxs();
+    if (txs.length === 0) { toast.error("No entries found for this period"); return; }
+    const rows: string[][] = [
+      ["Date", "Type", "Category", "Description", "Amount (KES)", "Payment Method"],
+      ...txs.map(t => [
+        format(new Date(t.transaction_date), "yyyy-MM-dd"),
+        t.type === "income" ? "Income" : "Expense",
+        t.financial_categories?.name || "Uncategorized",
+        t.description || "",
+        String(Number(t.amount)),
+        t.payment_method || "",
+      ]),
+    ];
+    const totalInc = txs.filter(t => t.type === "income").reduce((s, t) => s + Number(t.amount), 0);
+    const totalExp = txs.filter(t => t.type === "expense").reduce((s, t) => s + Number(t.amount), 0);
+    rows.push([]);
+    rows.push(["", "", "", "Total Income", String(totalInc), ""]);
+    rows.push(["", "", "", "Total Expenses", String(totalExp), ""]);
+    rows.push(["", "", "", "Net Profit", String(totalInc - totalExp), ""]);
+
+    const csv = rows.map(r => r.map(c => `"${String(c).replace(/"/g, '""')}"`).join(",")).join("\n");
+    const blob = new Blob([csv], { type: "text/csv" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url; a.download = `transactions-${exportRange.start}-to-${exportRange.end}.csv`; a.click();
+    URL.revokeObjectURL(url);
+    toast.success("Transactions exported as CSV");
+    setExportDialogOpen(false);
+  };
+
+  const exportTxPDF = async () => {
+    const txs = getFilteredExportTxs();
+    if (txs.length === 0) { toast.error("No entries found for this period"); return; }
+    const doc = new jsPDF();
+    const typeLabel = exportRange.type === "all" ? "Income & Expenses" : exportRange.type === "income" ? "Income" : "Expenses";
+    let y = await addBrandedHeader(doc, `${typeLabel} Report`, `${format(new Date(exportRange.start), "MMM d, yyyy")} — ${format(new Date(exportRange.end), "MMM d, yyyy")}`);
+
+    const totalInc = txs.filter(t => t.type === "income").reduce((s, t) => s + Number(t.amount), 0);
+    const totalExp = txs.filter(t => t.type === "expense").reduce((s, t) => s + Number(t.amount), 0);
+
+    y = addDocMeta(doc, [
+      { label: "Period", value: `${format(new Date(exportRange.start), "PPP")} — ${format(new Date(exportRange.end), "PPP")}` },
+      { label: "Total Income", value: `KES ${totalInc.toLocaleString()}` },
+      { label: "Total Expenses", value: `KES ${totalExp.toLocaleString()}` },
+      { label: "Net Profit", value: `KES ${(totalInc - totalExp).toLocaleString()}` },
+      { label: "Entries", value: String(txs.length) },
+    ], y);
+    y += 4;
+
+    y = addSectionTitle(doc, "Transaction Details", y);
+    doc.setFontSize(8);
+    doc.setFont("helvetica", "bold");
+    doc.text("Date", 14, y);
+    doc.text("Type", 40, y);
+    doc.text("Category", 60, y);
+    doc.text("Description", 100, y);
+    doc.text("Amount (KES)", 155, y);
+    y += 5;
+    doc.setFont("helvetica", "normal");
+
+    txs.forEach(t => {
+      if (y > 270) { doc.addPage(); y = 20; }
+      doc.text(format(new Date(t.transaction_date), "MMM d"), 14, y);
+      doc.text(t.type === "income" ? "Income" : "Expense", 40, y);
+      doc.text((t.financial_categories?.name || "—").substring(0, 18), 60, y);
+      doc.text((t.description || "—").substring(0, 25), 100, y);
+      doc.text(Number(t.amount).toLocaleString(), 155, y);
+      y += 5;
+    });
+
+    y += 6;
+    if (y > 240) { doc.addPage(); y = 20; }
+    y = addSectionTitle(doc, "Category Summary", y);
+    doc.setFontSize(8);
+    const catMap = new Map<string, { income: number; expense: number }>();
+    txs.forEach(t => {
+      const name = t.financial_categories?.name || "Uncategorized";
+      const prev = catMap.get(name) || { income: 0, expense: 0 };
+      if (t.type === "income") prev.income += Number(t.amount);
+      else prev.expense += Number(t.amount);
+      catMap.set(name, prev);
+    });
+    doc.setFont("helvetica", "bold");
+    doc.text("Category", 14, y); doc.text("Income", 100, y); doc.text("Expenses", 140, y);
+    y += 5;
+    doc.setFont("helvetica", "normal");
+    catMap.forEach((val, name) => {
+      if (y > 270) { doc.addPage(); y = 20; }
+      doc.text(name.substring(0, 35), 14, y);
+      doc.text(`KES ${val.income.toLocaleString()}`, 100, y);
+      doc.text(`KES ${val.expense.toLocaleString()}`, 140, y);
+      y += 5;
+    });
+
+    await finalizePdf(doc);
+    doc.save(`transactions-${exportRange.start}-to-${exportRange.end}.pdf`);
+    toast.success("Transactions exported as PDF");
+    setExportDialogOpen(false);
+  };
+
   const incomeCategories = (categories || []).filter(c => c.type === "income");
   const expenseCategories = (categories || []).filter(c => c.type === "expense");
   const activeCats = newTx.type === "income" ? incomeCategories : expenseCategories;
@@ -816,9 +931,60 @@ const EarningsExpensesPanel = ({ role }: Props) => {
             </TabsContent>
           </Tabs>
 
+          {/* Export Dialog */}
+          <Dialog open={exportDialogOpen} onOpenChange={setExportDialogOpen}>
+            <DialogContent className="max-w-sm">
+              <DialogHeader>
+                <DialogTitle className="flex items-center gap-2"><Download className="w-5 h-5" /> Export Transactions</DialogTitle>
+              </DialogHeader>
+              <div className="space-y-3">
+                <div>
+                  <Label>Type</Label>
+                  <Select value={exportRange.type} onValueChange={v => setExportRange(p => ({ ...p, type: v as any }))}>
+                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All (Income & Expenses)</SelectItem>
+                      <SelectItem value="income">Income Only</SelectItem>
+                      <SelectItem value="expense">Expenses Only</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="grid grid-cols-2 gap-2">
+                  <div>
+                    <Label>From</Label>
+                    <Input type="date" value={exportRange.start} onChange={e => setExportRange(p => ({ ...p, start: e.target.value }))} />
+                  </div>
+                  <div>
+                    <Label>To</Label>
+                    <Input type="date" value={exportRange.end} onChange={e => setExportRange(p => ({ ...p, end: e.target.value }))} />
+                  </div>
+                </div>
+                <div className="text-xs text-muted-foreground">
+                  {(() => {
+                    const count = getFilteredExportTxs().length;
+                    return `${count} entr${count === 1 ? "y" : "ies"} found for this period`;
+                  })()}
+                </div>
+                <div className="grid grid-cols-2 gap-2">
+                  <Button variant="outline" className="gap-2" onClick={exportTxCSV}>
+                    <FileSpreadsheet className="w-4 h-4" /> CSV
+                  </Button>
+                  <Button className="gap-2" onClick={exportTxPDF}>
+                    <FileText className="w-4 h-4" /> PDF
+                  </Button>
+                </div>
+              </div>
+            </DialogContent>
+          </Dialog>
+
           <Card className="shadow-soft">
             <CardHeader className="pb-2">
-              <CardTitle className="text-sm flex items-center gap-2"><Receipt className="w-4 h-4" /> Recent Entries</CardTitle>
+              <div className="flex items-center justify-between">
+                <CardTitle className="text-sm flex items-center gap-2"><Receipt className="w-4 h-4" /> Recent Entries</CardTitle>
+                <Button variant="ghost" size="sm" className="gap-1 text-xs h-7" onClick={() => setExportDialogOpen(true)}>
+                  <Download className="w-3.5 h-3.5" /> Export
+                </Button>
+              </div>
             </CardHeader>
             <CardContent>
               {(!transactions || transactions.length === 0) ? (
