@@ -117,6 +117,7 @@ const AggregatorDashboard = () => {
       case "cleanup": return <CleanupExercisePanel />;
       case "crm": return <CRMPanel role="aggregator" />;
       case "grants": return <GrantsDiscoveryPanel userRole="aggregator" />;
+      case "team": return <TeamPanel role="aggregator" navItems={navItems} />;
       case "trash": return <TrashPanel />;
       case "settings": return <ProfileSettingsPanel role="aggregator" />;
       default: return <WastePickerMgmtPanel />;
