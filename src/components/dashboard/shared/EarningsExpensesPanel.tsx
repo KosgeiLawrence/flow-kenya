@@ -28,6 +28,7 @@ import {
   subMonths, subYears, addWeeks, subWeeks, getYear, getMonth
 } from "date-fns";
 import FinancialReportsPanel from "./FinancialReportsPanel";
+import { CompactList } from "@/components/ui/compact-list";
 
 const COLORS = ["hsl(152,45%,22%)", "hsl(40,55%,55%)", "hsl(195,60%,50%)", "hsl(25,30%,35%)", "hsl(340,55%,50%)", "hsl(270,40%,50%)"];
 
@@ -987,27 +988,27 @@ const EarningsExpensesPanel = ({ role }: Props) => {
               </div>
             </CardHeader>
             <CardContent>
-              {(!transactions || transactions.length === 0) ? (
-                <p className="text-sm text-muted-foreground text-center py-6">No entries yet. Tap "Add Earning" or "Add Expense" to start tracking!</p>
-              ) : (
-                <div className="space-y-2 max-h-64 overflow-y-auto">
-                  {transactions.slice(0, 20).map(tx => (
-                    <div key={tx.id} className="flex items-center gap-3 p-2 rounded-md bg-muted/30 hover:bg-muted/50 transition-colors">
-                      <span className="text-lg">{tx.financial_categories?.icon || (tx.type === "income" ? "💰" : "📋")}</span>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium truncate">{tx.description || tx.financial_categories?.name || (tx.type === "income" ? "Income" : "Expense")}</p>
-                        <p className="text-[10px] text-muted-foreground">{format(new Date(tx.transaction_date), "MMM d")} · {tx.payment_method === "mpesa" ? "📱 M-Pesa" : tx.payment_method === "bank" ? "🏦 Bank" : "💵 Cash"}</p>
-                      </div>
-                      <span className={`text-sm font-bold ${tx.type === "income" ? "text-primary" : "text-destructive"}`}>
-                        {tx.type === "income" ? "+" : "-"}KES {Number(tx.amount).toLocaleString()}
-                      </span>
-                      <button onClick={() => handleDeleteTx(tx)} className="text-muted-foreground hover:text-destructive p-1">
-                        <Trash2 className="w-3.5 h-3.5" />
-                      </button>
+              <CompactList
+                items={transactions || []}
+                initialCount={5}
+                stepCount={10}
+                emptyMessage='No entries yet. Tap "Add Earning" or "Add Expense" to start tracking!'
+                renderItem={(tx: any) => (
+                  <div key={tx.id} className="flex items-center gap-3 p-2 rounded-md bg-muted/30 hover:bg-muted/50 transition-colors">
+                    <span className="text-lg">{tx.financial_categories?.icon || (tx.type === "income" ? "💰" : "📋")}</span>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium truncate">{tx.description || tx.financial_categories?.name || (tx.type === "income" ? "Income" : "Expense")}</p>
+                      <p className="text-[10px] text-muted-foreground">{format(new Date(tx.transaction_date), "MMM d")} · {tx.payment_method === "mpesa" ? "📱 M-Pesa" : tx.payment_method === "bank" ? "🏦 Bank" : "💵 Cash"}</p>
                     </div>
-                  ))}
-                </div>
-              )}
+                    <span className={`text-sm font-bold ${tx.type === "income" ? "text-primary" : "text-destructive"}`}>
+                      {tx.type === "income" ? "+" : "-"}KES {Number(tx.amount).toLocaleString()}
+                    </span>
+                    <button onClick={() => handleDeleteTx(tx)} className="text-muted-foreground hover:text-destructive p-1">
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                )}
+              />
             </CardContent>
           </Card>
         </div>
