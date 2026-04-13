@@ -559,6 +559,14 @@ const EarningsExpensesPanel = ({ role }: Props) => {
           <div className="border-t px-3 pb-3 pt-2 space-y-2 bg-muted/30">
             {first.notes && <p className="text-[10px] text-muted-foreground italic mb-2">📝 {first.notes}</p>}
             {group.items.map(bp => renderBudgetCard(bp, showActions))}
+            <div className="flex gap-2 pt-2 border-t">
+              <button onClick={(e) => { e.stopPropagation(); exportGroupCSV(group); }} className="flex items-center gap-1 text-[10px] text-primary hover:underline">
+                <FileSpreadsheet className="w-3 h-3" /> CSV
+              </button>
+              <button onClick={(e) => { e.stopPropagation(); exportGroupPDF(group); }} className="flex items-center gap-1 text-[10px] text-primary hover:underline">
+                <FileText className="w-3 h-3" /> PDF
+              </button>
+            </div>
           </div>
         )}
       </div>
