@@ -64,6 +64,12 @@ const EarningsExpensesPanel = ({ role }: Props) => {
   const [viewPeriod, setViewPeriod] = useState<"daily" | "weekly" | "monthly" | "yearly" | "all">("weekly");
   const [newTx, setNewTx] = useState({ type: "income" as "income" | "expense", amount: "", category_id: "", description: "", payment_method: "cash", transaction_date: format(new Date(), "yyyy-MM-dd") });
 
+  // New category inline creation
+  const [newCatName, setNewCatName] = useState("");
+  const [newCatType, setNewCatType] = useState<"income" | "expense">("expense");
+  const [showNewCatInput, setShowNewCatInput] = useState(false);
+  const [showNewBudgetCatInput, setShowNewBudgetCatInput] = useState(false);
+
   // Budget form state - enhanced
   const currentYear = getYear(new Date());
   const currentMonth = getMonth(new Date());
@@ -115,6 +121,25 @@ const EarningsExpensesPanel = ({ role }: Props) => {
       return data as any[];
     },
     enabled: !!user,
+  });
+
+  // Add new category mutation
+  const addCategoryMutation = useMutation({
+    mutationFn: async ({ name, type }: { name: string; type: "income" | "expense" }) => {
+      const { data, error } = await supabase.from("financial_categories").insert({
+        name, type, user_id: user!.id, is_system: false,
+      }).select().single();
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ["financial_categories"] });
+      toast.success(`Category "${data.name}" added!`);
+      setNewCatName("");
+      setShowNewCatInput(false);
+      setShowNewBudgetCatInput(false);
+    },
+    onError: () => toast.error("Failed to add category"),
   });
 
   // Fetch transactions
@@ -523,14 +548,27 @@ const EarningsExpensesPanel = ({ role }: Props) => {
                   </div>
                   <div>
                     <Label>Category</Label>
-                    <Select value={newTx.category_id} onValueChange={v => setNewTx(p => ({ ...p, category_id: v }))}>
+                    <Select value={newTx.category_id} onValueChange={v => {
+                      if (v === "__new__") { setShowNewCatInput(true); setNewCatType(newTx.type); return; }
+                      setNewTx(p => ({ ...p, category_id: v }));
+                    }}>
                       <SelectTrigger><SelectValue placeholder="Select category" /></SelectTrigger>
                       <SelectContent>
                         {activeCats.map(c => (
                           <SelectItem key={c.id} value={c.id}>{c.icon} {c.name}</SelectItem>
                         ))}
+                        <SelectItem value="__new__">➕ Add New Category</SelectItem>
                       </SelectContent>
                     </Select>
+                    {showNewCatInput && (
+                      <div className="flex gap-2 mt-2">
+                        <Input placeholder="Category name" value={newCatName} onChange={e => setNewCatName(e.target.value)} className="h-8 text-sm" />
+                        <Button size="sm" variant="outline" disabled={!newCatName.trim() || addCategoryMutation.isPending} onClick={() => addCategoryMutation.mutate({ name: newCatName.trim(), type: newTx.type })}>
+                          {addCategoryMutation.isPending ? "..." : "Add"}
+                        </Button>
+                        <Button size="sm" variant="ghost" onClick={() => { setShowNewCatInput(false); setNewCatName(""); }}>✕</Button>
+                      </div>
+                    )}
                   </div>
                   <div>
                     <Label>Description</Label>
@@ -870,6 +908,20 @@ const EarningsExpensesPanel = ({ role }: Props) => {
                         </div>
                       );
                     })}
+                    {/* Add new category inline */}
+                    {!showNewBudgetCatInput ? (
+                      <button onClick={() => { setShowNewBudgetCatInput(true); setNewCatName(""); setNewCatType("expense"); }} className="text-xs text-primary hover:underline flex items-center gap-1 py-1">
+                        <Plus className="w-3 h-3" /> Add new category
+                      </button>
+                    ) : (
+                      <div className="flex gap-2 items-center py-1">
+                        <Input placeholder="Category name" value={newCatName} onChange={e => setNewCatName(e.target.value)} className="h-7 text-xs flex-1" />
+                        <Button size="sm" variant="outline" className="h-7 text-xs px-2" disabled={!newCatName.trim() || addCategoryMutation.isPending} onClick={() => addCategoryMutation.mutate({ name: newCatName.trim(), type: "expense" })}>
+                          {addCategoryMutation.isPending ? "..." : "Add"}
+                        </Button>
+                        <Button size="sm" variant="ghost" className="h-7 px-1" onClick={() => { setShowNewBudgetCatInput(false); setNewCatName(""); }}>✕</Button>
+                      </div>
+                    )}
                   </div>
                   {/* Overall option */}
                   <div className="flex items-center gap-2 pt-1">
