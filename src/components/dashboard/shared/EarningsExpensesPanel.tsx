@@ -17,8 +17,10 @@ import { toast } from "sonner";
 import {
   Plus, TrendingUp, TrendingDown, Wallet, ArrowUpCircle, ArrowDownCircle,
   Calendar, Target, AlertTriangle, CheckCircle2, Trash2, Receipt, FileBarChart,
-  Clock, Archive, BarChart3, ChevronLeft, ChevronRight, Edit2
+  Clock, Archive, BarChart3, ChevronLeft, ChevronRight, Edit2, Download, FileText, FileSpreadsheet
 } from "lucide-react";
+import jsPDF from "jspdf";
+import { addBrandedHeader, addDocMeta, addSectionTitle, finalizePdf } from "@/lib/pdfBranding";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
 import {
   format, subDays, startOfWeek, startOfMonth, endOfMonth, startOfDay, endOfDay,
@@ -332,6 +334,76 @@ const EarningsExpensesPanel = ({ role }: Props) => {
     return msgs;
   }, [totalExpenses, totalIncome, netProfit, periodTxs, activeBudgets, viewPeriod]);
 
+  // ── Budget Export Functions ──
+  const exportBudgetsCSV = () => {
+    const allBudgets = [...activeBudgets, ...historyBudgets];
+    if (allBudgets.length === 0) { toast.error("No budgets to export"); return; }
+    const rows = [
+      ["Budget Name", "Period Type", "Period", "Category", "Budget (KES)", "Spent (KES)", "Remaining (KES)", "% Used", "Status", "Notes"],
+      ...allBudgets.map(b => [
+        b.name || b.financial_categories?.name || "Overall",
+        b.period_type,
+        b.periodLabel,
+        b.financial_categories?.name || "All Expenses",
+        String(Number(b.amount)),
+        String(b.spent),
+        String(Math.max(0, Number(b.amount) - b.spent)),
+        String(Math.round(b.pct)) + "%",
+        b.isExpired ? "Ended" : b.status === "archived" ? "Archived" : "Active",
+        b.notes || "",
+      ]),
+    ];
+    const csv = rows.map(r => r.map(c => `"${String(c).replace(/"/g, '""')}"`).join(",")).join("\n");
+    const blob = new Blob([csv], { type: "text/csv" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url; a.download = `budgets-${format(new Date(), "yyyy-MM-dd")}.csv`; a.click();
+    URL.revokeObjectURL(url);
+    toast.success("Budgets exported as CSV");
+  };
+
+  const exportBudgetsPDF = async () => {
+    const allBudgets = [...activeBudgets, ...historyBudgets];
+    if (allBudgets.length === 0) { toast.error("No budgets to export"); return; }
+    const doc = new jsPDF();
+    let y = await addBrandedHeader(doc, "Budget Report", format(new Date(), "MMMM yyyy"));
+    y = addDocMeta(doc, [
+      { label: "Generated", value: format(new Date(), "PPpp") },
+      { label: "Active Budgets", value: String(activeBudgets.length) },
+      { label: "Total Budgeted", value: `KES ${budgetSummary.totalBudgeted.toLocaleString()}` },
+      { label: "Total Spent", value: `KES ${budgetSummary.totalSpent.toLocaleString()}` },
+    ], y);
+    y += 4;
+
+    const renderSection = (title: string, list: typeof allBudgets) => {
+      if (list.length === 0) return;
+      y = addSectionTitle(doc, title, y);
+      doc.setFontSize(9);
+      list.forEach(b => {
+        if (y > 260) { doc.addPage(); y = 20; }
+        const name = b.name || b.financial_categories?.name || "Overall Budget";
+        doc.setFont("helvetica", "bold");
+        doc.text(name, 20, y); y += 5;
+        doc.setFont("helvetica", "normal");
+        doc.text(`Period: ${b.periodLabel}  |  Type: ${b.period_type}`, 20, y); y += 5;
+        doc.text(`Category: ${b.financial_categories?.name || "All Expenses"}`, 20, y); y += 5;
+        doc.text(`Budget: KES ${Number(b.amount).toLocaleString()}  |  Spent: KES ${b.spent.toLocaleString()}  |  ${Math.round(b.pct)}% used`, 20, y); y += 5;
+        const remaining = Math.max(0, Number(b.amount) - b.spent);
+        const over = b.pct > 100 ? `  |  Over by KES ${(b.spent - Number(b.amount)).toLocaleString()}` : "";
+        doc.text(`Remaining: KES ${remaining.toLocaleString()}${over}`, 20, y); y += 5;
+        if (b.notes) { doc.text(`Notes: ${b.notes}`, 20, y); y += 5; }
+        y += 4;
+      });
+    };
+
+    renderSection("Active Budgets", activeBudgets);
+    renderSection("Past / Archived Budgets", historyBudgets);
+
+    await finalizePdf(doc);
+    doc.save(`budgets-${format(new Date(), "yyyy-MM-dd")}.pdf`);
+    toast.success("Budgets exported as PDF");
+  };
+
   const incomeCategories = (categories || []).filter(c => c.type === "income");
   const expenseCategories = (categories || []).filter(c => c.type === "expense");
   const activeCats = newTx.type === "income" ? incomeCategories : expenseCategories;
@@ -628,7 +700,15 @@ const EarningsExpensesPanel = ({ role }: Props) => {
             </Card>
           </div>
 
-          {/* Create budget button */}
+          {/* Export & Create budget buttons */}
+          <div className="flex gap-2">
+            <Button variant="outline" size="sm" className="gap-1.5" onClick={() => exportBudgetsCSV()}>
+              <FileSpreadsheet className="w-3.5 h-3.5" /> CSV
+            </Button>
+            <Button variant="outline" size="sm" className="gap-1.5" onClick={() => exportBudgetsPDF()}>
+              <FileText className="w-3.5 h-3.5" /> PDF
+            </Button>
+          </div>
           <Dialog open={budgetDialogOpen} onOpenChange={setBudgetDialogOpen}>
             <DialogTrigger asChild>
               <Button className="w-full gap-2"><Plus className="w-4 h-4" /> Create New Budget</Button>
