@@ -1,12 +1,14 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { Loader2, CreditCard, CheckCircle, AlertCircle } from "lucide-react";
+import { Loader2, CreditCard, CheckCircle, AlertCircle, Smartphone, Phone } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { getAmount, BILLING_LABELS, BillingPeriod, ROLE_PRICING } from "@/lib/stripePlans";
 import { isPromoValidForRole } from "@/components/auth/PricingPlans";
+import { toast } from "sonner";
 
 const ROLE_FEATURES: Record<string, string[]> = {
   waste_picker: ["Collection logging", "Payment tracking", "Analytics"],
@@ -24,7 +26,10 @@ const Payment = () => {
   const { user, role } = useAuth();
   const [searchParams] = useSearchParams();
   const [loading, setLoading] = useState(false);
+  const [stkLoading, setStkLoading] = useState(false);
   const [checking, setChecking] = useState(true);
+  const [phoneNumber, setPhoneNumber] = useState("");
+  const [stkSent, setStkSent] = useState(false);
 
   const cancelled = searchParams.get("cancelled") === "true";
 
@@ -34,6 +39,13 @@ const Payment = () => {
   const promoValid = promoCode ? isPromoValidForRole(promoCode, roleStr as any) : false;
   const amount = getAmount(roleStr, billingPeriod);
   const features = ROLE_FEATURES[roleStr] || [];
+
+  useEffect(() => {
+    // Pre-fill phone from profile
+    if (user?.user_metadata?.phone_number) {
+      setPhoneNumber(user.user_metadata.phone_number);
+    }
+  }, [user]);
 
   useEffect(() => {
     if (!user) {
@@ -66,6 +78,33 @@ const Payment = () => {
     checkSub();
   }, [user, role, promoValid, navigate]);
 
+  const handleStkPush = async () => {
+    if (!amount || amount <= 0 || !phoneNumber) return;
+
+    setStkLoading(true);
+    setStkSent(false);
+    try {
+      const { data, error } = await supabase.functions.invoke("mpesa-stk-push", {
+        body: {
+          amount,
+          role: roleStr,
+          billingPeriod,
+          phoneNumber,
+        },
+      });
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+
+      setStkSent(true);
+      toast.success("STK Push sent! Check your phone to complete payment.");
+    } catch (e: any) {
+      console.error("STK Push error:", e);
+      toast.error(e.message || "Failed to send STK Push. Try again.");
+    } finally {
+      setStkLoading(false);
+    }
+  };
+
   const handleCheckout = async () => {
     if (!amount || amount <= 0) return;
 
@@ -85,6 +124,7 @@ const Payment = () => {
       }
     } catch (e: any) {
       console.error("Checkout error:", e);
+      toast.error("Checkout failed. Try again.");
     } finally {
       setLoading(false);
     }
@@ -105,7 +145,7 @@ const Payment = () => {
           <CreditCard className="w-12 h-12 mx-auto text-primary mb-2" />
           <CardTitle className="text-2xl font-display">Complete Your Subscription</CardTitle>
           <CardDescription>
-            Pay via M-Pesa or Card to activate your plan
+            Pay via M-Pesa STK Push or Card to activate your plan
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
@@ -116,6 +156,7 @@ const Payment = () => {
             </div>
           )}
 
+          {/* Plan summary */}
           <div className="p-4 rounded-xl border-2 border-primary bg-primary/5">
             <div className="flex justify-between items-center">
               <div>
@@ -150,14 +191,65 @@ const Payment = () => {
             </ul>
           </div>
 
+          {/* M-Pesa STK Push */}
+          <div className="space-y-3">
+            <div className="flex items-center gap-2 text-sm font-medium text-foreground">
+              <Smartphone className="w-4 h-4 text-emerald-600" />
+              Pay with M-Pesa (STK Push)
+            </div>
+            <div className="relative">
+              <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+              <Input
+                type="tel"
+                placeholder="Phone number (e.g. 0712345678)"
+                value={phoneNumber}
+                onChange={(e) => {
+                  setPhoneNumber(e.target.value);
+                  setStkSent(false);
+                }}
+                className="pl-10"
+              />
+            </div>
+
+            {stkSent && (
+              <div className="flex items-center gap-2 p-3 rounded-lg bg-emerald-50 text-emerald-700 text-sm dark:bg-emerald-950/30 dark:text-emerald-400">
+                <CheckCircle className="w-4 h-4 shrink-0" />
+                STK Push sent! Enter your M-Pesa PIN on your phone to complete.
+              </div>
+            )}
+
+            <Button
+              onClick={handleStkPush}
+              disabled={stkLoading || !amount || amount <= 0 || !phoneNumber.trim()}
+              className="w-full gap-2 bg-emerald-600 hover:bg-emerald-700 text-white"
+              size="lg"
+            >
+              {stkLoading ? (
+                <Loader2 className="w-4 h-4 animate-spin" />
+              ) : (
+                <Smartphone className="w-4 h-4" />
+              )}
+              {stkLoading ? "Sending STK Push..." : "Pay via M-Pesa"}
+            </Button>
+          </div>
+
+          {/* Divider */}
+          <div className="flex items-center gap-3">
+            <div className="h-px flex-1 bg-border" />
+            <span className="text-xs text-muted-foreground">OR</span>
+            <div className="h-px flex-1 bg-border" />
+          </div>
+
+          {/* Card / IntaSend checkout */}
           <Button
             onClick={handleCheckout}
             disabled={loading || !amount || amount <= 0}
+            variant="outline"
             className="w-full gap-2"
             size="lg"
           >
             {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <CreditCard className="w-4 h-4" />}
-            Pay with IntaSend
+            Pay with Card / Other
           </Button>
         </CardContent>
       </Card>
