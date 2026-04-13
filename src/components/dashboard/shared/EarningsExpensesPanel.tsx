@@ -69,16 +69,18 @@ const EarningsExpensesPanel = ({ role }: Props) => {
   const currentMonth = getMonth(new Date());
   const [newBudget, setNewBudget] = useState({
     name: "",
-    category_id: "",
     period_type: "monthly" as string,
     year: currentYear,
     month: currentMonth,
     week_start: format(startOfWeek(new Date(), { weekStartsOn: 1 }), "yyyy-MM-dd"),
     custom_start: format(new Date(), "yyyy-MM-dd"),
     custom_end: format(endOfMonth(new Date()), "yyyy-MM-dd"),
-    amount: "",
     notes: "",
   });
+  // Multi-category line items: { [categoryId]: amount string }
+  const [budgetLines, setBudgetLines] = useState<Record<string, string>>({});
+  const [includeOverall, setIncludeOverall] = useState(false);
+  const [overallAmount, setOverallAmount] = useState("");
 
   // Compute period_start and period_end from budget form
   const computeBudgetDates = (b: typeof newBudget) => {
@@ -168,31 +170,62 @@ const EarningsExpensesPanel = ({ role }: Props) => {
     onError: () => toast.error("Failed to save entry"),
   });
 
-  // Add budget - enhanced
+  // Add budget - supports multiple category line items
   const addBudgetMutation = useMutation({
     mutationFn: async () => {
       const dates = computeBudgetDates(newBudget);
-      const budgetName = newBudget.name || `${newBudget.period_type === "annual" ? newBudget.year : newBudget.period_type === "monthly" ? `${MONTH_NAMES[newBudget.month]} ${newBudget.year}` : newBudget.period_type} Budget`;
-      const { error } = await supabase.from("financial_budgets").insert({
-        user_id: user!.id,
-        category_id: newBudget.category_id || null,
-        period_type: newBudget.period_type,
-        amount: Number(newBudget.amount),
-        period_start: dates.start,
-        period_end: dates.end,
-        name: budgetName,
-        notes: newBudget.notes || null,
-        status: "active",
+      const baseName = newBudget.name || `${newBudget.period_type === "annual" ? newBudget.year : newBudget.period_type === "monthly" ? `${MONTH_NAMES[newBudget.month]} ${newBudget.year}` : newBudget.period_type} Budget`;
+
+      const rows: any[] = [];
+
+      // Add category-specific lines
+      Object.entries(budgetLines).forEach(([catId, amt]) => {
+        if (amt && Number(amt) > 0) {
+          const cat = expenseCategories.find(c => c.id === catId);
+          rows.push({
+            user_id: user!.id,
+            category_id: catId,
+            period_type: newBudget.period_type,
+            amount: Number(amt),
+            period_start: dates.start,
+            period_end: dates.end,
+            name: `${baseName} – ${cat?.name || "Category"}`,
+            notes: newBudget.notes || null,
+            status: "active",
+          });
+        }
       });
+
+      // Add overall line if selected
+      if (includeOverall && overallAmount && Number(overallAmount) > 0) {
+        rows.push({
+          user_id: user!.id,
+          category_id: null,
+          period_type: newBudget.period_type,
+          amount: Number(overallAmount),
+          period_start: dates.start,
+          period_end: dates.end,
+          name: baseName,
+          notes: newBudget.notes || null,
+          status: "active",
+        });
+      }
+
+      if (rows.length === 0) throw new Error("Add at least one budget line");
+
+      const { error } = await supabase.from("financial_budgets").insert(rows);
       if (error) throw error;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["financial_budgets"] });
-      toast.success("Budget created! 🎯");
+      toast.success(`Budget created! 🎯`);
       setBudgetDialogOpen(false);
-      setNewBudget({ name: "", category_id: "", period_type: "monthly", year: currentYear, month: currentMonth, week_start: format(startOfWeek(new Date(), { weekStartsOn: 1 }), "yyyy-MM-dd"), custom_start: format(new Date(), "yyyy-MM-dd"), custom_end: format(endOfMonth(new Date()), "yyyy-MM-dd"), amount: "", notes: "" });
+      setNewBudget({ name: "", period_type: "monthly", year: currentYear, month: currentMonth, week_start: format(startOfWeek(new Date(), { weekStartsOn: 1 }), "yyyy-MM-dd"), custom_start: format(new Date(), "yyyy-MM-dd"), custom_end: format(endOfMonth(new Date()), "yyyy-MM-dd"), notes: "" });
+      setBudgetLines({});
+      setIncludeOverall(false);
+      setOverallAmount("");
     },
-    onError: () => toast.error("Failed to save budget"),
+    onError: (e: any) => toast.error(e?.message || "Failed to save budget"),
   });
 
   // Archive budget
@@ -803,21 +836,70 @@ const EarningsExpensesPanel = ({ role }: Props) => {
                   </div>
                 )}
 
-                <div>
-                  <Label>Budget Amount (KES) *</Label>
-                  <Input type="number" placeholder="e.g. 50,000" value={newBudget.amount} onChange={e => setNewBudget(p => ({ ...p, amount: e.target.value }))} className="text-lg" />
-                </div>
-
-                <div>
-                  <Label>Category (optional – leave blank for overall expenses)</Label>
-                  <Select value={newBudget.category_id} onValueChange={v => setNewBudget(p => ({ ...p, category_id: v }))}>
-                    <SelectTrigger><SelectValue placeholder="All expenses" /></SelectTrigger>
-                    <SelectContent>
-                      {expenseCategories.map(c => (
-                        <SelectItem key={c.id} value={c.id}>{c.icon} {c.name}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                {/* Multi-category budget lines */}
+                <div className="space-y-2">
+                  <Label>Budget Categories & Amounts *</Label>
+                  <p className="text-[10px] text-muted-foreground">Select categories and set individual amounts for each</p>
+                  <div className="space-y-2 max-h-48 overflow-y-auto border rounded-md p-2">
+                    {expenseCategories.map(c => {
+                      const isSelected = budgetLines[c.id] !== undefined;
+                      return (
+                        <div key={c.id} className="flex items-center gap-2">
+                          <input
+                            type="checkbox"
+                            checked={isSelected}
+                            onChange={e => {
+                              setBudgetLines(prev => {
+                                const next = { ...prev };
+                                if (e.target.checked) { next[c.id] = ""; } else { delete next[c.id]; }
+                                return next;
+                              });
+                            }}
+                            className="rounded border-border"
+                          />
+                          <span className="text-sm flex-1 truncate">{c.icon} {c.name}</span>
+                          {isSelected && (
+                            <Input
+                              type="number"
+                              placeholder="KES"
+                              value={budgetLines[c.id]}
+                              onChange={e => setBudgetLines(prev => ({ ...prev, [c.id]: e.target.value }))}
+                              className="w-28 h-8 text-sm"
+                            />
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                  {/* Overall option */}
+                  <div className="flex items-center gap-2 pt-1">
+                    <input
+                      type="checkbox"
+                      checked={includeOverall}
+                      onChange={e => setIncludeOverall(e.target.checked)}
+                      className="rounded border-border"
+                    />
+                    <span className="text-sm flex-1">📊 Overall Budget (all expenses)</span>
+                    {includeOverall && (
+                      <Input
+                        type="number"
+                        placeholder="KES"
+                        value={overallAmount}
+                        onChange={e => setOverallAmount(e.target.value)}
+                        className="w-28 h-8 text-sm"
+                      />
+                    )}
+                  </div>
+                  {/* Total summary */}
+                  {(Object.values(budgetLines).some(v => v) || (includeOverall && overallAmount)) && (
+                    <div className="text-xs text-muted-foreground pt-1 border-t">
+                      Total: KES {(
+                        Object.values(budgetLines).reduce((s, v) => s + (Number(v) || 0), 0) +
+                        (includeOverall ? Number(overallAmount) || 0 : 0)
+                      ).toLocaleString()}
+                      {" · "}{Object.values(budgetLines).filter(v => v && Number(v) > 0).length + (includeOverall && Number(overallAmount) > 0 ? 1 : 0)} line(s)
+                    </div>
+                  )}
                 </div>
 
                 <div>
@@ -825,7 +907,9 @@ const EarningsExpensesPanel = ({ role }: Props) => {
                   <Textarea placeholder="Budget notes, goals, or context..." value={newBudget.notes} onChange={e => setNewBudget(p => ({ ...p, notes: e.target.value }))} rows={2} />
                 </div>
 
-                <Button className="w-full" onClick={() => addBudgetMutation.mutate()} disabled={!newBudget.amount || addBudgetMutation.isPending}>
+                <Button className="w-full" onClick={() => addBudgetMutation.mutate()} disabled={
+                  (!Object.values(budgetLines).some(v => v && Number(v) > 0) && !(includeOverall && Number(overallAmount) > 0)) || addBudgetMutation.isPending
+                }>
                   {addBudgetMutation.isPending ? "Creating..." : "Create Budget 🎯"}
                 </Button>
               </div>
