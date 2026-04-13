@@ -1034,16 +1034,16 @@ const EarningsExpensesPanel = ({ role }: Props) => {
           {/* Active / History tabs */}
           <div className="flex gap-1 bg-muted rounded-lg p-1">
             <button onClick={() => setBudgetViewTab("active")} className={`flex-1 px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${budgetViewTab === "active" ? "bg-card text-foreground shadow-sm" : "text-muted-foreground"}`}>
-              ✅ Active ({activeBudgets.length})
+              ✅ Active ({activeGroups.length})
             </button>
             <button onClick={() => setBudgetViewTab("history")} className={`flex-1 px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${budgetViewTab === "history" ? "bg-card text-foreground shadow-sm" : "text-muted-foreground"}`}>
-              📜 History ({historyBudgets.length})
+              📜 History ({historyGroups.length})
             </button>
           </div>
 
           {budgetViewTab === "active" && (
             <div className="space-y-3">
-              {activeBudgets.length === 0 ? (
+              {activeGroups.length === 0 ? (
                 <Card className="shadow-soft">
                   <CardContent className="p-6 text-center">
                     <Target className="w-10 h-10 text-muted-foreground mx-auto mb-2" />
@@ -1051,14 +1051,14 @@ const EarningsExpensesPanel = ({ role }: Props) => {
                   </CardContent>
                 </Card>
               ) : (
-                activeBudgets.map(bp => renderBudgetCard(bp))
+                activeGroups.map(g => renderBudgetGroup(g))
               )}
             </div>
           )}
 
           {budgetViewTab === "history" && (
             <div className="space-y-3">
-              {historyBudgets.length === 0 ? (
+              {historyGroups.length === 0 ? (
                 <Card className="shadow-soft">
                   <CardContent className="p-6 text-center">
                     <Clock className="w-10 h-10 text-muted-foreground mx-auto mb-2" />
@@ -1066,7 +1066,7 @@ const EarningsExpensesPanel = ({ role }: Props) => {
                   </CardContent>
                 </Card>
               ) : (
-                historyBudgets.map(bp => renderBudgetCard(bp, true))
+                historyGroups.map(g => renderBudgetGroup(g, true))
               )}
             </div>
           )}
