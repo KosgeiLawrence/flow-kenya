@@ -602,12 +602,12 @@ const EarningsExpensesPanel = ({ role }: Props) => {
           <div className="flex flex-wrap gap-2">
             <Dialog open={addDialogOpen} onOpenChange={setAddDialogOpen}>
               <DialogTrigger asChild>
-                <Button className="gap-2" onClick={() => setNewTx(p => ({ ...p, type: "income" }))}>
+                <Button className="gap-2" onClick={() => { setNewTx(p => ({ ...p, type: "income" })); setTxLines({}); }}>
                   <ArrowUpCircle className="w-4 h-4" /> {config.simple ? "Add Earning" : "Add Income"}
                 </Button>
               </DialogTrigger>
               <DialogTrigger asChild>
-                <Button variant="outline" className="gap-2" onClick={() => setNewTx(p => ({ ...p, type: "expense" }))}>
+                <Button variant="outline" className="gap-2" onClick={() => { setNewTx(p => ({ ...p, type: "expense" })); setTxLines({}); }}>
                   <ArrowDownCircle className="w-4 h-4" /> Add Expense
                 </Button>
               </DialogTrigger>
