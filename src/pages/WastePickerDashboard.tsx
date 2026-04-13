@@ -26,7 +26,8 @@ import MarketplacePanel from "@/components/dashboard/aggregator/MarketplacePanel
 import ESGPanel from "@/components/dashboard/aggregator/ESGPanel";
 import CompliancePanel from "@/components/dashboard/aggregator/CompliancePanel";
 import TrashPanel from "@/components/dashboard/shared/TrashPanel";
-import { Trash2 } from "lucide-react";
+import TeamPanel from "@/components/dashboard/shared/TeamPanel";
+import { Trash2, Users as UsersIcon } from "lucide-react";
 
 const navItems = [
   { id: "how-it-works", label: "How It Works", icon: BookOpen },
@@ -44,6 +45,7 @@ const navItems = [
   { id: "analytics", label: "Analytics", icon: BarChart3 },
   { id: "qr-id", label: "QR ID", icon: QrCode },
   { id: "grants", label: "Grants & Programs", icon: Briefcase },
+  { id: "team", label: "My Team", icon: UsersIcon },
   { id: "trash", label: "Trash", icon: Trash2 },
   { id: "settings", label: "Profile Settings", icon: Settings },
 ];
@@ -85,6 +87,7 @@ const WastePickerDashboard = () => {
       case "analytics": return <AnalyticsPanel />;
       case "qr-id": return <QRIDPanel />;
       case "grants": return <GrantsDiscoveryPanel userRole="waste_picker" />;
+      case "team": return <TeamPanel role="waste_picker" navItems={navItems} />;
       case "trash": return <TrashPanel />;
       case "settings": return <ProfileSettingsPanel role="waste_picker" />;
       default: return <CollectionPanel />;

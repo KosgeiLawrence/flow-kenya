@@ -1684,6 +1684,97 @@ export type Database = {
         }
         Relationships: []
       }
+      team_invitations: {
+        Row: {
+          created_at: string
+          email: string
+          expires_at: string
+          feature_permissions: Json
+          id: string
+          invite_token: string
+          invited_by: string
+          organization_id: string | null
+          role: Database["public"]["Enums"]["app_role"]
+          status: string
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          expires_at?: string
+          feature_permissions?: Json
+          id?: string
+          invite_token?: string
+          invited_by: string
+          organization_id?: string | null
+          role: Database["public"]["Enums"]["app_role"]
+          status?: string
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          expires_at?: string
+          feature_permissions?: Json
+          id?: string
+          invite_token?: string
+          invited_by?: string
+          organization_id?: string | null
+          role?: Database["public"]["Enums"]["app_role"]
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "team_invitations_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      team_members: {
+        Row: {
+          created_at: string
+          feature_permissions: Json
+          id: string
+          invited_by: string
+          is_active: boolean
+          organization_id: string | null
+          role: Database["public"]["Enums"]["app_role"]
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          feature_permissions?: Json
+          id?: string
+          invited_by: string
+          is_active?: boolean
+          organization_id?: string | null
+          role: Database["public"]["Enums"]["app_role"]
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          feature_permissions?: Json
+          id?: string
+          invited_by?: string
+          is_active?: boolean
+          organization_id?: string | null
+          role?: Database["public"]["Enums"]["app_role"]
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "team_members_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       training_resources: {
         Row: {
           category: string

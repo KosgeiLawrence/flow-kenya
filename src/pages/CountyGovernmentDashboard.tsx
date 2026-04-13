@@ -11,6 +11,8 @@ import CountyAnalyticsPanel from "@/components/dashboard/county/CountyAnalyticsP
 import ProfileSettingsPanel from "@/components/dashboard/shared/ProfileSettingsPanel";
 import TrainingManagementPanel from "@/components/dashboard/shared/TrainingManagementPanel";
 import TrashPanel from "@/components/dashboard/shared/TrashPanel";
+import TeamPanel from "@/components/dashboard/shared/TeamPanel";
+import { Users as UsersIcon } from "lucide-react";
 
 const navItems = [
   { id: "waste-flow", label: "Waste Flow Dashboard", icon: MapPin },
@@ -18,6 +20,7 @@ const navItems = [
   { id: "reports", label: "Monthly Reports", icon: FileText },
   { id: "regulatory", label: "Regulatory Reporting", icon: Scale },
   { id: "training-mgmt", label: "Training Management", icon: BookOpen },
+  { id: "team", label: "My Team", icon: UsersIcon },
   { id: "trash", label: "Trash", icon: Trash2 },
   { id: "settings", label: "Profile Settings", icon: Settings },
 ];
@@ -40,6 +43,7 @@ const CountyGovernmentDashboard = () => {
       case "reports": return <CountyReportsPanel />;
       case "regulatory": return <RegulatoryPanel />;
       case "training-mgmt": return <TrainingManagementPanel />;
+      case "team": return <TeamPanel role="county_government" navItems={navItems} />;
       case "trash": return <TrashPanel />;
       case "settings": return <ProfileSettingsPanel role="county_government" />;
       default: return <WasteFlowPanel />;

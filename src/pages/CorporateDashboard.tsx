@@ -20,6 +20,8 @@ import ProfileSettingsPanel from "@/components/dashboard/shared/ProfileSettingsP
 import TrainingManagementPanel from "@/components/dashboard/shared/TrainingManagementPanel";
 import CleanupExercisePanel from "@/components/dashboard/shared/CleanupExercisePanel";
 import TrashPanel from "@/components/dashboard/shared/TrashPanel";
+import TeamPanel from "@/components/dashboard/shared/TeamPanel";
+import { Users as UsersIcon } from "lucide-react";
 
 const navItems = [
   { id: "footprint", label: "Plastic Footprint", icon: Package },
@@ -31,6 +33,7 @@ const navItems = [
   { id: "esg", label: "ESG & Carbon", icon: Leaf },
   { id: "settings", label: "Settings", icon: Settings },
   { id: "cleanup", label: "Cleanup Exercise", icon: Package },
+  { id: "team", label: "My Team", icon: UsersIcon },
   { id: "trash", label: "Trash", icon: Trash2 },
   { id: "training-mgmt", label: "Training Management", icon: BookOpen },
   { id: "profile-settings", label: "Profile Settings", icon: User },
@@ -67,6 +70,7 @@ const CorporateDashboard = () => {
       case "esg": return <ESGAnalyticsPanel />;
       case "settings": return <CorporateSettingsPanel />;
       case "cleanup": return <CleanupExercisePanel />;
+      case "team": return <TeamPanel role="corporate" navItems={navItems} />;
       case "training-mgmt": return <TrainingManagementPanel />;
       case "trash": return <TrashPanel />;
       case "profile-settings": return <ProfileSettingsPanel role="corporate" />;

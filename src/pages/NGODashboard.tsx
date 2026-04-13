@@ -15,6 +15,8 @@ import ProfileSettingsPanel from "@/components/dashboard/shared/ProfileSettingsP
 import TrainingManagementPanel from "@/components/dashboard/shared/TrainingManagementPanel";
 import CleanupExercisePanel from "@/components/dashboard/shared/CleanupExercisePanel";
 import TrashPanel from "@/components/dashboard/shared/TrashPanel";
+import TeamPanel from "@/components/dashboard/shared/TeamPanel";
+import { Users as UsersIcon } from "lucide-react";
 
 const navItems = [
   { id: "sponsorship", label: "Community & Pickers", icon: Heart },
@@ -23,6 +25,7 @@ const navItems = [
   { id: "reports", label: "Reports", icon: FileText },
   { id: "cleanup", label: "Cleanup Exercise", icon: Package },
   { id: "training-mgmt", label: "Training Management", icon: BookOpen },
+  { id: "team", label: "My Team", icon: UsersIcon },
   { id: "trash", label: "Trash", icon: Trash2 },
   { id: "settings", label: "Profile Settings", icon: Settings },
 ];
@@ -55,6 +58,7 @@ const NGODashboard = () => {
       case "reports": return <ReportsPanel />;
       case "cleanup": return <CleanupExercisePanel />;
       case "training-mgmt": return <TrainingManagementPanel />;
+      case "team": return <TeamPanel role="ngo" navItems={navItems} />;
       case "trash": return <TrashPanel />;
       case "settings": return <ProfileSettingsPanel role="ngo" />;
       default: return <SponsorshipPanel />;
