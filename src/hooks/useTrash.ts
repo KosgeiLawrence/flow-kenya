@@ -74,9 +74,34 @@ export const useTrash = () => {
     table: string,
     id: string,
     itemData: Record<string, any>,
-    label: string
+    label: string,
+    skipConfirm = false
   ): Promise<boolean> => {
     if (!user) return false;
+
+    // Show confirmation dialog
+    if (!skipConfirm) {
+      const tableLabel = getTableLabel(table).toLowerCase();
+      const confirmed = await new Promise<boolean>((resolve) => {
+        toast(
+          `Delete "${label}"?`,
+          {
+            description: `This ${tableLabel} will be moved to trash for 30 days.`,
+            action: {
+              label: "Delete",
+              onClick: () => resolve(true),
+            },
+            cancel: {
+              label: "Cancel",
+              onClick: () => resolve(false),
+            },
+            duration: Infinity,
+            onDismiss: () => resolve(false),
+          }
+        );
+      });
+      if (!confirmed) return false;
+    }
 
     // Insert into trash
     const { error: trashError } = await supabase.from("trash_items").insert({
