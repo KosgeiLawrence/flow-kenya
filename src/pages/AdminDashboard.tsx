@@ -18,6 +18,8 @@ import InviteUsersPanel from "@/components/dashboard/admin/InviteUsersPanel";
 import ViewUserDashboardPanel from "@/components/dashboard/admin/ViewUserDashboardPanel";
 import UserVisibilityPanel from "@/components/dashboard/admin/UserVisibilityPanel";
 import TrashPanel from "@/components/dashboard/shared/TrashPanel";
+import TeamPanel from "@/components/dashboard/shared/TeamPanel";
+import { Users as UsersIcon } from "lucide-react";
 import FormBuilderPanel from "@/components/dashboard/admin/FormBuilderPanel";
 import ContactMessagesPanel from "@/components/dashboard/admin/ContactMessagesPanel";
 
@@ -36,6 +38,7 @@ const navItems = [
   { id: "training-mgmt", label: "Training Management", icon: BookOpen },
   { id: "forms", label: "Form Builder", icon: ClipboardList },
   { id: "messages", label: "Contact Messages", icon: MessageSquare },
+  { id: "team", label: "My Team", icon: UsersIcon },
   { id: "trash", label: "Trash", icon: Trash2 },
   { id: "profile-settings", label: "Profile Settings", icon: User },
 ];
@@ -67,6 +70,7 @@ const AdminDashboard = () => {
       case "training-mgmt": return <TrainingManagementPanel />;
       case "forms": return <FormBuilderPanel />;
       case "messages": return <ContactMessagesPanel />;
+      case "team": return <TeamPanel role="admin" navItems={navItems} />;
       case "trash": return <TrashPanel />;
       case "profile-settings": return <ProfileSettingsPanel role="admin" />;
       default: return <UserVerificationPanel />;

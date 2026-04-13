@@ -70,6 +70,7 @@ const CorporateDashboard = () => {
       case "esg": return <ESGAnalyticsPanel />;
       case "settings": return <CorporateSettingsPanel />;
       case "cleanup": return <CleanupExercisePanel />;
+      case "team": return <TeamPanel role="corporate" navItems={navItems} />;
       case "training-mgmt": return <TrainingManagementPanel />;
       case "trash": return <TrashPanel />;
       case "profile-settings": return <ProfileSettingsPanel role="corporate" />;
