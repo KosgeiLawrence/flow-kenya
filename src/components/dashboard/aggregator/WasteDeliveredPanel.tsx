@@ -11,6 +11,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { FileText, Plus, Truck, CheckCircle2, Clock, Package, Download } from "lucide-react";
+import MaterialIcon from "@/components/dashboard/shared/MaterialIcon";
 import { toast } from "sonner";
 import { format } from "date-fns";
 import jsPDF from "jspdf";
@@ -435,7 +436,7 @@ const WasteDeliveredPanel = () => {
               <SelectTrigger><SelectValue placeholder="Select material type *" /></SelectTrigger>
               <SelectContent>
                 {materialTypes?.map(mt => (
-                  <SelectItem key={mt.id} value={mt.name}>{mt.icon || "♻️"} {mt.name}</SelectItem>
+                  <SelectItem key={mt.id} value={mt.name}><span className="inline-flex items-center gap-1.5"><MaterialIcon iconName={mt.icon} className="w-4 h-4" /> {mt.name}</span></SelectItem>
                 ))}
               </SelectContent>
             </Select>

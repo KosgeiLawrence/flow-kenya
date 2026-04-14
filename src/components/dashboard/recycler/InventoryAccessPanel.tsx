@@ -10,6 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Package, Layers, TrendingUp, Users, Plus, ClipboardList } from "lucide-react";
+import MaterialIcon from "@/components/dashboard/shared/MaterialIcon";
 import { toast } from "sonner";
 import { format } from "date-fns";
 import OrdersPanel from "./OrdersPanel";
@@ -201,7 +202,7 @@ const InventoryAccessPanel = () => {
                 <SelectTrigger><SelectValue placeholder={t("inventoryPanel.selectMaterial", "Select material type")} /></SelectTrigger>
                 <SelectContent>
                   {materialTypes?.map((mt) => (
-                    <SelectItem key={mt.id} value={mt.id}>{mt.icon || "♻️"} {mt.name} (KES {mt.price_per_unit}/{mt.unit})</SelectItem>
+                    <SelectItem key={mt.id} value={mt.id}><span className="inline-flex items-center gap-1.5"><MaterialIcon iconName={mt.icon} className="w-4 h-4" /> {mt.name} (KES {mt.price_per_unit}/{mt.unit})</span></SelectItem>
                   ))}
                 </SelectContent>
               </Select>
@@ -224,7 +225,7 @@ const InventoryAccessPanel = () => {
                 {Array.from(materialMap.values()).map((m, i) => (
                   <div key={i} className="flex items-center justify-between py-3">
                     <div className="flex items-center gap-3">
-                      <span className="text-lg">{m.icon}</span>
+                      <MaterialIcon iconName={m.icon} className="w-5 h-5 text-primary" />
                       <div>
                         <p className="text-sm font-medium text-foreground">{m.name}</p>
                         <p className="text-xs text-muted-foreground">{m.qty.toFixed(1)} {m.unit} available</p>
