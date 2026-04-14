@@ -198,6 +198,41 @@ const ProfileSettingsPanel = ({ role }: ProfileSettingsPanelProps) => {
     }
   };
 
+  const handleOrgLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !fullProfile?.organization_id) return;
+    const allowedTypes = ["image/png", "image/jpeg", "image/webp", "image/svg+xml"];
+    if (!allowedTypes.includes(file.type)) { toast.error("Only PNG, JPG, WebP, or SVG files"); return; }
+    if (file.size > 2 * 1024 * 1024) { toast.error("File must be under 2 MB"); return; }
+    setUploadingLogo(true);
+    try {
+      const ext = file.name.split(".").pop()?.toLowerCase();
+      const path = `${fullProfile.organization_id}/logo.${ext}`;
+      const { error: upErr } = await supabase.storage.from("org-logos").upload(path, file, { upsert: true, contentType: file.type });
+      if (upErr) throw upErr;
+      const { data: urlData } = supabase.storage.from("org-logos").getPublicUrl(path);
+      const logoUrl = `${urlData.publicUrl}?t=${Date.now()}`;
+      const { error: updErr } = await supabase.from("organizations").update({ logo_url: logoUrl }).eq("id", fullProfile.organization_id);
+      if (updErr) throw updErr;
+      queryClient.invalidateQueries({ queryKey: ["organization"] });
+      queryClient.invalidateQueries({ queryKey: ["corp_settings_org"] });
+      queryClient.invalidateQueries({ queryKey: ["org_info"] });
+      await refreshProfile();
+      toast.success("Organization logo updated");
+    } catch (err: any) { toast.error(err.message); }
+    finally { setUploadingLogo(false); if (logoInputRef.current) logoInputRef.current.value = ""; }
+  };
+
+  const handleRemoveOrgLogo = async () => {
+    if (!fullProfile?.organization_id) return;
+    const { error } = await supabase.from("organizations").update({ logo_url: null }).eq("id", fullProfile.organization_id);
+    if (error) { toast.error("Failed to remove logo"); return; }
+    queryClient.invalidateQueries({ queryKey: ["organization"] });
+    queryClient.invalidateQueries({ queryKey: ["org_info"] });
+    await refreshProfile();
+    toast.success("Logo removed");
+  };
+
   const handleSaveSection = (sectionFields: string[]) => {
     const data: Record<string, any> = {};
     sectionFields.forEach(f => {
