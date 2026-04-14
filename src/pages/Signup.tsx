@@ -13,6 +13,7 @@ import { useToast } from "@/hooks/use-toast";
 import RoleSelector from "@/components/auth/RoleSelector";
 import PricingPlans, { isPromoValidForRole } from "@/components/auth/PricingPlans";
 import { useTranslation } from "react-i18next";
+import authHeroSignup from "@/assets/auth-hero-signup.png";
 
 type AppRole = "waste_picker" | "aggregator" | "recycler" | "ngo" | "corporate" | "county_government";
 
@@ -122,6 +123,13 @@ const Signup = () => {
               </div>
             ))}
           </div>
+          <img
+            src={authHeroSignup}
+            alt="Platform collaboration illustration"
+            className="mt-8 w-full max-w-xs mx-auto drop-shadow-2xl"
+            width={800}
+            height={800}
+          />
         </motion.div>
       </div>
 

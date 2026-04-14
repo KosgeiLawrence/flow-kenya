@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { useTranslation } from "react-i18next";
+import authHeroLogin from "@/assets/auth-hero-login.png";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -65,6 +66,13 @@ const Login = () => {
         >
           <h1 className="text-4xl font-display font-bold mb-4">{t("auth.signInTitle")}</h1>
           <p className="text-lg opacity-80 font-body">{t("auth.heroSubtitle")}</p>
+          <img
+            src={authHeroLogin}
+            alt="Circular economy illustration"
+            className="mt-8 w-full max-w-xs mx-auto drop-shadow-2xl"
+            width={800}
+            height={800}
+          />
         </motion.div>
       </div>
 
