@@ -118,6 +118,7 @@ interface Props {
 }
 
 const CleanupExercisePanel = ({ isAdmin = false }: Props) => {
+  const { t } = useTranslation();
   const { user, profile } = useAuth();
   const queryClient = useQueryClient();
   const [showForm, setShowForm] = useState(false);
