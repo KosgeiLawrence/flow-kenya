@@ -15,6 +15,7 @@ import { toast } from "sonner";
 import { useTranslation } from "react-i18next";
 
 const LogisticsPanel = () => {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const queryClient = useQueryClient();
   const [open, setOpen] = useState(false);

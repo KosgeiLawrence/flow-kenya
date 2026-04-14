@@ -54,6 +54,7 @@ const FIELD_TYPES: { value: FieldType; label: string }[] = [
 ];
 
 const FormBuilderPanel = () => {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const queryClient = useQueryClient();
   const [view, setView] = useState<ViewMode>("list");

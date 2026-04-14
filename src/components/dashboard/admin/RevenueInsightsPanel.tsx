@@ -25,6 +25,7 @@ const ROLE_LABELS: Record<string, string> = {
 type ViewPeriod = "today" | "week" | "month" | "year" | "all";
 
 const RevenueInsightsPanel = () => {
+  const { t } = useTranslation();
   const [viewPeriod, setViewPeriod] = useState<ViewPeriod>("month");
 
   // Fetch payments

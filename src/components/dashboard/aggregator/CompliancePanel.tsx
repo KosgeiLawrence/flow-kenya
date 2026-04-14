@@ -19,6 +19,7 @@ const AGGREGATOR_DOC_TYPES = [
 ];
 
 const CompliancePanel = () => {
+  const { t } = useTranslation();
   const { user, profile } = useAuth();
 
   const { data: collections } = useQuery({

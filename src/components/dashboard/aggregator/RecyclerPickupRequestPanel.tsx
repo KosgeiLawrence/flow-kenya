@@ -12,6 +12,7 @@ import { format } from "date-fns";
 import { useTranslation } from "react-i18next";
 
 const RecyclerPickupRequestPanel = () => {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const queryClient = useQueryClient();
   const [showRequestForm, setShowRequestForm] = useState(false);

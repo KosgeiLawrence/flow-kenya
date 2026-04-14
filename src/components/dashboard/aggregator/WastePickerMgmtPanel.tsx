@@ -11,6 +11,7 @@ import { toast } from "sonner";
 import { useTranslation } from "react-i18next";
 
 const WastePickerMgmtPanel = () => {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const queryClient = useQueryClient();
   const [search, setSearch] = useState("");

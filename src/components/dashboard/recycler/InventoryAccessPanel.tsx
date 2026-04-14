@@ -26,6 +26,7 @@ interface InventoryItem {
 }
 
 const InventoryAccessPanel = () => {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const queryClient = useQueryClient();
   const [open, setOpen] = useState(false);

@@ -8,6 +8,7 @@ import { format, subDays, subWeeks } from "date-fns";
 import { useTranslation } from "react-i18next";
 
 const SupplyForecastPanel = () => {
+  const { t } = useTranslation();
   const { user } = useAuth();
 
   const { data: collections } = useQuery({

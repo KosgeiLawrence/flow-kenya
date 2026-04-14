@@ -15,6 +15,7 @@ import { addBrandedHeader, addDocMeta, addSectionTitle, drawTableHeader, drawTab
 import { useTranslation } from "react-i18next";
 
 const TransactionTrackingPanel = () => {
+  const { t } = useTranslation();
   const [statusFilter, setStatusFilter] = useState("all");
 
   const { data: payments, isLoading } = useQuery({

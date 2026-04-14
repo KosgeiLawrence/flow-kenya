@@ -11,6 +11,7 @@ import { toast } from "sonner";
 import { useTranslation } from "react-i18next";
 
 const UserVerificationPanel = () => {
+  const { t } = useTranslation();
   const queryClient = useQueryClient();
   const [statusFilter, setStatusFilter] = useState<string>("all");
 

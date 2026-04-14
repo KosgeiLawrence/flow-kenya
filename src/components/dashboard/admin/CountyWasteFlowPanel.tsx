@@ -14,6 +14,7 @@ import { useTranslation } from "react-i18next";
 const COLORS = ["hsl(152,45%,22%)", "hsl(40,55%,55%)", "hsl(195,60%,50%)", "hsl(25,30%,35%)", "hsl(0,84%,60%)", "hsl(280,50%,50%)"];
 
 const CountyWasteFlowPanel = () => {
+  const { t } = useTranslation();
   const { data: collections } = useQuery({ queryKey: ["admin-county-waste-flow"], queryFn: async () => { const { data, error } = await supabase.from("collections").select("*, material_types(name)").order("collected_at", { ascending: false }); if (error) throw error; return data; } });
   const { data: payments } = useQuery({ queryKey: ["admin-county-payments"], queryFn: async () => { const { data, error } = await supabase.from("payments").select("*"); if (error) throw error; return data; } });
 

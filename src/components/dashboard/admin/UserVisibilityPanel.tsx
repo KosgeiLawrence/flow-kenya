@@ -12,6 +12,7 @@ import { toast } from "sonner";
 import { useTranslation } from "react-i18next";
 
 const UserVisibilityPanel = () => {
+  const { t } = useTranslation();
   const queryClient = useQueryClient();
   const [roleFilter, setRoleFilter] = useState<string>("all");
   const [search, setSearch] = useState("");

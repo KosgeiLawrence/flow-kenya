@@ -10,6 +10,7 @@ import { addCleanHeader, addDocMeta, drawTableHeader, drawTableRow, finalizeClea
 import { useTranslation } from "react-i18next";
 
 const ReceiptConfirmPanel = () => {
+  const { t } = useTranslation();
   const { user, profile } = useAuth();
 
   const { data: collections } = useQuery({

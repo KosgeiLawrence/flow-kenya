@@ -18,6 +18,7 @@ const COUNTIES = [
 ];
 
 const RecoveryCommitmentPanel = () => {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const qc = useQueryClient();
   const [showForm, setShowForm] = useState(false);

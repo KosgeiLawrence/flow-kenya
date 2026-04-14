@@ -8,6 +8,7 @@ import { format, subMonths } from "date-fns";
 import { useTranslation } from "react-i18next";
 
 const CarbonTrackerPanel = () => {
+  const { t } = useTranslation();
   const { data: collections } = useQuery({
     queryKey: ["corp_carbon_collections"],
     queryFn: async () => {

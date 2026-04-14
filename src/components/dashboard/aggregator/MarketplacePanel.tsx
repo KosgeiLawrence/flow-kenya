@@ -14,6 +14,7 @@ import MaterialIcon from "@/components/dashboard/shared/MaterialIcon";
 import { useTranslation } from "react-i18next";
 
 const MarketplacePanel = () => {
+  const { t } = useTranslation();
   const { user, profile } = useAuth();
   const [selectedRecycler, setSelectedRecycler] = useState<any>(null);
   const [search, setSearch] = useState("");

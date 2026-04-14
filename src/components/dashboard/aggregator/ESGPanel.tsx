@@ -140,6 +140,7 @@ const addReportFooter = async (doc: jsPDF, orgName: string) => {
 };
 
 const AggregatorESGPanel = () => {
+  const { t } = useTranslation();
   const { user, profile } = useAuth();
   const { orgInfo } = useOrgInfo();
   const [period, setPeriod] = useState<PeriodOption>("all");

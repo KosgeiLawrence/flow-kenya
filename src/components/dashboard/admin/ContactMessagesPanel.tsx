@@ -23,6 +23,7 @@ interface ContactMessage {
 }
 
 const ContactMessagesPanel = () => {
+  const { t } = useTranslation();
   const queryClient = useQueryClient();
   const [selected, setSelected] = useState<ContactMessage | null>(null);
 

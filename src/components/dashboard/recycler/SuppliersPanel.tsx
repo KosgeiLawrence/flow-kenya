@@ -39,6 +39,7 @@ const emptyForm: SupplierForm = {
 };
 
 const SuppliersPanel = () => {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const queryClient = useQueryClient();
   const [dialogOpen, setDialogOpen] = useState(false);

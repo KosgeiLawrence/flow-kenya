@@ -49,6 +49,7 @@ const statusBadge: Record<string, { label: string; variant: "default" | "seconda
 };
 
 const WasteDeliveredPanel = () => {
+  const { t } = useTranslation();
   const { user, profile } = useAuth();
   const { orgInfo } = useOrgInfo();
   const queryClient = useQueryClient();

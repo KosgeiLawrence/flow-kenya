@@ -14,6 +14,7 @@ import { addBrandedHeader, addDocMeta, drawTableHeader, drawTableRow, finalizePd
 import { useTranslation } from "react-i18next";
 
 const AuditLogsPanel = () => {
+  const { t } = useTranslation();
   const [typeFilter, setTypeFilter] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
 

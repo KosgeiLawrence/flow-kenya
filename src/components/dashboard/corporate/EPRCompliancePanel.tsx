@@ -25,6 +25,7 @@ const CORPORATE_DOC_TYPES = [
 ];
 
 const EPRCompliancePanel = () => {
+  const { t } = useTranslation();
   const { profile } = useAuth();
 
   const { data: declarations } = useQuery({ queryKey: ["plastic_declarations"], queryFn: async () => { const { data, error } = await supabase.from("plastic_declarations").select("*"); if (error) throw error; return data; } });

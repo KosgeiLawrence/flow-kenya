@@ -27,6 +27,7 @@ const statusMap: Record<string, { icon: React.ElementType; variant: "default" | 
 };
 
 const OrdersPanel = () => {
+  const { t } = useTranslation();
   const { user, profile } = useAuth();
   const { orgInfo } = useOrgInfo();
   const queryClient = useQueryClient();

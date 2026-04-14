@@ -10,6 +10,7 @@ import { useTranslation } from "react-i18next";
 const COLORS = ["hsl(152,45%,22%)", "hsl(40,55%,55%)", "hsl(195,60%,50%)", "hsl(25,30%,35%)", "hsl(0,84%,60%)"];
 
 const WasteFlowPanel = () => {
+  const { t } = useTranslation();
   const { data: collections } = useQuery({
     queryKey: ["county-collections"],
     queryFn: async () => {

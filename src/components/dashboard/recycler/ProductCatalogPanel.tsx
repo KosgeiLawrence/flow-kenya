@@ -45,6 +45,7 @@ const initialSale: SaleState = {
 };
 
 const ProductCatalogPanel = () => {
+  const { t } = useTranslation();
   const { user, profile } = useAuth();
   const { orgInfo } = useOrgInfo();
   const queryClient = useQueryClient();

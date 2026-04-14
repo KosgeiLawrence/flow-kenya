@@ -284,6 +284,7 @@ const OverviewDiagram = () => {
 };
 
 const WorkflowGuidePanel = () => {
+  const { t } = useTranslation();
   return (
     <div className="space-y-6">
       {/* Header */}

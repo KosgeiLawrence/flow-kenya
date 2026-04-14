@@ -9,6 +9,7 @@ import { addBrandedHeader, addDocMeta, addSectionTitle, finalizePdf } from "@/li
 import { useTranslation } from "react-i18next";
 
 const CountyReportsPanel = () => {
+  const { t } = useTranslation();
   const { data: collections } = useQuery({ queryKey: ["county-reports-collections"], queryFn: async () => { const { data, error } = await supabase.from("collections").select("*, material_types(name)"); if (error) throw error; return data; } });
   const { data: profiles } = useQuery({ queryKey: ["county-reports-profiles"], queryFn: async () => { const { data, error } = await supabase.from("profiles").select("*"); if (error) throw error; return data; } });
   const { data: payments } = useQuery({ queryKey: ["county-reports-payments"], queryFn: async () => { const { data, error } = await supabase.from("payments").select("*"); if (error) throw error; return data; } });

@@ -13,6 +13,7 @@ import VatOptions, { DEFAULT_VAT, type VatConfig } from "@/components/dashboard/
 import { useTranslation } from "react-i18next";
 
 const BulkReceiptsPanel = () => {
+  const { t } = useTranslation();
   const { user, profile } = useAuth();
   const { orgInfo } = useOrgInfo();
   const [vat, setVat] = useState<VatConfig>(DEFAULT_VAT);

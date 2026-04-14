@@ -52,6 +52,7 @@ const DUARA_SERVICES = [
 ];
 
 const AdminBillingPanel = () => {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const queryClient = useQueryClient();
   const [dialogOpen, setDialogOpen] = useState(false);

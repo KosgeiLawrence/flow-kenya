@@ -42,6 +42,7 @@ const roleLabels: Record<string, string> = {
 };
 
 const ViewUserDashboardPanel = () => {
+  const { t } = useTranslation();
   const realAuth = useAuth();
   const navigate = useNavigate();
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);

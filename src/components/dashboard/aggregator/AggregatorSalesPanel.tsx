@@ -51,6 +51,7 @@ const stepLabels: Record<SaleStep, string> = {
 };
 
 const AggregatorSalesPanel = () => {
+  const { t } = useTranslation();
   const { user, profile } = useAuth();
   const { orgInfo } = useOrgInfo();
   const queryClient = useQueryClient();

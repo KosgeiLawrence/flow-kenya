@@ -13,6 +13,7 @@ const CO2_FACTORS: Record<string, number> = {
 };
 
 const RecoveryTrackingPanel = () => {
+  const { t } = useTranslation();
   const { user } = useAuth();
 
   const { data: commitments } = useQuery({

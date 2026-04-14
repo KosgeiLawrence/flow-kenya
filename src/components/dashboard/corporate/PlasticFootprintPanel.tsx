@@ -20,6 +20,7 @@ const RECOVERY_RATES: Record<string, number> = {
 };
 
 const PlasticFootprintPanel = () => {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const qc = useQueryClient();
   const [showForm, setShowForm] = useState(false);

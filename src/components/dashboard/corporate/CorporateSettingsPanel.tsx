@@ -11,6 +11,7 @@ import { toast } from "sonner";
 import { useTranslation } from "react-i18next";
 
 const CorporateSettingsPanel = () => {
+  const { t } = useTranslation();
   const { profile, user } = useAuth();
   const queryClient = useQueryClient();
   const fileRef = useRef<HTMLInputElement>(null);

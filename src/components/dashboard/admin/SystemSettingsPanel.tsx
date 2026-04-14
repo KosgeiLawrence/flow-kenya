@@ -10,6 +10,7 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 
 const SystemSettingsPanel = () => {
+  const { t } = useTranslation();
   const queryClient = useQueryClient();
 
   const { data: materials, isLoading } = useQuery({

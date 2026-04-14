@@ -38,6 +38,7 @@ const emptyForm: SupplierForm = {
 };
 
 const AggregatorSuppliersPanel = () => {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const queryClient = useQueryClient();
   const [dialogOpen, setDialogOpen] = useState(false);

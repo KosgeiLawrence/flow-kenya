@@ -35,6 +35,7 @@ const ROLE_OPTIONS = [
 ];
 
 const SponsorshipPanel = () => {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const queryClient = useQueryClient();
   const [open, setOpen] = useState(false);
