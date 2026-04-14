@@ -3,8 +3,10 @@ import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/
 import { LineChart, Line, XAxis, YAxis, CartesianGrid } from "recharts";
 import { Users, Leaf, Droplets, Zap } from "lucide-react";
 import { usePlatformStats } from "@/hooks/usePlatformStats";
+import { useTranslation } from "react-i18next";
 
 const CountyAnalyticsPanel = () => {
+  const { t } = useTranslation();
   const { derived } = usePlatformStats();
 
   const d = derived ?? {

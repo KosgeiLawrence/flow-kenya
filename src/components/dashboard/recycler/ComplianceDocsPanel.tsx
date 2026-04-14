@@ -8,6 +8,7 @@ import jsPDF from "jspdf";
 import { format } from "date-fns";
 import ComplianceDocUpload from "@/components/dashboard/shared/ComplianceDocUpload";
 import { addBrandedHeader, addDocMeta, addSectionTitle, finalizePdf } from "@/lib/pdfBranding";
+import { useTranslation } from "react-i18next";
 
 const RECYCLER_DOC_TYPES = [
   { value: "nema_license", label: "NEMA License" },
@@ -20,6 +21,7 @@ const RECYCLER_DOC_TYPES = [
 ];
 
 const ComplianceDocsPanel = () => {
+  const { t } = useTranslation();
   const { profile } = useAuth();
 
   const isApproved = profile?.approval_status === "approved";

@@ -14,6 +14,7 @@ import { Upload, FileText, Trash2, Download, Eye, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { format } from "date-fns";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { useTranslation } from "react-i18next";
 
 interface ComplianceDocUploadProps {
   documentTypes: { value: string; label: string }[];

@@ -5,8 +5,10 @@ import { Progress } from "@/components/ui/progress";
 import { Recycle, TrendingUp, Target, Calendar } from "lucide-react";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
 import { format, subMonths } from "date-fns";
+import { useTranslation } from "react-i18next";
 
 const PlasticOffsetPanel = () => {
+  const { t } = useTranslation();
   const { data: collections } = useQuery({
     queryKey: ["corp_plastic_offset"],
     queryFn: async () => {

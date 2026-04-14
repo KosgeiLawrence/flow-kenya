@@ -4,8 +4,10 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { TrendingUp, TrendingDown, Minus } from "lucide-react";
 import MarketPriceEditor from "@/components/dashboard/shared/MarketPriceEditor";
 import MaterialIcon from "@/components/dashboard/shared/MaterialIcon";
+import { useTranslation } from "react-i18next";
 
 const MarketInsightsPanel = () => {
+  const { t } = useTranslation();
   const { data: materials } = useQuery({
     queryKey: ["recycler_market_prices"],
     queryFn: async () => {
