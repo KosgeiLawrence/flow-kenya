@@ -1752,6 +1752,7 @@ export type Database = {
           is_active: boolean
           organization_id: string | null
           role: Database["public"]["Enums"]["app_role"]
+          team_permissions: Json
           updated_at: string
           user_id: string
         }
@@ -1763,6 +1764,7 @@ export type Database = {
           is_active?: boolean
           organization_id?: string | null
           role: Database["public"]["Enums"]["app_role"]
+          team_permissions?: Json
           updated_at?: string
           user_id: string
         }
@@ -1774,6 +1776,7 @@ export type Database = {
           is_active?: boolean
           organization_id?: string | null
           role?: Database["public"]["Enums"]["app_role"]
+          team_permissions?: Json
           updated_at?: string
           user_id?: string
         }
