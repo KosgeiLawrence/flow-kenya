@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
@@ -31,6 +32,7 @@ const TEAM_PERMISSION_LABELS: Record<TeamPermission, { label: string; icon: any;
 };
 
 const TeamPanel = ({ role, navItems }: TeamPanelProps) => {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const { isTeamMember, invitedBy, isTeamOwner } = useTeamContext();
   const queryClient = useQueryClient();
@@ -233,14 +235,14 @@ const TeamPanel = ({ role, navItems }: TeamPanelProps) => {
       <div className="flex items-center justify-between flex-wrap gap-3">
         <div className="flex items-center gap-2">
           <Users className="w-5 h-5 text-primary" />
-          <h2 className="text-lg font-semibold">My Team</h2>
+          <h2 className="text-lg font-semibold">{t("teamPanel.title")}</h2>
           <Badge variant="secondary">
             {activeMembers.length + (isTeamMember || isTeamOwner ? 1 : 0)} members
           </Badge>
         </div>
         {canInvite && (
           <Button onClick={() => setShowInviteDialog(true)} className="gap-2">
-            <Mail className="w-4 h-4" /> Invite Team Member
+            <Mail className="w-4 h-4" /> {t("teamPanel.inviteTeamMember")}
           </Button>
         )}
       </div>
@@ -250,7 +252,7 @@ const TeamPanel = ({ role, navItems }: TeamPanelProps) => {
         <Card>
           <CardHeader className="pb-3">
             <CardTitle className="text-sm font-medium flex items-center gap-2">
-              <Crown className="w-4 h-4 text-amber-500" /> Team Leader
+              <Crown className="w-4 h-4 text-amber-500" /> {t("teamPanel.teamLeader")}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -269,8 +271,8 @@ const TeamPanel = ({ role, navItems }: TeamPanelProps) => {
                 </div>
               </div>
               <div className="flex items-center gap-1 shrink-0">
-                <Badge variant="outline"><Crown className="w-3 h-3 mr-1" /> Owner</Badge>
-                <Badge variant="secondary" className="text-[10px]">Full Access</Badge>
+                 <Badge variant="outline"><Crown className="w-3 h-3 mr-1" /> {t("teamPanel.owner")}</Badge>
+                 <Badge variant="secondary" className="text-[10px]">{t("teamPanel.fullAccess")}</Badge>
               </div>
             </div>
           </CardContent>
@@ -281,7 +283,7 @@ const TeamPanel = ({ role, navItems }: TeamPanelProps) => {
       <Card>
         <CardHeader className="pb-3">
           <CardTitle className="text-sm font-medium flex items-center gap-2">
-            <CheckCircle2 className="w-4 h-4 text-primary" /> Active Team Members
+            <CheckCircle2 className="w-4 h-4 text-primary" /> {t("teamPanel.activeTeamMembers")}
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -290,7 +292,7 @@ const TeamPanel = ({ role, navItems }: TeamPanelProps) => {
               <Loader2 className="w-4 h-4 animate-spin" /> Loading...
             </div>
           ) : activeMembers.length === 0 ? (
-            <p className="text-sm text-muted-foreground py-4">No team members yet. {canInvite ? "Invite someone to get started!" : ""}</p>
+            <p className="text-sm text-muted-foreground py-4">{t("teamPanel.noMembers")} {canInvite ? t("teamPanel.inviteToStart") : ""}</p>
           ) : (
             <div className="space-y-3">
               {activeMembers.map((member: any) => {
@@ -310,7 +312,7 @@ const TeamPanel = ({ role, navItems }: TeamPanelProps) => {
                       <div className="min-w-0">
                         <p className="text-sm font-medium truncate">
                           {member.profile?.full_name || "Unknown"}
-                          {isSelf && <span className="text-xs text-muted-foreground ml-1">(You)</span>}
+                          {isSelf && <span className="text-xs text-muted-foreground ml-1">{t("teamPanel.you")}</span>}
                         </p>
                         <p className="text-xs text-muted-foreground truncate">{member.profile?.email}</p>
                         <div className="flex flex-wrap gap-1 mt-1">

@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { CompactList } from "@/components/ui/compact-list";
 import { Button } from "@/components/ui/button";
@@ -9,6 +10,7 @@ import { useTrash, getTableLabel } from "@/hooks/useTrash";
 import { format, formatDistanceToNow } from "date-fns";
 
 const TrashPanel = () => {
+  const { t } = useTranslation();
   const { trashItems, loading, restore, permanentDelete, emptyTrash } = useTrash();
   const [confirmEmpty, setConfirmEmpty] = useState(false);
 
@@ -17,7 +19,7 @@ const TrashPanel = () => {
   };
 
   const handlePermanentDelete = async (id: string) => {
-    if (!confirm("Permanently delete this item? This cannot be undone.")) return;
+    if (!confirm(t("trashPanel.deleteConfirm"))) return;
     await permanentDelete(id);
   };
 
@@ -27,7 +29,7 @@ const TrashPanel = () => {
   };
 
   if (loading) {
-    return <div className="text-center py-8 text-muted-foreground">Loading trash...</div>;
+    return <div className="text-center py-8 text-muted-foreground">{t("trashPanel.loadingTrash")}</div>;
   }
 
   return (
@@ -35,8 +37,8 @@ const TrashPanel = () => {
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <Trash2 className="w-5 h-5 text-muted-foreground" />
-          <h2 className="text-lg font-semibold">Trash</h2>
-          <Badge variant="secondary" className="text-xs">{trashItems.length} items</Badge>
+          <h2 className="text-lg font-semibold">{t("trashPanel.title")}</h2>
+          <Badge variant="secondary" className="text-xs">{trashItems.length} {t("common.items")}</Badge>
         </div>
         {trashItems.length > 0 && (
           <Button
@@ -45,19 +47,19 @@ const TrashPanel = () => {
             onClick={() => setConfirmEmpty(true)}
             className="gap-1"
           >
-            <Trash2 className="w-3 h-3" /> Empty Trash
+            <Trash2 className="w-3 h-3" /> {t("trashPanel.emptyTrash")}
           </Button>
         )}
       </div>
 
       <p className="text-xs text-muted-foreground">
-        Deleted items are kept for 30 days before being permanently removed. You can restore them at any time.
+        {t("trashPanel.noItemsDesc")}
       </p>
 
       {trashItems.length === 0 ? (
         <Card className="p-8 text-center">
           <Package className="w-10 h-10 mx-auto text-muted-foreground mb-2" />
-          <p className="text-muted-foreground">Trash is empty</p>
+          <p className="text-muted-foreground">{t("trashPanel.noItems")}</p>
         </Card>
       ) : (
         <CompactList
@@ -76,9 +78,9 @@ const TrashPanel = () => {
                   </div>
                   <div className="flex items-center gap-2 mt-1 text-xs text-muted-foreground">
                     <Clock className="w-3 h-3" />
-                    <span>Deleted {formatDistanceToNow(new Date(item.deleted_at), { addSuffix: true })}</span>
+                    <span>{formatDistanceToNow(new Date(item.deleted_at), { addSuffix: true })}</span>
                     <span className="text-destructive/70">
-                      · Expires {format(new Date(item.expires_at), "dd MMM yyyy")}
+                      · {t("trashPanel.expiresIn")} {format(new Date(item.expires_at), "dd MMM yyyy")}
                     </span>
                   </div>
                 </div>
@@ -89,7 +91,7 @@ const TrashPanel = () => {
                     onClick={() => handleRestore(item)}
                     className="gap-1 h-8"
                   >
-                    <RotateCcw className="w-3 h-3" /> Restore
+                    <RotateCcw className="w-3 h-3" /> {t("trashPanel.restore")}
                   </Button>
                   <Button
                     size="sm"
@@ -112,15 +114,15 @@ const TrashPanel = () => {
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <AlertTriangle className="w-5 h-5 text-destructive" />
-              Empty Trash?
+              {t("trashPanel.emptyConfirmTitle")}
             </DialogTitle>
           </DialogHeader>
           <p className="text-sm text-muted-foreground">
-            This will permanently delete all {trashItems.length} items in the trash. This action cannot be undone.
+            {t("trashPanel.emptyConfirmDesc")}
           </p>
           <div className="flex gap-2 justify-end">
-            <Button variant="outline" onClick={() => setConfirmEmpty(false)}>Cancel</Button>
-            <Button variant="destructive" onClick={handleEmptyTrash}>Delete All</Button>
+            <Button variant="outline" onClick={() => setConfirmEmpty(false)}>{t("common.cancel")}</Button>
+            <Button variant="destructive" onClick={handleEmptyTrash}>{t("trashPanel.confirmEmpty")}</Button>
           </div>
         </DialogContent>
       </Dialog>
