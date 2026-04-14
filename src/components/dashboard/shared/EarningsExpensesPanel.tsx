@@ -61,6 +61,9 @@ const EarningsExpensesPanel = ({ role }: Props) => {
 
   const [addDialogOpen, setAddDialogOpen] = useState(false);
   const [budgetDialogOpen, setBudgetDialogOpen] = useState(false);
+  const [editingBudgetId, setEditingBudgetId] = useState<string | null>(null);
+  const [editBudgetAmount, setEditBudgetAmount] = useState("");
+  const [editBudgetNotes, setEditBudgetNotes] = useState("");
   const [exportDialogOpen, setExportDialogOpen] = useState(false);
   const [exportRange, setExportRange] = useState({ start: format(startOfMonth(new Date()), "yyyy-MM-dd"), end: format(new Date(), "yyyy-MM-dd"), type: "all" as "all" | "income" | "expense" });
   const [budgetViewTab, setBudgetViewTab] = useState<"active" | "history">("active");
