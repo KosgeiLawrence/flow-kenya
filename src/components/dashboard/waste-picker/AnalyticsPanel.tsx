@@ -14,6 +14,7 @@ const COLORS = [
 ];
 
 const AnalyticsPanel = () => {
+  const { t } = useTranslation();
   const { user } = useAuth();
 
   const { data: collections, isLoading } = useQuery({
@@ -63,19 +64,19 @@ const AnalyticsPanel = () => {
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <Card className="shadow-soft">
           <CardContent className="p-4">
-            <p className="text-xs text-muted-foreground uppercase">Total Collected</p>
+            <p className="text-xs text-muted-foreground uppercase">{t("collectionPanel.totalCollected")}</p>
             <p className="text-xl font-display font-bold">{impact.totalKg.toFixed(0)} kg</p>
           </CardContent>
         </Card>
         <Card className="shadow-soft border-primary/20">
           <CardContent className="p-4">
-            <p className="text-xs text-muted-foreground uppercase">CO₂ Avoided</p>
+            <p className="text-xs text-muted-foreground uppercase">{t("esgPanel.co2Avoided")}</p>
             <p className="text-xl font-display font-bold text-primary">{impact.co2Avoided.toFixed(0)} kg</p>
           </CardContent>
         </Card>
         <Card className="shadow-soft">
           <CardContent className="p-4">
-            <p className="text-xs text-muted-foreground uppercase">Total Earned</p>
+            <p className="text-xs text-muted-foreground uppercase">{t("earningsPanel.totalIncome")}</p>
             <p className="text-xl font-display font-bold text-primary">KES {impact.totalEarnings.toFixed(0)}</p>
           </CardContent>
         </Card>
@@ -91,7 +92,7 @@ const AnalyticsPanel = () => {
       {achievements.length > 0 && (
         <Card className="shadow-soft bg-primary/5 border-primary/20">
           <CardHeader className="pb-2">
-            <CardTitle className="text-base flex items-center gap-2"><Trophy className="w-4 h-4 text-primary" /> Impact Achievements</CardTitle>
+            <CardTitle className="text-base flex items-center gap-2"><Trophy className="w-4 h-4 text-primary" /> {t("analyticsPanel.performance")}</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="flex flex-wrap gap-3">

@@ -16,6 +16,7 @@ const CO2_FACTORS: Record<string, number> = {
 };
 
 const PricingPanel = () => {
+  const { t } = useTranslation();
   const { data: materialTypes, isLoading } = useQuery({
     queryKey: ["material_types"],
     queryFn: async () => {
@@ -35,7 +36,7 @@ const PricingPanel = () => {
         <CardContent className="flex items-center gap-3 p-4">
           <TrendingUp className="w-5 h-5 text-primary" />
           <div>
-            <p className="text-sm font-medium text-foreground">Live Market Prices</p>
+            <p className="text-sm font-medium text-foreground">{t("pricingPanel.title")}</p>
             <p className="text-xs text-muted-foreground">
               Tap the edit icon to update prices • Last update: {format(new Date(), "MMM d, yyyy")}
             </p>
@@ -44,15 +45,15 @@ const PricingPanel = () => {
       </Card>
 
       <Card className="shadow-soft">
-        <CardHeader><CardTitle className="text-base">Material Pricing & Environmental Value</CardTitle></CardHeader>
+        <CardHeader><CardTitle className="text-base">{t("pricingPanel.materialPrices")}</CardTitle></CardHeader>
         <CardContent>
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Material</TableHead>
-                <TableHead>Unit</TableHead>
-                <TableHead className="text-right">Price (KES)</TableHead>
-                <TableHead className="text-center">Edit</TableHead>
+                 <TableHead>{t("common.material")}</TableHead>
+                 <TableHead>{t("common.unit")}</TableHead>
+                 <TableHead className="text-right">{t("common.price")} (KES)</TableHead>
+                 <TableHead className="text-center">{t("common.edit")}</TableHead>
                 <TableHead className="text-right">
                   <span className="flex items-center gap-1 justify-end"><Leaf className="w-3.5 h-3.5" /> CO₂/kg</span>
                 </TableHead>
