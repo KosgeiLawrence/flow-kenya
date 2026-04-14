@@ -424,6 +424,38 @@ const ProfileSettingsPanel = ({ role }: ProfileSettingsPanelProps) => {
                   <p className="text-xs text-muted-foreground">Contact admin to change organization name</p>
                 </div>
               )}
+
+              {/* Organization Logo */}
+              {fullProfile?.organization_id && (
+                <div className="sm:col-span-2 space-y-3">
+                  <Label>Organization Logo</Label>
+                  <p className="text-xs text-muted-foreground">This logo appears on your dashboard header, receipts, and reports.</p>
+                  <div className="flex items-center gap-4">
+                    <div className="w-20 h-20 rounded-xl border-2 border-dashed border-border flex items-center justify-center bg-muted/30 overflow-hidden shrink-0">
+                      {organization?.logo_url ? (
+                        <img src={organization.logo_url} alt="Org logo" className="w-full h-full object-contain p-1" />
+                      ) : (
+                        <Building2 className="w-8 h-8 text-muted-foreground/40" />
+                      )}
+                    </div>
+                    <div className="flex flex-col gap-2">
+                      <div className="flex items-center gap-2">
+                        <Button variant="outline" size="sm" onClick={() => logoInputRef.current?.click()} disabled={uploadingLogo} className="gap-1.5">
+                          <Upload className="w-4 h-4" />
+                          {uploadingLogo ? "Uploading..." : organization?.logo_url ? "Change Logo" : "Upload Logo"}
+                        </Button>
+                        {organization?.logo_url && (
+                          <Button variant="outline" size="sm" onClick={handleRemoveOrgLogo} className="text-destructive hover:text-destructive gap-1.5">
+                            <Trash2 className="w-4 h-4" /> Remove
+                          </Button>
+                        )}
+                      </div>
+                      <p className="text-xs text-muted-foreground">PNG, JPG, WebP or SVG. Max 2 MB.</p>
+                      <input ref={logoInputRef} type="file" accept="image/png,image/jpeg,image/webp,image/svg+xml" className="hidden" onChange={handleOrgLogoUpload} />
+                    </div>
+                  </div>
+                </div>
+              )}
               <div className="space-y-2">
                 <Label htmlFor="company_registration">Business Registration Number</Label>
                 <Input id="company_registration" value={formData.company_registration || ""} onChange={e => setFormData(p => ({ ...p, company_registration: e.target.value }))} />
