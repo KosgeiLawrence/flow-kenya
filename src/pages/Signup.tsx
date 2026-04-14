@@ -122,6 +122,13 @@ const Signup = () => {
               </div>
             ))}
           </div>
+          <img
+            src={authHeroSignup}
+            alt="Platform collaboration illustration"
+            className="mt-8 w-full max-w-xs mx-auto drop-shadow-2xl"
+            width={800}
+            height={800}
+          />
         </motion.div>
       </div>
 
