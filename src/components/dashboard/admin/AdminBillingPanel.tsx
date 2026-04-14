@@ -287,12 +287,12 @@ const AdminBillingPanel = () => {
       <table className="w-full text-sm">
         <thead>
           <tr className="border-b text-muted-foreground">
-            <th className="text-left py-2 font-medium">No.</th>
-            <th className="text-left py-2 font-medium">Client</th>
-            <th className="text-left py-2 font-medium">Amount</th>
+            <th className="text-left py-2 font-medium">{t("common.number", "No.")}</th>
+            <th className="text-left py-2 font-medium">{t("common.client", "Client")}</th>
+            <th className="text-left py-2 font-medium">{t("common.amount", "Amount")}</th>
             <th className="text-left py-2 font-medium">Status</th>
-            <th className="text-left py-2 font-medium">Date</th>
-            <th className="text-right py-2 font-medium">Actions</th>
+            <th className="text-left py-2 font-medium">{t("common.date", "Date")}</th>
+            <th className="text-right py-2 font-medium">{t("common.actions", "Actions")}</th>
           </tr>
         </thead>
         <tbody>
@@ -328,7 +328,7 @@ const AdminBillingPanel = () => {
             </tr>
           ))}
           {list.length === 0 && (
-            <tr><td colSpan={6} className="text-center py-8 text-muted-foreground">No documents yet</td></tr>
+            <tr><td colSpan={6} className="text-center py-8 text-muted-foreground">{t("adminPanels.noDocuments", "No documents yet")}</td></tr>
           )}
         </tbody>
       </table>
@@ -338,10 +338,10 @@ const AdminBillingPanel = () => {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h3 className="text-lg font-semibold">Duara Flow Billing</h3>
+        <h3 className="text-lg font-semibold">{t("adminPanels.billing", "Duara Flow Billing")}</h3>
         <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
           <DialogTrigger asChild>
-            <Button size="sm" className="gap-2"><Plus className="w-4 h-4" /> New Document</Button>
+            <Button size="sm" className="gap-2"><Plus className="w-4 h-4" /> {t("adminPanels.newDocument", "New Document")}</Button>
           </DialogTrigger>
           <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
@@ -350,28 +350,28 @@ const AdminBillingPanel = () => {
             <div className="space-y-4">
               {/* Document type */}
               <div>
-                <Label>Document Type</Label>
+                <Label>{t("adminPanels.documentType", "Document Type")}</Label>
                 <Select value={docType} onValueChange={(v: any) => setDocType(v)}>
                   <SelectTrigger><SelectValue /></SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="invoice">Invoice</SelectItem>
-                    <SelectItem value="quotation">Quotation</SelectItem>
-                    <SelectItem value="receipt">Receipt</SelectItem>
+                    <SelectItem value="invoice">{t("adminPanels.invoice", "Invoice")}</SelectItem>
+                    <SelectItem value="quotation">{t("adminPanels.quotation", "Quotation")}</SelectItem>
+                    <SelectItem value="receipt">{t("adminPanels.receipt", "Receipt")}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
 
               {/* Client info */}
               <div className="grid grid-cols-2 gap-3">
-                <div><Label>Client Name *</Label><Input value={clientName} onChange={e => setClientName(e.target.value)} placeholder="Full name" /></div>
-                <div><Label>Organization</Label><Input value={clientOrg} onChange={e => setClientOrg(e.target.value)} placeholder="Company name" /></div>
-                <div><Label>Email</Label><Input type="email" value={clientEmail} onChange={e => setClientEmail(e.target.value)} /></div>
-                <div><Label>Phone</Label><Input value={clientPhone} onChange={e => setClientPhone(e.target.value)} /></div>
+                <div><Label>{t("adminPanels.clientName", "Client Name")} *</Label><Input value={clientName} onChange={e => setClientName(e.target.value)} placeholder="Full name" /></div>
+                <div><Label>{t("common.organization", "Organization")}</Label><Input value={clientOrg} onChange={e => setClientOrg(e.target.value)} placeholder="Company name" /></div>
+                <div><Label>{t("common.email", "Email")}</Label><Input type="email" value={clientEmail} onChange={e => setClientEmail(e.target.value)} /></div>
+                <div><Label>{t("common.phone", "Phone")}</Label><Input value={clientPhone} onChange={e => setClientPhone(e.target.value)} /></div>
               </div>
 
               {/* Line items */}
               <div>
-                <Label>Items</Label>
+                <Label>{t("adminPanels.items", "Items")}</Label>
                 <div className="space-y-2 mt-1">
                   {items.map((item, idx) => (
                     <div key={idx} className="flex gap-2 items-end">

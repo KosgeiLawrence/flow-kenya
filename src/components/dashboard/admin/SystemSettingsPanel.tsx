@@ -40,7 +40,7 @@ const SystemSettingsPanel = () => {
     <div className="space-y-6">
       <div>
         <h2 className="text-2xl font-display font-bold text-foreground">{t("adminPanels.systemSettings")}</h2>
-        <p className="text-muted-foreground">Manage material prices and platform configuration</p>
+        <p className="text-muted-foreground">{t("adminPanels.managePricesDesc", "Manage material prices and platform configuration")}</p>
       </div>
 
       <Card>
@@ -56,11 +56,11 @@ const SystemSettingsPanel = () => {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Material</TableHead>
-                  <TableHead>Unit</TableHead>
-                  <TableHead>Current Price (KES)</TableHead>
-                  <TableHead>New Price</TableHead>
-                  <TableHead>Action</TableHead>
+                  <TableHead>{t("common.material", "Material")}</TableHead>
+                  <TableHead>{t("common.unit", "Unit")}</TableHead>
+                  <TableHead>{t("adminPanels.currentPrice", "Current Price (KES)")}</TableHead>
+                  <TableHead>{t("marketPriceEditor.newPrice", "New Price")}</TableHead>
+                  <TableHead>{t("common.action", "Action")}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>

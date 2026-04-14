@@ -341,13 +341,13 @@ const ProductCatalogPanel = () => {
             <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
               <DialogTrigger asChild><Button size="sm"><Plus className="w-4 h-4 mr-1" /> Add Product</Button></DialogTrigger>
               <DialogContent className="max-w-md">
-                <DialogHeader><DialogTitle>Add Product</DialogTitle></DialogHeader>
+                <DialogHeader><DialogTitle>{t("recyclerPanels.addProduct", "Add Product")}</DialogTitle></DialogHeader>
                 <div className="space-y-3">
-                  <div><Label>Product Name</Label><Input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder="e.g. Recycled PET Flakes" /></div>
-                  <div><Label>Description</Label><Textarea value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} placeholder="Product description..." rows={2} /></div>
-                  <div><Label>Material Source</Label><Input value={form.material_source} onChange={(e) => setForm({ ...form, material_source: e.target.value })} placeholder="e.g. Post-consumer PET" /></div>
+                  <div><Label>{t("recyclerPanels.productName", "Product Name")}</Label><Input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder="e.g. Recycled PET Flakes" /></div>
+                  <div><Label>{t("common.description", "Description")}</Label><Textarea value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} placeholder="Product description..." rows={2} /></div>
+                  <div><Label>{t("recyclerPanels.materialSource", "Material Source")}</Label><Input value={form.material_source} onChange={(e) => setForm({ ...form, material_source: e.target.value })} placeholder="e.g. Post-consumer PET" /></div>
                   <div className="grid grid-cols-2 gap-3">
-                    <div><Label>Stock Quantity</Label><Input type="number" value={form.stock_quantity} onChange={(e) => setForm({ ...form, stock_quantity: e.target.value })} /></div>
+                    <div><Label>{t("recyclerPanels.stockQuantity", "Stock Quantity")}</Label><Input type="number" value={form.stock_quantity} onChange={(e) => setForm({ ...form, stock_quantity: e.target.value })} /></div>
                     <div>
                       <Label>Unit</Label>
                       <Select value={form.unit} onValueChange={(v) => setForm({ ...form, unit: v })}>

@@ -153,15 +153,15 @@ const ViewUserDashboardPanel = () => {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-2xl font-display font-bold text-foreground">View User Dashboards</h2>
-        <p className="text-muted-foreground">Click on any user to view their dashboard as they see it</p>
+        <h2 className="text-2xl font-display font-bold text-foreground">{t("adminPanels.viewUserDashboard", "View User Dashboards")}</h2>
+        <p className="text-muted-foreground">{t("adminPanels.viewDashboardDesc", "Click on any user to view their dashboard as they see it")}</p>
       </div>
 
       <div className="flex flex-col sm:flex-row gap-3">
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
           <Input
-            placeholder="Search by name or email..."
+            placeholder={t("common.searchByNameEmail", "Search by name or email...")}
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="pl-9"
@@ -169,16 +169,16 @@ const ViewUserDashboardPanel = () => {
         </div>
         <Select value={roleFilter} onValueChange={setRoleFilter}>
           <SelectTrigger className="w-48">
-            <SelectValue placeholder="Filter by role" />
+            <SelectValue placeholder={t("common.filterByRole", "Filter by role")} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">All Roles</SelectItem>
-            <SelectItem value="waste_picker">Waste Picker</SelectItem>
-            <SelectItem value="aggregator">Aggregator</SelectItem>
-            <SelectItem value="recycler">Recycler</SelectItem>
-            <SelectItem value="ngo">NGO</SelectItem>
-            <SelectItem value="corporate">Corporate</SelectItem>
-            <SelectItem value="county_government">County Government</SelectItem>
+            <SelectItem value="all">{t("common.allRoles", "All Roles")}</SelectItem>
+            <SelectItem value="waste_picker">{t("roles.wastePicker", "Waste Picker")}</SelectItem>
+            <SelectItem value="aggregator">{t("roles.aggregator", "Aggregator")}</SelectItem>
+            <SelectItem value="recycler">{t("roles.recycler", "Recycler")}</SelectItem>
+            <SelectItem value="ngo">{t("roles.ngo", "NGO")}</SelectItem>
+            <SelectItem value="corporate">{t("roles.corporate", "Corporate")}</SelectItem>
+            <SelectItem value="county_government">{t("roles.countyGovernment", "County Government")}</SelectItem>
           </SelectContent>
         </Select>
       </div>
@@ -192,18 +192,18 @@ const ViewUserDashboardPanel = () => {
         </CardHeader>
         <CardContent>
           {isLoading ? (
-            <p className="text-muted-foreground text-sm">Loading users...</p>
+            <p className="text-muted-foreground text-sm">{t("common.loadingUsers", "Loading users...")}</p>
           ) : filtered.length === 0 ? (
-            <p className="text-muted-foreground text-sm">No users found</p>
+            <p className="text-muted-foreground text-sm">{t("common.noUsersFound", "No users found")}</p>
           ) : (
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Name</TableHead>
-                  <TableHead>Email</TableHead>
-                  <TableHead>Role</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>Action</TableHead>
+                  <TableHead>{t("common.name", "Name")}</TableHead>
+                  <TableHead>{t("common.email", "Email")}</TableHead>
+                  <TableHead>{t("common.role", "Role")}</TableHead>
+                  <TableHead>{t("common.status", "Status")}</TableHead>
+                  <TableHead>{t("common.action", "Action")}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>

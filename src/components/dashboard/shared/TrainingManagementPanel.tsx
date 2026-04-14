@@ -374,7 +374,7 @@ const TrainingManagementPanel = () => {
                     <Input value={form.venue} onChange={e => setForm(f => ({ ...f, venue: e.target.value }))} placeholder="Location or online link" />
                   </div>
                   <div>
-                    <Label>Duration (minutes)</Label>
+                    <Label>{t("trainingPanel.duration", "Duration (minutes)")}</Label>
                     <Input type="number" value={form.duration_minutes} onChange={e => setForm(f => ({ ...f, duration_minutes: e.target.value }))} placeholder="e.g. 60" />
                   </div>
                 </div>

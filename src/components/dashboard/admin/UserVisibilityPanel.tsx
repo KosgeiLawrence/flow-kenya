@@ -75,8 +75,8 @@ const UserVisibilityPanel = () => {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-2xl font-display font-bold text-foreground">User Visibility Control</h2>
-        <p className="text-muted-foreground">Control which users are discoverable by other roles on the platform</p>
+        <h2 className="text-2xl font-display font-bold text-foreground">{t("adminPanels.userVisibility", "User Visibility Control")}</h2>
+        <p className="text-muted-foreground">{t("adminPanels.visibilityDesc", "Control which users are discoverable by other roles on the platform")}</p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -85,7 +85,7 @@ const UserVisibilityPanel = () => {
             <Eye className="w-8 h-8 text-primary" />
             <div>
               <p className="text-2xl font-bold text-foreground">{visibleCount}</p>
-              <p className="text-xs text-muted-foreground">Visible Users</p>
+              <p className="text-xs text-muted-foreground">{t("adminPanels.visibleUsers", "Visible Users")}</p>
             </div>
           </CardContent>
         </Card>
@@ -94,7 +94,7 @@ const UserVisibilityPanel = () => {
             <EyeOff className="w-8 h-8 text-muted-foreground" />
             <div>
               <p className="text-2xl font-bold text-foreground">{hiddenCount}</p>
-              <p className="text-xs text-muted-foreground">Hidden Users</p>
+              <p className="text-xs text-muted-foreground">{t("adminPanels.hiddenUsers", "Hidden Users")}</p>
             </div>
           </CardContent>
         </Card>
@@ -105,7 +105,7 @@ const UserVisibilityPanel = () => {
             </div>
             <div>
               <p className="text-2xl font-bold text-foreground">{profiles?.length || 0}</p>
-              <p className="text-xs text-muted-foreground">Total Users</p>
+              <p className="text-xs text-muted-foreground">{t("adminPanels.totalUsers", "Total Users")}</p>
             </div>
           </CardContent>
         </Card>
@@ -113,12 +113,12 @@ const UserVisibilityPanel = () => {
 
       <Card>
         <CardHeader className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-          <CardTitle className="text-lg">Manage User Visibility</CardTitle>
+          <CardTitle className="text-lg">{t("adminPanels.manageVisibility", "Manage User Visibility")}</CardTitle>
           <div className="flex gap-2 w-full sm:w-auto">
             <div className="relative flex-1 sm:flex-initial">
               <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
               <Input
-                placeholder="Search users..."
+                placeholder={t("common.searchUsers", "Search users...")}
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 className="pl-8 w-full sm:w-48"
@@ -127,31 +127,31 @@ const UserVisibilityPanel = () => {
             <Select value={roleFilter} onValueChange={setRoleFilter}>
               <SelectTrigger className="w-40"><SelectValue /></SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">All Roles</SelectItem>
-                <SelectItem value="waste_picker">Waste Pickers</SelectItem>
-                <SelectItem value="aggregator">Aggregators</SelectItem>
-                <SelectItem value="recycler">Recyclers</SelectItem>
-                <SelectItem value="ngo">NGOs</SelectItem>
-                <SelectItem value="corporate">Corporates</SelectItem>
-                <SelectItem value="county_government">County Gov</SelectItem>
+                <SelectItem value="all">{t("common.allRoles", "All Roles")}</SelectItem>
+                <SelectItem value="waste_picker">{t("roles.wastePicker", "Waste Pickers")}</SelectItem>
+                <SelectItem value="aggregator">{t("roles.aggregator", "Aggregators")}</SelectItem>
+                <SelectItem value="recycler">{t("roles.recycler", "Recyclers")}</SelectItem>
+                <SelectItem value="ngo">{t("roles.ngo", "NGOs")}</SelectItem>
+                <SelectItem value="corporate">{t("roles.corporate", "Corporates")}</SelectItem>
+                <SelectItem value="county_government">{t("roles.countyGovernment", "County Gov")}</SelectItem>
               </SelectContent>
             </Select>
           </div>
         </CardHeader>
         <CardContent>
           {isLoading ? (
-            <p className="text-muted-foreground text-sm">Loading users...</p>
+            <p className="text-muted-foreground text-sm">{t("common.loadingUsers", "Loading users...")}</p>
           ) : filtered.length === 0 ? (
-            <p className="text-muted-foreground text-sm text-center py-8">No users found</p>
+            <p className="text-muted-foreground text-sm text-center py-8">{t("common.noUsersFound", "No users found")}</p>
           ) : (
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Name</TableHead>
-                  <TableHead>Email</TableHead>
-                  <TableHead>Role</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>Visible</TableHead>
+                  <TableHead>{t("common.name", "Name")}</TableHead>
+                  <TableHead>{t("common.email", "Email")}</TableHead>
+                  <TableHead>{t("common.role", "Role")}</TableHead>
+                  <TableHead>{t("common.status", "Status")}</TableHead>
+                  <TableHead>{t("common.visible", "Visible")}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>

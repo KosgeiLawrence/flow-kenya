@@ -109,10 +109,10 @@ const UserVerificationPanel = () => {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Name</TableHead>
-                  <TableHead>Email</TableHead>
+                  <TableHead>{t("common.name", "Name")}</TableHead>
+                  <TableHead>{t("common.email", "Email")}</TableHead>
                   <TableHead>Phone</TableHead>
-                  <TableHead>Role</TableHead>
+                  <TableHead>{t("common.role", "Role")}</TableHead>
                   <TableHead>Status</TableHead>
                   <TableHead>Registered</TableHead>
                   <TableHead>Actions</TableHead>

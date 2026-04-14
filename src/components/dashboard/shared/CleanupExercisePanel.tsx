@@ -486,19 +486,19 @@ const CleanupExercisePanel = ({ isAdmin = false }: Props) => {
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <Card>
           <CardContent className="pt-4 pb-3 px-4">
-            <p className="text-xs text-muted-foreground">Total Cleanups</p>
+            <p className="text-xs text-muted-foreground">{t("cleanupPanel.totalCleanups", "Total Cleanups")}</p>
             <p className="text-2xl font-bold text-foreground">{totalCleanups}</p>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="pt-4 pb-3 px-4">
-            <p className="text-xs text-muted-foreground">Waste Collected</p>
+            <p className="text-xs text-muted-foreground">{t("cleanupPanel.wasteCollected", "Waste Collected")}</p>
             <p className="text-2xl font-bold text-foreground">{totalWaste.toLocaleString()} kg</p>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="pt-4 pb-3 px-4">
-            <p className="text-xs text-muted-foreground">Total Participants</p>
+            <p className="text-xs text-muted-foreground">{t("cleanupPanel.participants", "Total Participants")}</p>
             <p className="text-2xl font-bold text-foreground">{totalVolunteers.toLocaleString()}</p>
           </CardContent>
         </Card>
@@ -522,26 +522,26 @@ const CleanupExercisePanel = ({ isAdmin = false }: Props) => {
           <CardContent className="space-y-6">
             {/* Basic Info */}
             <div>
-              <h4 className="text-sm font-semibold text-foreground mb-3">Basic Information</h4>
+              <h4 className="text-sm font-semibold text-foreground mb-3">{t("common.basicInformation", "Basic Information")}</h4>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="md:col-span-2">
-                  <Label>Cleanup Title / Event Name</Label>
+                  <Label>{t("cleanupPanel.cleanupTitle", "Cleanup Title / Event Name")}</Label>
                   <Input value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} placeholder="e.g. Nairobi River Cleanup 2026" />
                 </div>
                 <div>
-                  <Label>Date</Label>
+                  <Label>{t("common.date", "Date")}</Label>
                   <Input type="date" value={form.cleanup_date} onChange={(e) => setForm({ ...form, cleanup_date: e.target.value })} />
                 </div>
                 <div className="grid grid-cols-2 gap-2">
-                  <div><Label>Start Time</Label><Input type="time" value={form.start_time} onChange={(e) => setForm({ ...form, start_time: e.target.value })} /></div>
-                  <div><Label>End Time</Label><Input type="time" value={form.end_time} onChange={(e) => setForm({ ...form, end_time: e.target.value })} /></div>
+                  <div><Label>{t("cleanupPanel.startTime", "Start Time")}</Label><Input type="time" value={form.start_time} onChange={(e) => setForm({ ...form, start_time: e.target.value })} /></div>
+                  <div><Label>{t("cleanupPanel.endTime", "End Time")}</Label><Input type="time" value={form.end_time} onChange={(e) => setForm({ ...form, end_time: e.target.value })} /></div>
                 </div>
                 <div>
-                  <Label>Location Name</Label>
+                  <Label>{t("cleanupPanel.locationName", "Location Name")}</Label>
                   <Input value={form.location_name} onChange={(e) => setForm({ ...form, location_name: e.target.value })} placeholder="e.g. Kiambu Beach" />
                 </div>
                 <div>
-                  <Label>Location Type</Label>
+                  <Label>{t("cleanupPanel.locationType", "Location Type")}</Label>
                   <Select value={form.location_type} onValueChange={(v) => setForm({ ...form, location_type: v })}>
                     <SelectTrigger><SelectValue /></SelectTrigger>
                     <SelectContent>
@@ -550,7 +550,7 @@ const CleanupExercisePanel = ({ isAdmin = false }: Props) => {
                   </Select>
                 </div>
                 <div className="md:col-span-2">
-                  <Label>GPS Coordinates</Label>
+                  <Label>{t("cleanupPanel.gpsCoordinates", "GPS Coordinates")}</Label>
                   <div className="flex gap-2">
                     <Input type="number" placeholder="Latitude" value={form.location_lat ?? ""} onChange={(e) => setForm({ ...form, location_lat: e.target.value ? Number(e.target.value) : null })} />
                     <Input type="number" placeholder="Longitude" value={form.location_lng ?? ""} onChange={(e) => setForm({ ...form, location_lng: e.target.value ? Number(e.target.value) : null })} />
@@ -566,15 +566,15 @@ const CleanupExercisePanel = ({ isAdmin = false }: Props) => {
 
             {/* Organizer */}
             <div>
-              <h4 className="text-sm font-semibold text-foreground mb-3">Organizer & Partners</h4>
+              <h4 className="text-sm font-semibold text-foreground mb-3">{t("cleanupPanel.organizerPartners", "Organizer & Partners")}</h4>
               <div>
-                <Label>Lead Organizer</Label>
+                <Label>{t("cleanupPanel.leadOrganizer", "Lead Organizer")}</Label>
                 <Input value={form.lead_organizer || profile?.full_name || ""} onChange={(e) => setForm({ ...form, lead_organizer: e.target.value })} />
               </div>
 
               {/* Existing Organizations */}
               <div className="mt-4">
-                <Label>Partner Organizations (from platform)</Label>
+                <Label>{t("cleanupPanel.partnerFromPlatform", "Partner Organizations (from platform)")}</Label>
                 <div className="flex flex-wrap gap-2 mt-1 max-h-32 overflow-y-auto">
                   {organizations.map((org) => (
                     <Badge
@@ -594,7 +594,7 @@ const CleanupExercisePanel = ({ isAdmin = false }: Props) => {
 
               {/* Add External Organization */}
               <div className="mt-4">
-                <Label>Add External Organization</Label>
+                <Label>{t("cleanupPanel.addExternalOrg", "Add External Organization")}</Label>
                 <div className="flex gap-2 mt-1">
                   <Input
                     placeholder="Organization name"
@@ -661,7 +661,7 @@ const CleanupExercisePanel = ({ isAdmin = false }: Props) => {
 
               {/* Invite Organization via Email */}
               <div className="mt-4">
-                <Label>Invite Organization via Email</Label>
+                <Label>{t("cleanupPanel.inviteOrgEmail", "Invite Organization via Email")}</Label>
                 <div className="flex gap-2 mt-1">
                   <Input
                     type="email"
@@ -690,11 +690,11 @@ const CleanupExercisePanel = ({ isAdmin = false }: Props) => {
 
             {/* Participation */}
             <div>
-              <h4 className="text-sm font-semibold text-foreground mb-3">Participation</h4>
+              <h4 className="text-sm font-semibold text-foreground mb-3">{t("cleanupPanel.participation", "Participation")}</h4>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                <div><Label>Volunteers</Label><Input type="number" min={0} value={form.num_volunteers} onChange={(e) => setForm({ ...form, num_volunteers: Number(e.target.value) })} /></div>
-                <div><Label>Waste Pickers</Label><Input type="number" min={0} value={form.num_waste_pickers} onChange={(e) => setForm({ ...form, num_waste_pickers: Number(e.target.value) })} /></div>
-                <div><Label>Partner Orgs Present</Label><Input type="number" min={0} value={form.num_partner_orgs} onChange={(e) => setForm({ ...form, num_partner_orgs: Number(e.target.value) })} /></div>
+                <div><Label>{t("cleanupPanel.numVolunteers", "Volunteers")}</Label><Input type="number" min={0} value={form.num_volunteers} onChange={(e) => setForm({ ...form, num_volunteers: Number(e.target.value) })} /></div>
+                <div><Label>{t("cleanupPanel.numWastePickers", "Waste Pickers")}</Label><Input type="number" min={0} value={form.num_waste_pickers} onChange={(e) => setForm({ ...form, num_waste_pickers: Number(e.target.value) })} /></div>
+                <div><Label>{t("cleanupPanel.partnerOrgsPresent", "Partner Orgs Present")}</Label><Input type="number" min={0} value={form.num_partner_orgs} onChange={(e) => setForm({ ...form, num_partner_orgs: Number(e.target.value) })} /></div>
               </div>
             </div>
 
@@ -704,11 +704,11 @@ const CleanupExercisePanel = ({ isAdmin = false }: Props) => {
             <div>
               <h4 className="text-sm font-semibold text-foreground mb-3">Waste Collection</h4>
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-                <div><Label>Total Waste (kg)</Label><Input type="number" min={0} value={form.total_waste_kg} onChange={(e) => setForm({ ...form, total_waste_kg: Number(e.target.value) })} /></div>
-                <div><Label>Plastic Waste (kg)</Label><Input type="number" min={0} value={form.plastic_waste_kg} onChange={(e) => setForm({ ...form, plastic_waste_kg: Number(e.target.value) })} /></div>
+                <div><Label>{t("cleanupPanel.totalWaste", "Total Waste (kg)")}</Label><Input type="number" min={0} value={form.total_waste_kg} onChange={(e) => setForm({ ...form, total_waste_kg: Number(e.target.value) })} /></div>
+                <div><Label>{t("cleanupPanel.plasticWaste", "Plastic Waste (kg)")}</Label><Input type="number" min={0} value={form.plastic_waste_kg} onChange={(e) => setForm({ ...form, plastic_waste_kg: Number(e.target.value) })} /></div>
                 <div><Label>Recyclable (kg)</Label><Input type="number" min={0} value={form.recyclable_waste_kg} onChange={(e) => setForm({ ...form, recyclable_waste_kg: Number(e.target.value) })} /></div>
                 <div><Label>Non-Recyclable (kg)</Label><Input type="number" min={0} value={form.non_recyclable_waste_kg} onChange={(e) => setForm({ ...form, non_recyclable_waste_kg: Number(e.target.value) })} /></div>
-                <div><Label>Number of Bags</Label><Input type="number" min={0} value={form.num_bags} onChange={(e) => setForm({ ...form, num_bags: Number(e.target.value) })} /></div>
+                <div><Label>{t("cleanupPanel.numBags", "Number of Bags")}</Label><Input type="number" min={0} value={form.num_bags} onChange={(e) => setForm({ ...form, num_bags: Number(e.target.value) })} /></div>
               </div>
 
               <Button type="button" variant="ghost" size="sm" className="mt-3 gap-1" onClick={() => setShowBreakdown(!showBreakdown)}>
@@ -718,12 +718,12 @@ const CleanupExercisePanel = ({ isAdmin = false }: Props) => {
 
               {showBreakdown && (
                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 mt-2">
-                  <div><Label className="text-xs">PET Bottles (kg)</Label><Input type="number" min={0} value={form.pet_bottles_kg} onChange={(e) => setForm({ ...form, pet_bottles_kg: Number(e.target.value) })} /></div>
-                  <div><Label className="text-xs">HDPE (kg)</Label><Input type="number" min={0} value={form.hdpe_kg} onChange={(e) => setForm({ ...form, hdpe_kg: Number(e.target.value) })} /></div>
-                  <div><Label className="text-xs">Fishing Nets (kg)</Label><Input type="number" min={0} value={form.fishing_nets_kg} onChange={(e) => setForm({ ...form, fishing_nets_kg: Number(e.target.value) })} /></div>
-                  <div><Label className="text-xs">Sachets (kg)</Label><Input type="number" min={0} value={form.sachets_kg} onChange={(e) => setForm({ ...form, sachets_kg: Number(e.target.value) })} /></div>
-                  <div><Label className="text-xs">Glass (kg)</Label><Input type="number" min={0} value={form.glass_kg} onChange={(e) => setForm({ ...form, glass_kg: Number(e.target.value) })} /></div>
-                  <div><Label className="text-xs">Metal (kg)</Label><Input type="number" min={0} value={form.metal_kg} onChange={(e) => setForm({ ...form, metal_kg: Number(e.target.value) })} /></div>
+                  <div><Label className="text-xs">{t("cleanupPanel.petBottles", "PET Bottles (kg)")}</Label><Input type="number" min={0} value={form.pet_bottles_kg} onChange={(e) => setForm({ ...form, pet_bottles_kg: Number(e.target.value) })} /></div>
+                  <div><Label className="text-xs">{t("cleanupPanel.hdpe", "HDPE (kg)")}</Label><Input type="number" min={0} value={form.hdpe_kg} onChange={(e) => setForm({ ...form, hdpe_kg: Number(e.target.value) })} /></div>
+                  <div><Label className="text-xs">{t("cleanupPanel.fishingNets", "Fishing Nets (kg)")}</Label><Input type="number" min={0} value={form.fishing_nets_kg} onChange={(e) => setForm({ ...form, fishing_nets_kg: Number(e.target.value) })} /></div>
+                  <div><Label className="text-xs">{t("cleanupPanel.sachets", "Sachets (kg)")}</Label><Input type="number" min={0} value={form.sachets_kg} onChange={(e) => setForm({ ...form, sachets_kg: Number(e.target.value) })} /></div>
+                  <div><Label className="text-xs">{t("cleanupPanel.glass", "Glass (kg)")}</Label><Input type="number" min={0} value={form.glass_kg} onChange={(e) => setForm({ ...form, glass_kg: Number(e.target.value) })} /></div>
+                  <div><Label className="text-xs">{t("cleanupPanel.metal", "Metal (kg)")}</Label><Input type="number" min={0} value={form.metal_kg} onChange={(e) => setForm({ ...form, metal_kg: Number(e.target.value) })} /></div>
                   <div><Label className="text-xs">Other (kg)</Label><Input type="number" min={0} value={form.other_materials_kg} onChange={(e) => setForm({ ...form, other_materials_kg: Number(e.target.value) })} /></div>
                 </div>
               )}
@@ -736,7 +736,7 @@ const CleanupExercisePanel = ({ isAdmin = false }: Props) => {
               <h4 className="text-sm font-semibold text-foreground mb-3">Logistics</h4>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div><Label>Waste Transported To</Label><Input value={form.waste_destination} onChange={(e) => setForm({ ...form, waste_destination: e.target.value })} placeholder="Recycling center / landfill" /></div>
-                <div><Label>Transport Method</Label><Input value={form.transport_method} onChange={(e) => setForm({ ...form, transport_method: e.target.value })} placeholder="e.g. Truck, Handcart" /></div>
+                <div><Label>{t("cleanupPanel.transportMethod", "Transport Method")}</Label><Input value={form.transport_method} onChange={(e) => setForm({ ...form, transport_method: e.target.value })} placeholder="e.g. Truck, Handcart" /></div>
               </div>
               <div className="flex items-center gap-2 mt-3">
                 <Switch checked={form.waste_sorted} onCheckedChange={(v) => setForm({ ...form, waste_sorted: v })} />
@@ -762,9 +762,9 @@ const CleanupExercisePanel = ({ isAdmin = false }: Props) => {
             <div>
               <h4 className="text-sm font-semibold text-foreground mb-3">Notes & Observations</h4>
               <div className="space-y-3">
-                <div><Label>Observations</Label><Textarea value={form.observations} onChange={(e) => setForm({ ...form, observations: e.target.value })} placeholder="What did you observe during the cleanup?" /></div>
-                <div><Label>Environmental Issues</Label><Textarea value={form.environmental_issues} onChange={(e) => setForm({ ...form, environmental_issues: e.target.value })} placeholder="Any environmental concerns noticed?" /></div>
-                <div><Label>Recommendations</Label><Textarea value={form.recommendations} onChange={(e) => setForm({ ...form, recommendations: e.target.value })} placeholder="Suggestions for future cleanups" /></div>
+                <div><Label>{t("cleanupPanel.observations", "Observations")}</Label><Textarea value={form.observations} onChange={(e) => setForm({ ...form, observations: e.target.value })} placeholder="What did you observe during the cleanup?" /></div>
+                <div><Label>{t("cleanupPanel.environmentalIssues", "Environmental Issues")}</Label><Textarea value={form.environmental_issues} onChange={(e) => setForm({ ...form, environmental_issues: e.target.value })} placeholder="Any environmental concerns noticed?" /></div>
+                <div><Label>{t("cleanupPanel.recommendations", "Recommendations")}</Label><Textarea value={form.recommendations} onChange={(e) => setForm({ ...form, recommendations: e.target.value })} placeholder="Suggestions for future cleanups" /></div>
               </div>
             </div>
 
@@ -790,7 +790,7 @@ const CleanupExercisePanel = ({ isAdmin = false }: Props) => {
                 {(createMutation.isPending || updateMutation.isPending) ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
                 {editingId ? "Update Cleanup" : "Submit Cleanup"}
               </Button>
-              <Button variant="outline" onClick={resetForm}>Cancel</Button>
+              <Button variant="outline" onClick={resetForm}>{t("common.cancel", "Cancel")}</Button>
             </div>
           </CardContent>
         </Card>
@@ -882,28 +882,28 @@ const CleanupExercisePanel = ({ isAdmin = false }: Props) => {
                 <div className="grid grid-cols-2 gap-3">
                   <div><span className="text-muted-foreground">Date:</span> {format(new Date(viewCleanup.cleanup_date), "PPP")}</div>
                   <div><span className="text-muted-foreground">Time:</span> {viewCleanup.start_time} - {viewCleanup.end_time}</div>
-                  <div><span className="text-muted-foreground">Location:</span> {viewCleanup.location_name}</div>
-                  <div><span className="text-muted-foreground">Type:</span> {LOCATION_TYPES.find((l) => l.value === viewCleanup.location_type)?.label}</div>
-                  <div><span className="text-muted-foreground">Organizer:</span> {viewCleanup.lead_organizer}</div>
+                  <div><span className="text-muted-foreground">{t("cleanupPanel.locationName", "Location")}:</span> {viewCleanup.location_name}</div>
+                  <div><span className="text-muted-foreground">{t("cleanupPanel.locationType", "Type")}:</span> {LOCATION_TYPES.find((l) => l.value === viewCleanup.location_type)?.label}</div>
+                  <div><span className="text-muted-foreground">{t("cleanupPanel.leadOrganizer", "Organizer")}:</span> {viewCleanup.lead_organizer}</div>
                   {viewCleanup.location_lat && <div><span className="text-muted-foreground">GPS:</span> {viewCleanup.location_lat}, {viewCleanup.location_lng}</div>}
                 </div>
 
                 <Separator />
                 <h4 className="font-semibold text-foreground">Participation</h4>
                 <div className="grid grid-cols-3 gap-3">
-                  <div><span className="text-muted-foreground">Volunteers:</span> {viewCleanup.num_volunteers}</div>
-                  <div><span className="text-muted-foreground">Waste Pickers:</span> {viewCleanup.num_waste_pickers}</div>
+                  <div><span className="text-muted-foreground">{t("cleanupPanel.numVolunteers", "Volunteers")}:</span> {viewCleanup.num_volunteers}</div>
+                  <div><span className="text-muted-foreground">{t("cleanupPanel.numWastePickers", "Waste Pickers")}:</span> {viewCleanup.num_waste_pickers}</div>
                   <div><span className="text-muted-foreground">Partners:</span> {viewCleanup.num_partner_orgs}</div>
                 </div>
 
                 <Separator />
                 <h4 className="font-semibold text-foreground">Waste Collection</h4>
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                  <div><span className="text-muted-foreground">Total:</span> <span className="font-semibold">{Number(viewCleanup.total_waste_kg).toLocaleString()} kg</span></div>
-                  <div><span className="text-muted-foreground">Plastic:</span> {Number(viewCleanup.plastic_waste_kg).toLocaleString()} kg</div>
-                  <div><span className="text-muted-foreground">Recyclable:</span> {Number(viewCleanup.recyclable_waste_kg).toLocaleString()} kg</div>
-                  <div><span className="text-muted-foreground">Non-Recyclable:</span> {Number(viewCleanup.non_recyclable_waste_kg).toLocaleString()} kg</div>
-                  <div><span className="text-muted-foreground">Bags:</span> {viewCleanup.num_bags}</div>
+                  <div><span className="text-muted-foreground">{t("common.total", "Total")}:</span> <span className="font-semibold">{Number(viewCleanup.total_waste_kg).toLocaleString()} kg</span></div>
+                  <div><span className="text-muted-foreground">{t("cleanupPanel.plasticWaste", "Plastic")}:</span> {Number(viewCleanup.plastic_waste_kg).toLocaleString()} kg</div>
+                  <div><span className="text-muted-foreground">{t("cleanupPanel.recyclableWaste", "Recyclable")}:</span> {Number(viewCleanup.recyclable_waste_kg).toLocaleString()} kg</div>
+                  <div><span className="text-muted-foreground">{t("cleanupPanel.nonRecyclableWaste", "Non-Recyclable")}:</span> {Number(viewCleanup.non_recyclable_waste_kg).toLocaleString()} kg</div>
+                  <div><span className="text-muted-foreground">{t("cleanupPanel.numBags", "Bags")}:</span> {viewCleanup.num_bags}</div>
                 </div>
 
                 {(viewCleanup.pet_bottles_kg > 0 || viewCleanup.hdpe_kg > 0 || viewCleanup.fishing_nets_kg > 0) && (
@@ -933,7 +933,7 @@ const CleanupExercisePanel = ({ isAdmin = false }: Props) => {
                 {[...viewCleanup.before_photos, ...viewCleanup.during_photos, ...viewCleanup.after_photos].length > 0 && (
                   <>
                     <Separator />
-                    <h4 className="font-semibold text-foreground">Photos</h4>
+                    <h4 className="font-semibold text-foreground">{t("cleanupPanel.photos", "Photos")}</h4>
                     {viewCleanup.before_photos.length > 0 && (
                       <div><p className="text-xs text-muted-foreground mb-1">Before</p><div className="flex flex-wrap gap-2">{viewCleanup.before_photos.map((url, i) => <img key={i} src={url} alt="Before" className="w-24 h-24 object-cover rounded-md border border-border" />)}</div></div>
                     )}

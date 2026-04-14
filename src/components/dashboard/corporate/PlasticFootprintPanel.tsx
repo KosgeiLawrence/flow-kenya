@@ -85,7 +85,7 @@ const PlasticFootprintPanel = () => {
           <CardContent className="p-4 text-center">
             <Target className="w-7 h-7 text-destructive mx-auto mb-2" />
             <p className="text-xl font-bold text-foreground">{(totalObligation / 1000).toFixed(1)} t</p>
-            <p className="text-xs text-muted-foreground">Recovery Obligation</p>
+            <p className="text-xs text-muted-foreground">{t("corporatePanels.recoveryObligation", "Recovery Obligation")}</p>
           </CardContent>
         </Card>
         <Card className="shadow-soft">
@@ -109,7 +109,7 @@ const PlasticFootprintPanel = () => {
             <div className="p-4 border border-border rounded-lg bg-muted/30 space-y-3">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
-                  <Label>Period Type</Label>
+                  <Label>{t("corporatePanels.periodType", "Period Type")}</Label>
                   <Select value={form.period_type} onValueChange={(v) => setForm({ ...form, period_type: v })}>
                     <SelectTrigger><SelectValue /></SelectTrigger>
                     <SelectContent>
@@ -120,7 +120,7 @@ const PlasticFootprintPanel = () => {
                   </Select>
                 </div>
                 <div>
-                  <Label>Material Type</Label>
+                  <Label>{t("corporatePanels.materialType", "Material Type")}</Label>
                   <Select value={form.material_type} onValueChange={(v) => setForm({ ...form, material_type: v })}>
                     <SelectTrigger><SelectValue /></SelectTrigger>
                     <SelectContent>
@@ -137,7 +137,7 @@ const PlasticFootprintPanel = () => {
                   <Input type="date" value={form.period_end} onChange={(e) => setForm({ ...form, period_end: e.target.value })} />
                 </div>
                 <div>
-                  <Label>Quantity (kg)</Label>
+                  <Label>{t("corporatePanels.quantityKg", "Quantity (kg)")}</Label>
                   <Input type="number" value={form.quantity_kg} onChange={(e) => setForm({ ...form, quantity_kg: e.target.value })} placeholder="e.g. 5000" />
                 </div>
                 <div className="flex items-end">
