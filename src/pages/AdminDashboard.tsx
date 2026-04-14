@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
-import { LogOut, Users, BarChart3, DollarSign, ShieldAlert, FileText, Settings, MapPin, Menu, X, ChevronRight, User, BookOpen, Mail, Eye, EyeOff, Trash2, ClipboardList, MessageSquare, TrendingUp, Receipt } from "lucide-react";
+import { LogOut, Users, BarChart3, DollarSign, ShieldAlert, FileText, Settings, MapPin, Menu, X, ChevronRight, User, BookOpen, Mail, Eye, EyeOff, Trash2, ClipboardList, MessageSquare, TrendingUp, Receipt, Wallet } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import UserVerificationPanel from "@/components/dashboard/admin/UserVerificationPanel";
@@ -24,9 +24,11 @@ import FormBuilderPanel from "@/components/dashboard/admin/FormBuilderPanel";
 import ContactMessagesPanel from "@/components/dashboard/admin/ContactMessagesPanel";
 import RevenueInsightsPanel from "@/components/dashboard/admin/RevenueInsightsPanel";
 import AdminBillingPanel from "@/components/dashboard/admin/AdminBillingPanel";
+import EarningsExpensesPanel from "@/components/dashboard/shared/EarningsExpensesPanel";
 
 const navItems = [
   { id: "revenue", label: "Revenue Insights", icon: TrendingUp },
+  { id: "business-insights", label: "Business Insights", icon: Wallet },
   { id: "billing", label: "Billing & Invoices", icon: Receipt },
   { id: "users", label: "User Verification", icon: Users },
   { id: "view-dashboards", label: "View User Dashboards", icon: Eye },
@@ -61,6 +63,7 @@ const AdminDashboard = () => {
   const renderPanel = () => {
     switch (activeTab) {
       case "revenue": return <RevenueInsightsPanel />;
+      case "business-insights": return <EarningsExpensesPanel role="admin" />;
       case "billing": return <AdminBillingPanel />;
       case "users": return <UserVerificationPanel />;
       case "view-dashboards": return <ViewUserDashboardPanel />;
