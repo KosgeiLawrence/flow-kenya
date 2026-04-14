@@ -342,6 +342,7 @@ const EarningsExpensesPanel = ({ role }: Props) => {
   const { softDelete } = useTrash();
 
   const handleDeleteTx = async (tx: any) => {
+    if (tx._isPayment) { toast.error("Platform payments can't be deleted from here"); return; }
     const success = await softDelete("financial_transactions", tx.id, tx, `${tx.type === "income" ? "Income" : "Expense"}: KES ${Number(tx.amount).toLocaleString()}`);
     if (success) queryClient.invalidateQueries({ queryKey: ["financial_transactions"] });
   };
