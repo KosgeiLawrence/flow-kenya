@@ -29,9 +29,9 @@ const Navbar = () => {
 
   return (
     <header
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] ${
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] ${
         scrolled
-          ? "bg-forest-deep/80 backdrop-blur-2xl border-b border-primary-foreground/8 shadow-elevated"
+          ? "bg-[rgba(255,255,255,0.06)] backdrop-blur-[20px] border-b border-[rgba(255,255,255,0.08)] shadow-[0_8px_32px_rgba(0,0,0,0.2)]"
           : "bg-transparent"
       }`}
     >
@@ -109,7 +109,7 @@ const Navbar = () => {
             animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
             transition={{ duration: 0.3, ease: [0.4, 0, 0.2, 1] }}
-            className="md:hidden overflow-hidden bg-forest-deep/95 backdrop-blur-2xl border-t border-primary-foreground/8"
+            className="md:hidden overflow-hidden bg-[rgba(255,255,255,0.06)] backdrop-blur-[20px] border-t border-[rgba(255,255,255,0.08)]"
           >
             <div className="container py-6 flex flex-col gap-2">
               {navItems.map((item) => (

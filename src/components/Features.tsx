@@ -43,7 +43,7 @@ const Features = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={isInView ? { opacity: 1, y: 0 } : {}}
               transition={{ delay: i * 0.08, duration: 0.5, ease: [0.4, 0, 0.2, 1] }}
-              className="group flex gap-4 rounded-2xl glass-card p-6"
+              className="group flex gap-4 glass p-6"
             >
               <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-primary/10 transition-all duration-300 group-hover:bg-primary group-hover:scale-110">
                 <f.icon className="h-6 w-6 text-primary transition-colors duration-300 group-hover:text-primary-foreground" />
