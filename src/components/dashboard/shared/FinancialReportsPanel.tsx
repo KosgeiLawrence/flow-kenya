@@ -19,6 +19,7 @@ import jsPDF from "jspdf";
 import { addCleanHeader, addSectionTitle, addDocMeta, drawTableHeader, drawTableRow, drawTotalLine, finalizeCleanPdf, PDF_COLORS, buildPdfOrgInfo, loadImageAsBase64 } from "@/lib/pdfBranding";
 import { useOrgInfo } from "@/hooks/useOrgInfo";
 import { toast } from "sonner";
+import { useTranslation } from "react-i18next";
 
 type UserRole = "waste_picker" | "aggregator" | "recycler" | "admin";
 

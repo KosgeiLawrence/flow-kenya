@@ -12,6 +12,7 @@ import { Briefcase, Target, Calendar, Send, CheckCircle2, Clock, XCircle, Loader
 import { toast } from "sonner";
 import { format } from "date-fns";
 import ExternalGrantsFeed from "./ExternalGrantsFeed";
+import { useTranslation } from "react-i18next";
 
 const GrantsDiscoveryPanel = ({ userRole = "waste_picker" }: { userRole?: string }) => {
   const { user, profile } = useAuth();
