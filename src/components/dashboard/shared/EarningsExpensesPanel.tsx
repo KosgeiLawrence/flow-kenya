@@ -61,6 +61,9 @@ const EarningsExpensesPanel = ({ role }: Props) => {
 
   const [addDialogOpen, setAddDialogOpen] = useState(false);
   const [budgetDialogOpen, setBudgetDialogOpen] = useState(false);
+  const [editingBudgetId, setEditingBudgetId] = useState<string | null>(null);
+  const [editBudgetAmount, setEditBudgetAmount] = useState("");
+  const [editBudgetNotes, setEditBudgetNotes] = useState("");
   const [exportDialogOpen, setExportDialogOpen] = useState(false);
   const [exportRange, setExportRange] = useState({ start: format(startOfMonth(new Date()), "yyyy-MM-dd"), end: format(new Date(), "yyyy-MM-dd"), type: "all" as "all" | "income" | "expense" });
   const [budgetViewTab, setBudgetViewTab] = useState<"active" | "history">("active");
@@ -282,6 +285,20 @@ const EarningsExpensesPanel = ({ role }: Props) => {
       queryClient.invalidateQueries({ queryKey: ["financial_budgets"] });
       toast.success("Budget archived");
     },
+  });
+
+  // Update budget
+  const updateBudgetMutation = useMutation({
+    mutationFn: async ({ id, amount, notes }: { id: string; amount: number; notes: string }) => {
+      const { error } = await supabase.from("financial_budgets").update({ amount, notes: notes || null }).eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["financial_budgets"] });
+      setEditingBudgetId(null);
+      toast.success("Budget updated");
+    },
+    onError: (e: any) => toast.error(e?.message || "Failed to update budget"),
   });
 
   const { softDelete } = useTrash();
@@ -619,34 +636,67 @@ const EarningsExpensesPanel = ({ role }: Props) => {
   const expenseCategories = (categories || []).filter(c => c.type === "expense");
   const activeCats = newTx.type === "income" ? incomeCategories : expenseCategories;
 
-  const renderBudgetCard = (bp: any, showActions = true) => (
-    <div key={bp.id} className="p-3 rounded-lg border bg-card/50 space-y-2">
-      <div className="flex items-start justify-between">
-        <div className="min-w-0 flex-1">
+  const renderBudgetCard = (bp: any, showActions = true) => {
+    const isEditing = editingBudgetId === bp.id;
+
+    if (isEditing) {
+      return (
+        <div key={bp.id} className="p-3 rounded-lg border bg-card/50 space-y-2">
           <p className="text-xs font-medium truncate">{bp.financial_categories?.name || "Overall Budget"}</p>
-        </div>
-        {showActions && (
-          <div className="flex gap-1 shrink-0">
-            {!bp.isExpired && bp.status !== "archived" && (
-              <button onClick={(e) => { e.stopPropagation(); archiveBudgetMutation.mutate(bp.id); }} className="text-muted-foreground hover:text-foreground p-1" title="Archive">
-                <Archive className="w-3 h-3" />
-              </button>
-            )}
-            <button onClick={(e) => { e.stopPropagation(); handleDeleteBudget(bp); }} className="text-muted-foreground hover:text-destructive p-1" title="Delete">
-              <Trash2 className="w-3 h-3" />
-            </button>
+          <div className="space-y-2">
+            <div>
+              <Label className="text-[10px]">Amount (KES)</Label>
+              <Input type="number" className="h-8 text-sm" value={editBudgetAmount} onChange={e => setEditBudgetAmount(e.target.value)} />
+            </div>
+            <div>
+              <Label className="text-[10px]">Notes</Label>
+              <Input className="h-8 text-sm" placeholder="Optional notes" value={editBudgetNotes} onChange={e => setEditBudgetNotes(e.target.value)} />
+            </div>
+            <div className="flex gap-2">
+              <Button size="sm" className="h-7 text-xs" disabled={!editBudgetAmount || Number(editBudgetAmount) <= 0 || updateBudgetMutation.isPending}
+                onClick={(e) => { e.stopPropagation(); updateBudgetMutation.mutate({ id: bp.id, amount: Number(editBudgetAmount), notes: editBudgetNotes }); }}>
+                {updateBudgetMutation.isPending ? "Saving..." : "Save"}
+              </Button>
+              <Button size="sm" variant="ghost" className="h-7 text-xs" onClick={(e) => { e.stopPropagation(); setEditingBudgetId(null); }}>Cancel</Button>
+            </div>
           </div>
-        )}
+        </div>
+      );
+    }
+
+    return (
+      <div key={bp.id} className="p-3 rounded-lg border bg-card/50 space-y-2">
+        <div className="flex items-start justify-between">
+          <div className="min-w-0 flex-1">
+            <p className="text-xs font-medium truncate">{bp.financial_categories?.name || "Overall Budget"}</p>
+          </div>
+          {showActions && (
+            <div className="flex gap-1 shrink-0">
+              <button onClick={(e) => { e.stopPropagation(); setEditingBudgetId(bp.id); setEditBudgetAmount(String(Number(bp.amount))); setEditBudgetNotes(bp.notes || ""); }} className="text-muted-foreground hover:text-foreground p-1" title="Edit">
+                <Edit2 className="w-3 h-3" />
+              </button>
+              {!bp.isExpired && bp.status !== "archived" && (
+                <button onClick={(e) => { e.stopPropagation(); archiveBudgetMutation.mutate(bp.id); }} className="text-muted-foreground hover:text-foreground p-1" title="Archive">
+                  <Archive className="w-3 h-3" />
+                </button>
+              )}
+              <button onClick={(e) => { e.stopPropagation(); handleDeleteBudget(bp); }} className="text-muted-foreground hover:text-destructive p-1" title="Delete">
+                <Trash2 className="w-3 h-3" />
+              </button>
+            </div>
+          )}
+        </div>
+        <div className="flex items-center justify-between text-xs">
+          <span className="text-muted-foreground">KES {bp.spent.toLocaleString()} / {Number(bp.amount).toLocaleString()}</span>
+          <span className={`font-bold ${bp.pct > 100 ? "text-destructive" : bp.pct >= 80 ? "text-yellow-600" : "text-primary"}`}>
+            {Math.round(bp.pct)}%
+          </span>
+        </div>
+        <Progress value={Math.min(bp.pct, 100)} className={`h-2 ${bp.pct > 100 ? "[&>div]:bg-destructive" : bp.pct >= 80 ? "[&>div]:bg-yellow-500" : ""}`} />
+        {bp.notes && <p className="text-[10px] text-muted-foreground italic">📝 {bp.notes}</p>}
       </div>
-      <div className="flex items-center justify-between text-xs">
-        <span className="text-muted-foreground">KES {bp.spent.toLocaleString()} / {Number(bp.amount).toLocaleString()}</span>
-        <span className={`font-bold ${bp.pct > 100 ? "text-destructive" : bp.pct >= 80 ? "text-yellow-600" : "text-primary"}`}>
-          {Math.round(bp.pct)}%
-        </span>
-      </div>
-      <Progress value={Math.min(bp.pct, 100)} className={`h-2 ${bp.pct > 100 ? "[&>div]:bg-destructive" : bp.pct >= 80 ? "[&>div]:bg-yellow-500" : ""}`} />
-    </div>
-  );
+    );
+  };
 
   const renderBudgetGroup = (group: ReturnType<typeof groupBudgets>[0], showActions = true) => {
     const isExpanded = expandedBudgetGroups.has(group.key);
