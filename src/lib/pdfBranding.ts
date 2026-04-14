@@ -1,14 +1,26 @@
 import jsPDF from "jspdf";
 
-// ── Brand Colors ──
+// ── Modern Minimal Color Palette ──
 export const PDF_COLORS = {
-  forest: [31, 107, 69] as [number, number, number],       // #1F6B45
-  forestDeep: [26, 58, 42] as [number, number, number],     // #1A3A2A
-  gold: [212, 168, 67] as [number, number, number],         // #D4A843
-  darkText: [30, 30, 30] as [number, number, number],
-  mutedText: [120, 120, 120] as [number, number, number],
-  lightGray: [240, 240, 240] as [number, number, number],
+  // Primary text
+  black: [20, 20, 20] as [number, number, number],
+  darkText: [35, 35, 35] as [number, number, number],
+  bodyText: [55, 55, 55] as [number, number, number],
+  mutedText: [130, 130, 130] as [number, number, number],
+  lightMuted: [170, 170, 170] as [number, number, number],
+
+  // Backgrounds & dividers
   white: [255, 255, 255] as [number, number, number],
+  offWhite: [250, 250, 250] as [number, number, number],
+  lightGray: [240, 240, 240] as [number, number, number],
+  divider: [225, 225, 225] as [number, number, number],
+  tableRowAlt: [248, 249, 250] as [number, number, number],
+
+  // Brand accent (used sparingly)
+  forest: [31, 107, 69] as [number, number, number],
+  forestDeep: [22, 78, 50] as [number, number, number],
+  gold: [198, 155, 55] as [number, number, number],
+  // Legacy aliases
   tableHeaderBg: [31, 107, 69] as [number, number, number],
 };
 
@@ -18,6 +30,15 @@ const CONTACT = {
   email: "info@duaraflow.co.ke",
   website: "www.duaraflow.co.ke",
   location: "Mombasa, Kenya",
+};
+
+// ── Spacing Constants (8px system mapped to PDF mm) ──
+const S = {
+  margin: 20,      // page margin
+  gutter: 4,       // small gap
+  sectionGap: 12,  // between sections
+  lineHeight: 5,   // body text line height
+  rowHeight: 7,    // table row height
 };
 
 // ── Logo Cache ──
@@ -54,9 +75,17 @@ const getDuaraIntelligenceLogo = async (): Promise<string | null> => {
   return _intelligenceLogoCache;
 };
 
+// ── Utility: thin horizontal divider ──
+const drawDivider = (doc: jsPDF, y: number, x1?: number, x2?: number) => {
+  const pw = doc.internal.pageSize.getWidth();
+  doc.setDrawColor(...PDF_COLORS.divider);
+  doc.setLineWidth(0.3);
+  doc.line(x1 ?? S.margin, y, x2 ?? (pw - S.margin), y);
+};
+
 /**
- * Adds a professional branded header to the PDF.
- * Returns the Y position after the header for content to start.
+ * Premium branded header — Duara Flow logo + contact.
+ * Clean, minimal layout inspired by Stripe invoices.
  */
 export const addBrandedHeader = async (
   doc: jsPDF,
@@ -64,103 +93,99 @@ export const addBrandedHeader = async (
   documentSubtitle?: string,
   options?: { orgLogoBase64?: string | null }
 ): Promise<number> => {
-  const pageWidth = doc.internal.pageSize.getWidth();
+  const pw = doc.internal.pageSize.getWidth();
   const logo = await getDuaraFlowLogo();
 
-  // ── Top accent bar (gold) ──
-  doc.setFillColor(...PDF_COLORS.gold);
-  doc.rect(0, 0, pageWidth, 4, "F");
-
-  // ── Logo ──
+  // Logo (left)
+  let y = 18;
   if (logo) {
-    doc.addImage(logo, "PNG", 15, 10, 52, 20);
+    doc.addImage(logo, "PNG", S.margin, 12, 48, 18);
   } else {
-    doc.setFontSize(18);
+    doc.setFontSize(16);
+    doc.setFont("helvetica", "bold");
     doc.setTextColor(...PDF_COLORS.forest);
-    doc.text("DUARA FLOW", 15, 24);
+    doc.text("DUARA FLOW", S.margin, y + 4);
   }
 
-  // ── Org logo (right side) ──
+  // Org logo (right side, if provided)
   if (options?.orgLogoBase64) {
-    doc.addImage(options.orgLogoBase64, "PNG", pageWidth - 45, 10, 30, 20);
+    doc.addImage(options.orgLogoBase64, "PNG", pw - S.margin - 28, 12, 28, 18);
   }
 
-  // ── Contact info (right-aligned) ──
-  const contactX = options?.orgLogoBase64 ? pageWidth - 50 : pageWidth - 15;
+  // Contact info — right aligned, small & muted
+  const contactX = options?.orgLogoBase64 ? pw - S.margin - 32 : pw - S.margin;
   doc.setFontSize(7);
+  doc.setFont("helvetica", "normal");
   doc.setTextColor(...PDF_COLORS.mutedText);
-  doc.text(CONTACT.phone, contactX, 12, { align: "right" });
-  doc.text(CONTACT.email, contactX, 16, { align: "right" });
-  doc.text(CONTACT.website, contactX, 20, { align: "right" });
-  doc.text(CONTACT.location, contactX, 24, { align: "right" });
+  doc.text(CONTACT.phone, contactX, 14, { align: "right" });
+  doc.text(CONTACT.email, contactX, 18, { align: "right" });
+  doc.text(CONTACT.website, contactX, 22, { align: "right" });
+  doc.text(CONTACT.location, contactX, 26, { align: "right" });
 
-  // ── Separator line ──
-  doc.setDrawColor(...PDF_COLORS.forest);
-  doc.setLineWidth(0.8);
-  doc.line(15, 33, pageWidth - 15, 33);
+  y = 34;
+  drawDivider(doc, y);
+  y += 10;
 
-  // ── Document Title ──
-  doc.setFontSize(16);
-  doc.setTextColor(...PDF_COLORS.forestDeep);
-  doc.text(documentTitle.toUpperCase(), 15, 42);
+  // Document title — large, bold, dark
+  doc.setFontSize(20);
+  doc.setFont("helvetica", "bold");
+  doc.setTextColor(...PDF_COLORS.black);
+  doc.text(documentTitle, S.margin, y);
+  y += 4;
 
-  let y = 46;
   if (documentSubtitle) {
+    y += 2;
     doc.setFontSize(9);
+    doc.setFont("helvetica", "normal");
     doc.setTextColor(...PDF_COLORS.mutedText);
-    doc.text(documentSubtitle, 15, y);
-    y += 6;
+    doc.text(documentSubtitle, S.margin, y);
+    y += 4;
   }
 
-  // ── Thin gold accent under title ──
-  doc.setDrawColor(...PDF_COLORS.gold);
-  doc.setLineWidth(0.5);
-  doc.line(15, y, 60, y);
-  y += 8;
-
+  y += 6;
   doc.setTextColor(...PDF_COLORS.darkText);
+  doc.setFont("helvetica", "normal");
   return y;
 };
 
 /**
- * Adds a branded footer to every page of the PDF.
+ * Clean branded footer — page numbers, subtle contact line, intelligence logo.
  */
 export const addBrandedFooter = async (doc: jsPDF) => {
   const totalPages = doc.getNumberOfPages();
-  const pageWidth = doc.internal.pageSize.getWidth();
-  const pageHeight = doc.internal.pageSize.getHeight();
+  const pw = doc.internal.pageSize.getWidth();
+  const ph = doc.internal.pageSize.getHeight();
   const intelligenceLogo = await getDuaraIntelligenceLogo();
 
   for (let i = 1; i <= totalPages; i++) {
     doc.setPage(i);
+    const footerY = ph - 18;
 
-    const footerY = pageHeight - 18;
+    drawDivider(doc, footerY);
 
-    // ── Separator ──
-    doc.setDrawColor(...PDF_COLORS.lightGray);
-    doc.setLineWidth(0.3);
-    doc.line(15, footerY, pageWidth - 15, footerY);
-
-    // ── Intelligence logo (left) ──
+    // Intelligence logo (left)
     if (intelligenceLogo) {
-      doc.addImage(intelligenceLogo, "PNG", 15, footerY + 2, 25, 13);
+      doc.addImage(intelligenceLogo, "PNG", S.margin, footerY + 2, 22, 11);
     }
 
-    // ── Contact info (center) ──
-    doc.setFontSize(6.5);
-    doc.setTextColor(...PDF_COLORS.mutedText);
-    const centerX = pageWidth / 2;
-    doc.text(`${CONTACT.phone}  •  ${CONTACT.email}  •  ${CONTACT.website}`, centerX, footerY + 6, { align: "center" });
-    doc.text(`${CONTACT.location}  •  System-generated document — Duara Flow`, centerX, footerY + 10, { align: "center" });
+    // Contact line (center)
+    doc.setFontSize(6);
+    doc.setFont("helvetica", "normal");
+    doc.setTextColor(...PDF_COLORS.lightMuted);
+    const cx = pw / 2;
+    doc.text(`${CONTACT.phone}  ·  ${CONTACT.email}  ·  ${CONTACT.website}`, cx, footerY + 6, { align: "center" });
+    doc.text(`${CONTACT.location}  ·  Generated by Duara Flow`, cx, footerY + 10, { align: "center" });
 
-    // ── Page number (right) ──
+    // Page number (right)
     doc.setFontSize(7);
-    doc.text(`Page ${i} of ${totalPages}`, pageWidth - 15, footerY + 8, { align: "right" });
+    doc.setTextColor(...PDF_COLORS.mutedText);
+    doc.text(`${i} / ${totalPages}`, pw - S.margin, footerY + 8, { align: "right" });
   }
 };
 
 /**
- * Draw a styled table header row.
+ * Modern table header — light background, no heavy fills.
+ * Uses thin bottom border and muted uppercase labels.
  */
 export const drawTableHeader = (
   doc: jsPDF,
@@ -168,19 +193,30 @@ export const drawTableHeader = (
   y: number,
   width: number = 170
 ) => {
-  doc.setFillColor(...PDF_COLORS.forest);
-  doc.rect(15, y - 5, width, 8, "F");
-  doc.setTextColor(...PDF_COLORS.white);
-  doc.setFontSize(8);
+  // Light gray background strip
+  doc.setFillColor(...PDF_COLORS.offWhite);
+  doc.rect(S.margin, y - 5, width, 8, "F");
+
+  // Bottom border of header
+  doc.setDrawColor(...PDF_COLORS.divider);
+  doc.setLineWidth(0.4);
+  doc.line(S.margin, y + 3, S.margin + width, y + 3);
+
+  // Labels — small, uppercase, muted
+  doc.setFontSize(7);
+  doc.setFont("helvetica", "bold");
+  doc.setTextColor(...PDF_COLORS.mutedText);
   columns.forEach((col) => {
-    doc.text(col.label, col.x, y);
+    doc.text(col.label.toUpperCase(), col.x, y);
   });
+
   doc.setTextColor(...PDF_COLORS.darkText);
+  doc.setFont("helvetica", "normal");
   return y + 8;
 };
 
 /**
- * Draw alternating row background for table readability.
+ * Table row — subtle alternating background, no borders.
  */
 export const drawTableRow = (
   doc: jsPDF,
@@ -189,40 +225,48 @@ export const drawTableRow = (
   width: number = 170
 ) => {
   if (index % 2 === 0) {
-    doc.setFillColor(248, 248, 248);
-    doc.rect(15, y - 4, width, 7, "F");
+    doc.setFillColor(...PDF_COLORS.tableRowAlt);
+    doc.rect(S.margin, y - 4, width, S.rowHeight, "F");
   }
 };
 
 /**
- * Add a section title with forest color.
+ * Section title — clean, with a subtle bottom accent.
  */
 export const addSectionTitle = (doc: jsPDF, title: string, y: number): number => {
   doc.setFontSize(12);
-  doc.setTextColor(...PDF_COLORS.forest);
-  doc.text(title, 15, y);
+  doc.setFont("helvetica", "bold");
+  doc.setTextColor(...PDF_COLORS.black);
+  doc.text(title, S.margin, y);
+
+  // Thin accent underline
+  doc.setDrawColor(...PDF_COLORS.divider);
+  doc.setLineWidth(0.3);
+  doc.line(S.margin, y + 2, S.margin + 40, y + 2);
+
   doc.setTextColor(...PDF_COLORS.darkText);
+  doc.setFont("helvetica", "normal");
   return y + 10;
 };
 
 /**
- * Draw a totals line with separator.
+ * Totals line — thin top divider + bold total in brand color.
  */
 export const drawTotalLine = (doc: jsPDF, label: string, y: number): number => {
-  doc.setDrawColor(...PDF_COLORS.gold);
-  doc.setLineWidth(0.5);
-  doc.line(15, y, 195, y);
+  const pw = doc.internal.pageSize.getWidth();
+  drawDivider(doc, y);
   y += 6;
   doc.setFontSize(11);
-  doc.setTextColor(...PDF_COLORS.forestDeep);
-  doc.text(label, 110, y);
+  doc.setFont("helvetica", "bold");
+  doc.setTextColor(...PDF_COLORS.forest);
+  doc.text(label, pw - S.margin, y, { align: "right" });
   doc.setTextColor(...PDF_COLORS.darkText);
-  return y + 8;
+  doc.setFont("helvetica", "normal");
+  return y + 10;
 };
 
 /**
- * Draw subtotal, VAT, and grand total lines on the PDF.
- * Use this instead of drawTotalLine when VAT is applicable.
+ * VAT total block — subtotal, VAT, grand total with clean alignment.
  */
 export const drawVatTotalBlock = (
   doc: jsPDF,
@@ -232,36 +276,50 @@ export const drawVatTotalBlock = (
   y: number,
   currency: string = "KES"
 ): number => {
-  doc.setDrawColor(...PDF_COLORS.gold);
-  doc.setLineWidth(0.5);
-  doc.line(15, y, 195, y);
-  y += 6;
+  const pw = doc.internal.pageSize.getWidth();
+  const rightX = pw - S.margin;
+
+  drawDivider(doc, y);
+  y += 8;
 
   doc.setFontSize(9);
-  doc.setTextColor(...PDF_COLORS.darkText);
-  doc.text(`Subtotal: ${currency} ${subtotal.toLocaleString()}`, 110, y);
-  y += 6;
+  doc.setFont("helvetica", "normal");
+  doc.setTextColor(...PDF_COLORS.bodyText);
+  doc.text("Subtotal", rightX - 55, y);
+  doc.text(`${currency} ${subtotal.toLocaleString()}`, rightX, y, { align: "right" });
+  y += 7;
 
   if (includeVat) {
     const vatAmount = subtotal * (vatPercent / 100);
-    doc.text(`VAT (${vatPercent}%): ${currency} ${vatAmount.toLocaleString()}`, 110, y);
-    y += 6;
-    const grandTotal = subtotal + vatAmount;
-    doc.setFontSize(11);
-    doc.setTextColor(...PDF_COLORS.forestDeep);
-    doc.text(`Total: ${currency} ${grandTotal.toLocaleString()}`, 110, y);
+    doc.text(`VAT (${vatPercent}%)`, rightX - 55, y);
+    doc.text(`${currency} ${vatAmount.toLocaleString()}`, rightX, y, { align: "right" });
+    y += 7;
+
+    // Grand total — bold, slightly larger
+    drawDivider(doc, y - 2, rightX - 60, rightX);
+    y += 4;
+    doc.setFontSize(12);
+    doc.setFont("helvetica", "bold");
+    doc.setTextColor(...PDF_COLORS.black);
+    doc.text("Total", rightX - 55, y);
+    doc.text(`${currency} ${(subtotal + vatAmount).toLocaleString()}`, rightX, y, { align: "right" });
   } else {
-    doc.setFontSize(11);
-    doc.setTextColor(...PDF_COLORS.forestDeep);
-    doc.text(`Total: ${currency} ${subtotal.toLocaleString()}`, 110, y);
+    drawDivider(doc, y - 2, rightX - 60, rightX);
+    y += 4;
+    doc.setFontSize(12);
+    doc.setFont("helvetica", "bold");
+    doc.setTextColor(...PDF_COLORS.black);
+    doc.text("Total", rightX - 55, y);
+    doc.text(`${currency} ${subtotal.toLocaleString()}`, rightX, y, { align: "right" });
   }
 
   doc.setTextColor(...PDF_COLORS.darkText);
-  return y + 8;
+  doc.setFont("helvetica", "normal");
+  return y + 10;
 };
 
 /**
- * Add document metadata (date, reference, entity, etc.)
+ * Document metadata — structured label:value pairs with clean spacing.
  */
 export const addDocMeta = (
   doc: jsPDF,
@@ -271,24 +329,28 @@ export const addDocMeta = (
   let y = startY;
   doc.setFontSize(9);
   fields.forEach((f) => {
+    doc.setFont("helvetica", "normal");
     doc.setTextColor(...PDF_COLORS.mutedText);
-    doc.text(`${f.label}:`, 15, y);
+    doc.text(`${f.label}`, S.margin, y);
     doc.setTextColor(...PDF_COLORS.darkText);
-    doc.text(f.value, 55, y);
-    y += 7;
+    doc.setFont("helvetica", "bold");
+    doc.text(f.value, S.margin + 40, y);
+    y += 6;
   });
-  return y + 4;
+  doc.setFont("helvetica", "normal");
+  return y + 6;
 };
 
 /**
- * Complete PDF generation with header + footer.
- * Call this at the very end before doc.save().
+ * Finalize PDF — adds branded footer to every page.
  */
 export const finalizePdf = async (doc: jsPDF) => {
   await addBrandedFooter(doc);
 };
 
-// ── Clean (unbranded) header for user-to-client documents ──
+// ────────────────────────────────────────────
+// Clean (org-branded) document utilities
+// ────────────────────────────────────────────
 
 export interface PdfOrgInfo {
   orgName: string;
@@ -303,10 +365,8 @@ export interface PdfOrgInfo {
 }
 
 /**
- * Adds a clean header with the user's organization branding.
- * If orgInfo is provided, displays org name, logo, address, and contact.
- * Falls back to a simple title-only header if no orgInfo.
- * Returns the Y position after the header.
+ * Clean header — user/org branding, no Duara logos.
+ * Stripe-like layout: logo left, contact right, title below.
  */
 export const addCleanHeader = (
   doc: jsPDF,
@@ -314,121 +374,102 @@ export const addCleanHeader = (
   documentSubtitle?: string,
   orgInfo?: PdfOrgInfo | null
 ): number => {
-  const pageWidth = doc.internal.pageSize.getWidth();
-
-  // ── Thin accent line at top ──
-  doc.setDrawColor(...PDF_COLORS.forest);
-  doc.setLineWidth(1);
-  doc.line(15, 12, pageWidth - 15, 12);
-
-  let y = 14;
+  const pw = doc.internal.pageSize.getWidth();
+  let y = 16;
 
   if (orgInfo) {
-    // ── Org Logo (left side) ──
+    // Org logo (left)
     if (orgInfo.orgLogoBase64) {
       try {
-        doc.addImage(orgInfo.orgLogoBase64, "PNG", 15, y + 1, 28, 18);
-      } catch { /* logo failed, skip */ }
+        doc.addImage(orgInfo.orgLogoBase64, "PNG", S.margin, y - 2, 26, 17);
+      } catch { /* logo failed */ }
     }
 
-    const textStartX = orgInfo.orgLogoBase64 ? 48 : 15;
+    const textX = orgInfo.orgLogoBase64 ? S.margin + 30 : S.margin;
 
-    // ── Organization Name ──
+    // Org name
     doc.setFontSize(14);
-    doc.setTextColor(...PDF_COLORS.forestDeep);
-    doc.text(orgInfo.orgName, textStartX, y + 8);
+    doc.setFont("helvetica", "bold");
+    doc.setTextColor(...PDF_COLORS.black);
+    doc.text(orgInfo.orgName, textX, y + 5);
 
-    // ── Contact details ──
-    doc.setFontSize(7.5);
+    // Contact details — right column
+    doc.setFontSize(7);
+    doc.setFont("helvetica", "normal");
     doc.setTextColor(...PDF_COLORS.mutedText);
-    let contactY = y + 13;
-    const contactParts: string[] = [];
-    if (orgInfo.contactPhone) contactParts.push(orgInfo.contactPhone);
-    if (orgInfo.contactEmail) contactParts.push(orgInfo.contactEmail);
-    if (contactParts.length) {
-      doc.text(contactParts.join("  •  "), textStartX, contactY);
-      contactY += 4;
+    let ry = y;
+    const rx = pw - S.margin;
+    if (orgInfo.contactPhone) { doc.text(orgInfo.contactPhone, rx, ry, { align: "right" }); ry += 4; }
+    if (orgInfo.contactEmail) { doc.text(orgInfo.contactEmail, rx, ry, { align: "right" }); ry += 4; }
+    if (orgInfo.physicalAddress || orgInfo.county) {
+      const addr = [orgInfo.physicalAddress, orgInfo.county].filter(Boolean).join(", ");
+      doc.text(addr, rx, ry, { align: "right" }); ry += 4;
     }
-    const addressParts: string[] = [];
-    if (orgInfo.physicalAddress) addressParts.push(orgInfo.physicalAddress);
-    if (orgInfo.county) addressParts.push(orgInfo.county);
-    if (addressParts.length) {
-      doc.text(addressParts.join(", "), textStartX, contactY);
-      contactY += 4;
-    }
-    if (orgInfo.website) {
-      doc.text(orgInfo.website, textStartX, contactY);
-      contactY += 4;
-    }
+    if (orgInfo.website) { doc.text(orgInfo.website, rx, ry, { align: "right" }); ry += 4; }
     const regParts: string[] = [];
     if (orgInfo.kraPin) regParts.push(`KRA: ${orgInfo.kraPin}`);
     if (orgInfo.companyRegistration) regParts.push(`Reg: ${orgInfo.companyRegistration}`);
-    if (regParts.length) {
-      doc.text(regParts.join("  •  "), textStartX, contactY);
-      contactY += 4;
-    }
+    if (regParts.length) { doc.text(regParts.join("  ·  "), rx, ry, { align: "right" }); ry += 4; }
 
-    y = Math.max(contactY, y + 22) + 2;
-
-    // ── Separator ──
-    doc.setDrawColor(...PDF_COLORS.forest);
-    doc.setLineWidth(0.5);
-    doc.line(15, y, pageWidth - 15, y);
-    y += 6;
+    y = Math.max(ry, y + 20) + 2;
+  } else {
+    y += 8;
   }
 
-  // ── Document Title ──
-  doc.setFontSize(18);
-  doc.setTextColor(...PDF_COLORS.forestDeep);
-  doc.text(documentTitle.toUpperCase(), 15, y + 6);
+  // Divider
+  drawDivider(doc, y);
   y += 10;
 
+  // Document title
+  doc.setFontSize(20);
+  doc.setFont("helvetica", "bold");
+  doc.setTextColor(...PDF_COLORS.black);
+  doc.text(documentTitle, S.margin, y);
+  y += 4;
+
   if (documentSubtitle) {
+    y += 2;
     doc.setFontSize(9);
+    doc.setFont("helvetica", "normal");
     doc.setTextColor(...PDF_COLORS.mutedText);
-    doc.text(documentSubtitle, 15, y);
-    y += 6;
+    doc.text(documentSubtitle, S.margin, y);
+    y += 4;
   }
 
-  // ── Thin accent under title ──
-  doc.setDrawColor(...PDF_COLORS.gold);
-  doc.setLineWidth(0.5);
-  doc.line(15, y, 60, y);
-  y += 8;
-
+  y += 6;
   doc.setTextColor(...PDF_COLORS.darkText);
+  doc.setFont("helvetica", "normal");
   return y;
 };
 
 /**
- * Adds a clean footer with only page numbers (no logos or contact info).
+ * Clean footer — page numbers only, no branding.
  */
 export const addCleanFooter = (doc: jsPDF) => {
   const totalPages = doc.getNumberOfPages();
-  const pageWidth = doc.internal.pageSize.getWidth();
-  const pageHeight = doc.internal.pageSize.getHeight();
+  const pw = doc.internal.pageSize.getWidth();
+  const ph = doc.internal.pageSize.getHeight();
 
   for (let i = 1; i <= totalPages; i++) {
     doc.setPage(i);
-    const footerY = pageHeight - 14;
-    doc.setDrawColor(...PDF_COLORS.lightGray);
-    doc.setLineWidth(0.3);
-    doc.line(15, footerY, pageWidth - 15, footerY);
+    const footerY = ph - 14;
+    drawDivider(doc, footerY);
     doc.setFontSize(7);
-    doc.setTextColor(...PDF_COLORS.mutedText);
-    doc.text(`Page ${i} of ${totalPages}`, pageWidth - 15, footerY + 6, { align: "right" });
+    doc.setFont("helvetica", "normal");
+    doc.setTextColor(...PDF_COLORS.lightMuted);
+    doc.text(`Page ${i} of ${totalPages}`, pw - S.margin, footerY + 6, { align: "right" });
   }
 };
 
 /**
- * Finalize a clean (unbranded) PDF — only page numbers in footer.
+ * Finalize clean PDF — page numbers only.
  */
 export const finalizeCleanPdf = (doc: jsPDF) => {
   addCleanFooter(doc);
 };
 
 /**
- * Load an image URL as base64 for use in PDFs.
+ * Load an image URL as base64 for PDF embedding.
  */
 export const loadImageAsBase64 = (url: string): Promise<string | null> => {
   return new Promise((resolve) => {
@@ -449,7 +490,7 @@ export const loadImageAsBase64 = (url: string): Promise<string | null> => {
 };
 
 /**
- * Build a PdfOrgInfo object from useOrgInfo data + optional logo base64.
+ * Build PdfOrgInfo from useOrgInfo data.
  */
 export const buildPdfOrgInfo = (
   orgInfo: { orgName: string; contactEmail?: string | null; contactPhone?: string | null; physicalAddress?: string | null; county?: string | null; website?: string | null; kraPin?: string | null; companyRegistration?: string | null },
