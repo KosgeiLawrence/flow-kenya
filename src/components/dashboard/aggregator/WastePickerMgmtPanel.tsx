@@ -114,7 +114,7 @@ const WastePickerMgmtPanel = () => {
       {/* Picker list with performance */}
       <Card className="shadow-soft">
         <CardHeader>
-          <CardTitle className="text-lg">Waste Pickers</CardTitle>
+          <CardTitle className="text-lg">{t("wastePickerMgmt.title")}</CardTitle>
         </CardHeader>
         <CardContent>
           {isLoading ? (

@@ -332,7 +332,7 @@ const SponsorshipPanel = () => {
       {/* County breakdown */}
       {countyMap.size > 0 && (
         <Card className="shadow-soft">
-          <CardHeader><CardTitle className="text-lg">Impact by County</CardTitle></CardHeader>
+          <CardHeader><CardTitle className="text-lg">{t("ngoPanels.impactByCounty", "Impact by County")}</CardTitle></CardHeader>
           <CardContent>
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
               {Array.from(countyMap.entries()).map(([county, count]) => (
