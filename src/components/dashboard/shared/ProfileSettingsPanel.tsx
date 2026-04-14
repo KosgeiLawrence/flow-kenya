@@ -60,6 +60,8 @@ const ProfileSettingsPanel = ({ role }: ProfileSettingsPanelProps) => {
   const queryClient = useQueryClient();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
+  const [uploadingLogo, setUploadingLogo] = useState(false);
+  const logoInputRef = useRef<HTMLInputElement>(null);
   const [activeSection, setActiveSection] = useState("basic");
   const [passwordData, setPasswordData] = useState({ current: "", new: "", confirm: "" });
 
@@ -194,6 +196,41 @@ const ProfileSettingsPanel = ({ role }: ProfileSettingsPanelProps) => {
     } finally {
       setUploading(false);
     }
+  };
+
+  const handleOrgLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !fullProfile?.organization_id) return;
+    const allowedTypes = ["image/png", "image/jpeg", "image/webp", "image/svg+xml"];
+    if (!allowedTypes.includes(file.type)) { toast.error("Only PNG, JPG, WebP, or SVG files"); return; }
+    if (file.size > 2 * 1024 * 1024) { toast.error("File must be under 2 MB"); return; }
+    setUploadingLogo(true);
+    try {
+      const ext = file.name.split(".").pop()?.toLowerCase();
+      const path = `${fullProfile.organization_id}/logo.${ext}`;
+      const { error: upErr } = await supabase.storage.from("org-logos").upload(path, file, { upsert: true, contentType: file.type });
+      if (upErr) throw upErr;
+      const { data: urlData } = supabase.storage.from("org-logos").getPublicUrl(path);
+      const logoUrl = `${urlData.publicUrl}?t=${Date.now()}`;
+      const { error: updErr } = await supabase.from("organizations").update({ logo_url: logoUrl }).eq("id", fullProfile.organization_id);
+      if (updErr) throw updErr;
+      queryClient.invalidateQueries({ queryKey: ["organization"] });
+      queryClient.invalidateQueries({ queryKey: ["corp_settings_org"] });
+      queryClient.invalidateQueries({ queryKey: ["org_info"] });
+      await refreshProfile();
+      toast.success("Organization logo updated");
+    } catch (err: any) { toast.error(err.message); }
+    finally { setUploadingLogo(false); if (logoInputRef.current) logoInputRef.current.value = ""; }
+  };
+
+  const handleRemoveOrgLogo = async () => {
+    if (!fullProfile?.organization_id) return;
+    const { error } = await supabase.from("organizations").update({ logo_url: null }).eq("id", fullProfile.organization_id);
+    if (error) { toast.error("Failed to remove logo"); return; }
+    queryClient.invalidateQueries({ queryKey: ["organization"] });
+    queryClient.invalidateQueries({ queryKey: ["org_info"] });
+    await refreshProfile();
+    toast.success("Logo removed");
   };
 
   const handleSaveSection = (sectionFields: string[]) => {
@@ -385,6 +422,38 @@ const ProfileSettingsPanel = ({ role }: ProfileSettingsPanelProps) => {
                   <Label>Organization Name</Label>
                   <Input value={organization.name} disabled className="opacity-60" />
                   <p className="text-xs text-muted-foreground">Contact admin to change organization name</p>
+                </div>
+              )}
+
+              {/* Organization Logo */}
+              {fullProfile?.organization_id && (
+                <div className="sm:col-span-2 space-y-3">
+                  <Label>Organization Logo</Label>
+                  <p className="text-xs text-muted-foreground">This logo appears on your dashboard header, receipts, and reports.</p>
+                  <div className="flex items-center gap-4">
+                    <div className="w-20 h-20 rounded-xl border-2 border-dashed border-border flex items-center justify-center bg-muted/30 overflow-hidden shrink-0">
+                      {organization?.logo_url ? (
+                        <img src={organization.logo_url} alt="Org logo" className="w-full h-full object-contain p-1" />
+                      ) : (
+                        <Building2 className="w-8 h-8 text-muted-foreground/40" />
+                      )}
+                    </div>
+                    <div className="flex flex-col gap-2">
+                      <div className="flex items-center gap-2">
+                        <Button variant="outline" size="sm" onClick={() => logoInputRef.current?.click()} disabled={uploadingLogo} className="gap-1.5">
+                          <Upload className="w-4 h-4" />
+                          {uploadingLogo ? "Uploading..." : organization?.logo_url ? "Change Logo" : "Upload Logo"}
+                        </Button>
+                        {organization?.logo_url && (
+                          <Button variant="outline" size="sm" onClick={handleRemoveOrgLogo} className="text-destructive hover:text-destructive gap-1.5">
+                            <Trash2 className="w-4 h-4" /> Remove
+                          </Button>
+                        )}
+                      </div>
+                      <p className="text-xs text-muted-foreground">PNG, JPG, WebP or SVG. Max 2 MB.</p>
+                      <input ref={logoInputRef} type="file" accept="image/png,image/jpeg,image/webp,image/svg+xml" className="hidden" onChange={handleOrgLogoUpload} />
+                    </div>
+                  </div>
                 </div>
               )}
               <div className="space-y-2">
