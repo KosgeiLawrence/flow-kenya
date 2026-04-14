@@ -154,7 +154,7 @@ const RevenueInsightsPanel = () => {
     }));
   }, [subscriptions]);
 
-  const formatKES = (v: number) => `KES ${v.toLocaleString("en-KE")}`;
+  const formatKES = (v: number) => `KSh ${v.toLocaleString("en-KE")}`;
 
   return (
     <div className="space-y-6">
