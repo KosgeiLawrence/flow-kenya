@@ -145,9 +145,9 @@ const InventoryAccessPanel = () => {
   return (
     <Tabs defaultValue="stock" className="space-y-6">
       <TabsList className="grid w-full grid-cols-3">
-        <TabsTrigger value="stock"><Package className="w-4 h-4 mr-1.5" />Stock</TabsTrigger>
-        <TabsTrigger value="orders"><ClipboardList className="w-4 h-4 mr-1.5" />Orders</TabsTrigger>
-        <TabsTrigger value="suppliers"><Users className="w-4 h-4 mr-1.5" />Suppliers</TabsTrigger>
+        <TabsTrigger value="stock"><Package className="w-4 h-4 mr-1.5" />{t("inventoryPanel.stock", "Stock")}</TabsTrigger>
+        <TabsTrigger value="orders"><ClipboardList className="w-4 h-4 mr-1.5" />{t("inventoryPanel.orders", "Orders")}</TabsTrigger>
+        <TabsTrigger value="suppliers"><Users className="w-4 h-4 mr-1.5" />{t("inventoryPanel.suppliers", "Suppliers")}</TabsTrigger>
       </TabsList>
 
       <TabsContent value="stock" className="space-y-6">
@@ -157,7 +157,7 @@ const InventoryAccessPanel = () => {
               <Package className="w-7 h-7 text-primary" />
               <div>
                 <p className="text-xl font-bold text-foreground">{totalQty.toFixed(0)} kg</p>
-                <p className="text-xs text-muted-foreground">Available Stock</p>
+                <p className="text-xs text-muted-foreground">{t("inventoryPanel.availableStock", "Available Stock")}</p>
               </div>
             </CardContent>
           </Card>
@@ -166,7 +166,7 @@ const InventoryAccessPanel = () => {
               <Layers className="w-7 h-7 text-accent" />
               <div>
                 <p className="text-xl font-bold text-foreground">{materialMap.size}</p>
-                <p className="text-xs text-muted-foreground">Material Types</p>
+                <p className="text-xs text-muted-foreground">{t("inventoryPanel.materialTypes", "Material Types")}</p>
               </div>
             </CardContent>
           </Card>
@@ -175,7 +175,7 @@ const InventoryAccessPanel = () => {
               <TrendingUp className="w-7 h-7 text-primary" />
               <div>
                 <p className="text-xl font-bold text-foreground">KES {totalValue.toLocaleString()}</p>
-                <p className="text-xs text-muted-foreground">Market Value</p>
+                <p className="text-xs text-muted-foreground">{t("inventoryPanel.marketValue", "Market Value")}</p>
               </div>
             </CardContent>
           </Card>
@@ -184,7 +184,7 @@ const InventoryAccessPanel = () => {
               <ClipboardList className="w-7 h-7 text-muted-foreground" />
               <div>
                 <p className="text-xl font-bold text-foreground">{totalOrders}</p>
-                <p className="text-xs text-muted-foreground">Delivered Orders</p>
+                <p className="text-xs text-muted-foreground">{t("inventoryPanel.deliveredOrders", "Delivered Orders")}</p>
               </div>
             </CardContent>
           </Card>
@@ -192,21 +192,21 @@ const InventoryAccessPanel = () => {
 
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger asChild>
-            <Button><Plus className="w-4 h-4 mr-1" /> Add to Inventory</Button>
+            <Button><Plus className="w-4 h-4 mr-1" /> {t("inventoryPanel.addInventory", "Add to Inventory")}</Button>
           </DialogTrigger>
           <DialogContent>
-            <DialogHeader><DialogTitle>Record Material Receipt</DialogTitle></DialogHeader>
+            <DialogHeader><DialogTitle>{t("inventoryPanel.recordReceipt", "Record Material Receipt")}</DialogTitle></DialogHeader>
             <div className="space-y-3">
               <Select value={form.material_type_id} onValueChange={(v) => setForm({ ...form, material_type_id: v })}>
-                <SelectTrigger><SelectValue placeholder="Select material type" /></SelectTrigger>
+                <SelectTrigger><SelectValue placeholder={t("inventoryPanel.selectMaterial", "Select material type")} /></SelectTrigger>
                 <SelectContent>
                   {materialTypes?.map((mt) => (
                     <SelectItem key={mt.id} value={mt.id}>{mt.icon || "♻️"} {mt.name} (KES {mt.price_per_unit}/{mt.unit})</SelectItem>
                   ))}
                 </SelectContent>
               </Select>
-              <Input type="number" placeholder="Quantity (kg)" value={form.quantity} onChange={(e) => setForm({ ...form, quantity: e.target.value })} />
-              <Input placeholder="Source / location (optional)" value={form.location_name} onChange={(e) => setForm({ ...form, location_name: e.target.value })} />
+              <Input type="number" placeholder={t("common.quantity", "Quantity (kg)")} value={form.quantity} onChange={(e) => setForm({ ...form, quantity: e.target.value })} />
+              <Input placeholder={t("inventoryPanel.sourceLocation", "Source / location (optional)")} value={form.location_name} onChange={(e) => setForm({ ...form, location_name: e.target.value })} />
               <Button className="w-full" onClick={() => addEntry.mutate()} disabled={!form.material_type_id || !form.quantity || addEntry.isPending}>
                 {addEntry.isPending ? "Adding..." : "Add to Inventory"}
               </Button>
@@ -215,10 +215,10 @@ const InventoryAccessPanel = () => {
         </Dialog>
 
         <Card className="shadow-soft">
-          <CardHeader><CardTitle className="text-lg">Inventory Summary</CardTitle></CardHeader>
+          <CardHeader><CardTitle className="text-lg">{t("inventoryPanel.inventorySummary", "Inventory Summary")}</CardTitle></CardHeader>
           <CardContent>
             {!materialMap.size ? (
-              <p className="text-sm text-muted-foreground">No inventory data available.</p>
+              <p className="text-sm text-muted-foreground">{t("inventoryPanel.noInventory", "No inventory data available.")}</p>
             ) : (
               <div className="divide-y divide-border">
                 {Array.from(materialMap.values()).map((m, i) => (
@@ -231,8 +231,8 @@ const InventoryAccessPanel = () => {
                       </div>
                     </div>
                     <div className="flex items-center gap-2">
-                      {m.source === "order" && <Badge variant="secondary" className="text-xs">From Orders</Badge>}
-                      {m.source === "both" && <Badge variant="secondary" className="text-xs">Mixed Sources</Badge>}
+                      {m.source === "order" && <Badge variant="secondary" className="text-xs">{t("inventoryPanel.fromOrders", "From Orders")}</Badge>}
+                      {m.source === "both" && <Badge variant="secondary" className="text-xs">{t("inventoryPanel.mixedSources", "Mixed Sources")}</Badge>}
                       <p className="text-sm font-semibold text-foreground">KES {m.value.toLocaleString()}</p>
                     </div>
                   </div>
@@ -244,7 +244,7 @@ const InventoryAccessPanel = () => {
 
         {deliveredOrders && deliveredOrders.length > 0 && (
           <Card className="shadow-soft">
-            <CardHeader><CardTitle className="text-lg">Recent Delivered Orders</CardTitle></CardHeader>
+            <CardHeader><CardTitle className="text-lg">{t("inventoryPanel.recentDelivered", "Recent Delivered Orders")}</CardTitle></CardHeader>
             <CardContent>
               <div className="divide-y divide-border">
                 {deliveredOrders.slice(0, 10).map((o) => (
