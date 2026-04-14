@@ -100,8 +100,8 @@ const CorporateDashboard = () => {
             </Button>
           </div>
           <div className="mt-3 flex items-center gap-2">
-            {effectiveLogoUrl || profile?.avatar_url ? (
-              <img src={effectiveLogoUrl || profile?.avatar_url || ""} alt={effectiveDisplayName} className="w-8 h-8 rounded-full object-cover" />
+            {effectiveLogoUrl ? (
+              <img src={effectiveLogoUrl} alt={effectiveDisplayName} className="w-8 h-8 rounded-full object-cover" />
             ) : (
               <div className="w-8 h-8 rounded-full bg-sidebar-accent flex items-center justify-center text-sm font-bold">
                 {effectiveDisplayName?.charAt(0) || "C"}
