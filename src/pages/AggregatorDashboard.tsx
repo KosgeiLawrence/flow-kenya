@@ -38,6 +38,7 @@ import WasteDeliveredPanel from "@/components/dashboard/aggregator/WasteDelivere
 import TrashPanel from "@/components/dashboard/shared/TrashPanel";
 import TeamPanel from "@/components/dashboard/shared/TeamPanel";
 import { HelpCircle, ClipboardList, Trash2, Users as UsersIcon } from "lucide-react";
+import DashboardChatbot from "@/components/dashboard/shared/DashboardChatbot";
 
 const navItems = [
   { id: "workflows", label: "How It Works", icon: HelpCircle },
@@ -208,6 +209,7 @@ const AggregatorDashboard = () => {
           {renderPanel()}
         </main>
       </div>
+      <DashboardChatbot role="aggregator" navItems={navItems} onNavigate={(id) => setActivePanel(id)} />
     </div>
   );
 };

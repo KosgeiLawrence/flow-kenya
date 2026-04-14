@@ -31,6 +31,7 @@ import ESGPanel from "@/components/dashboard/aggregator/ESGPanel";
 import CompliancePanel from "@/components/dashboard/aggregator/CompliancePanel";
 import TrashPanel from "@/components/dashboard/shared/TrashPanel";
 import TeamPanel from "@/components/dashboard/shared/TeamPanel";
+import DashboardChatbot from "@/components/dashboard/shared/DashboardChatbot";
 import { Trash2, Users as UsersIcon } from "lucide-react";
 
 const navItems = [
@@ -181,6 +182,7 @@ const WastePickerDashboard = () => {
           {renderPanel()}
         </main>
       </div>
+      <DashboardChatbot role="waste_picker" navItems={navItems} onNavigate={(id) => setActivePanel(id)} />
     </div>
   );
 };

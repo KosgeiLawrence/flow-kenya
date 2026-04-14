@@ -35,6 +35,7 @@ import TeamPanel from "@/components/dashboard/shared/TeamPanel";
 import DigitalIDPanel from "@/components/dashboard/waste-picker/DigitalIDPanel";
 import { Users as UsersIcon, CreditCard } from "lucide-react";
 import LanguageToggle from "@/components/dashboard/shared/LanguageToggle";
+import DashboardChatbot from "@/components/dashboard/shared/DashboardChatbot";
 
 const navItems = [
   { id: "workflows", label: "How It Works", icon: HelpCircle },
@@ -190,6 +191,7 @@ const RecyclerDashboard = () => {
           {renderPanel()}
         </main>
       </div>
+      <DashboardChatbot role="recycler" navItems={navItems} onNavigate={(id) => setActivePanel(id)} />
     </div>
   );
 };
