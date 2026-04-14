@@ -1,10 +1,11 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import { Button } from "@/components/ui/button";
-import { MessageSquare, X, Send, Bot, User, Loader2, Sparkles } from "lucide-react";
+import { MessageSquare, X, Send, Bot, User, Loader2, Sparkles, Trash2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import ReactMarkdown from "react-markdown";
+import { toast } from "sonner";
 
 interface NavItem {
   id: string;
@@ -27,6 +28,7 @@ const DashboardChatbot = ({ role, navItems, onNavigate }: DashboardChatbotProps)
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [conversationId, setConversationId] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const { user } = useAuth();
@@ -35,26 +37,53 @@ const DashboardChatbot = ({ role, navItems, onNavigate }: DashboardChatbotProps)
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, []);
 
-  useEffect(() => {
-    scrollToBottom();
-  }, [messages, scrollToBottom]);
+  useEffect(() => { scrollToBottom(); }, [messages, scrollToBottom]);
+  useEffect(() => { if (isOpen && inputRef.current) inputRef.current.focus(); }, [isOpen]);
 
+  // Load existing conversation on open
   useEffect(() => {
-    if (isOpen && inputRef.current) {
-      inputRef.current.focus();
+    if (!isOpen || !user?.id) return;
+    const loadConversation = async () => {
+      const { data } = await supabase
+        .from("chat_conversations")
+        .select("id, messages")
+        .eq("user_id", user.id)
+        .eq("role", role)
+        .order("last_active_at", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+      if (data) {
+        setConversationId(data.id);
+        const msgs = data.messages as ChatMessage[];
+        if (msgs?.length) setMessages(msgs);
+      } else {
+        setConversationId(crypto.randomUUID());
+      }
+    };
+    loadConversation();
+  }, [isOpen, user?.id, role]);
+
+  const handleResponse = (data: { content: string; navigate?: string | null; actions?: unknown[] }) => {
+    setMessages((prev) => [...prev, { role: "assistant", content: data.content }]);
+    if (data.navigate) {
+      setTimeout(() => onNavigate(data.navigate!), 800);
     }
-  }, [isOpen]);
-
-  const extractNavigation = (content: string): { cleanContent: string; panelId: string | null } => {
-    const navMatch = content.match(/\[\[NAVIGATE:([^\]]+)\]\]/);
-    const cleanContent = content.replace(/\[\[NAVIGATE:[^\]]+\]\]/g, "").trim();
-    return { cleanContent, panelId: navMatch ? navMatch[1] : null };
+    // Show toast for completed actions
+    if (data.actions?.length) {
+      for (const action of data.actions) {
+        const a = action as { success?: boolean; message?: string };
+        if (a.success && a.message && !a.message.startsWith("Navigating")) {
+          toast.success(a.message);
+        }
+      }
+    }
   };
 
-  const sendMessage = async () => {
-    if (!input.trim() || isLoading) return;
+  const sendMessage = async (content?: string) => {
+    const text = (content || input).trim();
+    if (!text || isLoading) return;
 
-    const userMessage: ChatMessage = { role: "user", content: input.trim() };
+    const userMessage: ChatMessage = { role: "user", content: text };
     const newMessages = [...messages, userMessage];
     setMessages(newMessages);
     setInput("");
@@ -67,38 +96,35 @@ const DashboardChatbot = ({ role, navItems, onNavigate }: DashboardChatbotProps)
           role,
           navItems: navItems.map((n) => ({ id: n.id, label: n.label })),
           userId: user?.id,
+          conversationId,
         },
       });
-
       if (error) throw error;
-
-      const { cleanContent, panelId } = extractNavigation(data.content);
-
-      setMessages((prev) => [...prev, { role: "assistant", content: cleanContent }]);
-
-      if (panelId) {
-        setTimeout(() => onNavigate(panelId), 800);
-      }
+      handleResponse(data);
     } catch (err) {
       console.error("Chat error:", err);
-      setMessages((prev) => [
-        ...prev,
-        { role: "assistant", content: "Sorry, I encountered an error. Please try again." },
-      ]);
+      setMessages((prev) => [...prev, { role: "assistant", content: "Sorry, I encountered an error. Please try again." }]);
     } finally {
       setIsLoading(false);
     }
   };
 
+  const clearConversation = async () => {
+    setMessages([]);
+    if (conversationId && user?.id) {
+      await supabase.from("chat_conversations").delete().eq("id", conversationId);
+    }
+    setConversationId(crypto.randomUUID());
+  };
+
   const quickActions = [
-    "Show me my analytics",
-    "How do I add an expense?",
-    "Summarize my recent activity",
+    "📊 Analyze my performance this month",
+    "💰 Show my financial summary",
+    "🔍 What can you help me with?",
   ];
 
   return (
     <>
-      {/* FAB Button */}
       <button
         onClick={() => setIsOpen(!isOpen)}
         className={cn(
@@ -112,7 +138,6 @@ const DashboardChatbot = ({ role, navItems, onNavigate }: DashboardChatbotProps)
         {isOpen ? <X className="w-6 h-6" /> : <MessageSquare className="w-6 h-6" />}
       </button>
 
-      {/* Chat Panel */}
       {isOpen && (
         <div
           className={cn(
@@ -132,8 +157,11 @@ const DashboardChatbot = ({ role, navItems, onNavigate }: DashboardChatbotProps)
             </div>
             <div className="flex-1">
               <h3 className="text-sm font-semibold text-foreground">Duara AI Assistant</h3>
-              <p className="text-xs text-muted-foreground">Ask anything about your dashboard</p>
+              <p className="text-xs text-muted-foreground">I can do actions, analyze data & navigate</p>
             </div>
+            <button onClick={clearConversation} className="p-1.5 rounded-lg hover:bg-[rgba(255,255,255,0.08)] text-muted-foreground hover:text-foreground transition-colors" title="Clear conversation">
+              <Trash2 className="w-4 h-4" />
+            </button>
           </div>
 
           {/* Messages */}
@@ -145,32 +173,14 @@ const DashboardChatbot = ({ role, navItems, onNavigate }: DashboardChatbotProps)
                     <Bot className="w-4 h-4 text-primary" />
                   </div>
                   <div className="text-sm text-muted-foreground leading-relaxed">
-                    Hi! I'm your Duara AI assistant. I can help you navigate your dashboard, analyze your data, and answer questions. Try asking me something!
+                    Hi! I'm your AI assistant with <strong className="text-foreground">full platform powers</strong>. I can analyze your data, add transactions, log collections, navigate anywhere, and remember our conversations. What would you like to do?
                   </div>
                 </div>
                 <div className="space-y-2 pl-10">
                   {quickActions.map((action) => (
                     <button
                       key={action}
-                      onClick={() => {
-                        setMessages([{ role: "user", content: action }]);
-                        setIsLoading(true);
-                        supabase.functions.invoke("dashboard-chat", {
-                          body: {
-                            messages: [{ role: "user", content: action }],
-                            role,
-                            navItems: navItems.map((n) => ({ id: n.id, label: n.label })),
-                            userId: user?.id,
-                          },
-                        }).then(({ data, error }) => {
-                          if (error) throw error;
-                          const { cleanContent, panelId } = extractNavigation(data.content);
-                          setMessages((prev) => [...prev, { role: "assistant", content: cleanContent }]);
-                          if (panelId) setTimeout(() => onNavigate(panelId), 800);
-                        }).catch(() => {
-                          setMessages((prev) => [...prev, { role: "assistant", content: "Sorry, I encountered an error." }]);
-                        }).finally(() => setIsLoading(false));
-                      }}
+                      onClick={() => sendMessage(action)}
                       className="block w-full text-left text-xs px-3 py-2 rounded-lg bg-[rgba(255,255,255,0.05)] border border-[rgba(255,255,255,0.08)] text-muted-foreground hover:bg-[rgba(255,255,255,0.08)] hover:text-foreground transition-colors"
                     >
                       {action}
@@ -182,33 +192,15 @@ const DashboardChatbot = ({ role, navItems, onNavigate }: DashboardChatbotProps)
 
             {messages.map((msg, i) => (
               <div key={i} className={cn("flex items-start gap-3", msg.role === "user" && "flex-row-reverse")}>
-                <div
-                  className={cn(
-                    "w-7 h-7 rounded-lg flex items-center justify-center shrink-0 mt-0.5",
-                    msg.role === "assistant" ? "bg-primary/20" : "bg-secondary/20"
-                  )}
-                >
-                  {msg.role === "assistant" ? (
-                    <Bot className="w-4 h-4 text-primary" />
-                  ) : (
-                    <User className="w-4 h-4 text-secondary" />
-                  )}
+                <div className={cn("w-7 h-7 rounded-lg flex items-center justify-center shrink-0 mt-0.5", msg.role === "assistant" ? "bg-primary/20" : "bg-secondary/20")}>
+                  {msg.role === "assistant" ? <Bot className="w-4 h-4 text-primary" /> : <User className="w-4 h-4 text-secondary" />}
                 </div>
-                <div
-                  className={cn(
-                    "max-w-[80%] text-sm rounded-xl px-3.5 py-2.5 leading-relaxed",
-                    msg.role === "assistant"
-                      ? "bg-[rgba(255,255,255,0.06)] text-foreground"
-                      : "bg-primary/20 text-foreground"
-                  )}
-                >
+                <div className={cn("max-w-[80%] text-sm rounded-xl px-3.5 py-2.5 leading-relaxed", msg.role === "assistant" ? "bg-[rgba(255,255,255,0.06)] text-foreground" : "bg-primary/20 text-foreground")}>
                   {msg.role === "assistant" ? (
                     <div className="prose prose-sm prose-invert max-w-none [&_p]:mb-2 [&_p:last-child]:mb-0 [&_ul]:mb-2 [&_ol]:mb-2 [&_li]:mb-0.5 [&_table]:text-xs [&_th]:p-1.5 [&_td]:p-1.5 [&_strong]:text-foreground [&_h1]:text-base [&_h2]:text-sm [&_h3]:text-sm">
                       <ReactMarkdown>{msg.content}</ReactMarkdown>
                     </div>
-                  ) : (
-                    msg.content
-                  )}
+                  ) : msg.content}
                 </div>
               </div>
             ))}
@@ -220,44 +212,31 @@ const DashboardChatbot = ({ role, navItems, onNavigate }: DashboardChatbotProps)
                 </div>
                 <div className="bg-[rgba(255,255,255,0.06)] rounded-xl px-3.5 py-2.5 flex items-center gap-2">
                   <Loader2 className="w-4 h-4 animate-spin text-muted-foreground" />
-                  <span className="text-sm text-muted-foreground">Thinking...</span>
+                  <span className="text-sm text-muted-foreground">Working on it...</span>
                 </div>
               </div>
             )}
-
             <div ref={messagesEndRef} />
           </div>
 
           {/* Input */}
           <div className="p-3 border-t border-[rgba(255,255,255,0.08)]">
-            <form
-              onSubmit={(e) => {
-                e.preventDefault();
-                sendMessage();
-              }}
-              className="flex items-center gap-2"
-            >
+            <form onSubmit={(e) => { e.preventDefault(); sendMessage(); }} className="flex items-center gap-2">
               <input
                 ref={inputRef}
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
-                placeholder="Ask anything..."
+                placeholder="Ask anything or give a command..."
                 disabled={isLoading}
                 className={cn(
                   "flex-1 h-10 rounded-xl px-4 text-sm",
                   "bg-[rgba(255,255,255,0.06)] border border-[rgba(255,255,255,0.08)]",
                   "text-foreground placeholder:text-muted-foreground",
                   "focus:outline-none focus:border-[rgba(255,255,255,0.15)] focus:ring-2 focus:ring-primary/20",
-                  "transition-all duration-300",
-                  "disabled:opacity-50"
+                  "transition-all duration-300 disabled:opacity-50"
                 )}
               />
-              <Button
-                type="submit"
-                size="icon"
-                disabled={!input.trim() || isLoading}
-                className="h-10 w-10 rounded-xl shrink-0"
-              >
+              <Button type="submit" size="icon" disabled={!input.trim() || isLoading} className="h-10 w-10 rounded-xl shrink-0">
                 <Send className="w-4 h-4" />
               </Button>
             </form>
