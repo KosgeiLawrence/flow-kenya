@@ -253,7 +253,7 @@ const SponsorshipPanel = () => {
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <Label>Fund Type</Label>
+                  <Label>{t("ngoPanels.fundType", "Fund Type")}</Label>
                   <Select value={fundType} onValueChange={setFundType}>
                     <SelectTrigger><SelectValue /></SelectTrigger>
                     <SelectContent>

@@ -253,7 +253,7 @@ const CRMPanel = ({ role }: CRMPanelProps) => {
             </div>
             {viewCustomer.notes && (
               <div className="bg-muted/30 rounded-lg p-3 mb-4">
-                <p className="text-xs font-medium text-muted-foreground mb-1">Notes</p>
+                <p className="text-xs font-medium text-muted-foreground mb-1">{t("crmPanel.clientNotes", "Notes")}</p>
                 <p className="text-sm">{viewCustomer.notes}</p>
               </div>
             )}
@@ -423,19 +423,19 @@ const CRMPanel = ({ role }: CRMPanelProps) => {
               <Input value={form.full_name} onChange={e => setForm(f => ({ ...f, full_name: e.target.value }))} placeholder="Customer name" />
             </div>
             <div>
-              <Label>Phone</Label>
+              <Label>{t("crmPanel.clientPhone", "Phone")}</Label>
               <Input value={form.phone} onChange={e => setForm(f => ({ ...f, phone: e.target.value }))} placeholder="Phone number" />
             </div>
             <div>
-              <Label>Email</Label>
+              <Label>{t("crmPanel.clientEmail", "Email")}</Label>
               <Input type="email" value={form.email} onChange={e => setForm(f => ({ ...f, email: e.target.value }))} placeholder="Email address" />
             </div>
             <div>
-              <Label>Location</Label>
+              <Label>{t("crmPanel.clientLocation", "Location")}</Label>
               <Input value={form.location} onChange={e => setForm(f => ({ ...f, location: e.target.value }))} placeholder="Location / Address" />
             </div>
             <div>
-              <Label>Category</Label>
+              <Label>{t("crmPanel.clientCategory", "Category")}</Label>
               <Select value={form.category} onValueChange={v => setForm(f => ({ ...f, category: v }))}>
                 <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent>
