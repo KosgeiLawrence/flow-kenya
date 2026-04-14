@@ -35,6 +35,7 @@ const Payment = () => {
 
   const roleStr = (role || user?.user_metadata?.role || "") as string;
   const billingPeriod = (user?.user_metadata?.billing_period || "monthly") as BillingPeriod;
+  const isTrialUser = billingPeriod === "free_trial";
   const promoCode = user?.user_metadata?.promo_code || "";
   const promoValid = promoCode ? isPromoValidForRole(promoCode, roleStr as any) : false;
   const amount = getAmount(roleStr, billingPeriod);
