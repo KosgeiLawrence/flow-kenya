@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
-import { LogOut, Users, BarChart3, DollarSign, ShieldAlert, FileText, Settings, MapPin, Menu, X, ChevronRight, User, BookOpen, Mail, Eye, EyeOff, Trash2, ClipboardList, MessageSquare } from "lucide-react";
+import { LogOut, Users, BarChart3, DollarSign, ShieldAlert, FileText, Settings, MapPin, Menu, X, ChevronRight, User, BookOpen, Mail, Eye, EyeOff, Trash2, ClipboardList, MessageSquare, TrendingUp, Receipt } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import UserVerificationPanel from "@/components/dashboard/admin/UserVerificationPanel";
@@ -22,8 +22,12 @@ import TeamPanel from "@/components/dashboard/shared/TeamPanel";
 import { Users as UsersIcon } from "lucide-react";
 import FormBuilderPanel from "@/components/dashboard/admin/FormBuilderPanel";
 import ContactMessagesPanel from "@/components/dashboard/admin/ContactMessagesPanel";
+import RevenueInsightsPanel from "@/components/dashboard/admin/RevenueInsightsPanel";
+import AdminBillingPanel from "@/components/dashboard/admin/AdminBillingPanel";
 
 const navItems = [
+  { id: "revenue", label: "Revenue Insights", icon: TrendingUp },
+  { id: "billing", label: "Billing & Invoices", icon: Receipt },
   { id: "users", label: "User Verification", icon: Users },
   { id: "view-dashboards", label: "View User Dashboards", icon: Eye },
   { id: "invite", label: "Invite Users", icon: Mail },
@@ -46,7 +50,7 @@ const navItems = [
 const AdminDashboard = () => {
   const { profile, signOut, displayName, orgLogoUrl } = useAuth();
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState("users");
+  const [activeTab, setActiveTab] = useState("revenue");
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const handleSignOut = async () => {
@@ -56,6 +60,8 @@ const AdminDashboard = () => {
 
   const renderPanel = () => {
     switch (activeTab) {
+      case "revenue": return <RevenueInsightsPanel />;
+      case "billing": return <AdminBillingPanel />;
       case "users": return <UserVerificationPanel />;
       case "view-dashboards": return <ViewUserDashboardPanel />;
       case "invite": return <InviteUsersPanel />;
@@ -73,7 +79,7 @@ const AdminDashboard = () => {
       case "team": return <TeamPanel role="admin" navItems={navItems} />;
       case "trash": return <TrashPanel />;
       case "profile-settings": return <ProfileSettingsPanel role="admin" />;
-      default: return <UserVerificationPanel />;
+      default: return <RevenueInsightsPanel />;
     }
   };
 
