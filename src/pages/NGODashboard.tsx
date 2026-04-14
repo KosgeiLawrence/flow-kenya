@@ -110,7 +110,7 @@ const NGODashboard = () => {
         </div>
 
         <nav className="flex-1 p-2 space-y-1 overflow-y-auto">
-          {filteredNavItems.map((item) => (
+          {translatedNavItems.map((item) => (
             <button
               key={item.id}
               onClick={() => { setActivePanel(item.id); setSidebarOpen(false); }}

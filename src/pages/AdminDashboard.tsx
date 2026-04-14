@@ -123,7 +123,7 @@ const AdminDashboard = () => {
         </div>
 
         <nav className="flex-1 p-2 space-y-1 overflow-y-auto">
-          {navItems.map((item) => (
+          {translatedNavItems.map((item) => (
             <button
               key={item.id}
               onClick={() => { setActiveTab(item.id); setSidebarOpen(false); }}
