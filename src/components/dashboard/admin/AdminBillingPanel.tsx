@@ -12,7 +12,7 @@ import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
-import { Plus, FileText, Receipt, FileBarChart, Download, Send, Eye, Trash2, Edit2 } from "lucide-react";
+import { Plus, FileText, Receipt, FileBarChart, Download, Send, Eye, Trash2, Edit2, Mail } from "lucide-react";
 import jsPDF from "jspdf";
 import { addBrandedHeader, addDocMeta, addSectionTitle, finalizePdf, drawTableHeader, drawTableRow, drawVatTotalBlock, PDF_COLORS } from "@/lib/pdfBranding";
 import { format } from "date-fns";
@@ -273,9 +273,12 @@ const AdminBillingPanel = () => {
               <td className="py-2 text-muted-foreground">{format(new Date(inv.created_at), "dd MMM yyyy")}</td>
               <td className="py-2">
                 <div className="flex gap-1 justify-end">
-                  <Button size="sm" variant="ghost" onClick={() => generatePdf(inv)}><Download className="w-3.5 h-3.5" /></Button>
+                  <Button size="sm" variant="ghost" onClick={() => generatePdf(inv)} title="Download PDF"><Download className="w-3.5 h-3.5" /></Button>
+                  {inv.client_email && (
+                    <Button size="sm" variant="ghost" onClick={() => sendDocumentEmail(inv)} title="Email to client" className="text-primary"><Mail className="w-3.5 h-3.5" /></Button>
+                  )}
                   {inv.status === "draft" && (
-                    <Button size="sm" variant="ghost" onClick={() => updateStatusMutation.mutate({ id: inv.id, status: "sent" })}><Send className="w-3.5 h-3.5" /></Button>
+                    <Button size="sm" variant="ghost" onClick={() => { sendDocumentEmail(inv); updateStatusMutation.mutate({ id: inv.id, status: "sent" }); }} title="Mark sent"><Send className="w-3.5 h-3.5" /></Button>
                   )}
                   {(inv.status === "draft" || inv.status === "sent") && (
                     <Button size="sm" variant="ghost" onClick={() => updateStatusMutation.mutate({ id: inv.id, status: "paid", paid_at: new Date().toISOString() })} className="text-emerald-600"><Receipt className="w-3.5 h-3.5" /></Button>
