@@ -17,8 +17,8 @@ const AboutSection = () => {
 
   return (
     <section id="about" className="relative py-20 md:py-32 overflow-hidden" ref={ref}>
-      <div className="absolute inset-0 bg-muted">
-        <div className="absolute top-0 left-1/4 h-[30%] w-[30%] rounded-full bg-forest/5 blur-3xl" />
+      <div className="absolute inset-0 bg-[rgba(255,255,255,0.02)]">
+        <div className="absolute top-0 left-1/4 h-[30%] w-[30%] rounded-full bg-primary/5 blur-3xl" />
         <div className="absolute bottom-0 right-1/4 h-[25%] w-[25%] rounded-full bg-gold/5 blur-3xl" />
       </div>
 
