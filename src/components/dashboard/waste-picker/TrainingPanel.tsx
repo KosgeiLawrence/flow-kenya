@@ -15,6 +15,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Loader2, BookOpen, Clock, Calendar, MapPin, Users, ExternalLink, Plus, Pencil, Trash2, TreePine, Award } from "lucide-react";
 import { format } from "date-fns";
 import { toast } from "sonner";
+import { useTranslation } from "react-i18next";
 
 const statusColors: Record<string, "default" | "secondary" | "outline" | "destructive"> = {
   upcoming: "default",
@@ -64,6 +65,7 @@ interface TrainingPanelProps {
 
 const TrainingPanel = ({ viewerRole }: TrainingPanelProps) => {
   const { user, role: authRole } = useAuth();
+  const { t } = useTranslation();
   const queryClient = useQueryClient();
   const currentRole = viewerRole || authRole || "waste_picker";
 
@@ -169,8 +171,8 @@ const TrainingPanel = ({ viewerRole }: TrainingPanelProps) => {
     <div className="space-y-6">
       <Tabs defaultValue="scheduled">
         <TabsList>
-          <TabsTrigger value="scheduled"><BookOpen className="w-4 h-4 mr-1.5" />Training Resources</TabsTrigger>
-          <TabsTrigger value="community"><Award className="w-4 h-4 mr-1.5" />Community Impact Log</TabsTrigger>
+          <TabsTrigger value="scheduled"><BookOpen className="w-4 h-4 mr-1.5" />{t("trainingPanel.availableTraining", "Training Resources")}</TabsTrigger>
+          <TabsTrigger value="community"><Award className="w-4 h-4 mr-1.5" />{t("trainingPanel.communityEvents", "Community Impact Log")}</TabsTrigger>
         </TabsList>
 
         {/* Scheduled Trainings Tab */}
@@ -179,8 +181,8 @@ const TrainingPanel = ({ viewerRole }: TrainingPanelProps) => {
             <CardContent className="flex items-center gap-3 p-4">
               <BookOpen className="w-5 h-5 text-primary" />
               <div>
-                <p className="text-sm font-medium text-foreground">Training & Capacity Building</p>
-                <p className="text-xs text-muted-foreground">Upcoming training sessions and resources to help you grow.</p>
+              <p className="text-sm font-medium text-foreground">{t("trainingPanel.title")}</p>
+                <p className="text-xs text-muted-foreground">{t("trainingPanel.upcomingDescription", "Upcoming training sessions and resources to help you grow.")}</p>
               </div>
             </CardContent>
           </Card>
@@ -230,7 +232,7 @@ const TrainingPanel = ({ viewerRole }: TrainingPanelProps) => {
               </Card>
             ))}
             {resources?.length === 0 && (
-              <p className="text-sm text-muted-foreground col-span-full text-center py-8">No training sessions available at the moment. Check back soon!</p>
+              <p className="text-sm text-muted-foreground col-span-full text-center py-8">{t("trainingPanel.noTraining")}</p>
             )}
           </div>
         </TabsContent>
@@ -241,25 +243,25 @@ const TrainingPanel = ({ viewerRole }: TrainingPanelProps) => {
             <Card className="shadow-soft">
               <CardContent className="p-3 text-center">
                 <p className="text-xl font-bold text-foreground">{communityTrainings?.length || 0}</p>
-                <p className="text-xs text-muted-foreground">Trainings</p>
+                <p className="text-xs text-muted-foreground">{t("trainingPanel.communityTraining", "Trainings")}</p>
               </CardContent>
             </Card>
             <Card className="shadow-soft">
               <CardContent className="p-3 text-center">
                 <p className="text-xl font-bold text-foreground">{totalParticipants}</p>
-                <p className="text-xs text-muted-foreground">Participants</p>
+                <p className="text-xs text-muted-foreground">{t("trainingPanel.numParticipants")}</p>
               </CardContent>
             </Card>
             <Card className="shadow-soft">
               <CardContent className="p-3 text-center">
                 <p className="text-xl font-bold text-foreground">{totalWomen}</p>
-                <p className="text-xs text-muted-foreground">Women</p>
+                <p className="text-xs text-muted-foreground">{t("trainingPanel.numWomen")}</p>
               </CardContent>
             </Card>
             <Card className="shadow-soft">
               <CardContent className="p-3 text-center">
                 <p className="text-xl font-bold text-foreground">{totalYouth}</p>
-                <p className="text-xs text-muted-foreground">Youth</p>
+                <p className="text-xs text-muted-foreground">{t("trainingPanel.numYouth")}</p>
               </CardContent>
             </Card>
             <Card className="shadow-soft">
@@ -272,7 +274,7 @@ const TrainingPanel = ({ viewerRole }: TrainingPanelProps) => {
 
           <Dialog open={communityDialogOpen} onOpenChange={(o) => { setCommunityDialogOpen(o); if (!o) { setEditingCommunityId(null); setCommunityForm(emptyCommunityForm); } }}>
             <DialogTrigger asChild>
-              <Button className="gap-2"><Plus className="w-4 h-4" /> Log Community Training</Button>
+              <Button className="gap-2"><Plus className="w-4 h-4" /> {t("trainingPanel.logEvent", "Log Community Training")}</Button>
             </DialogTrigger>
             <DialogContent className="max-w-lg max-h-[85vh] overflow-y-auto">
               <DialogHeader>
