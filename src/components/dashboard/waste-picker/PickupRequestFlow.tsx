@@ -45,7 +45,7 @@ const PickupRequestFlow = ({ onBack }: Props) => {
       const userIds = roleUsers.map(r => r.user_id);
       const { data: profiles } = await supabase
         .from("profiles")
-        .select("user_id, full_name, phone_number, email, county, area_of_operation")
+        .select("user_id, full_name, phone_number, email, county, area_of_operation, organization_id, organizations(name)")
         .in("user_id", userIds);
       return profiles || [];
     },

@@ -37,7 +37,7 @@ const RequestedPickupsPanel = () => {
       if (!requesterIds.length) return [];
       const { data } = await supabase
         .from("profiles")
-        .select("user_id, full_name, phone_number, email, county")
+        .select("user_id, full_name, phone_number, email, county, organization_id, organizations(name)")
         .in("user_id", requesterIds);
       return data || [];
     },

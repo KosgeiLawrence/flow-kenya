@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { getDisplayName, getDisplayInitial } from "@/lib/displayUtils";
 import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
