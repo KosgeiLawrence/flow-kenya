@@ -100,7 +100,7 @@ const UserVisibilityPanel = () => {
         </Card>
         <Card>
           <CardContent className="p-4 flex items-center gap-3">
-            <div className="w-8 h-8 rounded-full bg-accent flex items-center justify-center text-sm font-bold text-secondary-foreground">
+            <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center text-sm font-bold text-secondary-foreground">
               {profiles?.length || 0}
             </div>
             <div>
