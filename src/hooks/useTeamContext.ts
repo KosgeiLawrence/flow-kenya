@@ -11,8 +11,10 @@ export interface TeamContext {
   featurePermissions: string[];
   /** Whether the current user is a team owner (has invited others) */
   isTeamOwner: boolean;
-  /** All team member records (for both owners and members) */
-  teamMembers: any[];
+  /** Display name to use (team leader's org/name for team members) */
+  teamDisplayName: string | null;
+  /** Logo URL to use (team leader's org logo for team members) */
+  teamLogoUrl: string | null;
   /** Loading state */
   isLoading: boolean;
 }
@@ -26,7 +28,7 @@ export const useTeamContext = (): TeamContext => {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("team_members")
-        .select("invited_by, feature_permissions, is_active")
+        .select("invited_by, feature_permissions, is_active, organization_id")
         .eq("user_id", user!.id)
         .eq("is_active", true)
         .limit(1)
@@ -54,6 +56,40 @@ export const useTeamContext = (): TeamContext => {
   });
 
   const isTeamMember = !!membership;
+  const invitedBy = membership?.invited_by ?? null;
+
+  // Fetch team leader's profile + org info so the team member's dashboard mirrors the leader's
+  const { data: leaderInfo, isLoading: leaderLoading } = useQuery({
+    queryKey: ["team_leader_info", invitedBy],
+    queryFn: async () => {
+      const { data: leaderProfile } = await supabase
+        .from("profiles")
+        .select("full_name, organization_id, avatar_url")
+        .eq("user_id", invitedBy!)
+        .single();
+      if (!leaderProfile) return null;
+
+      let orgName: string | null = null;
+      let orgLogoUrl: string | null = null;
+      if (leaderProfile.organization_id) {
+        const { data: org } = await supabase
+          .from("organizations")
+          .select("name, logo_url")
+          .eq("id", leaderProfile.organization_id)
+          .single();
+        if (org) {
+          orgName = org.name;
+          orgLogoUrl = org.logo_url;
+        }
+      }
+      return {
+        displayName: orgName || leaderProfile.full_name,
+        logoUrl: orgLogoUrl || leaderProfile.avatar_url,
+      };
+    },
+    enabled: !!invitedBy,
+  });
+
   const isTeamOwner = (ownedMembers?.length ?? 0) > 0;
   const featurePermissions = isTeamMember
     ? (membership?.feature_permissions as string[] || [])
@@ -61,10 +97,11 @@ export const useTeamContext = (): TeamContext => {
 
   return {
     isTeamMember,
-    invitedBy: membership?.invited_by ?? null,
+    invitedBy,
     featurePermissions,
     isTeamOwner,
-    teamMembers: [],
-    isLoading: membershipLoading || ownedLoading,
+    teamDisplayName: leaderInfo?.displayName ?? null,
+    teamLogoUrl: leaderInfo?.logoUrl ?? null,
+    isLoading: membershipLoading || ownedLoading || leaderLoading,
   };
 };

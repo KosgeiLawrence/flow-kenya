@@ -51,7 +51,9 @@ const CorporateDashboard = () => {
   const navigate = useNavigate();
   const [activePanel, setActivePanel] = useState("footprint");
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const { filteredNavItems } = useFilteredNavItems(navItems);
+  const { filteredNavItems, teamDisplayName, teamLogoUrl } = useFilteredNavItems(navItems);
+  const effectiveDisplayName = teamDisplayName || displayName;
+  const effectiveLogoUrl = teamLogoUrl || orgLogoUrl;
 
   const status = statusConfig[profile?.approval_status || "pending"];
   const StatusIcon = status.icon;
@@ -98,15 +100,15 @@ const CorporateDashboard = () => {
             </Button>
           </div>
           <div className="mt-3 flex items-center gap-2">
-            {orgLogoUrl || profile?.avatar_url ? (
-              <img src={orgLogoUrl || profile?.avatar_url || ""} alt={displayName} className="w-8 h-8 rounded-full object-cover" />
+            {effectiveLogoUrl || profile?.avatar_url ? (
+              <img src={effectiveLogoUrl || profile?.avatar_url || ""} alt={effectiveDisplayName} className="w-8 h-8 rounded-full object-cover" />
             ) : (
               <div className="w-8 h-8 rounded-full bg-sidebar-accent flex items-center justify-center text-sm font-bold">
-                {displayName?.charAt(0) || "C"}
+                {effectiveDisplayName?.charAt(0) || "C"}
               </div>
             )}
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium truncate">{displayName || "Corporate"}</p>
+              <p className="text-sm font-medium truncate">{effectiveDisplayName || "Corporate"}</p>
               <div className="flex items-center gap-1">
                 <StatusIcon className={cn("w-3 h-3", status.color)} />
                 <span className={cn("text-xs", status.color)}>{status.label}</span>
