@@ -427,8 +427,7 @@ const ProfileSettingsPanel = ({ role }: ProfileSettingsPanelProps) => {
               {organization && (
                 <div className="sm:col-span-2 space-y-2">
                   <Label>Organization Name</Label>
-                  <Input value={organization.name} disabled className="opacity-60" />
-                  <p className="text-xs text-muted-foreground">Contact admin to change organization name</p>
+                  <Input value={orgName} onChange={e => setOrgName(e.target.value)} placeholder="Organization name" />
                 </div>
               )}
 
