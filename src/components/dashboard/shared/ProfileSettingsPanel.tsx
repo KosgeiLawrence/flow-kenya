@@ -1,4 +1,5 @@
 import { useState, useRef, useCallback, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -56,6 +57,7 @@ const kenyaCounties = [
 ];
 
 const ProfileSettingsPanel = ({ role }: ProfileSettingsPanelProps) => {
+  const { t } = useTranslation();
   const { user, profile, refreshProfile } = useAuth();
   const queryClient = useQueryClient();
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -279,22 +281,22 @@ const ProfileSettingsPanel = ({ role }: ProfileSettingsPanelProps) => {
 
   const completeness = calculateCompleteness();
   const statusMap: Record<string, { icon: React.ElementType; label: string; variant: "default" | "secondary" | "destructive" }> = {
-    pending: { icon: Clock, label: "Pending Verification", variant: "secondary" },
-    approved: { icon: CheckCircle2, label: "Verified", variant: "default" },
-    rejected: { icon: AlertTriangle, label: "Rejected", variant: "destructive" },
+    pending: { icon: Clock, label: t("profilePanel.pendingVerification"), variant: "secondary" },
+    approved: { icon: CheckCircle2, label: t("common.verified"), variant: "default" },
+    rejected: { icon: AlertTriangle, label: t("common.rejected"), variant: "destructive" },
   };
   const s = statusMap[fullProfile?.approval_status || "pending"];
   const StatusIcon = s.icon;
 
   const sections = [
-    { id: "basic", label: "Basic Info", icon: User },
-    ...(!["waste_picker", "admin"].includes(role) ? [{ id: "organization", label: "Organization", icon: Building2 }] : []),
-    ...(!["admin", "county_government"].includes(role) ? [{ id: "operational", label: "Operations", icon: MapPin }] : []),
-    { id: "security", label: "Security", icon: Shield },
+    { id: "basic", label: t("profilePanel.basicInfo"), icon: User },
+    ...(!["waste_picker", "admin"].includes(role) ? [{ id: "organization", label: t("profilePanel.organization"), icon: Building2 }] : []),
+    ...(!["admin", "county_government"].includes(role) ? [{ id: "operational", label: t("profilePanel.operations"), icon: MapPin }] : []),
+    { id: "security", label: t("profilePanel.security"), icon: Shield },
   ];
 
   if (isLoading) {
-    return <div className="flex items-center justify-center h-64 text-muted-foreground">Loading profile...</div>;
+    return <div className="flex items-center justify-center h-64 text-muted-foreground">{t("profilePanel.loadingProfile")}</div>;
   }
 
   return (
@@ -334,7 +336,7 @@ const ProfileSettingsPanel = ({ role }: ProfileSettingsPanelProps) => {
               </div>
               <div className="mt-4">
                 <div className="flex items-center justify-between text-sm mb-1.5">
-                  <span className="text-muted-foreground">Profile Completeness</span>
+                   <span className="text-muted-foreground">{t("profilePanel.profileCompleteness")}</span>
                   <span className="font-medium">{completeness}%</span>
                 </div>
                 <Progress value={completeness} className="h-2" />
@@ -364,51 +366,51 @@ const ProfileSettingsPanel = ({ role }: ProfileSettingsPanelProps) => {
       {activeSection === "basic" && (
         <Card className="shadow-soft">
           <CardHeader>
-            <CardTitle className="text-lg flex items-center gap-2"><User className="w-5 h-5 text-primary" /> Basic Information</CardTitle>
-            <CardDescription>Your personal details and contact information</CardDescription>
+             <CardTitle className="text-lg flex items-center gap-2"><User className="w-5 h-5 text-primary" /> {t("profilePanel.basicInformation")}</CardTitle>
+             <CardDescription>{t("profilePanel.personalDetails")}</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="full_name">Full Name *</Label>
+                <Label htmlFor="full_name">{t("profilePanel.fullName")} *</Label>
                 <Input id="full_name" value={formData.full_name || ""} onChange={e => setFormData(p => ({ ...p, full_name: e.target.value }))} />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="email">Email Address</Label>
-                <Input id="email" type="email" value={formData.email || user?.email || ""} disabled className="opacity-60" />
-                <p className="text-xs text-muted-foreground">Email is linked to your account</p>
+                 <Label htmlFor="email">{t("profilePanel.emailAddress")}</Label>
+                 <Input id="email" type="email" value={formData.email || user?.email || ""} disabled className="opacity-60" />
+                 <p className="text-xs text-muted-foreground">{t("profilePanel.emailLinked")}</p>
               </div>
               <div className="space-y-2">
-                <Label htmlFor="phone_number">Phone Number</Label>
+                <Label htmlFor="phone_number">{t("profilePanel.phoneNumber")}</Label>
                 <Input id="phone_number" placeholder="+254..." value={formData.phone_number || ""} onChange={e => setFormData(p => ({ ...p, phone_number: e.target.value }))} />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="national_id">
-                  {["corporate", "ngo", "county_government"].includes(role) ? "Registration Number" : "National ID"}
-                </Label>
+                 <Label htmlFor="national_id">
+                   {["corporate", "ngo", "county_government"].includes(role) ? t("profilePanel.registrationNumber") : t("profilePanel.nationalId")}
+                 </Label>
                 <Input id="national_id" value={formData.national_id || ""} onChange={e => setFormData(p => ({ ...p, national_id: e.target.value }))} />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="date_of_birth">Date of Birth</Label>
+                <Label htmlFor="date_of_birth">{t("profilePanel.dateOfBirth")}</Label>
                 <Input id="date_of_birth" type="date" value={formData.date_of_birth || ""} onChange={e => setFormData(p => ({ ...p, date_of_birth: e.target.value }))} />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="gender">Gender</Label>
-                <Select value={formData.gender || ""} onValueChange={v => setFormData(p => ({ ...p, gender: v }))}>
-                  <SelectTrigger><SelectValue placeholder="Select" /></SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="male">Male</SelectItem>
-                    <SelectItem value="female">Female</SelectItem>
-                    <SelectItem value="other">Other</SelectItem>
-                    <SelectItem value="prefer_not">Prefer not to say</SelectItem>
-                  </SelectContent>
+                 <Label htmlFor="gender">{t("profilePanel.gender")}</Label>
+                 <Select value={formData.gender || ""} onValueChange={v => setFormData(p => ({ ...p, gender: v }))}>
+                   <SelectTrigger><SelectValue placeholder={t("common.select")} /></SelectTrigger>
+                   <SelectContent>
+                     <SelectItem value="male">{t("profilePanel.male")}</SelectItem>
+                     <SelectItem value="female">{t("profilePanel.female")}</SelectItem>
+                     <SelectItem value="other">{t("profilePanel.other")}</SelectItem>
+                     <SelectItem value="prefer_not">{t("profilePanel.preferNotToSay")}</SelectItem>
+                   </SelectContent>
                 </Select>
               </div>
             </div>
             <Separator />
             <div className="flex justify-end">
               <Button onClick={() => handleSaveSection(["full_name", "phone_number", "national_id", "date_of_birth", "gender"])} disabled={updateProfile.isPending} className="gap-2">
-                <Save className="w-4 h-4" /> Save Basic Info
+                <Save className="w-4 h-4" /> {t("profilePanel.saveBasicInfo")}
               </Button>
             </div>
           </CardContent>
@@ -419,14 +421,14 @@ const ProfileSettingsPanel = ({ role }: ProfileSettingsPanelProps) => {
       {activeSection === "organization" && !["waste_picker", "admin"].includes(role) && (
         <Card className="shadow-soft">
           <CardHeader>
-            <CardTitle className="text-lg flex items-center gap-2"><Building2 className="w-5 h-5 text-primary" /> Organization Details</CardTitle>
-            <CardDescription>Your company or organization information</CardDescription>
+             <CardTitle className="text-lg flex items-center gap-2"><Building2 className="w-5 h-5 text-primary" /> {t("profilePanel.organizationDetails")}</CardTitle>
+             <CardDescription>{t("profilePanel.companyInfo")}</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {organization && (
                 <div className="sm:col-span-2 space-y-2">
-                  <Label>Organization Name</Label>
+                   <Label>{t("profilePanel.organizationName")}</Label>
                   <Input value={orgName} onChange={e => setOrgName(e.target.value)} placeholder="Organization name" />
                 </div>
               )}
@@ -434,8 +436,8 @@ const ProfileSettingsPanel = ({ role }: ProfileSettingsPanelProps) => {
               {/* Organization Logo */}
               {fullProfile?.organization_id && (
                 <div className="sm:col-span-2 space-y-3">
-                  <Label>Organization Logo</Label>
-                  <p className="text-xs text-muted-foreground">This logo appears on your dashboard header, receipts, and reports.</p>
+                   <Label>{t("profilePanel.organizationLogo")}</Label>
+                   <p className="text-xs text-muted-foreground">{t("profilePanel.logoDescription")}</p>
                   <div className="flex items-center gap-4">
                     <div className="w-20 h-20 rounded-xl border-2 border-dashed border-border flex items-center justify-center bg-muted/30 overflow-hidden shrink-0">
                       {organization?.logo_url ? (
@@ -448,65 +450,65 @@ const ProfileSettingsPanel = ({ role }: ProfileSettingsPanelProps) => {
                       <div className="flex items-center gap-2">
                         <Button variant="outline" size="sm" onClick={() => logoInputRef.current?.click()} disabled={uploadingLogo} className="gap-1.5">
                           <Upload className="w-4 h-4" />
-                          {uploadingLogo ? "Uploading..." : organization?.logo_url ? "Change Logo" : "Upload Logo"}
+                          {uploadingLogo ? t("profilePanel.uploading") : organization?.logo_url ? t("profilePanel.changeLogo") : t("profilePanel.uploadLogo")}
                         </Button>
                         {organization?.logo_url && (
                           <Button variant="outline" size="sm" onClick={handleRemoveOrgLogo} className="text-destructive hover:text-destructive gap-1.5">
-                            <Trash2 className="w-4 h-4" /> Remove
+                            <Trash2 className="w-4 h-4" /> {t("profilePanel.removeLogo")}
                           </Button>
                         )}
                       </div>
-                      <p className="text-xs text-muted-foreground">PNG, JPG, WebP or SVG. Max 2 MB.</p>
+                      <p className="text-xs text-muted-foreground">{t("profilePanel.logoFormat")}</p>
                       <input ref={logoInputRef} type="file" accept="image/png,image/jpeg,image/webp,image/svg+xml" className="hidden" onChange={handleOrgLogoUpload} />
                     </div>
                   </div>
                 </div>
               )}
               <div className="space-y-2">
-                <Label htmlFor="company_registration">Business Registration Number</Label>
+                <Label htmlFor="company_registration">{t("profilePanel.businessRegNumber")}</Label>
                 <Input id="company_registration" value={formData.company_registration || ""} onChange={e => setFormData(p => ({ ...p, company_registration: e.target.value }))} />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="kra_pin">KRA PIN</Label>
+                <Label htmlFor="kra_pin">{t("profilePanel.kraPin")}</Label>
                 <Input id="kra_pin" placeholder="e.g. A012345678Z" value={formData.kra_pin || ""} onChange={e => setFormData(p => ({ ...p, kra_pin: e.target.value }))} />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="industry_sector">Industry / Sector</Label>
-                <Select value={formData.industry_sector || ""} onValueChange={v => setFormData(p => ({ ...p, industry_sector: v }))}>
-                  <SelectTrigger><SelectValue placeholder="Select sector" /></SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="waste_management">Waste Management</SelectItem>
-                    <SelectItem value="recycling">Recycling & Manufacturing</SelectItem>
-                    <SelectItem value="fmcg">FMCG / Consumer Goods</SelectItem>
-                    <SelectItem value="hospitality">Hospitality</SelectItem>
-                    <SelectItem value="construction">Construction</SelectItem>
-                    <SelectItem value="agriculture">Agriculture</SelectItem>
-                    <SelectItem value="technology">Technology</SelectItem>
-                    <SelectItem value="ngo_nonprofit">NGO / Non-Profit</SelectItem>
-                    <SelectItem value="government">Government</SelectItem>
-                    <SelectItem value="other">Other</SelectItem>
+                 <Label htmlFor="industry_sector">{t("profilePanel.industrySector")}</Label>
+                 <Select value={formData.industry_sector || ""} onValueChange={v => setFormData(p => ({ ...p, industry_sector: v }))}>
+                   <SelectTrigger><SelectValue placeholder={t("profilePanel.selectSector")} /></SelectTrigger>
+                   <SelectContent>
+                     <SelectItem value="waste_management">{t("profilePanel.wasteManagement")}</SelectItem>
+                     <SelectItem value="recycling">{t("profilePanel.recyclingManufacturing")}</SelectItem>
+                     <SelectItem value="fmcg">{t("profilePanel.fmcg")}</SelectItem>
+                     <SelectItem value="hospitality">{t("profilePanel.hospitality")}</SelectItem>
+                     <SelectItem value="construction">{t("profilePanel.construction")}</SelectItem>
+                     <SelectItem value="agriculture">{t("profilePanel.agriculture")}</SelectItem>
+                     <SelectItem value="technology">{t("profilePanel.technology")}</SelectItem>
+                     <SelectItem value="ngo_nonprofit">{t("profilePanel.ngoNonProfit")}</SelectItem>
+                     <SelectItem value="government">{t("profilePanel.government")}</SelectItem>
+                     <SelectItem value="other">{t("profilePanel.other")}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
               <div className="space-y-2">
-                <Label htmlFor="physical_address">Physical Address</Label>
+                <Label htmlFor="physical_address">{t("profilePanel.physicalAddress")}</Label>
                 <Input id="physical_address" value={formData.physical_address || ""} onChange={e => setFormData(p => ({ ...p, physical_address: e.target.value }))} />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="county">County</Label>
-                <Select value={formData.county || ""} onValueChange={v => setFormData(p => ({ ...p, county: v }))}>
-                  <SelectTrigger><SelectValue placeholder="Select county" /></SelectTrigger>
+                 <Label htmlFor="county">{t("profilePanel.county")}</Label>
+                 <Select value={formData.county || ""} onValueChange={v => setFormData(p => ({ ...p, county: v }))}>
+                   <SelectTrigger><SelectValue placeholder={t("profilePanel.selectCounty")} /></SelectTrigger>
                   <SelectContent>
                     {kenyaCounties.map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}
                   </SelectContent>
                 </Select>
               </div>
               <div className="space-y-2">
-                <Label htmlFor="sub_county">Sub-County</Label>
+                <Label htmlFor="sub_county">{t("profilePanel.subCounty")}</Label>
                 <Input id="sub_county" value={formData.sub_county || ""} onChange={e => setFormData(p => ({ ...p, sub_county: e.target.value }))} />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="website">Website</Label>
+                <Label htmlFor="website">{t("profilePanel.website")}</Label>
                 <Input id="website" type="url" placeholder="https://..." value={formData.website || ""} onChange={e => setFormData(p => ({ ...p, website: e.target.value }))} />
               </div>
             </div>
@@ -544,7 +546,7 @@ const ProfileSettingsPanel = ({ role }: ProfileSettingsPanelProps) => {
                 }
                 handleSaveSection(["company_registration", "kra_pin", "industry_sector", "physical_address", "county", "sub_county", "website", "social_media_links"]);
               }} disabled={updateProfile.isPending} className="gap-2">
-                <Save className="w-4 h-4" /> Save Organization Info
+                <Save className="w-4 h-4" /> {t("profilePanel.saveOrganization")}
               </Button>
             </div>
           </CardContent>
@@ -555,13 +557,13 @@ const ProfileSettingsPanel = ({ role }: ProfileSettingsPanelProps) => {
       {activeSection === "operational" && !["admin", "county_government"].includes(role) && (
         <Card className="shadow-soft">
           <CardHeader>
-            <CardTitle className="text-lg flex items-center gap-2"><MapPin className="w-5 h-5 text-primary" /> Operational Details</CardTitle>
-            <CardDescription>Your area of operation, waste categories, and capacity</CardDescription>
+             <CardTitle className="text-lg flex items-center gap-2"><MapPin className="w-5 h-5 text-primary" /> {t("profilePanel.operationalDetails")}</CardTitle>
+             <CardDescription>{t("profilePanel.operationalInfo")}</CardDescription>
           </CardHeader>
           <CardContent className="space-y-5">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="area_of_operation">Area of Operation</Label>
+                <Label htmlFor="area_of_operation">{t("profilePanel.areaOfOperation")}</Label>
                 <Select value={formData.area_of_operation || ""} onValueChange={v => setFormData(p => ({ ...p, area_of_operation: v }))}>
                   <SelectTrigger><SelectValue placeholder="Select county/ward" /></SelectTrigger>
                   <SelectContent>
@@ -570,17 +572,17 @@ const ProfileSettingsPanel = ({ role }: ProfileSettingsPanelProps) => {
                 </Select>
               </div>
               <div className="space-y-2">
-                <Label htmlFor="daily_capacity_kg">Daily Capacity (kg)</Label>
+                <Label htmlFor="daily_capacity_kg">{t("profilePanel.dailyCapacity")}</Label>
                 <Input id="daily_capacity_kg" type="number" value={formData.daily_capacity_kg || ""} onChange={e => setFormData(p => ({ ...p, daily_capacity_kg: e.target.value ? Number(e.target.value) : "" }))} />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="monthly_capacity_kg">Monthly Capacity (kg)</Label>
+                <Label htmlFor="monthly_capacity_kg">{t("profilePanel.monthlyCapacity")}</Label>
                 <Input id="monthly_capacity_kg" type="number" value={formData.monthly_capacity_kg || ""} onChange={e => setFormData(p => ({ ...p, monthly_capacity_kg: e.target.value ? Number(e.target.value) : "" }))} />
               </div>
             </div>
 
             <div>
-              <Label className="mb-3 block">Waste Categories Handled</Label>
+              <Label className="mb-3 block">{t("profilePanel.wasteCategories")}</Label>
               <div className="flex flex-wrap gap-2">
                 {wasteCategories.map(cat => (
                   <Badge
@@ -601,7 +603,7 @@ const ProfileSettingsPanel = ({ role }: ProfileSettingsPanelProps) => {
               <h3 className="text-sm font-semibold mb-3 flex items-center gap-2"><CreditCard className="w-4 h-4 text-primary" /> Payment Details</h3>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="payment_method">Payment Method</Label>
+                  <Label htmlFor="payment_method">{t("profilePanel.paymentMethod")}</Label>
                   <Select value={formData.payment_method || ""} onValueChange={v => setFormData(p => ({ ...p, payment_method: v }))}>
                     <SelectTrigger><SelectValue placeholder="Select method" /></SelectTrigger>
                     <SelectContent>
@@ -611,18 +613,18 @@ const ProfileSettingsPanel = ({ role }: ProfileSettingsPanelProps) => {
                 </div>
                 {(formData.payment_method === "M-Pesa" || formData.payment_method === "Both") && (
                   <div className="space-y-2">
-                    <Label htmlFor="mpesa_number">M-Pesa Number</Label>
+                    <Label htmlFor="mpesa_number">{t("profilePanel.mpesaNumber")}</Label>
                     <Input id="mpesa_number" placeholder="+254..." value={formData.mpesa_number || ""} onChange={e => setFormData(p => ({ ...p, mpesa_number: e.target.value }))} />
                   </div>
                 )}
                 {(formData.payment_method === "Bank Transfer" || formData.payment_method === "Both") && (
                   <>
                     <div className="space-y-2">
-                      <Label htmlFor="bank_name">Bank Name</Label>
+                      <Label htmlFor="bank_name">{t("profilePanel.bankName")}</Label>
                       <Input id="bank_name" value={formData.bank_name || ""} onChange={e => setFormData(p => ({ ...p, bank_name: e.target.value }))} />
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="bank_account_number">Account Number</Label>
+                      <Label htmlFor="bank_account_number">{t("profilePanel.bankAccountNumber")}</Label>
                       <Input id="bank_account_number" value={formData.bank_account_number || ""} onChange={e => setFormData(p => ({ ...p, bank_account_number: e.target.value }))} />
                     </div>
                   </>
@@ -633,7 +635,7 @@ const ProfileSettingsPanel = ({ role }: ProfileSettingsPanelProps) => {
             <Separator />
             <div className="flex justify-end">
               <Button onClick={() => handleSaveSection(["area_of_operation", "waste_categories", "daily_capacity_kg", "monthly_capacity_kg", "payment_method", "mpesa_number", "bank_name", "bank_account_number"])} disabled={updateProfile.isPending} className="gap-2">
-                <Save className="w-4 h-4" /> Save Operational Details
+                <Save className="w-4 h-4" /> {t("profilePanel.saveOperational")}
               </Button>
             </div>
           </CardContent>
@@ -644,24 +646,24 @@ const ProfileSettingsPanel = ({ role }: ProfileSettingsPanelProps) => {
       {activeSection === "security" && (
         <Card className="shadow-soft">
           <CardHeader>
-            <CardTitle className="text-lg flex items-center gap-2"><Shield className="w-5 h-5 text-primary" /> Security & Account</CardTitle>
-            <CardDescription>Manage password and account preferences</CardDescription>
+             <CardTitle className="text-lg flex items-center gap-2"><Shield className="w-5 h-5 text-primary" /> {t("profilePanel.securitySettings")}</CardTitle>
+             <CardDescription>{t("profilePanel.accountSecurity")}</CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
             <div>
-              <h3 className="text-sm font-semibold mb-3 flex items-center gap-2"><Lock className="w-4 h-4" /> Change Password</h3>
+              <h3 className="text-sm font-semibold mb-3 flex items-center gap-2"><Lock className="w-4 h-4" /> {t("profilePanel.changePassword")}</h3>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-md">
                 <div className="sm:col-span-2 space-y-2">
-                  <Label htmlFor="new_password">New Password</Label>
+                  <Label htmlFor="new_password">{t("profilePanel.newPassword")}</Label>
                   <Input id="new_password" type="password" value={passwordData.new} onChange={e => setPasswordData(p => ({ ...p, new: e.target.value }))} />
                 </div>
                 <div className="sm:col-span-2 space-y-2">
-                  <Label htmlFor="confirm_password">Confirm New Password</Label>
+                  <Label htmlFor="confirm_password">{t("profilePanel.confirmNewPassword")}</Label>
                   <Input id="confirm_password" type="password" value={passwordData.confirm} onChange={e => setPasswordData(p => ({ ...p, confirm: e.target.value }))} />
                 </div>
               </div>
               <Button onClick={handlePasswordChange} size="sm" className="mt-3 gap-2">
-                <Lock className="w-4 h-4" /> Update Password
+                <Lock className="w-4 h-4" /> {t("profilePanel.updatePassword")}
               </Button>
             </div>
 
