@@ -1,6 +1,6 @@
 // Subscription pricing structure per role with billing period options
 
-export type BillingPeriod = "monthly" | "yearly" | "one_time";
+export type BillingPeriod = "monthly" | "yearly" | "one_time" | "free_trial";
 
 export interface RolePricing {
   monthly: number;
@@ -21,15 +21,18 @@ export const BILLING_LABELS: Record<BillingPeriod, string> = {
   monthly: "/month",
   yearly: "/year",
   one_time: " (one-time)",
+  free_trial: " (30-day trial)",
 };
 
 export const getAmount = (role: string, period: BillingPeriod): number => {
+  if (period === "free_trial") return 0;
   return ROLE_PRICING[role]?.[period] ?? 0;
 };
 
 export const getMonthlyEquivalent = (role: string, period: BillingPeriod): number => {
   const pricing = ROLE_PRICING[role];
   if (!pricing) return 0;
+  if (period === "free_trial") return 0;
   if (period === "monthly") return pricing.monthly;
   if (period === "yearly") return Math.round(pricing.yearly / 12);
   return 0; // one-time has no monthly equivalent
@@ -37,7 +40,7 @@ export const getMonthlyEquivalent = (role: string, period: BillingPeriod): numbe
 
 export const getSavingsPercent = (role: string, period: BillingPeriod): number => {
   const pricing = ROLE_PRICING[role];
-  if (!pricing || period === "monthly") return 0;
+  if (!pricing || period === "monthly" || period === "free_trial") return 0;
   const fullYearly = pricing.monthly * 12;
   if (period === "yearly") return Math.round(((fullYearly - pricing.yearly) / fullYearly) * 100);
   // one_time vs 2 years

@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { motion } from "framer-motion";
-import { Check, Tag, Crown, Zap, Clock } from "lucide-react";
+import { Check, Tag, Crown, Zap, Clock, Gift } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -48,6 +48,7 @@ const roleColors: Record<AppRole, string> = {
 };
 
 const periodIcons: Record<BillingPeriod, typeof Zap> = {
+  free_trial: Gift,
   monthly: Zap,
   yearly: Crown,
   one_time: Clock,
@@ -82,6 +83,7 @@ const PricingPlans = ({
   const savings = getSavingsPercent(role, billingPeriod);
   const features = ROLE_FEATURES[role] || [];
   const planId = `${role}_${billingPeriod}`;
+  const isTrial = billingPeriod === "free_trial";
 
   // Auto-select plan when role/period changes
   useEffect(() => {
@@ -92,7 +94,8 @@ const PricingPlans = ({
 
   if (!pricing) return null;
 
-  const periods: { id: BillingPeriod; label: string }[] = [
+  const periods: { id: BillingPeriod; label: string; badge?: string }[] = [
+    { id: "free_trial", label: "Free Trial", badge: "30 days" },
     { id: "monthly", label: "Monthly" },
     { id: "yearly", label: "Yearly" },
     { id: "one_time", label: "One-Time" },
@@ -101,7 +104,7 @@ const PricingPlans = ({
   return (
     <div className="space-y-5">
       {/* Billing period selector */}
-      <div className="grid grid-cols-3 gap-2 p-1 rounded-lg bg-muted/50 border border-border">
+      <div className="grid grid-cols-4 gap-1.5 p-1 rounded-lg bg-muted/50 border border-border">
         {periods.map((p) => {
           const isActive = billingPeriod === p.id;
           const Icon = periodIcons[p.id];
@@ -112,14 +115,19 @@ const PricingPlans = ({
               type="button"
               onClick={() => onBillingPeriodChange(p.id)}
               className={cn(
-                "relative flex flex-col items-center gap-0.5 py-2.5 px-2 rounded-md text-xs font-medium transition-all",
+                "relative flex flex-col items-center gap-0.5 py-2.5 px-1.5 rounded-md text-xs font-medium transition-all",
                 isActive
                   ? "bg-background shadow-sm text-foreground border border-primary/30"
                   : "text-muted-foreground hover:text-foreground"
               )}
             >
               <Icon className="w-3.5 h-3.5" />
-              {p.label}
+              <span className="text-[10px] sm:text-xs">{p.label}</span>
+              {p.badge && (
+                <Badge variant="secondary" className="text-[9px] px-1 py-0 bg-primary/10 text-primary border-0">
+                  {p.badge}
+                </Badge>
+              )}
               {periodSavings > 0 && (
                 <Badge variant="secondary" className="text-[9px] px-1 py-0 bg-emerald-500/10 text-emerald-600 border-0">
                   Save {periodSavings}%
@@ -137,7 +145,9 @@ const PricingPlans = ({
         animate={{ opacity: 1, y: 0 }}
         className={cn(
           "relative flex flex-col p-5 rounded-xl border-2 text-left transition-all",
-          `border-primary shadow-soft ${roleColors[role]}`
+          isTrial
+            ? "border-primary shadow-soft bg-primary/5"
+            : `border-primary shadow-soft ${roleColors[role]}`
         )}
       >
         <div className="flex justify-between items-start">
@@ -146,7 +156,12 @@ const PricingPlans = ({
               {role.replace(/_/g, " ")}
             </span>
             <div className="mt-1">
-              {promoValid ? (
+              {isTrial ? (
+                <div>
+                  <span className="text-2xl font-bold text-primary">Free</span>
+                  <span className="text-xs text-muted-foreground ml-1">for 30 days</span>
+                </div>
+              ) : promoValid ? (
                 <div className="flex items-center gap-2">
                   <span className="line-through text-muted-foreground text-sm">{formatKES(amount)}</span>
                   <span className="text-xl font-bold text-emerald-600">Free</span>
@@ -160,6 +175,11 @@ const PricingPlans = ({
                 </div>
               )}
             </div>
+            {isTrial && (
+              <p className="text-xs text-primary mt-0.5 font-medium">
+                Full access — no payment required
+              </p>
+            )}
             {billingPeriod === "yearly" && (
               <p className="text-xs text-muted-foreground mt-0.5">
                 ≈ {formatKES(Math.round(pricing.yearly / 12))}/month
@@ -176,7 +196,12 @@ const PricingPlans = ({
               </p>
             )}
           </div>
-          {savings > 0 && (
+          {isTrial && (
+            <Badge className="bg-primary text-primary-foreground text-[10px] px-2">
+              TRY FREE
+            </Badge>
+          )}
+          {!isTrial && savings > 0 && (
             <Badge className="bg-emerald-500 text-white text-[10px] px-2">
               {savings}% OFF
             </Badge>
@@ -191,30 +216,38 @@ const PricingPlans = ({
             </li>
           ))}
         </ul>
-      </motion.div>
 
-      {/* Promo Code */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.3 }}
-        className="flex items-center gap-3 p-3 rounded-lg bg-muted/50 border border-border"
-      >
-        <Tag className="w-4 h-4 text-muted-foreground shrink-0" />
-        <div className="flex-1">
-          <Input
-            placeholder="Promo code (optional)"
-            value={promoCode}
-            onChange={(e) => onPromoCodeChange(e.target.value.toUpperCase().trim())}
-            className="h-8 text-sm"
-          />
-        </div>
-        {promoCode && (
-          <span className={cn("text-xs font-medium", promoValid ? "text-emerald-600" : "text-destructive")}>
-            {promoValid ? "✓ 100% off!" : "Invalid"}
-          </span>
+        {isTrial && (
+          <p className="mt-3 text-[10px] text-muted-foreground border-t border-border pt-2">
+            After 30 days, choose a paid plan to continue. No auto-charge.
+          </p>
         )}
       </motion.div>
+
+      {/* Promo Code - hide when trial is selected */}
+      {!isTrial && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.3 }}
+          className="flex items-center gap-3 p-3 rounded-lg bg-muted/50 border border-border"
+        >
+          <Tag className="w-4 h-4 text-muted-foreground shrink-0" />
+          <div className="flex-1">
+            <Input
+              placeholder="Promo code (optional)"
+              value={promoCode}
+              onChange={(e) => onPromoCodeChange(e.target.value.toUpperCase().trim())}
+              className="h-8 text-sm"
+            />
+          </div>
+          {promoCode && (
+            <span className={cn("text-xs font-medium", promoValid ? "text-emerald-600" : "text-destructive")}>
+              {promoValid ? "✓ 100% off!" : "Invalid"}
+            </span>
+          )}
+        </motion.div>
+      )}
     </div>
   );
 };
