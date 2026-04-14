@@ -61,6 +61,7 @@ const Login = () => {
           transition={{ duration: 0.6, ease: [0.4, 0, 0.2, 1] }}
           className="relative z-10 text-primary-foreground max-w-md"
         >
+          <img src="/images/duara-flow-logo.svg" alt="Duara Flow" className="h-12 mb-6" />
           <h1 className="text-4xl font-display font-bold mb-4">Welcome Back</h1>
           <p className="text-lg opacity-80 font-body">
             Sign in to access your Duara Flow dashboard and continue tracking your impact.
