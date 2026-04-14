@@ -287,6 +287,20 @@ const EarningsExpensesPanel = ({ role }: Props) => {
     },
   });
 
+  // Update budget
+  const updateBudgetMutation = useMutation({
+    mutationFn: async ({ id, amount, notes }: { id: string; amount: number; notes: string }) => {
+      const { error } = await supabase.from("financial_budgets").update({ amount, notes: notes || null }).eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["financial_budgets"] });
+      setEditingBudgetId(null);
+      toast.success("Budget updated");
+    },
+    onError: (e: any) => toast.error(e?.message || "Failed to update budget"),
+  });
+
   const { softDelete } = useTrash();
 
   const handleDeleteTx = async (tx: any) => {
