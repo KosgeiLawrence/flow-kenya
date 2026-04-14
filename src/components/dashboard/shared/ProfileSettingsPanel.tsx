@@ -127,6 +127,12 @@ const ProfileSettingsPanel = ({ role }: ProfileSettingsPanelProps) => {
     }
   }, [fullProfile]);
 
+  useEffect(() => {
+    if (organization) {
+      setOrgName(organization.name || "");
+    }
+  }, [organization]);
+
   // Calculate profile completeness
   const calculateCompleteness = useCallback(() => {
     if (!formData.full_name) return 0;
