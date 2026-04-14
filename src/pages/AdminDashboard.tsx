@@ -4,6 +4,8 @@ import { Button } from "@/components/ui/button";
 import { LogOut, Users, BarChart3, DollarSign, ShieldAlert, FileText, Settings, MapPin, Menu, X, ChevronRight, User, BookOpen, Mail, Eye, EyeOff, Trash2, ClipboardList, MessageSquare, TrendingUp, Receipt, Wallet } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
+import { useTranslatedNavItems } from "@/hooks/useTranslatedNavItems";
+import { useTranslation } from "react-i18next";
 import UserVerificationPanel from "@/components/dashboard/admin/UserVerificationPanel";
 import PlatformAnalyticsPanel from "@/components/dashboard/admin/PlatformAnalyticsPanel";
 import TransactionTrackingPanel from "@/components/dashboard/admin/TransactionTrackingPanel";

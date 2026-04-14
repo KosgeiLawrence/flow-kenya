@@ -5,6 +5,8 @@ import { LogOut, MapPin, BarChart3, FileText, Scale, Menu, X, ChevronRight, Sett
 import { useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { useFilteredNavItems } from "@/hooks/useFilteredNavItems";
+import { useTranslatedNavItems } from "@/hooks/useTranslatedNavItems";
+import { useTranslation } from "react-i18next";
 import WasteFlowPanel from "@/components/dashboard/county/WasteFlowPanel";
 import CountyReportsPanel from "@/components/dashboard/county/CountyReportsPanel";
 import RegulatoryPanel from "@/components/dashboard/county/RegulatoryPanel";

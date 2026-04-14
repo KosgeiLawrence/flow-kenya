@@ -9,6 +9,8 @@ import {
 import { useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { useFilteredNavItems } from "@/hooks/useFilteredNavItems";
+import { useTranslatedNavItems } from "@/hooks/useTranslatedNavItems";
+import { useTranslation } from "react-i18next";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import InventoryAccessPanel from "@/components/dashboard/recycler/InventoryAccessPanel";
 import OrdersPanel from "@/components/dashboard/recycler/OrdersPanel";
