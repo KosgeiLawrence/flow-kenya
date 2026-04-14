@@ -113,9 +113,9 @@ const RecoveryTrackingPanel = () => {
         {[
           { icon: Recycle, label: "Total Recovered", value: `${(totalRecoveredKg / 1000).toFixed(1)} t`, color: "text-primary" },
           { icon: Leaf, label: "CO₂ Avoided", value: `${(co2Avoided / 1000).toFixed(1)} t`, color: "text-primary" },
-          { icon: DollarSign, label: "Income Generated", value: `KES ${(totalIncome / 1000).toFixed(0)}K`, color: "text-accent" },
+          { icon: DollarSign, label: "Income Generated", value: `KES ${(totalIncome / 1000).toFixed(0)}K`, color: "text-secondary" },
           { icon: Users, label: "Livelihoods", value: `${uniquePickers.size}`, color: "text-primary" },
-          { icon: Globe, label: "Locations", value: `${Object.keys(countyMap).length}`, color: "text-accent" },
+          { icon: Globe, label: "Locations", value: `${Object.keys(countyMap).length}`, color: "text-secondary" },
           { icon: Recycle, label: "Batches Tracked", value: `${collections?.length || 0}`, color: "text-primary" },
         ].map((kpi, i) => (
           <Card key={i} className="shadow-soft">

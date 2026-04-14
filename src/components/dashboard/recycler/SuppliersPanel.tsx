@@ -184,7 +184,7 @@ const SuppliersPanel = () => {
         </Card>
         <Card className="shadow-soft">
           <CardContent className="flex items-center gap-3 p-4">
-            <UserPlus className="w-7 h-7 text-accent" />
+            <UserPlus className="w-7 h-7 text-secondary" />
             <div>
               <p className="text-xl font-bold text-foreground">{suppliers?.filter((s) => s.platform_user_id).length || 0}</p>
               <p className="text-xs text-muted-foreground">Platform Users</p>

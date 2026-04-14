@@ -151,7 +151,7 @@ const SponsorshipPanel = () => {
         </Card>
         <Card className="shadow-soft">
           <CardContent className="flex items-center gap-3 p-4">
-            <Heart className="w-7 h-7 text-accent" />
+            <Heart className="w-7 h-7 text-secondary" />
             <div>
               <p className="text-xl font-bold text-foreground">{activeSponsors.length}</p>
               <p className="text-xs text-muted-foreground">Active Sponsorships</p>

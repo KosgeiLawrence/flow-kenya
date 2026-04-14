@@ -204,7 +204,7 @@ const OrdersPanel = () => {
     <div className="space-y-6">
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <Card className="shadow-soft"><CardContent className="flex items-center gap-3 p-4"><ClipboardList className="w-7 h-7 text-primary" /><div><p className="text-xl font-bold text-foreground">{orders?.length || 0}</p><p className="text-xs text-muted-foreground">Total Orders</p></div></CardContent></Card>
-        <Card className="shadow-soft"><CardContent className="flex items-center gap-3 p-4"><Clock className="w-7 h-7 text-accent" /><div><p className="text-xl font-bold text-foreground">{active.length}</p><p className="text-xs text-muted-foreground">Active</p></div></CardContent></Card>
+        <Card className="shadow-soft"><CardContent className="flex items-center gap-3 p-4"><Clock className="w-7 h-7 text-secondary" /><div><p className="text-xl font-bold text-foreground">{active.length}</p><p className="text-xs text-muted-foreground">Active</p></div></CardContent></Card>
         <Card className="shadow-soft"><CardContent className="flex items-center gap-3 p-4"><CheckCircle2 className="w-7 h-7 text-primary" /><div><p className="text-xl font-bold text-foreground">{completed.length}</p><p className="text-xs text-muted-foreground">Completed</p></div></CardContent></Card>
       </div>
 

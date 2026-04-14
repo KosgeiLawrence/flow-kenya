@@ -60,12 +60,12 @@ const workflows: Workflow[] = [
     title: "Live Pricing",
     subtitle: "Check current market prices for materials",
     icon: DollarSign,
-    color: "text-accent",
+    color: "text-secondary",
     tip: "Check live prices before selling to ensure you get the best deal for your materials.",
     steps: [
-      { label: "View Prices", description: "See current market prices for all material types", icon: DollarSign, color: "bg-accent/10 text-accent" },
-      { label: "Compare Rates", description: "Compare prices across different material categories", icon: BarChart3, color: "bg-accent/10 text-accent" },
-      { label: "Update Prices", description: "Suggest price updates based on your local market", icon: TrendingUp, color: "bg-accent/10 text-accent" },
+      { label: "View Prices", description: "See current market prices for all material types", icon: DollarSign, color: "bg-accent/10 text-secondary" },
+      { label: "Compare Rates", description: "Compare prices across different material categories", icon: BarChart3, color: "bg-accent/10 text-secondary" },
+      { label: "Update Prices", description: "Suggest price updates based on your local market", icon: TrendingUp, color: "bg-accent/10 text-secondary" },
     ],
   },
   {
@@ -87,12 +87,12 @@ const workflows: Workflow[] = [
     title: "My Clients",
     subtitle: "Manage your client relationships",
     icon: Users,
-    color: "text-accent",
+    color: "text-secondary",
     tip: "Keep client details updated to auto-fill when logging collections.",
     steps: [
-      { label: "View Clients", description: "See all your registered clients and their details", icon: Users, color: "bg-accent/10 text-accent" },
-      { label: "Add Client", description: "Register new clients from collections or manually", icon: CheckCircle2, color: "bg-accent/10 text-accent" },
-      { label: "Track Transactions", description: "View collection history and revenue per client", icon: BarChart3, color: "bg-accent/10 text-accent" },
+      { label: "View Clients", description: "See all your registered clients and their details", icon: Users, color: "bg-accent/10 text-secondary" },
+      { label: "Add Client", description: "Register new clients from collections or manually", icon: CheckCircle2, color: "bg-accent/10 text-secondary" },
+      { label: "Track Transactions", description: "View collection history and revenue per client", icon: BarChart3, color: "bg-accent/10 text-secondary" },
     ],
   },
   {
@@ -112,12 +112,12 @@ const workflows: Workflow[] = [
     title: "Training & Community",
     subtitle: "Learn and log community impact",
     icon: BookOpen,
-    color: "text-accent",
+    color: "text-secondary",
     tip: "Complete training modules to improve your skills and log community trainings for ESG reporting.",
     steps: [
-      { label: "Browse Training", description: "View available training resources and materials", icon: BookOpen, color: "bg-accent/10 text-accent" },
-      { label: "Log Community Training", description: "Record trainings you've conducted with community impact data", icon: Users, color: "bg-accent/10 text-accent" },
-      { label: "Track Impact", description: "See participants trained, waste collected, and trees planted", icon: Leaf, color: "bg-accent/10 text-accent" },
+      { label: "Browse Training", description: "View available training resources and materials", icon: BookOpen, color: "bg-accent/10 text-secondary" },
+      { label: "Log Community Training", description: "Record trainings you've conducted with community impact data", icon: Users, color: "bg-accent/10 text-secondary" },
+      { label: "Track Impact", description: "See participants trained, waste collected, and trees planted", icon: Leaf, color: "bg-accent/10 text-secondary" },
     ],
   },
   {
@@ -137,11 +137,11 @@ const workflows: Workflow[] = [
     title: "Grants & Programs",
     subtitle: "Discover funding opportunities",
     icon: Briefcase,
-    color: "text-accent",
+    color: "text-secondary",
     steps: [
-      { label: "Browse Grants", description: "Discover available grants and funding programs", icon: Briefcase, color: "bg-accent/10 text-accent" },
-      { label: "Apply", description: "Submit applications for relevant programs", icon: FileText, color: "bg-accent/10 text-accent" },
-      { label: "Track Applications", description: "Monitor the status of your grant applications", icon: CheckCircle2, color: "bg-accent/10 text-accent" },
+      { label: "Browse Grants", description: "Discover available grants and funding programs", icon: Briefcase, color: "bg-accent/10 text-secondary" },
+      { label: "Apply", description: "Submit applications for relevant programs", icon: FileText, color: "bg-accent/10 text-secondary" },
+      { label: "Track Applications", description: "Monitor the status of your grant applications", icon: CheckCircle2, color: "bg-accent/10 text-secondary" },
     ],
   },
 ];
@@ -228,8 +228,8 @@ const OverviewDiagram = () => {
   const mainFlow = [
     { label: "Collect Materials", icon: Package, color: "bg-primary/10 text-primary" },
     { label: "Log Collection", icon: ClipboardList, color: "bg-primary/10 text-primary" },
-    { label: "Sort & Weigh", icon: BarChart3, color: "bg-accent/10 text-accent" },
-    { label: "Request Pickup", icon: Truck, color: "bg-accent/10 text-accent" },
+    { label: "Sort & Weigh", icon: BarChart3, color: "bg-accent/10 text-secondary" },
+    { label: "Request Pickup", icon: Truck, color: "bg-accent/10 text-secondary" },
     { label: "Sell to Buyers", icon: DollarSign, color: "bg-primary/10 text-primary" },
     { label: "Track Earnings", icon: TrendingUp, color: "bg-primary/10 text-primary" },
   ];

@@ -153,7 +153,7 @@ const GrantsPanel = () => {
         </Card>
         <Card className="shadow-soft">
           <CardContent className="flex items-center gap-3 p-4">
-            <Target className="w-7 h-7 text-accent" />
+            <Target className="w-7 h-7 text-secondary" />
             <div>
               <p className="text-xl font-bold text-foreground">{totalBudget > 0 ? Math.round((totalSpent / totalBudget) * 100) : 0}%</p>
               <p className="text-xs text-muted-foreground">Utilization</p>

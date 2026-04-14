@@ -84,7 +84,7 @@ const CompliancePanel = () => {
               {c.pass ? (
                 <CheckCircle2 className="w-5 h-5 text-primary shrink-0 mt-0.5" />
               ) : (
-                <AlertTriangle className="w-5 h-5 text-accent shrink-0 mt-0.5" />
+                <AlertTriangle className="w-5 h-5 text-secondary shrink-0 mt-0.5" />
               )}
               <div>
                 <p className="text-sm font-medium text-foreground">{c.label}</p>
@@ -117,7 +117,7 @@ const CompliancePanel = () => {
         </Card>
         <Card className="shadow-soft">
           <CardContent className="p-4 text-center">
-            <Shield className="w-8 h-8 text-accent mx-auto mb-2" />
+            <Shield className="w-8 h-8 text-secondary mx-auto mb-2" />
             <p className="text-2xl font-bold text-foreground">{eprProgress.toFixed(0)}%</p>
             <p className="text-xs text-muted-foreground">EPR Target</p>
           </CardContent>

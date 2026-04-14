@@ -953,7 +953,7 @@ const EarningsExpensesPanel = ({ role }: Props) => {
             </Card>
             <Card className="shadow-soft col-span-2 sm:col-span-1">
               <CardContent className="p-3 flex items-center gap-2">
-                <Wallet className="w-6 h-6 text-accent shrink-0" />
+                <Wallet className="w-6 h-6 text-secondary shrink-0" />
                 <div className="min-w-0">
                   <p className={`text-lg font-bold truncate ${netProfit >= 0 ? "text-primary" : "text-destructive"}`}>KES {netProfit.toLocaleString()}</p>
                   <p className="text-[11px] text-muted-foreground">Profit</p>

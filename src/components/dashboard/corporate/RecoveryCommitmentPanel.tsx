@@ -89,7 +89,7 @@ const RecoveryCommitmentPanel = () => {
         </Card>
         <Card className="shadow-soft">
           <CardContent className="p-4 text-center">
-            <TrendingUp className="w-7 h-7 text-accent mx-auto mb-2" />
+            <TrendingUp className="w-7 h-7 text-secondary mx-auto mb-2" />
             <p className="text-xl font-bold text-foreground">{(totalCommitted / 1000).toFixed(1)} t</p>
             <p className="text-xs text-muted-foreground">Committed Recovery</p>
           </CardContent>

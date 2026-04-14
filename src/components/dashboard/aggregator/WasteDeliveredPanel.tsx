@@ -355,7 +355,7 @@ const WasteDeliveredPanel = () => {
         </Card>
         <Card className="shadow-soft">
           <CardContent className="flex items-center gap-3 p-4">
-            <Package className="w-7 h-7 text-accent" />
+            <Package className="w-7 h-7 text-secondary" />
             <div>
               <p className="text-xl font-bold text-foreground">
                 {deliveredOrders.reduce((s, o) => s + Number(o.delivered_quantity || o.quantity), 0).toFixed(0)} kg
