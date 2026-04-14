@@ -802,7 +802,7 @@ const CleanupExercisePanel = ({ isAdmin = false }: Props) => {
       ) : cleanups.length === 0 ? (
         <Card>
           <CardContent className="py-12 text-center text-muted-foreground">
-            <Package className="w-10 h-10 mx-auto mb-3 opacity-40" />
+            <Package className="w-10 h-10 mx-auto mb-3 opacity-60" />
             <p>No cleanup exercises logged yet</p>
           </CardContent>
         </Card>

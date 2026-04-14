@@ -257,7 +257,7 @@ const PickupRequestFlow = ({ onBack }: Props) => {
             <div className="flex justify-center py-8"><Loader2 className="w-6 h-6 animate-spin text-muted-foreground" /></div>
           ) : !requests?.length ? (
             <div className="text-center py-8 text-muted-foreground">
-              <Truck className="w-10 h-10 mx-auto mb-2 opacity-40" />
+              <Truck className="w-10 h-10 mx-auto mb-2 opacity-60" />
               <p className="text-sm">No pickup requests yet.</p>
             </div>
           ) : (

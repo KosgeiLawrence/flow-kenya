@@ -138,7 +138,7 @@ const CorporateSettingsPanel = () => {
                   className="w-full h-full object-contain p-1"
                 />
               ) : (
-                <Building2 className="w-10 h-10 text-muted-foreground/40" />
+                <Building2 className="w-10 h-10 text-muted-foreground" />
               )}
             </div>
             <div className="flex-1 space-y-2">
