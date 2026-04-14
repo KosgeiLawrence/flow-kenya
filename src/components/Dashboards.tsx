@@ -53,15 +53,15 @@ const Dashboards = () => {
   const isInView = useInView(ref, { once: true, margin: "-100px" });
 
   return (
-    <section id="stakeholders" className="py-20 md:py-32" ref={ref}>
+    <section id="stakeholders" className="relative py-20 md:py-32 bg-mesh" ref={ref}>
       <div className="container">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={isInView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.6 }}
+          transition={{ duration: 0.6, ease: [0.4, 0, 0.2, 1] }}
           className="mb-16 text-center"
         >
-          <span className="mb-4 inline-block rounded-full bg-gold/10 px-4 py-1.5 text-sm font-semibold text-gold">
+          <span className="mb-4 inline-block rounded-full bg-gold/10 px-4 py-1.5 text-sm font-semibold text-gold backdrop-blur-sm">
             Role-Based Access
           </span>
           <h2 className="mb-4 font-display text-3xl font-bold text-foreground md:text-5xl">
@@ -78,10 +78,10 @@ const Dashboards = () => {
               key={dash.role}
               initial={{ opacity: 0, y: 30 }}
               animate={isInView ? { opacity: 1, y: 0 } : {}}
-              transition={{ delay: i * 0.1, duration: 0.5 }}
-              className="group rounded-xl border border-border bg-card p-6 transition-all duration-300 hover:shadow-elevated"
+              transition={{ delay: i * 0.08, duration: 0.5, ease: [0.4, 0, 0.2, 1] }}
+              className="group rounded-2xl glass-card p-6"
             >
-              <div className={`mb-4 flex h-12 w-12 items-center justify-center rounded-lg ${dash.accent} transition-transform duration-300 group-hover:scale-110`}>
+              <div className={`mb-4 flex h-12 w-12 items-center justify-center rounded-xl ${dash.accent} transition-all duration-300 group-hover:scale-110 group-hover:shadow-lg`}>
                 <dash.icon className="h-6 w-6 text-primary-foreground" />
               </div>
               <h3 className="mb-3 font-display text-lg font-bold text-foreground">

@@ -23,16 +23,16 @@ const Navbar = () => {
 
   return (
     <header
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] ${
         scrolled
-          ? "bg-forest-deep/95 backdrop-blur-xl border-b border-primary-foreground/10 shadow-elevated"
+          ? "bg-forest-deep/80 backdrop-blur-2xl border-b border-primary-foreground/8 shadow-elevated"
           : "bg-transparent"
       }`}
     >
       <div className="container flex items-center justify-between h-16 md:h-20 pt-2">
         {/* Logo */}
         <Link to="/" className="flex items-center gap-2.5 group">
-          <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-gold transition-transform duration-300 group-hover:scale-110">
+          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gold transition-all duration-300 group-hover:scale-110 group-hover:shadow-gold">
             <Recycle className="h-5 w-5 text-forest-deep" />
           </div>
           <span className="font-display text-lg font-bold text-primary-foreground tracking-tight">
@@ -46,7 +46,7 @@ const Navbar = () => {
             <a
               key={item.label}
               href={item.href}
-              className="relative px-4 py-2 text-sm font-medium text-primary-foreground/70 transition-colors hover:text-gold-light group"
+              className="relative px-4 py-2 text-sm font-medium text-primary-foreground/70 transition-all duration-300 hover:text-gold-light group"
             >
               {item.label}
               <span className="absolute bottom-0 left-1/2 -translate-x-1/2 h-0.5 w-0 bg-gold rounded-full transition-all duration-300 group-hover:w-1/2" />
@@ -58,11 +58,11 @@ const Navbar = () => {
         <div className="hidden md:flex items-center gap-3">
           <Link
             to="/login"
-            className="px-4 py-2 text-sm font-medium text-primary-foreground/80 transition-colors hover:text-gold-light"
+            className="px-4 py-2 text-sm font-medium text-primary-foreground/80 transition-all duration-300 hover:text-gold-light"
           >
             Sign In
           </Link>
-          <Button variant="hero" size="sm" asChild>
+          <Button variant="hero" size="sm" className="hover-glow" asChild>
             <Link to="/signup">Get Started</Link>
           </Button>
         </div>
@@ -70,7 +70,7 @@ const Navbar = () => {
         {/* Mobile toggle */}
         <button
           onClick={() => setMobileOpen(!mobileOpen)}
-          className="md:hidden flex items-center justify-center h-10 w-10 rounded-lg text-primary-foreground/80 hover:bg-primary-foreground/10 transition-colors"
+          className="md:hidden flex items-center justify-center h-10 w-10 rounded-xl text-primary-foreground/80 hover:bg-primary-foreground/10 transition-all duration-300"
           aria-label="Toggle menu"
         >
           {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
@@ -84,8 +84,8 @@ const Navbar = () => {
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
-            transition={{ duration: 0.3, ease: "easeInOut" }}
-            className="md:hidden overflow-hidden bg-forest-deep/98 backdrop-blur-xl border-t border-primary-foreground/10"
+            transition={{ duration: 0.3, ease: [0.4, 0, 0.2, 1] }}
+            className="md:hidden overflow-hidden bg-forest-deep/95 backdrop-blur-2xl border-t border-primary-foreground/8"
           >
             <div className="container py-6 flex flex-col gap-2">
               {navItems.map((item) => (
@@ -93,7 +93,7 @@ const Navbar = () => {
                   key={item.label}
                   href={item.href}
                   onClick={() => setMobileOpen(false)}
-                  className="px-4 py-3 rounded-lg text-sm font-medium text-primary-foreground/80 hover:text-gold-light hover:bg-primary-foreground/5 transition-colors"
+                  className="px-4 py-3 rounded-xl text-sm font-medium text-primary-foreground/80 hover:text-gold-light hover:bg-primary-foreground/5 transition-all duration-300"
                 >
                   {item.label}
                 </a>
@@ -102,7 +102,7 @@ const Navbar = () => {
                 <Button variant="hero-outline" asChild className="w-full">
                   <Link to="/login" onClick={() => setMobileOpen(false)}>Sign In</Link>
                 </Button>
-                <Button variant="hero" asChild className="w-full">
+                <Button variant="hero" asChild className="w-full hover-glow">
                   <Link to="/signup" onClick={() => setMobileOpen(false)}>Get Started</Link>
                 </Button>
               </div>

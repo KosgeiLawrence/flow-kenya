@@ -1,5 +1,4 @@
-import { motion } from "framer-motion";
-import { useInView } from "framer-motion";
+import { motion, useInView } from "framer-motion";
 import { useRef } from "react";
 import { ArrowRight } from "lucide-react";
 
@@ -39,15 +38,21 @@ const TraceabilityFlow = () => {
   const isInView = useInView(ref, { once: true, margin: "-100px" });
 
   return (
-    <section id="platform" className="bg-muted py-20 md:py-32" ref={ref}>
-      <div className="container">
+    <section id="platform" className="relative py-20 md:py-32 overflow-hidden" ref={ref}>
+      {/* Subtle background gradient */}
+      <div className="absolute inset-0 bg-muted">
+        <div className="absolute top-0 right-0 h-[40%] w-[40%] rounded-full bg-gold/5 blur-3xl" />
+        <div className="absolute bottom-0 left-0 h-[30%] w-[30%] rounded-full bg-forest/5 blur-3xl" />
+      </div>
+
+      <div className="container relative">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={isInView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.6 }}
+          transition={{ duration: 0.6, ease: [0.4, 0, 0.2, 1] }}
           className="mb-16 text-center"
         >
-          <span className="mb-4 inline-block rounded-full bg-primary/10 px-4 py-1.5 text-sm font-semibold text-primary">
+          <span className="mb-4 inline-block rounded-full bg-primary/10 px-4 py-1.5 text-sm font-semibold text-primary backdrop-blur-sm">
             Traceability Framework
           </span>
           <h2 className="mb-4 font-display text-3xl font-bold text-foreground md:text-5xl">
@@ -59,19 +64,16 @@ const TraceabilityFlow = () => {
         </motion.div>
 
         <div className="relative grid grid-cols-1 gap-6 md:grid-cols-4">
-          {/* Connecting line */}
-          <div className="absolute left-1/2 top-0 hidden h-full w-px -translate-x-1/2 bg-border md:left-0 md:right-0 md:top-1/2 md:h-px md:w-full md:translate-x-0 md:-translate-y-1/2" />
-
           {steps.map((step, i) => (
             <motion.div
               key={step.step}
               initial={{ opacity: 0, y: 30 }}
               animate={isInView ? { opacity: 1, y: 0 } : {}}
-              transition={{ delay: i * 0.15, duration: 0.5 }}
+              transition={{ delay: i * 0.12, duration: 0.5, ease: [0.4, 0, 0.2, 1] }}
               className="relative"
             >
-              <div className="rounded-xl bg-card p-6 shadow-soft transition-all duration-300 hover:shadow-elevated">
-                <div className={`mb-4 flex h-12 w-12 items-center justify-center rounded-lg ${step.color}`}>
+              <div className="rounded-2xl glass-card p-6">
+                <div className={`mb-4 flex h-12 w-12 items-center justify-center rounded-xl ${step.color} transition-transform duration-300 hover:scale-110`}>
                   <span className="font-display text-lg font-bold text-primary-foreground">
                     {step.step}
                   </span>
