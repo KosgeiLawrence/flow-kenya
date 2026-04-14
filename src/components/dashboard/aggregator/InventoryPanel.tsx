@@ -10,6 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Package, Layers, TrendingUp, Plus } from "lucide-react";
 import { toast } from "sonner";
+import { useTranslation } from "react-i18next";
 
 const InventoryPanel = () => {
   const { user } = useAuth();

@@ -12,6 +12,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { loadImageAsBase64 } from "@/lib/pdfLogoUtils";
 import ComplianceDocUpload from "@/components/dashboard/shared/ComplianceDocUpload";
 import { addBrandedHeader, addDocMeta, addSectionTitle, finalizePdf, PDF_COLORS } from "@/lib/pdfBranding";
+import { useTranslation } from "react-i18next";
 
 const CORPORATE_DOC_TYPES = [
   { value: "epr_registration", label: "EPR Scheme Registration" },

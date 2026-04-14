@@ -8,6 +8,7 @@ import { ShieldAlert, AlertTriangle, Eye, TrendingUp, Download } from "lucide-re
 import jsPDF from "jspdf";
 import { toast } from "sonner";
 import { addBrandedHeader, addDocMeta, addSectionTitle, finalizePdf } from "@/lib/pdfBranding";
+import { useTranslation } from "react-i18next";
 
 const FraudDetectionPanel = () => {
   const { data: collections } = useQuery({

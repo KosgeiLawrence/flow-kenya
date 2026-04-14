@@ -3,6 +3,7 @@ import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, PieChart, Pie, Cell } from "recharts";
 import { Package, Users, DollarSign, Recycle } from "lucide-react";
 import { usePlatformStats } from "@/hooks/usePlatformStats";
+import { useTranslation } from "react-i18next";
 
 const COLORS = ["hsl(152,45%,22%)", "hsl(40,55%,55%)", "hsl(195,60%,50%)", "hsl(25,30%,35%)", "hsl(0,84%,60%)"];
 

@@ -5,6 +5,7 @@ import { Progress } from "@/components/ui/progress";
 import { Factory, TrendingDown, Target, Flame } from "lucide-react";
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, Area, AreaChart } from "recharts";
 import { format, subMonths } from "date-fns";
+import { useTranslation } from "react-i18next";
 
 const CarbonTrackerPanel = () => {
   const { data: collections } = useQuery({

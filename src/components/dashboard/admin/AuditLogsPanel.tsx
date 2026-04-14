@@ -11,6 +11,7 @@ import { FileText, Download, Search } from "lucide-react";
 import jsPDF from "jspdf";
 import { toast } from "sonner";
 import { addBrandedHeader, addDocMeta, drawTableHeader, drawTableRow, finalizePdf } from "@/lib/pdfBranding";
+import { useTranslation } from "react-i18next";
 
 const AuditLogsPanel = () => {
   const [typeFilter, setTypeFilter] = useState("all");

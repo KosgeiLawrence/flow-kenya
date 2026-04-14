@@ -14,6 +14,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Users, Heart, MapPin, DollarSign, Plus, History, Recycle, Factory } from "lucide-react";
 import { toast } from "sonner";
 import { format } from "date-fns";
+import { useTranslation } from "react-i18next";
 
 const FUND_TYPES = [
   { value: "general", label: "General Support" },

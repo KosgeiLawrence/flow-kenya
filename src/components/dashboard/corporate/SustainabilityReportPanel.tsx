@@ -7,6 +7,7 @@ import { Download, FileSpreadsheet, BookOpen } from "lucide-react";
 import { format } from "date-fns";
 import jsPDF from "jspdf";
 import { addBrandedHeader, addDocMeta, addSectionTitle, drawTableHeader, drawTableRow, drawTotalLine, finalizePdf } from "@/lib/pdfBranding";
+import { useTranslation } from "react-i18next";
 
 const SustainabilityReportPanel = () => {
   const { profile } = useAuth();

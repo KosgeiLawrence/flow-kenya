@@ -11,6 +11,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { DollarSign, ArrowUpRight, Clock, Plus } from "lucide-react";
 import { format } from "date-fns";
 import { toast } from "sonner";
+import { useTranslation } from "react-i18next";
 
 const PaymentsPanel = () => {
   const { user } = useAuth();

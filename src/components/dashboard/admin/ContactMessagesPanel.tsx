@@ -10,6 +10,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Mail, MailOpen, Trash2, Eye } from "lucide-react";
 import { toast } from "sonner";
 import { format } from "date-fns";
+import { useTranslation } from "react-i18next";
 
 interface ContactMessage {
   id: string;

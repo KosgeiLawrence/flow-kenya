@@ -15,6 +15,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Briefcase, Target, DollarSign, Calendar, Plus, Upload, FileText, Trash2, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { format } from "date-fns";
+import { useTranslation } from "react-i18next";
 
 const COUNTIES = [
   "Nairobi", "Mombasa", "Kisumu", "Nakuru", "Kiambu",

@@ -14,6 +14,7 @@ import { toast } from "sonner";
 import { format } from "date-fns";
 import OrdersPanel from "./OrdersPanel";
 import SuppliersPanel from "./SuppliersPanel";
+import { useTranslation } from "react-i18next";
 
 interface InventoryItem {
   name: string;

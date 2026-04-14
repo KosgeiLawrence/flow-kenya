@@ -18,6 +18,7 @@ import RecyclerDashboard from "@/pages/RecyclerDashboard";
 import NGODashboard from "@/pages/NGODashboard";
 import CorporateDashboard from "@/pages/CorporateDashboard";
 import CountyGovernmentDashboard from "@/pages/CountyGovernmentDashboard";
+import { useTranslation } from "react-i18next";
 
 type AppRole = "waste_picker" | "aggregator" | "recycler" | "ngo" | "corporate" | "county_government" | "admin";
 

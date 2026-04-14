@@ -7,6 +7,7 @@ import { Download, ClipboardCheck, Truck } from "lucide-react";
 import { format } from "date-fns";
 import jsPDF from "jspdf";
 import { addCleanHeader, addDocMeta, drawTableHeader, drawTableRow, finalizeCleanPdf } from "@/lib/pdfBranding";
+import { useTranslation } from "react-i18next";
 
 const ReceiptConfirmPanel = () => {
   const { user, profile } = useAuth();

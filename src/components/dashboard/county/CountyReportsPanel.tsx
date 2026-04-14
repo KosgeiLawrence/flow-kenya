@@ -6,6 +6,7 @@ import { Download, FileText, FileSpreadsheet } from "lucide-react";
 import jsPDF from "jspdf";
 import { toast } from "sonner";
 import { addBrandedHeader, addDocMeta, addSectionTitle, finalizePdf } from "@/lib/pdfBranding";
+import { useTranslation } from "react-i18next";
 
 const CountyReportsPanel = () => {
   const { data: collections } = useQuery({ queryKey: ["county-reports-collections"], queryFn: async () => { const { data, error } = await supabase.from("collections").select("*, material_types(name)"); if (error) throw error; return data; } });

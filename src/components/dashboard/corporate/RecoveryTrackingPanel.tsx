@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Recycle, MapPin, Users, Leaf, DollarSign, Globe } from "lucide-react";
 import { PieChart, Pie, Cell, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid } from "recharts";
+import { useTranslation } from "react-i18next";
 
 const CO2_FACTORS: Record<string, number> = {
   pet: 3.1, hdpe: 2.5, ldpe: 1.8, pp: 1.5, ps: 2.7, plastic: 2.5, aluminium: 9.1, glass: 0.6, paper: 1.1,

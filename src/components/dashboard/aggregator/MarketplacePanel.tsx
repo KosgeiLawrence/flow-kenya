@@ -11,6 +11,7 @@ import { Store, Recycle, ArrowRight, Search, Mail, Phone } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import MarketPriceEditor from "@/components/dashboard/shared/MarketPriceEditor";
 import MaterialIcon from "@/components/dashboard/shared/MaterialIcon";
+import { useTranslation } from "react-i18next";
 
 const MarketplacePanel = () => {
   const { user, profile } = useAuth();

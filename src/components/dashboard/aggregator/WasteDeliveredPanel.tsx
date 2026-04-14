@@ -16,6 +16,7 @@ import { format } from "date-fns";
 import jsPDF from "jspdf";
 import { addCleanHeader, addDocMeta, drawTableHeader, drawTableRow, drawVatTotalBlock, finalizeCleanPdf, loadImageAsBase64, buildPdfOrgInfo } from "@/lib/pdfBranding";
 import VatOptions, { DEFAULT_VAT, type VatConfig } from "@/components/dashboard/shared/VatOptions";
+import { useTranslation } from "react-i18next";
 
 type PurchaseOrder = {
   id: string;

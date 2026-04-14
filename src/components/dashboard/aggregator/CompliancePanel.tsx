@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Shield, Leaf, FileCheck, AlertTriangle, CheckCircle2 } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 import ComplianceDocUpload from "@/components/dashboard/shared/ComplianceDocUpload";
+import { useTranslation } from "react-i18next";
 
 const AGGREGATOR_DOC_TYPES = [
   { value: "business_registration", label: "Business Registration" },

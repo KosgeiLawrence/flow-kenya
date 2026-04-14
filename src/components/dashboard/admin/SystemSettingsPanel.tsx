@@ -7,6 +7,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Settings, Save } from "lucide-react";
 import { toast } from "sonner";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 
 const SystemSettingsPanel = () => {
   const queryClient = useQueryClient();

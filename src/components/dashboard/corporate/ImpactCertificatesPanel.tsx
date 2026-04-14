@@ -9,6 +9,7 @@ import jsPDF from "jspdf";
 import { format } from "date-fns";
 import { loadImageAsBase64 } from "@/lib/pdfLogoUtils";
 import { addBrandedHeader, addDocMeta, finalizePdf, PDF_COLORS } from "@/lib/pdfBranding";
+import { useTranslation } from "react-i18next";
 
 const ImpactCertificatesPanel = () => {
   const { profile } = useAuth();

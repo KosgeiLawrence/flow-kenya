@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, LineChart, Line } from "recharts";
 import { TrendingUp, Calendar, Package } from "lucide-react";
 import { format, subDays, subWeeks } from "date-fns";
+import { useTranslation } from "react-i18next";
 
 const SupplyForecastPanel = () => {
   const { user } = useAuth();

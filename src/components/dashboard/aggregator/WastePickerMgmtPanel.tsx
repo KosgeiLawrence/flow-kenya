@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Users, UserCheck, Clock, Search, TrendingUp, Package } from "lucide-react";
 import { toast } from "sonner";
+import { useTranslation } from "react-i18next";
 
 const WastePickerMgmtPanel = () => {
   const { user } = useAuth();

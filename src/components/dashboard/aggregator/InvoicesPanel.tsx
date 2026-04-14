@@ -10,6 +10,7 @@ import { format } from "date-fns";
 import jsPDF from "jspdf";
 import { addCleanHeader, addDocMeta, drawTableHeader, drawTableRow, drawVatTotalBlock, drawTotalLine, finalizeCleanPdf, loadImageAsBase64, buildPdfOrgInfo } from "@/lib/pdfBranding";
 import VatOptions, { DEFAULT_VAT, type VatConfig } from "@/components/dashboard/shared/VatOptions";
+import { useTranslation } from "react-i18next";
 
 const InvoicesPanel = () => {
   const { user, profile } = useAuth();
