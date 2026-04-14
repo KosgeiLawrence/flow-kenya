@@ -5,7 +5,7 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-const LOVABLE_API_URL = "https://ai.lovable.dev/api/v1/chat/completions";
+const LOVABLE_API_URL = "https://api.lovable.dev/api/ai/v1/chat/completions";
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
