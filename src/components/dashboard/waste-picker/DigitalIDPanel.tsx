@@ -168,11 +168,11 @@ const DigitalIDPanel = () => {
           {/* Business Info */}
           <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-xs">
             <div>
-              <p className="text-muted-foreground">Type</p>
-              <p className="font-medium text-foreground">{isOrg ? "Organization" : "Individual"}</p>
+              <p className="text-muted-foreground">{t("common.type")}</p>
+              <p className="font-medium text-foreground">{isOrg ? t("profilePanel.organization") : t("digitalIdPanel.individual", "Individual")}</p>
             </div>
             <div>
-              <p className="text-muted-foreground">Value Chain Role</p>
+              <p className="text-muted-foreground">{t("digitalIdPanel.valueChainRole", "Value Chain Role")}</p>
               <p className="font-medium text-foreground">{roleLabelMap[role || ""] || "—"}</p>
             </div>
             {isOrg && orgData?.name && (
@@ -193,11 +193,11 @@ const DigitalIDPanel = () => {
                 <Shield className="w-3 h-3" /> {t("digitalIdPanel.verificationStatus")}
               </p>
               <p className={`font-medium ${isVerified ? "text-primary" : "text-muted-foreground"}`}>
-                {isVerified ? "Verified" : "Unverified"}
+                {isVerified ? t("common.verified") : t("digitalIdPanel.unverified", "Unverified")}
               </p>
             </div>
             <div>
-              <p className="text-muted-foreground">ID Type Used</p>
+              <p className="text-muted-foreground">{t("digitalIdPanel.idTypeUsed", "ID Type Used")}</p>
               <p className="font-medium text-foreground">{idVerificationType}</p>
             </div>
             <div>
