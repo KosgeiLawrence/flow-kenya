@@ -1,19 +1,25 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Recycle, Menu, X } from "lucide-react";
+import { Recycle, Menu, X, Globe } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-
-const navItems = [
-  { label: "Platform", href: "#platform" },
-  { label: "Impact", href: "#impact" },
-  { label: "Stakeholders", href: "#stakeholders" },
-  { label: "About", href: "#about" },
-];
+import { useTranslation } from "react-i18next";
 
 const Navbar = () => {
+  const { t, i18n } = useTranslation();
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+
+  const navItems = [
+    { label: t("nav.platform"), href: "#platform" },
+    { label: t("nav.impact"), href: "#impact" },
+    { label: t("nav.stakeholders"), href: "#stakeholders" },
+    { label: t("nav.about"), href: "#about" },
+  ];
+
+  const toggleLang = () => {
+    i18n.changeLanguage(i18n.language === "en" ? "sw" : "en");
+  };
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20);
@@ -44,7 +50,7 @@ const Navbar = () => {
         <nav className="hidden md:flex items-center gap-1">
           {navItems.map((item) => (
             <a
-              key={item.label}
+              key={item.href}
               href={item.href}
               className="relative px-4 py-2 text-sm font-medium text-primary-foreground/70 transition-all duration-300 hover:text-gold-light group"
             >
@@ -54,27 +60,45 @@ const Navbar = () => {
           ))}
         </nav>
 
-        {/* Desktop CTA */}
+        {/* Desktop CTA + Lang */}
         <div className="hidden md:flex items-center gap-3">
+          <button
+            onClick={toggleLang}
+            className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-primary-foreground/70 rounded-lg hover:text-gold-light hover:bg-primary-foreground/5 transition-all duration-300"
+            aria-label="Switch language"
+          >
+            <Globe className="h-4 w-4" />
+            {t("nav.language")}
+          </button>
           <Link
             to="/login"
             className="px-4 py-2 text-sm font-medium text-primary-foreground/80 transition-all duration-300 hover:text-gold-light"
           >
-            Sign In
+            {t("nav.signIn")}
           </Link>
           <Button variant="hero" size="sm" className="hover-glow" asChild>
-            <Link to="/signup">Get Started</Link>
+            <Link to="/signup">{t("nav.getStarted")}</Link>
           </Button>
         </div>
 
         {/* Mobile toggle */}
-        <button
-          onClick={() => setMobileOpen(!mobileOpen)}
-          className="md:hidden flex items-center justify-center h-10 w-10 rounded-xl text-primary-foreground/80 hover:bg-primary-foreground/10 transition-all duration-300"
-          aria-label="Toggle menu"
-        >
-          {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-        </button>
+        <div className="md:hidden flex items-center gap-2">
+          <button
+            onClick={toggleLang}
+            className="flex items-center gap-1 px-2 py-1.5 text-xs font-medium text-primary-foreground/70 rounded-lg hover:text-gold-light hover:bg-primary-foreground/5 transition-all duration-300"
+            aria-label="Switch language"
+          >
+            <Globe className="h-3.5 w-3.5" />
+            {t("nav.language")}
+          </button>
+          <button
+            onClick={() => setMobileOpen(!mobileOpen)}
+            className="flex items-center justify-center h-10 w-10 rounded-xl text-primary-foreground/80 hover:bg-primary-foreground/10 transition-all duration-300"
+            aria-label="Toggle menu"
+          >
+            {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+          </button>
+        </div>
       </div>
 
       {/* Mobile menu */}
@@ -90,7 +114,7 @@ const Navbar = () => {
             <div className="container py-6 flex flex-col gap-2">
               {navItems.map((item) => (
                 <a
-                  key={item.label}
+                  key={item.href}
                   href={item.href}
                   onClick={() => setMobileOpen(false)}
                   className="px-4 py-3 rounded-xl text-sm font-medium text-primary-foreground/80 hover:text-gold-light hover:bg-primary-foreground/5 transition-all duration-300"
@@ -100,10 +124,10 @@ const Navbar = () => {
               ))}
               <div className="mt-4 pt-4 border-t border-primary-foreground/10 flex flex-col gap-3">
                 <Button variant="hero-outline" asChild className="w-full">
-                  <Link to="/login" onClick={() => setMobileOpen(false)}>Sign In</Link>
+                  <Link to="/login" onClick={() => setMobileOpen(false)}>{t("nav.signIn")}</Link>
                 </Button>
                 <Button variant="hero" asChild className="w-full hover-glow">
-                  <Link to="/signup" onClick={() => setMobileOpen(false)}>Get Started</Link>
+                  <Link to="/signup" onClick={() => setMobileOpen(false)}>{t("nav.getStarted")}</Link>
                 </Button>
               </div>
             </div>

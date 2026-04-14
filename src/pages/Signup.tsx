@@ -12,6 +12,7 @@ import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/hooks/use-toast";
 import RoleSelector from "@/components/auth/RoleSelector";
 import PricingPlans, { isPromoValidForRole } from "@/components/auth/PricingPlans";
+import { useTranslation } from "react-i18next";
 
 type AppRole = "waste_picker" | "aggregator" | "recycler" | "ngo" | "corporate" | "county_government";
 
@@ -27,6 +28,7 @@ const orgTypes = [
 const Signup = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { t } = useTranslation();
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -90,6 +92,12 @@ const Signup = () => {
     } finally { setLoading(false); }
   };
 
+  const featuresList = [
+    t("features.mpesa").replace("M-Pesa Integration", "M-Pesa integrated payments"),
+    "Real-time material tracking",
+    "Impact analytics & reporting",
+  ];
+
   return (
     <div className="min-h-screen flex bg-mesh">
       {/* Left panel */}
@@ -104,15 +112,13 @@ const Signup = () => {
           transition={{ duration: 0.6, ease: [0.4, 0, 0.2, 1] }}
           className="relative z-10 text-primary-foreground max-w-md"
         >
-          <h1 className="text-4xl font-display font-bold mb-4">Join Duara Flow</h1>
-          <p className="text-lg opacity-80 font-body">
-            Kenya's digital infrastructure for circular economy traceability. Connect with the waste value chain ecosystem.
-          </p>
+          <h1 className="text-4xl font-display font-bold mb-4">{t("auth.heroSignUpTitle")}</h1>
+          <p className="text-lg opacity-80 font-body">{t("auth.heroSignUpSubtitle")}</p>
           <div className="mt-8 space-y-3 text-sm opacity-70">
-            {["Real-time material tracking", "M-Pesa integrated payments", "Impact analytics & reporting"].map((t) => (
-              <div key={t} className="flex items-center gap-2">
+            {featuresList.map((feat) => (
+              <div key={feat} className="flex items-center gap-2">
                 <div className="w-2 h-2 rounded-full bg-gold" />
-                <span>{t}</span>
+                <span>{feat}</span>
               </div>
             ))}
           </div>
@@ -124,7 +130,7 @@ const Signup = () => {
         <button
           onClick={() => navigate("/")}
           className="absolute top-6 right-6 p-2 rounded-full glass hover:bg-muted/80 text-muted-foreground hover:text-foreground transition-smooth z-10"
-          aria-label="Back to home"
+          aria-label={t("auth.close")}
         >
           <X className="w-5 h-5" />
         </button>
@@ -143,7 +149,7 @@ const Signup = () => {
                 <p className="text-muted-foreground mb-6">Choose the role that best describes your position in the waste value chain.</p>
                 <RoleSelector selected={role} onSelect={handleRoleSelect} />
                 <div className="flex justify-end mt-6">
-                  <Button onClick={() => setStep(2)} disabled={!canProceedStep1} className="gap-2">Continue <ArrowRight className="w-4 h-4" /></Button>
+                  <Button onClick={() => setStep(2)} disabled={!canProceedStep1} className="gap-2">{t("common.next")} <ArrowRight className="w-4 h-4" /></Button>
                 </div>
               </motion.div>
             )}
@@ -154,8 +160,8 @@ const Signup = () => {
                 <p className="text-muted-foreground mb-6">Select the plan that fits your needs. You can upgrade anytime.</p>
                 <PricingPlans role={role} selectedPlan={selectedPlan} onSelectPlan={setSelectedPlan} billingPeriod={billingPeriod} onBillingPeriodChange={setBillingPeriod} promoCode={promoCode} onPromoCodeChange={setPromoCode} promoValid={promoValid} />
                 <div className="flex justify-between mt-6">
-                  <Button variant="outline" onClick={() => setStep(1)} className="gap-2"><ArrowLeft className="w-4 h-4" /> Back</Button>
-                  <Button onClick={() => setStep(3)} disabled={!canProceedStep2} className="gap-2">Continue <ArrowRight className="w-4 h-4" /></Button>
+                  <Button variant="outline" onClick={() => setStep(1)} className="gap-2"><ArrowLeft className="w-4 h-4" /> {t("common.back")}</Button>
+                  <Button onClick={() => setStep(3)} disabled={!canProceedStep2} className="gap-2">{t("common.next")} <ArrowRight className="w-4 h-4" /></Button>
                 </div>
               </motion.div>
             )}
@@ -165,11 +171,11 @@ const Signup = () => {
                 <h2 className="text-2xl font-display font-bold text-foreground mb-2">Personal Information</h2>
                 <p className="text-muted-foreground mb-6">Provide your details to create your account.</p>
                 <div className="space-y-4">
-                  <div><Label htmlFor="fullName">Full Name *</Label><Input id="fullName" value={fullName} onChange={(e) => setFullName(e.target.value)} placeholder="Enter your full name" /></div>
-                  <div><Label htmlFor="email">Email Address *</Label><Input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@example.com" /></div>
+                  <div><Label htmlFor="fullName">{t("auth.fullName")} *</Label><Input id="fullName" value={fullName} onChange={(e) => setFullName(e.target.value)} placeholder="Enter your full name" /></div>
+                  <div><Label htmlFor="email">{t("auth.email")} *</Label><Input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@example.com" /></div>
                   <div><Label htmlFor="phone">Phone Number</Label><Input id="phone" value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="+254 7XX XXX XXX" /></div>
                   <div>
-                    <Label htmlFor="password">Password *</Label>
+                    <Label htmlFor="password">{t("auth.password")} *</Label>
                     <div className="relative">
                       <Input id="password" type={showPassword ? "text" : "password"} value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Min. 8 characters" />
                       <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-smooth">
@@ -182,8 +188,8 @@ const Signup = () => {
                   {(role === "corporate" || role === "recycler" || role === "ngo") && <div><Label htmlFor="companyReg">Company Registration Number</Label><Input id="companyReg" value={companyReg} onChange={(e) => setCompanyReg(e.target.value)} placeholder="Enter registration number" /></div>}
                 </div>
                 <div className="flex justify-between mt-6">
-                  <Button variant="outline" onClick={() => setStep(2)} className="gap-2"><ArrowLeft className="w-4 h-4" /> Back</Button>
-                  <Button onClick={() => setStep(4)} disabled={!canProceedStep3} className="gap-2">Continue <ArrowRight className="w-4 h-4" /></Button>
+                  <Button variant="outline" onClick={() => setStep(2)} className="gap-2"><ArrowLeft className="w-4 h-4" /> {t("common.back")}</Button>
+                  <Button onClick={() => setStep(4)} disabled={!canProceedStep3} className="gap-2">{t("common.next")} <ArrowRight className="w-4 h-4" /></Button>
                 </div>
               </motion.div>
             )}
@@ -208,17 +214,17 @@ const Signup = () => {
                       <Label htmlFor="orgType">Organization Type</Label>
                       <Select value={orgType} onValueChange={setOrgType}>
                         <SelectTrigger><SelectValue placeholder="Select type" /></SelectTrigger>
-                        <SelectContent>{orgTypes.map((t) => <SelectItem key={t.value} value={t.value}>{t.label}</SelectItem>)}</SelectContent>
+                        <SelectContent>{orgTypes.map((ot) => <SelectItem key={ot.value} value={ot.value}>{ot.label}</SelectItem>)}</SelectContent>
                       </Select>
                     </div>
                     <div><Label htmlFor="orgDesc">Organization Description</Label><Textarea id="orgDesc" value={orgDescription} onChange={(e) => setOrgDescription(e.target.value)} placeholder="Brief description of your organization" rows={3} /></div>
                   </div>
                 )}
                 <div className="flex justify-between mt-6">
-                  <Button variant="outline" onClick={() => setStep(3)} className="gap-2"><ArrowLeft className="w-4 h-4" /> Back</Button>
+                  <Button variant="outline" onClick={() => setStep(3)} className="gap-2"><ArrowLeft className="w-4 h-4" /> {t("common.back")}</Button>
                   <Button onClick={handleSubmit} disabled={loading || !canProceedStep4} className="gap-2">
                     {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
-                    Create Account
+                    {loading ? t("auth.signingUp") : t("auth.signUpTitle")}
                   </Button>
                 </div>
               </motion.div>
@@ -226,8 +232,8 @@ const Signup = () => {
           </AnimatePresence>
 
           <p className="text-center text-sm text-muted-foreground mt-6">
-            Already have an account?{" "}
-            <Link to="/login" className="text-primary font-medium hover:underline">Sign in</Link>
+            {t("auth.hasAccount")}{" "}
+            <Link to="/login" className="text-primary font-medium hover:underline">{t("nav.signIn")}</Link>
           </p>
         </div>
       </div>

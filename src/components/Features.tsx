@@ -1,43 +1,21 @@
 import { motion, useInView } from "framer-motion";
 import { useRef } from "react";
 import { Smartphone, QrCode, MapPin, Wifi, Shield, BarChart3 } from "lucide-react";
-
-const features = [
-  {
-    icon: Smartphone,
-    title: "M-Pesa Integration",
-    description: "Instant payments to waste pickers with SMS confirmations and downloadable receipts.",
-  },
-  {
-    icon: QrCode,
-    title: "QR Batch Tracking",
-    description: "Every material batch tagged with QR codes for full chain-of-custody verification.",
-  },
-  {
-    icon: MapPin,
-    title: "Geo-Tagged Collection",
-    description: "GPS-stamped collection and aggregation points for spatial waste flow analytics.",
-  },
-  {
-    icon: Wifi,
-    title: "Offline-First Design",
-    description: "Capture data offline on low-end Android devices with automatic cloud sync.",
-  },
-  {
-    icon: Shield,
-    title: "EPR Compliance",
-    description: "Automated Extended Producer Responsibility reporting with verified certificates.",
-  },
-  {
-    icon: BarChart3,
-    title: "Financial Tracking",
-    description: "Built-in income, expense, and budget management with branded PDF reports and CSV exports.",
-  },
-];
+import { useTranslation } from "react-i18next";
 
 const Features = () => {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: "-100px" });
+  const { t } = useTranslation();
+
+  const features = [
+    { icon: Smartphone, title: t("features.mpesa"), description: t("features.mpesaDesc") },
+    { icon: QrCode, title: t("features.qr"), description: t("features.qrDesc") },
+    { icon: MapPin, title: t("features.geo"), description: t("features.geoDesc") },
+    { icon: Wifi, title: t("features.offline"), description: t("features.offlineDesc") },
+    { icon: Shield, title: t("features.epr"), description: t("features.eprDesc") },
+    { icon: BarChart3, title: t("features.financial"), description: t("features.financialDesc") },
+  ];
 
   return (
     <section className="relative py-20 md:py-32 bg-mesh" ref={ref}>
@@ -49,20 +27,20 @@ const Features = () => {
           className="mb-16 text-center"
         >
           <span className="mb-4 inline-block rounded-full bg-primary/10 px-4 py-1.5 text-sm font-semibold text-primary backdrop-blur-sm">
-            Built for Kenya
+            {t("features.badge")}
           </span>
           <h2 className="mb-4 font-display text-3xl font-bold text-foreground md:text-5xl">
-            Infrastructure That Works
+            {t("features.title")}
           </h2>
           <p className="mx-auto max-w-2xl text-muted-foreground">
-            Designed for the realities of Kenya's waste ecosystem — mobile-first, offline-capable, and M-Pesa native.
+            {t("features.subtitle")}
           </p>
         </motion.div>
 
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {features.map((f, i) => (
             <motion.div
-              key={f.title}
+              key={i}
               initial={{ opacity: 0, y: 20 }}
               animate={isInView ? { opacity: 1, y: 0 } : {}}
               transition={{ delay: i * 0.08, duration: 0.5, ease: [0.4, 0, 0.2, 1] }}
@@ -72,9 +50,7 @@ const Features = () => {
                 <f.icon className="h-6 w-6 text-primary transition-colors duration-300 group-hover:text-primary-foreground" />
               </div>
               <div>
-                <h3 className="mb-1 font-display text-base font-bold text-foreground">
-                  {f.title}
-                </h3>
+                <h3 className="mb-1 font-display text-base font-bold text-foreground">{f.title}</h3>
                 <p className="text-sm text-muted-foreground">{f.description}</p>
               </div>
             </motion.div>

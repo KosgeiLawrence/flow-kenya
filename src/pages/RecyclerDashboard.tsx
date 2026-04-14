@@ -9,6 +9,8 @@ import {
 import { useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { useFilteredNavItems } from "@/hooks/useFilteredNavItems";
+import { useTranslatedNavItems } from "@/hooks/useTranslatedNavItems";
+import { useTranslation } from "react-i18next";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import InventoryAccessPanel from "@/components/dashboard/recycler/InventoryAccessPanel";
 import OrdersPanel from "@/components/dashboard/recycler/OrdersPanel";
@@ -66,6 +68,8 @@ const RecyclerDashboard = () => {
   const [activePanel, setActivePanel] = useState("inventory");
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const { filteredNavItems, teamDisplayName, teamLogoUrl } = useFilteredNavItems(navItems);
+  const translatedNavItems = useTranslatedNavItems(filteredNavItems);
+  const { t } = useTranslation();
   const effectiveDisplayName = teamDisplayName || displayName;
   const effectiveLogoUrl = teamLogoUrl || orgLogoUrl;
 

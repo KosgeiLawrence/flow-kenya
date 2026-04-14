@@ -9,6 +9,8 @@ import {
 import { useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { useFilteredNavItems } from "@/hooks/useFilteredNavItems";
+import { useTranslatedNavItems } from "@/hooks/useTranslatedNavItems";
+import { useTranslation } from "react-i18next";
 import PlasticFootprintPanel from "@/components/dashboard/corporate/PlasticFootprintPanel";
 import RecoveryCommitmentPanel from "@/components/dashboard/corporate/RecoveryCommitmentPanel";
 import RecoveryTrackingPanel from "@/components/dashboard/corporate/RecoveryTrackingPanel";
@@ -52,6 +54,8 @@ const CorporateDashboard = () => {
   const [activePanel, setActivePanel] = useState("footprint");
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const { filteredNavItems, teamDisplayName, teamLogoUrl } = useFilteredNavItems(navItems);
+  const translatedNavItems = useTranslatedNavItems(filteredNavItems);
+  const { t } = useTranslation();
   const effectiveDisplayName = teamDisplayName || displayName;
   const effectiveLogoUrl = teamLogoUrl || orgLogoUrl;
 

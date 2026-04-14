@@ -7,10 +7,12 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
+import { useTranslation } from "react-i18next";
 
 const Login = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { t } = useTranslation();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -61,10 +63,8 @@ const Login = () => {
           transition={{ duration: 0.6, ease: [0.4, 0, 0.2, 1] }}
           className="relative z-10 text-primary-foreground max-w-md"
         >
-          <h1 className="text-4xl font-display font-bold mb-4">Welcome Back</h1>
-          <p className="text-lg opacity-80 font-body">
-            Sign in to access your Duara Flow dashboard and continue tracking your impact.
-          </p>
+          <h1 className="text-4xl font-display font-bold mb-4">{t("auth.signInTitle")}</h1>
+          <p className="text-lg opacity-80 font-body">{t("auth.heroSubtitle")}</p>
         </motion.div>
       </div>
 
@@ -73,7 +73,7 @@ const Login = () => {
         <button
           onClick={() => navigate("/")}
           className="absolute top-6 right-6 p-2 rounded-full glass hover:bg-muted/80 text-muted-foreground hover:text-foreground transition-smooth"
-          aria-label="Back to home"
+          aria-label={t("auth.close")}
         >
           <X className="w-5 h-5" />
         </button>
@@ -86,13 +86,13 @@ const Login = () => {
         >
           <div className="glass-card rounded-2xl p-8">
             <div className="text-center mb-8">
-              <h2 className="text-2xl font-display font-bold text-foreground">Sign In</h2>
-              <p className="text-muted-foreground mt-2">Enter your credentials to access your dashboard</p>
+              <h2 className="text-2xl font-display font-bold text-foreground">{t("nav.signIn")}</h2>
+              <p className="text-muted-foreground mt-2">{t("auth.signInSubtitle")}</p>
             </div>
 
             <form onSubmit={handleLogin} className="space-y-4">
               <div>
-                <Label htmlFor="email">Email Address</Label>
+                <Label htmlFor="email">{t("auth.email")}</Label>
                 <Input
                   id="email"
                   type="email"
@@ -103,7 +103,7 @@ const Login = () => {
                 />
               </div>
               <div>
-                <Label htmlFor="password">Password</Label>
+                <Label htmlFor="password">{t("auth.password")}</Label>
                 <div className="relative">
                   <Input
                     id="password"
@@ -125,21 +125,21 @@ const Login = () => {
 
               <div className="flex justify-end">
                 <Link to="/forgot-password" className="text-sm text-primary hover:underline transition-smooth">
-                  Forgot password?
+                  {t("auth.forgotPassword")}
                 </Link>
               </div>
 
               <Button type="submit" className="w-full" disabled={loading}>
                 {loading && <Loader2 className="w-4 h-4 animate-spin mr-2" />}
-                Sign In
+                {loading ? t("auth.signingIn") : t("nav.signIn")}
               </Button>
             </form>
           </div>
 
           <p className="text-center text-sm text-muted-foreground mt-6">
-            Don't have an account?{" "}
+            {t("auth.noAccount")}{" "}
             <Link to="/signup" className="text-primary font-medium hover:underline">
-              Create one
+              {t("auth.signUp")}
             </Link>
           </p>
         </motion.div>
