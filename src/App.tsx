@@ -209,6 +209,7 @@ const App = () => {
                 <Route path="/form/:token" element={<PublicForm />} />
                 <Route path="/join-team" element={<JoinTeam />} />
                 <Route path="/profile/:userId" element={<PublicProfile />} />
+                <Route path="/unsubscribe" element={<Unsubscribe />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </BiometricGate>
