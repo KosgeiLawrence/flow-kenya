@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { getDisplayName } from "@/lib/displayUtils";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -116,7 +117,8 @@ const PickupRequestFlow = ({ onBack }: Props) => {
   });
 
   const getTargetName = (targetId: string) => {
-    return targets?.find(t => t.user_id === targetId)?.full_name || "Unknown";
+    const t = targets?.find(t => t.user_id === targetId);
+    return getDisplayName(t, "Unknown");
   };
 
   const statusIcon = (status: string) => {
@@ -217,7 +219,7 @@ const PickupRequestFlow = ({ onBack }: Props) => {
                 <SelectContent>
                   {targets?.slice(0, 5).map(t => (
                     <SelectItem key={t.user_id} value={t.user_id}>
-                      {t.full_name} {t.county ? `(${t.county})` : ""}
+                      {getDisplayName(t)} {t.county ? `(${t.county})` : ""}
                     </SelectItem>
                   ))}
                   {!targets?.length && <SelectItem value="_none" disabled>No {targetRole}s found</SelectItem>}
