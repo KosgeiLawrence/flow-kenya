@@ -6,6 +6,7 @@ import { useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { useTranslatedNavItems } from "@/hooks/useTranslatedNavItems";
 import { useTranslation } from "react-i18next";
+import LanguageToggle from "@/components/dashboard/shared/LanguageToggle";
 import UserVerificationPanel from "@/components/dashboard/admin/UserVerificationPanel";
 import PlatformAnalyticsPanel from "@/components/dashboard/admin/PlatformAnalyticsPanel";
 import TransactionTrackingPanel from "@/components/dashboard/admin/TransactionTrackingPanel";

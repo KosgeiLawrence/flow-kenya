@@ -10,6 +10,7 @@ import { cn } from "@/lib/utils";
 import { useFilteredNavItems } from "@/hooks/useFilteredNavItems";
 import { useTranslatedNavItems } from "@/hooks/useTranslatedNavItems";
 import { useTranslation } from "react-i18next";
+import LanguageToggle from "@/components/dashboard/shared/LanguageToggle";
 import SponsorshipPanel from "@/components/dashboard/ngo/SponsorshipPanel";
 import ImpactMetricsPanel from "@/components/dashboard/ngo/ImpactMetricsPanel";
 import GrantsPanel from "@/components/dashboard/ngo/GrantsPanel";

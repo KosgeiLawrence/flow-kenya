@@ -7,6 +7,7 @@ import { cn } from "@/lib/utils";
 import { useFilteredNavItems } from "@/hooks/useFilteredNavItems";
 import { useTranslatedNavItems } from "@/hooks/useTranslatedNavItems";
 import { useTranslation } from "react-i18next";
+import LanguageToggle from "@/components/dashboard/shared/LanguageToggle";
 import WasteFlowPanel from "@/components/dashboard/county/WasteFlowPanel";
 import CountyReportsPanel from "@/components/dashboard/county/CountyReportsPanel";
 import RegulatoryPanel from "@/components/dashboard/county/RegulatoryPanel";

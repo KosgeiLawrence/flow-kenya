@@ -11,6 +11,7 @@ import { cn } from "@/lib/utils";
 import { useFilteredNavItems } from "@/hooks/useFilteredNavItems";
 import { useTranslatedNavItems } from "@/hooks/useTranslatedNavItems";
 import { useTranslation } from "react-i18next";
+import LanguageToggle from "@/components/dashboard/shared/LanguageToggle";
 import PlasticFootprintPanel from "@/components/dashboard/corporate/PlasticFootprintPanel";
 import RecoveryCommitmentPanel from "@/components/dashboard/corporate/RecoveryCommitmentPanel";
 import RecoveryTrackingPanel from "@/components/dashboard/corporate/RecoveryTrackingPanel";

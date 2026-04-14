@@ -12,6 +12,7 @@ import { cn } from "@/lib/utils";
 import { useFilteredNavItems } from "@/hooks/useFilteredNavItems";
 import { useTranslatedNavItems } from "@/hooks/useTranslatedNavItems";
 import { useTranslation } from "react-i18next";
+import LanguageToggle from "@/components/dashboard/shared/LanguageToggle";
 import WastePickerMgmtPanel from "@/components/dashboard/aggregator/WastePickerMgmtPanel";
 import InventoryPanel from "@/components/dashboard/aggregator/InventoryPanel";
 import MarketplacePanel from "@/components/dashboard/aggregator/MarketplacePanel";

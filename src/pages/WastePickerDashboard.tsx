@@ -11,6 +11,7 @@ import { cn } from "@/lib/utils";
 import { useTranslatedNavItems } from "@/hooks/useTranslatedNavItems";
 import { useTranslation } from "react-i18next";
 import { useFilteredNavItems } from "@/hooks/useFilteredNavItems";
+import LanguageToggle from "@/components/dashboard/shared/LanguageToggle";
 import CollectionPanel from "@/components/dashboard/waste-picker/CollectionPanel";
 import ProfileSettingsPanel from "@/components/dashboard/shared/ProfileSettingsPanel";
 import PricingPanel from "@/components/dashboard/waste-picker/PricingPanel";
