@@ -1,6 +1,6 @@
 import { motion, useInView } from "framer-motion";
 import { useRef } from "react";
-import { Smartphone, QrCode, MapPin, Wifi, Shield, Globe } from "lucide-react";
+import { Smartphone, QrCode, MapPin, Wifi, Shield, BarChart3 } from "lucide-react";
 
 const features = [
   {
@@ -29,9 +29,9 @@ const features = [
     description: "Automated Extended Producer Responsibility reporting with verified certificates.",
   },
   {
-    icon: Globe,
-    title: "English & Swahili",
-    description: "Full bilingual support for inclusive access across Kenya's waste value chain.",
+    icon: BarChart3,
+    title: "Financial Tracking",
+    description: "Built-in income, expense, and budget management with branded PDF reports and CSV exports.",
   },
 ];
 

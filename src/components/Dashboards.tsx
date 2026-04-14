@@ -13,19 +13,19 @@ const dashboards = [
   {
     icon: User,
     role: "Waste Pickers",
-    features: ["Daily collection tracking", "M-Pesa payments", "QR digital ID", "Performance leaderboard"],
+    features: ["Daily collection tracking", "M-Pesa payments", "QR digital ID", "Earnings & expense tracking"],
     accent: "bg-forest",
   },
   {
     icon: Warehouse,
     role: "Aggregators",
-    features: ["Inventory & batch tracking", "Recycler marketplace", "Bulk payments", "Profit analytics"],
+    features: ["Inventory & batch tracking", "Recycler marketplace", "Financial reports & budgets", "Profit analytics"],
     accent: "bg-earth",
   },
   {
     icon: Factory,
     role: "Recyclers",
-    features: ["Supply forecasting", "Order management", "ESG & carbon tracking", "Compliance docs"],
+    features: ["Supply forecasting", "Order management", "Income & expense tracking", "Compliance docs"],
     accent: "bg-sky",
   },
   {
