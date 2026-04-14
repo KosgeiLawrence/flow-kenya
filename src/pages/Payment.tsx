@@ -86,7 +86,7 @@ const Payment = () => {
       setChecking(false);
     };
     checkSub();
-  }, [user, role, promoValid, navigate]);
+  }, [user, role, promoValid, isTrialUser, navigate]);
 
   const handleStkPush = async () => {
     if (!amount || amount <= 0 || !phoneNumber) return;
