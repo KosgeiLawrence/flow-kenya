@@ -295,6 +295,7 @@ const OverviewDiagram = () => {
 };
 
 const WastePickerWorkflowGuidePanel = () => {
+  const { t } = useTranslation();
   return (
     <div className="space-y-6">
       <div>

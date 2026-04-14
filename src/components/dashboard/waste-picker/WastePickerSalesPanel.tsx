@@ -50,6 +50,7 @@ const stepLabels: Record<SaleStep, string> = {
 };
 
 const WastePickerSalesPanel = () => {
+  const { t } = useTranslation();
   const { user, profile } = useAuth();
   const { orgInfo } = useOrgInfo();
   const queryClient = useQueryClient();

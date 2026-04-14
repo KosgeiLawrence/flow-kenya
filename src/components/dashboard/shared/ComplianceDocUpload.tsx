@@ -22,6 +22,7 @@ interface ComplianceDocUploadProps {
 }
 
 const ComplianceDocUpload = ({ documentTypes, title = "Compliance Documents" }: ComplianceDocUploadProps) => {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const queryClient = useQueryClient();
   const [uploading, setUploading] = useState(false);

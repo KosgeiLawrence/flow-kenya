@@ -13,6 +13,7 @@ import { format } from "date-fns";
 import { useTranslation } from "react-i18next";
 
 const RequestedPickupsPanel = () => {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const queryClient = useQueryClient();
   const [responseNotes, setResponseNotes] = useState<Record<string, string>>({});

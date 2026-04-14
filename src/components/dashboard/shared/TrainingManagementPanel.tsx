@@ -124,6 +124,7 @@ const emptyCommunityForm: CommunityForm = {
 };
 
 const TrainingManagementPanel = () => {
+  const { t } = useTranslation();
   const { user, role } = useAuth();
   const queryClient = useQueryClient();
   const [dialogOpen, setDialogOpen] = useState(false);
