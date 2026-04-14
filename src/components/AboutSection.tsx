@@ -1,44 +1,28 @@
 import { motion, useInView } from "framer-motion";
 import { useRef } from "react";
 import { Globe, Users, Leaf, BarChart3, Target, Heart } from "lucide-react";
-
-const values = [
-  {
-    icon: Globe,
-    title: "Circular Economy",
-    description: "We believe waste is a resource. Our platform transforms Kenya's linear waste model into a thriving circular economy where every material finds new life.",
-  },
-  {
-    icon: Users,
-    title: "Inclusive Growth",
-    description: "From informal waste pickers to large corporates — Duara Flow empowers every stakeholder with digital tools, fair pricing, and transparent transactions.",
-  },
-  {
-    icon: Leaf,
-    title: "Environmental Impact",
-    description: "Every kilogram tracked on our platform is a kilogram diverted from landfills. We make environmental impact measurable, verifiable, and bankable.",
-  },
-  {
-    icon: BarChart3,
-    title: "Data-Driven Decisions",
-    description: "Real-time analytics and traceability data help counties, NGOs, and corporates make informed decisions about waste management and sustainability.",
-  },
-];
+import { useTranslation } from "react-i18next";
 
 const AboutSection = () => {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: "-100px" });
+  const { t } = useTranslation();
+
+  const values = [
+    { icon: Globe, title: t("about.value1Title"), description: t("about.value1Desc") },
+    { icon: Users, title: t("about.value2Title"), description: t("about.value2Desc") },
+    { icon: Leaf, title: t("about.value3Title"), description: t("about.value3Desc") },
+    { icon: BarChart3, title: t("about.value4Title"), description: t("about.value4Desc") },
+  ];
 
   return (
     <section id="about" className="relative py-20 md:py-32 overflow-hidden" ref={ref}>
-      {/* Background */}
       <div className="absolute inset-0 bg-muted">
         <div className="absolute top-0 left-1/4 h-[30%] w-[30%] rounded-full bg-forest/5 blur-3xl" />
         <div className="absolute bottom-0 right-1/4 h-[25%] w-[25%] rounded-full bg-gold/5 blur-3xl" />
       </div>
 
       <div className="container relative">
-        {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={isInView ? { opacity: 1, y: 0 } : {}}
@@ -46,17 +30,14 @@ const AboutSection = () => {
           className="mx-auto max-w-3xl text-center mb-16"
         >
           <span className="inline-block rounded-full bg-primary/10 px-4 py-1.5 text-xs font-semibold uppercase tracking-wider text-primary mb-4 backdrop-blur-sm">
-            About Us
+            {t("about.badge")}
           </span>
           <h2 className="font-display text-3xl font-bold text-foreground md:text-5xl mb-5">
-            Building Kenya's <span className="text-primary">Circular Economy</span> Infrastructure
+            {t("about.title")} <span className="text-primary">{t("about.titleHighlight")}</span> {t("about.titleEnd")}
           </h2>
-          <p className="text-lg text-muted-foreground leading-relaxed">
-            Duara Flow is a digital platform by Duara Intelligence that connects every link in Kenya's waste value chain — from collection to recycling. We provide traceability, transparency, and fair compensation to create a sustainable circular economy that benefits people and planet.
-          </p>
+          <p className="text-lg text-muted-foreground leading-relaxed">{t("about.description")}</p>
         </motion.div>
 
-        {/* Mission & Vision */}
         <div className="grid md:grid-cols-2 gap-6 mb-16">
           <motion.div
             initial={{ opacity: 0, x: -30 }}
@@ -68,11 +49,9 @@ const AboutSection = () => {
               <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10">
                 <Target className="h-5 w-5 text-primary" />
               </div>
-              <h3 className="font-display text-xl font-bold text-foreground">Our Mission</h3>
+              <h3 className="font-display text-xl font-bold text-foreground">{t("about.missionTitle")}</h3>
             </div>
-            <p className="text-muted-foreground leading-relaxed">
-              To digitize and formalize Kenya's waste value chain, ensuring every waste picker is fairly compensated, every kilogram is traceable, and every stakeholder has the data they need to drive sustainable impact.
-            </p>
+            <p className="text-muted-foreground leading-relaxed">{t("about.missionText")}</p>
           </motion.div>
 
           <motion.div
@@ -85,19 +64,16 @@ const AboutSection = () => {
               <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10">
                 <Heart className="h-5 w-5 text-primary" />
               </div>
-              <h3 className="font-display text-xl font-bold text-foreground">Our Vision</h3>
+              <h3 className="font-display text-xl font-bold text-foreground">{t("about.visionTitle")}</h3>
             </div>
-            <p className="text-muted-foreground leading-relaxed">
-              A Kenya where zero waste goes to landfill, waste workers thrive with dignity, and every business takes full responsibility for its plastic footprint — powered by technology and trust.
-            </p>
+            <p className="text-muted-foreground leading-relaxed">{t("about.visionText")}</p>
           </motion.div>
         </div>
 
-        {/* Values */}
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
           {values.map((value, i) => (
             <motion.div
-              key={value.title}
+              key={i}
               initial={{ opacity: 0, y: 30 }}
               animate={isInView ? { opacity: 1, y: 0 } : {}}
               transition={{ duration: 0.5, delay: 0.12 * i + 0.3, ease: [0.4, 0, 0.2, 1] }}
