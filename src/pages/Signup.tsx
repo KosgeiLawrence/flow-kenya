@@ -37,7 +37,7 @@ const Signup = () => {
   // Step 2: Plan
   const [searchParams] = useSearchParams();
   const [selectedPlan, setSelectedPlan] = useState<string | null>(null);
-  const [billingPeriod, setBillingPeriod] = useState<"monthly" | "yearly" | "one_time">("monthly");
+  const [billingPeriod, setBillingPeriod] = useState<"monthly" | "yearly" | "one_time" | "free_trial">("free_trial");
   const [promoCode, setPromoCode] = useState("");
   const promoValid = isPromoValidForRole(promoCode, role);
 
