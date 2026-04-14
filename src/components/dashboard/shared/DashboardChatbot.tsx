@@ -54,7 +54,7 @@ const DashboardChatbot = ({ role, navItems, onNavigate }: DashboardChatbotProps)
         .maybeSingle();
       if (data) {
         setConversationId(data.id);
-        const msgs = data.messages as ChatMessage[];
+        const msgs = data.messages as unknown as ChatMessage[];
         if (msgs?.length) setMessages(msgs);
       } else {
         setConversationId(crypto.randomUUID());
