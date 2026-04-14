@@ -6,13 +6,13 @@
 
 @layer base {
   :root {
-    --background: 220 16% 8%;
+    --background: 220 14% 12%;
     --foreground: 220 10% 92%;
 
-    --card: 220 16% 12%;
+    --card: 220 14% 15%;
     --card-foreground: 220 10% 92%;
 
-    --popover: 220 16% 12%;
+    --popover: 220 14% 15%;
     --popover-foreground: 220 10% 92%;
 
     --primary: 152 45% 42%;
@@ -21,35 +21,35 @@
     --secondary: 40 55% 55%;
     --secondary-foreground: 220 16% 8%;
 
-    --muted: 220 12% 16%;
-    --muted-foreground: 220 8% 55%;
+    --muted: 220 12% 20%;
+    --muted-foreground: 220 8% 60%;
 
-    --accent: 220 12% 18%;
+    --accent: 220 12% 22%;
     --accent-foreground: 220 10% 92%;
 
     --destructive: 0 72% 51%;
     --destructive-foreground: 220 10% 98%;
 
-    --border: 220 12% 18%;
-    --input: 220 12% 18%;
+    --border: 220 12% 22%;
+    --input: 220 12% 22%;
     --ring: 152 45% 42%;
 
     --radius: 1rem;
 
-    --sidebar-background: 220 18% 6%;
+    --sidebar-background: 220 16% 10%;
     --sidebar-foreground: 220 10% 88%;
     --sidebar-primary: 152 45% 42%;
     --sidebar-primary-foreground: 220 16% 8%;
-    --sidebar-accent: 220 14% 14%;
+    --sidebar-accent: 220 14% 18%;
     --sidebar-accent-foreground: 220 10% 92%;
-    --sidebar-border: 220 12% 14%;
+    --sidebar-border: 220 12% 18%;
     --sidebar-ring: 152 45% 42%;
 
     /* Brand tokens */
     --gold: 40 55% 55%;
     --gold-light: 40 60% 75%;
     --forest: 152 45% 42%;
-    --forest-deep: 220 18% 6%;
+    --forest-deep: 220 16% 10%;
     --earth: 25 30% 35%;
     --earth-light: 30 25% 65%;
     --sky: 195 60% 50%;
@@ -66,7 +66,7 @@
     --glass-radius: 16px;
 
     /* Gradients */
-    --gradient-hero: linear-gradient(135deg, hsl(220 18% 6%) 0%, hsl(220 16% 10%) 50%, hsl(225 18% 12%) 100%);
+    --gradient-hero: linear-gradient(135deg, hsl(220 16% 10%) 0%, hsl(220 14% 14%) 50%, hsl(225 14% 16%) 100%);
     --gradient-gold: linear-gradient(135deg, hsl(40 55% 55%) 0%, hsl(35 65% 60%) 100%);
     --gradient-radial-primary: radial-gradient(ellipse at 20% 50%, hsl(152 45% 42% / 0.08) 0%, transparent 60%);
     --gradient-radial-accent: radial-gradient(ellipse at 80% 20%, hsl(40 55% 55% / 0.06) 0%, transparent 50%);
