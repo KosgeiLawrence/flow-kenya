@@ -48,8 +48,8 @@ const MarketplacePanel = () => {
   });
 
   const filteredRecyclers = recyclers?.filter(r =>
-    !search || r.full_name?.toLowerCase().includes(search.toLowerCase()) ||
-    (r as any).organizations?.name?.toLowerCase().includes(search.toLowerCase())
+    !search || getDisplayName(r).toLowerCase().includes(search.toLowerCase()) ||
+    r.full_name?.toLowerCase().includes(search.toLowerCase())
   ) || [];
 
   return (
@@ -108,13 +108,13 @@ const MarketplacePanel = () => {
                 <div key={r.id} className="flex items-center justify-between py-3">
                   <div className="flex items-center gap-3">
                     <div className="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center text-sm font-bold text-primary">
-                      {r.full_name?.charAt(0) || "R"}
+                      {getDisplayInitial(r)}
                     </div>
                     <div>
-                      <p className="text-sm font-medium text-foreground">{r.full_name}</p>
-                      <p className="text-xs text-muted-foreground">
-                        {(r as any).organizations?.name || "Independent"}
-                      </p>
+                      <p className="text-sm font-medium text-foreground">{getDisplayName(r)}</p>
+                      {(r as any).organizations?.name && (
+                        <p className="text-xs text-muted-foreground">{r.full_name}</p>
+                      )}
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
@@ -135,11 +135,11 @@ const MarketplacePanel = () => {
       {/* Recycler detail dialog */}
       <Dialog open={!!selectedRecycler} onOpenChange={() => setSelectedRecycler(null)}>
         <DialogContent>
-          <DialogHeader><DialogTitle>{selectedRecycler?.full_name}</DialogTitle></DialogHeader>
+          <DialogHeader><DialogTitle>{getDisplayName(selectedRecycler)}</DialogTitle></DialogHeader>
           <div className="space-y-3">
-            <p className="text-sm text-muted-foreground">
-              {(selectedRecycler as any)?.organizations?.name || "Independent Recycler"}
-            </p>
+            {(selectedRecycler as any)?.organizations?.name && (
+              <p className="text-sm text-muted-foreground">Contact: {selectedRecycler?.full_name}</p>
+            )}
             {selectedRecycler?.phone_number && (
               <div className="flex items-center gap-2 text-sm"><Phone className="w-4 h-4 text-muted-foreground" /> {selectedRecycler.phone_number}</div>
             )}
