@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
@@ -15,6 +15,7 @@ import MaterialIcon from "@/components/dashboard/shared/MaterialIcon";
 import { toast } from "sonner";
 import { format } from "date-fns";
 import { useTranslation } from "react-i18next";
+import { useChatbotUIAction } from "@/hooks/useChatbotUIAction";
 
 const TRANSFORMATION_TYPES = [
   { value: "recycling", label: "♻️ Recycling" },
@@ -30,6 +31,12 @@ const MaterialTransformationPanel = () => {
   const { user } = useAuth();
   const queryClient = useQueryClient();
   const [open, setOpen] = useState(false);
+
+  // Listen for chatbot UI actions
+  useChatbotUIAction(
+    ["add-transformation"],
+    useCallback(() => setOpen(true), [])
+  );
   const [inputMaterialId, setInputMaterialId] = useState("");
   const [inputQty, setInputQty] = useState("");
   const [outputName, setOutputName] = useState("");
