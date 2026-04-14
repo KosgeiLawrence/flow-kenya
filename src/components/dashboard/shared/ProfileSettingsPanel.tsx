@@ -62,6 +62,7 @@ const ProfileSettingsPanel = ({ role }: ProfileSettingsPanelProps) => {
   const [uploading, setUploading] = useState(false);
   const [uploadingLogo, setUploadingLogo] = useState(false);
   const logoInputRef = useRef<HTMLInputElement>(null);
+  const [orgName, setOrgName] = useState("");
   const [activeSection, setActiveSection] = useState("basic");
   const [passwordData, setPasswordData] = useState({ current: "", new: "", confirm: "" });
 
