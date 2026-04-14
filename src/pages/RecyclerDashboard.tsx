@@ -193,6 +193,7 @@ const RecyclerDashboard = () => {
       </div>
       <DashboardChatbot role="recycler" navItems={navItems} onNavigate={(id) => setActivePanel(id)} />
     </div>
+  );
 };
 
 export default RecyclerDashboard;

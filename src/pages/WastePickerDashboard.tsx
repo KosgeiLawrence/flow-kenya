@@ -184,6 +184,7 @@ const WastePickerDashboard = () => {
       </div>
       <DashboardChatbot role="waste_picker" navItems={navItems} onNavigate={(id) => setActivePanel(id)} />
     </div>
+  );
 };
 
 export default WastePickerDashboard;

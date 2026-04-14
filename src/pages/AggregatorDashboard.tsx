@@ -211,6 +211,7 @@ const AggregatorDashboard = () => {
       </div>
       <DashboardChatbot role="aggregator" navItems={navItems} onNavigate={(id) => setActivePanel(id)} />
     </div>
+  );
 };
 
 export default AggregatorDashboard;

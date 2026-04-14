@@ -137,6 +137,7 @@ const CountyGovernmentDashboard = () => {
       </div>
       <DashboardChatbot role="county_government" navItems={navItems} onNavigate={(id) => setActivePanel(id)} />
     </div>
+  );
 };
 
 export default CountyGovernmentDashboard;

@@ -165,6 +165,7 @@ const CorporateDashboard = () => {
       </div>
       <DashboardChatbot role="corporate" navItems={navItems} onNavigate={(id) => setActivePanel(id)} />
     </div>
+  );
 };
 
 export default CorporateDashboard;

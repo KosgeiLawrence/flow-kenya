@@ -152,6 +152,7 @@ const NGODashboard = () => {
       </div>
       <DashboardChatbot role="ngo" navItems={navItems} onNavigate={(id) => setActivePanel(id)} />
     </div>
+  );
 };
 
 export default NGODashboard;

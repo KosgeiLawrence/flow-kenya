@@ -165,6 +165,7 @@ const AdminDashboard = () => {
       </div>
       <DashboardChatbot role="admin" navItems={navItems} onNavigate={(id) => setActiveTab(id)} />
     </div>
+  );
 };
 
 export default AdminDashboard;
