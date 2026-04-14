@@ -52,7 +52,7 @@ const RevenueInsightsPanel = () => {
     queryFn: async () => {
       const { data, error } = await supabase.from("user_roles" as any).select("role");
       if (error) throw error;
-      return (data || []) as { role: string }[];
+      return (data || []) as unknown as { role: string }[];
     },
   });
 
