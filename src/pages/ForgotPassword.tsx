@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import { motion } from "framer-motion";
 import { Loader2, ArrowLeft, CheckCircle2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -16,7 +17,6 @@ const ForgotPassword = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-
     try {
       const { error } = await supabase.auth.resetPasswordForEmail(email, {
         redirectTo: `https://duaraflow.co.ke/reset-password`,
@@ -25,41 +25,46 @@ const ForgotPassword = () => {
       setSent(true);
     } catch (error: any) {
       toast({ title: "Error", description: error.message, variant: "destructive" });
-    } finally {
-      setLoading(false);
-    }
+    } finally { setLoading(false); }
   };
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center p-6">
-      <div className="w-full max-w-md">
-        <Link to="/login" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground mb-8">
+    <div className="min-h-screen bg-mesh flex items-center justify-center p-6">
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, ease: [0.4, 0, 0.2, 1] }}
+        className="w-full max-w-md"
+      >
+        <Link to="/login" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground mb-6 transition-smooth">
           <ArrowLeft className="w-4 h-4" /> Back to login
         </Link>
 
-        {sent ? (
-          <div className="text-center">
-            <CheckCircle2 className="w-12 h-12 text-primary mx-auto mb-4" />
-            <h2 className="text-2xl font-display font-bold text-foreground mb-2">Check your email</h2>
-            <p className="text-muted-foreground">We've sent a password reset link to <strong>{email}</strong></p>
-          </div>
-        ) : (
-          <>
-            <h2 className="text-2xl font-display font-bold text-foreground mb-2">Reset Password</h2>
-            <p className="text-muted-foreground mb-6">Enter your email and we'll send you a reset link.</p>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div>
-                <Label htmlFor="email">Email Address</Label>
-                <Input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@example.com" required />
-              </div>
-              <Button type="submit" className="w-full" disabled={loading}>
-                {loading && <Loader2 className="w-4 h-4 animate-spin mr-2" />}
-                Send Reset Link
-              </Button>
-            </form>
-          </>
-        )}
-      </div>
+        <div className="glass-card rounded-2xl p-8">
+          {sent ? (
+            <div className="text-center">
+              <CheckCircle2 className="w-12 h-12 text-primary mx-auto mb-4" />
+              <h2 className="text-2xl font-display font-bold text-foreground mb-2">Check your email</h2>
+              <p className="text-muted-foreground">We've sent a password reset link to <strong>{email}</strong></p>
+            </div>
+          ) : (
+            <>
+              <h2 className="text-2xl font-display font-bold text-foreground mb-2">Reset Password</h2>
+              <p className="text-muted-foreground mb-6">Enter your email and we'll send you a reset link.</p>
+              <form onSubmit={handleSubmit} className="space-y-4">
+                <div>
+                  <Label htmlFor="email">Email Address</Label>
+                  <Input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@example.com" required />
+                </div>
+                <Button type="submit" className="w-full" disabled={loading}>
+                  {loading && <Loader2 className="w-4 h-4 animate-spin mr-2" />}
+                  Send Reset Link
+                </Button>
+              </form>
+            </>
+          )}
+        </div>
+      </motion.div>
     </div>
   );
 };
