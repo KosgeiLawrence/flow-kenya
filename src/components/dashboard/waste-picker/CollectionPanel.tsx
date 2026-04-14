@@ -22,6 +22,7 @@ import {
 } from "@/lib/pdfBranding";
 
 const CollectionPanel = () => {
+  const { t } = useTranslation();
   const { user, profile } = useAuth();
   const { orgInfo } = useOrgInfo();
   const queryClient = useQueryClient();
@@ -205,8 +206,8 @@ const CollectionPanel = () => {
     <div className="space-y-6">
       <Tabs value={activeTab} onValueChange={setActiveTab}>
         <TabsList>
-          <TabsTrigger value="log">Log Collection</TabsTrigger>
-          <TabsTrigger value="client">Collect from Client</TabsTrigger>
+          <TabsTrigger value="log">{t("collectionPanel.addCollection")}</TabsTrigger>
+          <TabsTrigger value="client">{t("crmPanel.title")}</TabsTrigger>
         </TabsList>
 
         <TabsContent value="client" className="mt-4">
@@ -218,7 +219,7 @@ const CollectionPanel = () => {
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <Card className="shadow-soft">
           <CardContent className="p-4">
-            <p className="text-xs text-muted-foreground uppercase tracking-wider">Today</p>
+            <p className="text-xs text-muted-foreground uppercase tracking-wider">{t("common.today")}</p>
             <p className="text-2xl font-display font-bold text-foreground">{todayTotal.toFixed(1)} kg</p>
           </CardContent>
         </Card>
@@ -255,7 +256,7 @@ const CollectionPanel = () => {
       {impact.materialBreakdown.length > 0 && (
         <Card className="shadow-soft bg-primary/5 border-primary/20">
           <CardContent className="p-4">
-            <p className="text-sm font-medium text-foreground mb-2">Environmental Impact by Material</p>
+            <p className="text-sm font-medium text-foreground mb-2">{t("analyticsPanel.title")}</p>
             <div className="space-y-2">
               {impact.materialBreakdown.slice(0, 5).map(m => (
                 <div key={m.name} className="flex items-center justify-between text-sm">
@@ -271,14 +272,14 @@ const CollectionPanel = () => {
       {/* Add button */}
       {!showForm && (
         <Button onClick={() => setShowForm(true)} className="gap-2">
-          <Plus className="w-4 h-4" /> Log Collection
+          <Plus className="w-4 h-4" /> {t("collectionPanel.addCollection")}
         </Button>
       )}
 
       {/* Add form */}
       {showForm && (
         <Card className="shadow-soft">
-          <CardHeader><CardTitle className="text-base">Log New Collection</CardTitle></CardHeader>
+          <CardHeader><CardTitle className="text-base">{t("collectionPanel.addCollection")}</CardTitle></CardHeader>
           <CardContent className="space-y-4">
             <Select value={materialTypeId} onValueChange={setMaterialTypeId}>
               <SelectTrigger><SelectValue placeholder="Select material type" /></SelectTrigger>
@@ -292,9 +293,9 @@ const CollectionPanel = () => {
             <Input placeholder="Location (optional)" value={locationName} onChange={e => setLocationName(e.target.value)} />
             <div className="flex gap-2">
               <Button onClick={() => addCollection.mutate()} disabled={!materialTypeId || !quantity || addCollection.isPending}>
-                {addCollection.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : "Save"}
-              </Button>
-              <Button variant="ghost" onClick={() => setShowForm(false)}>Cancel</Button>
+                 {addCollection.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : t("common.save")}
+               </Button>
+               <Button variant="ghost" onClick={() => setShowForm(false)}>{t("common.cancel")}</Button>
             </div>
           </CardContent>
         </Card>
@@ -302,14 +303,14 @@ const CollectionPanel = () => {
 
       {/* History */}
       <Card className="shadow-soft">
-        <CardHeader><CardTitle className="text-base">Recent Collections</CardTitle></CardHeader>
+        <CardHeader><CardTitle className="text-base">{t("collectionPanel.recentCollections")}</CardTitle></CardHeader>
         <CardContent>
           {isLoading ? (
             <div className="flex justify-center py-8"><Loader2 className="w-6 h-6 animate-spin text-muted-foreground" /></div>
           ) : !collections?.length ? (
             <div className="text-center py-8 text-muted-foreground">
               <Package className="w-10 h-10 mx-auto mb-2 opacity-40" />
-              <p className="text-sm">No collections yet. Start logging!</p>
+              <p className="text-sm">{t("collectionPanel.noCollections")}</p>
             </div>
           ) : (
             <div className="space-y-3">
