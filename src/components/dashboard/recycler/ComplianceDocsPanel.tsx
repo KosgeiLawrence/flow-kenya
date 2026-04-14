@@ -8,6 +8,7 @@ import jsPDF from "jspdf";
 import { format } from "date-fns";
 import ComplianceDocUpload from "@/components/dashboard/shared/ComplianceDocUpload";
 import { addBrandedHeader, addDocMeta, addSectionTitle, finalizePdf } from "@/lib/pdfBranding";
+import { useTranslation } from "react-i18next";
 
 const RECYCLER_DOC_TYPES = [
   { value: "nema_license", label: "NEMA License" },
@@ -20,6 +21,7 @@ const RECYCLER_DOC_TYPES = [
 ];
 
 const ComplianceDocsPanel = () => {
+  const { t } = useTranslation();
   const { profile } = useAuth();
 
   const isApproved = profile?.approval_status === "approved";
@@ -70,7 +72,7 @@ const ComplianceDocsPanel = () => {
           <div className="flex items-center gap-3 mb-4">
             <Shield className="w-8 h-8 text-primary" />
             <div>
-              <p className="text-lg font-semibold text-foreground">Compliance Status</p>
+              <p className="text-lg font-semibold text-foreground">{t("compliancePanel.title")}</p>
               <p className="text-xs text-muted-foreground">Regulatory requirements for recycling operations</p>
             </div>
           </div>
@@ -83,7 +85,7 @@ const ComplianceDocsPanel = () => {
 
       <Card className="shadow-soft">
         <CardHeader className="flex flex-row items-center justify-between">
-          <CardTitle className="text-lg">Checklist</CardTitle>
+          <CardTitle className="text-lg">{t("compliancePanel.checklist", "Checklist")}</CardTitle>
           <Button size="sm" variant="outline" onClick={downloadComplianceReport}>
             <Download className="w-4 h-4 mr-1" /> Download Report
           </Button>

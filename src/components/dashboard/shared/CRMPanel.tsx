@@ -17,6 +17,7 @@ import {
   MapPin, ShoppingBag, ArrowUpDown, Eye, X, FileSpreadsheet, ChevronLeft
 } from "lucide-react";
 import { format } from "date-fns";
+import { useTranslation } from "react-i18next";
 
 interface Customer {
   id: string;
@@ -41,6 +42,7 @@ interface CRMPanelProps {
 }
 
 const CRMPanel = ({ role }: CRMPanelProps) => {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const { softDelete } = useTrash();
   const [customers, setCustomers] = useState<Customer[]>([]);

@@ -11,8 +11,10 @@ import { FileText, Download, Search } from "lucide-react";
 import jsPDF from "jspdf";
 import { toast } from "sonner";
 import { addBrandedHeader, addDocMeta, drawTableHeader, drawTableRow, finalizePdf } from "@/lib/pdfBranding";
+import { useTranslation } from "react-i18next";
 
 const AuditLogsPanel = () => {
+  const { t } = useTranslation();
   const [typeFilter, setTypeFilter] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
 
@@ -66,7 +68,7 @@ const AuditLogsPanel = () => {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between flex-wrap gap-3">
-        <div><h2 className="text-2xl font-display font-bold text-foreground">Audit Logs</h2><p className="text-muted-foreground">Complete activity trail across the platform</p></div>
+        <div><h2 className="text-2xl font-display font-bold text-foreground">{t("adminPanels.auditLogs")}</h2><p className="text-muted-foreground">Complete activity trail across the platform</p></div>
         <div className="flex gap-2">
           <Button variant="outline" onClick={exportCSV} className="gap-2"><Download className="w-4 h-4" /> CSV</Button>
           <Button onClick={exportPDF} className="gap-2"><Download className="w-4 h-4" /> PDF</Button>

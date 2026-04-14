@@ -9,6 +9,7 @@ import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pi
 import { format, subMonths, startOfMonth, endOfMonth, isWithinInterval, parseISO, startOfDay, endOfDay, subDays, startOfWeek, endOfWeek } from "date-fns";
 import { ROLE_PRICING } from "@/lib/stripePlans";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 
 const COLORS = ["hsl(152,45%,22%)", "hsl(40,55%,55%)", "hsl(195,60%,50%)", "hsl(25,30%,35%)", "hsl(340,55%,50%)", "hsl(270,40%,50%)", "hsl(80,40%,40%)"];
 
@@ -24,6 +25,7 @@ const ROLE_LABELS: Record<string, string> = {
 type ViewPeriod = "today" | "week" | "month" | "year" | "all";
 
 const RevenueInsightsPanel = () => {
+  const { t } = useTranslation();
   const [viewPeriod, setViewPeriod] = useState<ViewPeriod>("month");
 
   // Fetch payments

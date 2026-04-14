@@ -12,6 +12,7 @@ import { Progress } from "@/components/ui/progress";
 import { toast } from "sonner";
 import { Package, Plus, Target, TrendingUp, Trash2 } from "lucide-react";
 import { format } from "date-fns";
+import { useTranslation } from "react-i18next";
 
 const MATERIAL_TYPES = ["PET", "HDPE", "LDPE", "PP", "PS", "Other Plastic"];
 const RECOVERY_RATES: Record<string, number> = {
@@ -19,6 +20,7 @@ const RECOVERY_RATES: Record<string, number> = {
 };
 
 const PlasticFootprintPanel = () => {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const qc = useQueryClient();
   const [showForm, setShowForm] = useState(false);

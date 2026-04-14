@@ -13,6 +13,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Recycle, ArrowRight, Plus, History, BarChart3, Package, Layers } from "lucide-react";
 import { toast } from "sonner";
 import { format } from "date-fns";
+import { useTranslation } from "react-i18next";
 
 const TRANSFORMATION_TYPES = [
   { value: "recycling", label: "♻️ Recycling" },
@@ -24,6 +25,7 @@ const TRANSFORMATION_TYPES = [
 ];
 
 const MaterialTransformationPanel = () => {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const queryClient = useQueryClient();
   const [open, setOpen] = useState(false);

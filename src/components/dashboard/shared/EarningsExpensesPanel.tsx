@@ -27,6 +27,7 @@ import {
   isWithinInterval, startOfYear, endOfYear, endOfWeek, addMonths, addYears,
   subMonths, subYears, addWeeks, subWeeks, getYear, getMonth
 } from "date-fns";
+import { useTranslation } from "react-i18next";
 import FinancialReportsPanel from "./FinancialReportsPanel";
 import { CompactList } from "@/components/ui/compact-list";
 
@@ -56,6 +57,7 @@ const generateYearOptions = () => {
 const MONTH_NAMES = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 
 const EarningsExpensesPanel = ({ role }: Props) => {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const queryClient = useQueryClient();
   const config = roleConfig[role];

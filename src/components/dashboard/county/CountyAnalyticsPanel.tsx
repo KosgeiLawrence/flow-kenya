@@ -3,8 +3,10 @@ import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/
 import { LineChart, Line, XAxis, YAxis, CartesianGrid } from "recharts";
 import { Users, Leaf, Droplets, Zap } from "lucide-react";
 import { usePlatformStats } from "@/hooks/usePlatformStats";
+import { useTranslation } from "react-i18next";
 
 const CountyAnalyticsPanel = () => {
+  const { t } = useTranslation();
   const { derived } = usePlatformStats();
 
   const d = derived ?? {
@@ -32,8 +34,8 @@ const CountyAnalyticsPanel = () => {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-2xl font-display font-bold text-foreground">County Analytics</h2>
-        <p className="text-muted-foreground">Environmental impact and operational metrics</p>
+        <h2 className="text-2xl font-display font-bold text-foreground">{t("countyPanels.countyAnalytics")}</h2>
+        <p className="text-muted-foreground">{t("countyPanels.envImpactDesc", "Environmental impact and operational metrics")}</p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -56,7 +58,7 @@ const CountyAnalyticsPanel = () => {
       </div>
 
       <Card>
-        <CardHeader><CardTitle className="text-base">Monthly Collection Trend (12 months)</CardTitle></CardHeader>
+        <CardHeader><CardTitle className="text-base">{t("countyPanels.monthlyTrend", "Monthly Collection Trend (12 months)")}</CardTitle></CardHeader>
         <CardContent>
           <ChartContainer config={chartConfig} className="h-[300px]">
             <LineChart data={monthlyData}>

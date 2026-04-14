@@ -12,8 +12,10 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid } from "recharts";
 import jsPDF from "jspdf";
 import { toast } from "sonner";
 import { addBrandedHeader, addDocMeta, addSectionTitle, drawTableHeader, drawTableRow, finalizePdf } from "@/lib/pdfBranding";
+import { useTranslation } from "react-i18next";
 
 const TransactionTrackingPanel = () => {
+  const { t } = useTranslation();
   const [statusFilter, setStatusFilter] = useState("all");
 
   const { data: payments, isLoading } = useQuery({

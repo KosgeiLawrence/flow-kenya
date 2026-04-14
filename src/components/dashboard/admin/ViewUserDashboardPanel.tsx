@@ -18,6 +18,7 @@ import RecyclerDashboard from "@/pages/RecyclerDashboard";
 import NGODashboard from "@/pages/NGODashboard";
 import CorporateDashboard from "@/pages/CorporateDashboard";
 import CountyGovernmentDashboard from "@/pages/CountyGovernmentDashboard";
+import { useTranslation } from "react-i18next";
 
 type AppRole = "waste_picker" | "aggregator" | "recycler" | "ngo" | "corporate" | "county_government" | "admin";
 
@@ -41,6 +42,7 @@ const roleLabels: Record<string, string> = {
 };
 
 const ViewUserDashboardPanel = () => {
+  const { t } = useTranslation();
   const realAuth = useAuth();
   const navigate = useNavigate();
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);

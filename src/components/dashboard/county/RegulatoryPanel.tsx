@@ -8,8 +8,10 @@ import { Scale, Download, CheckCircle2, AlertTriangle, FileSpreadsheet, FileText
 import jsPDF from "jspdf";
 import { toast } from "sonner";
 import { addBrandedHeader, addDocMeta, addSectionTitle, finalizePdf } from "@/lib/pdfBranding";
+import { useTranslation } from "react-i18next";
 
 const RegulatoryPanel = () => {
+  const { t } = useTranslation();
   const { data: collections } = useQuery({ queryKey: ["county-regulatory-collections"], queryFn: async () => { const { data, error } = await supabase.from("collections").select("*, material_types(name)"); if (error) throw error; return data; } });
   const { data: profiles } = useQuery({ queryKey: ["county-regulatory-profiles"], queryFn: async () => { const { data, error } = await supabase.from("profiles").select("*"); if (error) throw error; return data; } });
   const { data: payments } = useQuery({ queryKey: ["county-regulatory-payments"], queryFn: async () => { const { data, error } = await supabase.from("payments").select("*"); if (error) throw error; return data; } });

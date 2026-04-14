@@ -12,9 +12,11 @@ import {
 import { calculateImpact } from "@/lib/impactUtils";
 import { useRef } from "react";
 import { format } from "date-fns";
+import { useTranslation } from "react-i18next";
 
 const DigitalIDPanel = () => {
   const { user, profile, role } = useAuth();
+  const { t } = useTranslation();
   const cardRef = useRef<HTMLDivElement>(null);
 
   const { data: orgData } = useQuery({
@@ -53,13 +55,13 @@ const DigitalIDPanel = () => {
   const duaraId = `DF-${user?.id?.substring(0, 8).toUpperCase()}`;
 
   const roleLabelMap: Record<string, string> = {
-    waste_picker: "Waste Picker",
-    aggregator: "Aggregator",
-    recycler: "Recycler",
-    ngo: "NGO",
-    corporate: "Corporate",
-    county_government: "County Government",
-    admin: "Administrator",
+    waste_picker: t("roles.wastePicker"),
+    aggregator: t("roles.aggregator"),
+    recycler: t("roles.recycler"),
+    ngo: t("roles.ngo"),
+    corporate: t("roles.corporate"),
+    county_government: t("roles.countyGovernment"),
+    admin: t("roles.admin"),
   };
 
   const profileUrl = `https://duaraflow.co.ke/profile/${user?.id}`;
@@ -104,7 +106,7 @@ const DigitalIDPanel = () => {
             className="gap-1 text-xs font-semibold"
           >
             {isVerified ? <CheckCircle2 className="w-3 h-3" /> : <Clock className="w-3 h-3" />}
-            {isVerified ? "Verified" : "Unverified"}
+            {isVerified ? t("common.verified") : t("digitalIdPanel.unverified", "Unverified")}
           </Badge>
         </div>
 
@@ -166,16 +168,16 @@ const DigitalIDPanel = () => {
           {/* Business Info */}
           <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-xs">
             <div>
-              <p className="text-muted-foreground">Type</p>
-              <p className="font-medium text-foreground">{isOrg ? "Organization" : "Individual"}</p>
+              <p className="text-muted-foreground">{t("common.type")}</p>
+              <p className="font-medium text-foreground">{isOrg ? t("profilePanel.organization") : t("digitalIdPanel.individual", "Individual")}</p>
             </div>
             <div>
-              <p className="text-muted-foreground">Value Chain Role</p>
+              <p className="text-muted-foreground">{t("digitalIdPanel.valueChainRole", "Value Chain Role")}</p>
               <p className="font-medium text-foreground">{roleLabelMap[role || ""] || "—"}</p>
             </div>
             {isOrg && orgData?.name && (
               <div className="col-span-2">
-                <p className="text-muted-foreground">Business Name</p>
+                <p className="text-muted-foreground">{t("digitalIdPanel.businessName", "Business Name")}</p>
                 <p className="font-medium text-foreground">{orgData.name}</p>
               </div>
             )}
@@ -188,25 +190,25 @@ const DigitalIDPanel = () => {
           <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-xs">
             <div>
               <p className="text-muted-foreground flex items-center gap-1">
-                <Shield className="w-3 h-3" /> Verification
+                <Shield className="w-3 h-3" /> {t("digitalIdPanel.verificationStatus")}
               </p>
               <p className={`font-medium ${isVerified ? "text-primary" : "text-muted-foreground"}`}>
-                {isVerified ? "Verified" : "Unverified"}
+                {isVerified ? t("common.verified") : t("digitalIdPanel.unverified", "Unverified")}
               </p>
             </div>
             <div>
-              <p className="text-muted-foreground">ID Type Used</p>
+              <p className="text-muted-foreground">{t("digitalIdPanel.idTypeUsed", "ID Type Used")}</p>
               <p className="font-medium text-foreground">{idVerificationType}</p>
             </div>
             <div>
               <p className="text-muted-foreground flex items-center gap-1">
-                <CalendarDays className="w-3 h-3" /> Date Joined
+                <CalendarDays className="w-3 h-3" /> {t("digitalIdPanel.memberSince")}
               </p>
               <p className="font-medium text-foreground">{joinDate}</p>
             </div>
             <div>
               <p className="text-muted-foreground flex items-center gap-1">
-                <Activity className="w-3 h-3" /> Status
+                <Activity className="w-3 h-3" /> {t("common.status")}
               </p>
               <p className="font-medium text-primary">Active</p>
             </div>
@@ -221,8 +223,8 @@ const DigitalIDPanel = () => {
               <QRCodeSVG value={qrData} size={80} level="H" bgColor="transparent" fgColor="hsl(150, 30%, 10%)" />
             </div>
             <div className="flex-1 text-xs text-muted-foreground space-y-1">
-              <p className="font-medium text-foreground">Scan to verify</p>
-              <p>Scan this QR code to view this member's profile and impact data on Duara Flow.</p>
+              <p className="font-medium text-foreground">{t("digitalIdPanel.scanToVerify")}</p>
+              <p>{t("digitalIdPanel.scanDescription", "Scan this QR code to view this member's profile and impact data on Duara Flow.")}</p>
             </div>
           </div>
 
@@ -230,15 +232,15 @@ const DigitalIDPanel = () => {
           <div className="bg-muted/50 rounded-lg p-3 grid grid-cols-3 gap-2 text-center">
             <div>
               <p className="text-sm font-display font-bold text-foreground">{impact.totalKg.toFixed(0)}</p>
-              <p className="text-[10px] text-muted-foreground">kg collected</p>
+              <p className="text-[10px] text-muted-foreground">{t("digitalIdPanel.kgCollected", "kg collected")}</p>
             </div>
             <div>
               <p className="text-sm font-display font-bold text-primary">{impact.co2Avoided.toFixed(0)}</p>
-              <p className="text-[10px] text-muted-foreground">kg CO₂ saved</p>
+              <p className="text-[10px] text-muted-foreground">{t("digitalIdPanel.co2Saved", "kg CO₂ saved")}</p>
             </div>
             <div>
               <p className="text-sm font-display font-bold text-foreground">{collections?.length || 0}</p>
-              <p className="text-[10px] text-muted-foreground">entries</p>
+              <p className="text-[10px] text-muted-foreground">{t("digitalIdPanel.entries", "entries")}</p>
             </div>
           </div>
         </div>
@@ -246,7 +248,7 @@ const DigitalIDPanel = () => {
 
       {/* Download button outside card */}
       <Button onClick={handleDownload} className="w-full gap-2">
-        <Download className="w-4 h-4" /> Download Digital ID
+        <Download className="w-4 h-4" /> {t("digitalIdPanel.downloadId")}
       </Button>
     </div>
   );

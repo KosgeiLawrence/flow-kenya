@@ -16,6 +16,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Loader2, Plus, BookOpen, Calendar, MapPin, Clock, Pencil, Trash2, Users, TreePine, Award } from "lucide-react";
 import { toast } from "sonner";
 import { format } from "date-fns";
+import { useTranslation } from "react-i18next";
 
 const targetRoleOptions = [
   { value: "waste_picker", label: "Waste Pickers" },
@@ -123,6 +124,7 @@ const emptyCommunityForm: CommunityForm = {
 };
 
 const TrainingManagementPanel = () => {
+  const { t } = useTranslation();
   const { user, role } = useAuth();
   const queryClient = useQueryClient();
   const [dialogOpen, setDialogOpen] = useState(false);

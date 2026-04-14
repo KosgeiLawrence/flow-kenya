@@ -4,8 +4,10 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { TrendingUp, TrendingDown, Minus } from "lucide-react";
 import MarketPriceEditor from "@/components/dashboard/shared/MarketPriceEditor";
 import MaterialIcon from "@/components/dashboard/shared/MaterialIcon";
+import { useTranslation } from "react-i18next";
 
 const MarketInsightsPanel = () => {
+  const { t } = useTranslation();
   const { data: materials } = useQuery({
     queryKey: ["recycler_market_prices"],
     queryFn: async () => {
@@ -26,11 +28,11 @@ const MarketInsightsPanel = () => {
     <div className="space-y-6">
       <Card className="shadow-soft">
         <CardHeader>
-          <CardTitle className="text-lg">Current Market Prices</CardTitle>
+          <CardTitle className="text-lg">{t("recyclerPanels.marketInsights")}</CardTitle>
         </CardHeader>
         <CardContent>
           {!trendData.length ? (
-            <p className="text-sm text-muted-foreground">No pricing data available.</p>
+            <p className="text-sm text-muted-foreground">{t("pricingPanel.noPrices")}</p>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               {trendData.map((m) => {
@@ -62,7 +64,7 @@ const MarketInsightsPanel = () => {
       </Card>
 
       <Card className="shadow-soft">
-        <CardHeader><CardTitle className="text-lg">Market Notes</CardTitle></CardHeader>
+        <CardHeader><CardTitle className="text-lg">{t("recyclerPanels.marketNotes", "Market Notes")}</CardTitle></CardHeader>
         <CardContent>
           <div className="space-y-3">
             <div className="p-3 rounded-lg bg-primary/5 border border-primary/20">

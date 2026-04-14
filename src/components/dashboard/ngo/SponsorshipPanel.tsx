@@ -14,6 +14,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Users, Heart, MapPin, DollarSign, Plus, History, Recycle, Factory } from "lucide-react";
 import { toast } from "sonner";
 import { format } from "date-fns";
+import { useTranslation } from "react-i18next";
 
 const FUND_TYPES = [
   { value: "general", label: "General Support" },
@@ -34,6 +35,7 @@ const ROLE_OPTIONS = [
 ];
 
 const SponsorshipPanel = () => {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const queryClient = useQueryClient();
   const [open, setOpen] = useState(false);
@@ -330,7 +332,7 @@ const SponsorshipPanel = () => {
       {/* County breakdown */}
       {countyMap.size > 0 && (
         <Card className="shadow-soft">
-          <CardHeader><CardTitle className="text-lg">Impact by County</CardTitle></CardHeader>
+          <CardHeader><CardTitle className="text-lg">{t("ngoPanels.impactByCounty", "Impact by County")}</CardTitle></CardHeader>
           <CardContent>
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
               {Array.from(countyMap.entries()).map(([county, count]) => (

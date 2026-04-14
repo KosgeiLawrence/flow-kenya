@@ -8,10 +8,12 @@ import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pi
 import { format, subDays } from "date-fns";
 import { usePlatformStats } from "@/hooks/usePlatformStats";
 import { getCO2Avoided } from "@/lib/impactFactors";
+import { useTranslation } from "react-i18next";
 
 const COLORS = ["hsl(152,45%,22%)", "hsl(40,55%,55%)", "hsl(195,60%,50%)", "hsl(25,30%,35%)", "hsl(0,84%,60%)", "hsl(280,50%,50%)"];
 
 const ImpactMetricsPanel = () => {
+  const { t } = useTranslation();
   const [dateRange, setDateRange] = useState("all");
   const [materialFilter, setMaterialFilter] = useState("all");
   const { derived } = usePlatformStats();

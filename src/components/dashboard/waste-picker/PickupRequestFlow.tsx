@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { getDisplayName } from "@/lib/displayUtils";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
@@ -22,6 +23,7 @@ interface Props {
 }
 
 const PickupRequestFlow = ({ onBack }: Props) => {
+  const { t } = useTranslation();
   const { user, profile } = useAuth();
   const queryClient = useQueryClient();
   const [showForm, setShowForm] = useState(false);
@@ -185,25 +187,25 @@ const PickupRequestFlow = ({ onBack }: Props) => {
   return (
     <div className="space-y-4">
       <Button variant="ghost" onClick={onBack} className="gap-2 mb-2">
-        <ArrowLeft className="w-4 h-4" /> Back
+        <ArrowLeft className="w-4 h-4" /> {t("common.back")}
       </Button>
 
       <Card className="shadow-soft border-primary/20 bg-primary/5">
         <CardContent className="p-4">
-          <p className="text-sm font-medium text-foreground">Request Pickup (Inventory Sale)</p>
-          <p className="text-xs text-muted-foreground">Select up to 5 aggregators or recyclers to request pickup of your collected materials. They can accept or decline.</p>
+          <p className="text-sm font-medium text-foreground">{t("requestedPickups.title", "Request Pickup (Inventory Sale)")}</p>
+          <p className="text-xs text-muted-foreground">{t("requestedPickups.pickupDescription", "Select up to 5 aggregators or recyclers to request pickup of your collected materials. They can accept or decline.")}</p>
         </CardContent>
       </Card>
 
       {!showForm && (
         <Button onClick={() => setShowForm(true)} className="gap-2">
-          <Plus className="w-4 h-4" /> New Pickup Request
+          <Plus className="w-4 h-4" /> {t("requestedPickups.newRequest")}
         </Button>
       )}
 
       {showForm && (
         <Card className="shadow-soft">
-          <CardHeader><CardTitle className="text-base">Send Pickup Request</CardTitle></CardHeader>
+          <CardHeader><CardTitle className="text-base">{t("requestedPickups.sendRequest")}</CardTitle></CardHeader>
           <CardContent className="space-y-3">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <Select value={targetRole} onValueChange={(v: "aggregator" | "recycler") => { setTargetRole(v); setTargetUserId(""); }}>
@@ -242,14 +244,14 @@ const PickupRequestFlow = ({ onBack }: Props) => {
               <Button onClick={() => sendRequest.mutate()} disabled={!canSubmit || sendRequest.isPending} className="gap-2">
                 {sendRequest.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <><Send className="w-4 h-4" /> Send Request</>}
               </Button>
-              <Button variant="ghost" onClick={() => setShowForm(false)}>Cancel</Button>
+              <Button variant="ghost" onClick={() => setShowForm(false)}>{t("common.cancel")}</Button>
             </div>
           </CardContent>
         </Card>
       )}
 
       <Card className="shadow-soft">
-        <CardHeader><CardTitle className="text-base">Your Requests</CardTitle></CardHeader>
+        <CardHeader><CardTitle className="text-base">{t("requestedPickups.yourRequests", "Your Requests")}</CardTitle></CardHeader>
         <CardContent>
           {isLoading ? (
             <div className="flex justify-center py-8"><Loader2 className="w-6 h-6 animate-spin text-muted-foreground" /></div>

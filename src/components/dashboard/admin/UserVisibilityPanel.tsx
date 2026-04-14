@@ -9,8 +9,10 @@ import { Switch } from "@/components/ui/switch";
 import { Eye, EyeOff, Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
+import { useTranslation } from "react-i18next";
 
 const UserVisibilityPanel = () => {
+  const { t } = useTranslation();
   const queryClient = useQueryClient();
   const [roleFilter, setRoleFilter] = useState<string>("all");
   const [search, setSearch] = useState("");

@@ -9,8 +9,10 @@ import jsPDF from "jspdf";
 import { format } from "date-fns";
 import { loadImageAsBase64 } from "@/lib/pdfLogoUtils";
 import { addBrandedHeader, addDocMeta, finalizePdf, PDF_COLORS } from "@/lib/pdfBranding";
+import { useTranslation } from "react-i18next";
 
 const ImpactCertificatesPanel = () => {
+  const { t } = useTranslation();
   const { profile } = useAuth();
 
   const { data: collections } = useQuery({ queryKey: ["corp_cert_collections"], queryFn: async () => { const { data, error } = await supabase.from("collections").select("*, material_types(name, unit)").order("collected_at", { ascending: false }); if (error) throw error; return data; } });

@@ -17,6 +17,7 @@ import { toast } from "sonner";
 import { format } from "date-fns";
 import jsPDF from "jspdf";
 import { addCleanHeader, addDocMeta, drawTableHeader, drawTableRow, drawTotalLine, finalizeCleanPdf, loadImageAsBase64, buildPdfOrgInfo } from "@/lib/pdfBranding";
+import { useTranslation } from "react-i18next";
 
 const statusMap: Record<string, { icon: React.ElementType; variant: "default" | "secondary" | "destructive"; label: string }> = {
   pending: { icon: Clock, variant: "secondary", label: "Pending" },
@@ -26,6 +27,7 @@ const statusMap: Record<string, { icon: React.ElementType; variant: "default" | 
 };
 
 const OrdersPanel = () => {
+  const { t } = useTranslation();
   const { user, profile } = useAuth();
   const { orgInfo } = useOrgInfo();
   const queryClient = useQueryClient();

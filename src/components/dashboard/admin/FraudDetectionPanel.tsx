@@ -8,8 +8,10 @@ import { ShieldAlert, AlertTriangle, Eye, TrendingUp, Download } from "lucide-re
 import jsPDF from "jspdf";
 import { toast } from "sonner";
 import { addBrandedHeader, addDocMeta, addSectionTitle, finalizePdf } from "@/lib/pdfBranding";
+import { useTranslation } from "react-i18next";
 
 const FraudDetectionPanel = () => {
+  const { t } = useTranslation();
   const { data: collections } = useQuery({
     queryKey: ["admin-fraud-collections"],
     queryFn: async () => { const { data, error } = await supabase.from("collections").select("*, material_types(name)").order("created_at", { ascending: false }); if (error) throw error; return data; },

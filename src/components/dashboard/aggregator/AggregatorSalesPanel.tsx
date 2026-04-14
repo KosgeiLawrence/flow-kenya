@@ -17,6 +17,7 @@ import jsPDF from "jspdf";
 import { format } from "date-fns";
 import { addCleanHeader, addDocMeta, drawTableHeader, drawTableRow, drawVatTotalBlock, finalizeCleanPdf, loadImageAsBase64, buildPdfOrgInfo } from "@/lib/pdfBranding";
 import VatOptions, { DEFAULT_VAT, type VatConfig } from "@/components/dashboard/shared/VatOptions";
+import { useTranslation } from "react-i18next";
 
 type SaleStep = "details" | "quotation_sent" | "invoice_sent" | "receipt_done";
 
@@ -50,6 +51,7 @@ const stepLabels: Record<SaleStep, string> = {
 };
 
 const AggregatorSalesPanel = () => {
+  const { t } = useTranslation();
   const { user, profile } = useAuth();
   const { orgInfo } = useOrgInfo();
   const queryClient = useQueryClient();

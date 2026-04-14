@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 
 const LanguageToggle = () => {
+  const { t } = useTranslation();
   const { i18n } = useTranslation();
 
   const toggleLang = () => {

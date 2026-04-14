@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useAuth } from "@/hooks/useAuth";
 import { useOrgInfo } from "@/hooks/useOrgInfo";
 import { supabase } from "@/integrations/supabase/client";
@@ -34,6 +35,7 @@ const statusLabels: Record<DocStatus, { label: string; color: string }> = {
 
 const ClientCollectionFlow = ({ onBack }: Props) => {
   const { user, profile } = useAuth();
+  const { t } = useTranslation();
   const { orgInfo } = useOrgInfo();
   const queryClient = useQueryClient();
   const [showForm, setShowForm] = useState(false);
@@ -291,7 +293,7 @@ const ClientCollectionFlow = ({ onBack }: Props) => {
   return (
     <div className="space-y-4">
       <Button variant="ghost" onClick={onBack} className="gap-2 mb-2">
-        <ArrowLeft className="w-4 h-4" /> Back
+        <ArrowLeft className="w-4 h-4" /> {t("common.back")}
       </Button>
 
       <Card className="shadow-soft border-primary/20 bg-primary/5">
@@ -306,13 +308,13 @@ const ClientCollectionFlow = ({ onBack }: Props) => {
 
       {!showForm && (
         <Button onClick={() => setShowForm(true)} className="gap-2">
-          <Plus className="w-4 h-4" /> New Collection
+          <Plus className="w-4 h-4" /> {t("collectionPanel.addCollection", "New Collection")}
         </Button>
       )}
 
       {showForm && (
         <Card className="shadow-soft">
-          <CardHeader><CardTitle className="text-base">Record Collection</CardTitle></CardHeader>
+          <CardHeader><CardTitle className="text-base">{t("collectionPanel.recordCollection", "Record Collection")}</CardTitle></CardHeader>
           <CardContent className="space-y-3">
             {/* Client selection */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -376,9 +378,9 @@ const ClientCollectionFlow = ({ onBack }: Props) => {
             )}
             <div className="flex gap-2">
               <Button onClick={() => addCollection.mutate()} disabled={!canSubmit || addCollection.isPending}>
-                {addCollection.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : "Save Collection"}
+                {addCollection.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : t("collectionPanel.addCollection", "Save Collection")}
               </Button>
-              <Button variant="ghost" onClick={() => setShowForm(false)}>Cancel</Button>
+              <Button variant="ghost" onClick={() => setShowForm(false)}>{t("common.cancel")}</Button>
             </div>
           </CardContent>
         </Card>
@@ -387,7 +389,7 @@ const ClientCollectionFlow = ({ onBack }: Props) => {
       <VatOptions value={vat} onChange={setVat} />
 
       <Card className="shadow-soft">
-        <CardHeader><CardTitle className="text-base">Collection History</CardTitle></CardHeader>
+        <CardHeader><CardTitle className="text-base">{t("collectionPanel.recentCollections", "Collection History")}</CardTitle></CardHeader>
         <CardContent>
           {isLoading ? (
             <div className="flex justify-center py-8"><Loader2 className="w-6 h-6 animate-spin text-muted-foreground" /></div>

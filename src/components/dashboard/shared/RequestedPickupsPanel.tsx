@@ -10,8 +10,10 @@ import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import { Loader2, CheckCircle2, XCircle, Clock, Truck, MapPin } from "lucide-react";
 import { format } from "date-fns";
+import { useTranslation } from "react-i18next";
 
 const RequestedPickupsPanel = () => {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const queryClient = useQueryClient();
   const [responseNotes, setResponseNotes] = useState<Record<string, string>>({});

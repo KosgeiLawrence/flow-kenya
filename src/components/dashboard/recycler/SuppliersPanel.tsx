@@ -16,6 +16,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Users, Plus, Edit2, Trash2, Phone, Mail, MapPin, Search, UserPlus } from "lucide-react";
 import { toast } from "sonner";
 import { format } from "date-fns";
+import { useTranslation } from "react-i18next";
 
 interface SupplierForm {
   supplier_name: string;
@@ -38,6 +39,7 @@ const emptyForm: SupplierForm = {
 };
 
 const SuppliersPanel = () => {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const queryClient = useQueryClient();
   const [dialogOpen, setDialogOpen] = useState(false);

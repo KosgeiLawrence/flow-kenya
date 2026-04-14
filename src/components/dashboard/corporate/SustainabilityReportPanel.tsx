@@ -7,8 +7,10 @@ import { Download, FileSpreadsheet, BookOpen } from "lucide-react";
 import { format } from "date-fns";
 import jsPDF from "jspdf";
 import { addBrandedHeader, addDocMeta, addSectionTitle, drawTableHeader, drawTableRow, drawTotalLine, finalizePdf } from "@/lib/pdfBranding";
+import { useTranslation } from "react-i18next";
 
 const SustainabilityReportPanel = () => {
+  const { t } = useTranslation();
   const { profile } = useAuth();
 
   const { data: collections } = useQuery({ queryKey: ["corp_report_collections"], queryFn: async () => { const { data, error } = await supabase.from("collections").select("*, material_types(name, unit, price_per_unit)").order("collected_at", { ascending: false }); if (error) throw error; return data; } });

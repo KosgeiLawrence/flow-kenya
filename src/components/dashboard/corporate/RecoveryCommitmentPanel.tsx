@@ -10,6 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { toast } from "sonner";
 import { HandCoins, Plus, MapPin, TrendingUp, CheckCircle2 } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 const COUNTIES = [
   "Nairobi", "Mombasa", "Kisumu", "Nakuru", "Kiambu", "Machakos",
@@ -17,6 +18,7 @@ const COUNTIES = [
 ];
 
 const RecoveryCommitmentPanel = () => {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const qc = useQueryClient();
   const [showForm, setShowForm] = useState(false);

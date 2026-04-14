@@ -15,6 +15,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { toast } from "sonner";
 import { Plus, Trash2, Copy, Eye, FileText, ArrowLeft, GripVertical } from "lucide-react";
 import { format } from "date-fns";
+import { useTranslation } from "react-i18next";
 
 type FieldType = "text" | "email" | "number" | "textarea" | "select" | "checkbox" | "date" | "phone";
 
@@ -53,6 +54,7 @@ const FIELD_TYPES: { value: FieldType; label: string }[] = [
 ];
 
 const FormBuilderPanel = () => {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const queryClient = useQueryClient();
   const [view, setView] = useState<ViewMode>("list");

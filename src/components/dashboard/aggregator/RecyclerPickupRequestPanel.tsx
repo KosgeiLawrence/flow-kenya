@@ -9,8 +9,10 @@ import { Input } from "@/components/ui/input";
 import { Truck, Send, Loader2, Plus } from "lucide-react";
 import { toast } from "sonner";
 import { format } from "date-fns";
+import { useTranslation } from "react-i18next";
 
 const RecyclerPickupRequestPanel = () => {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const queryClient = useQueryClient();
   const [showRequestForm, setShowRequestForm] = useState(false);

@@ -21,6 +21,7 @@ import {
 } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { generateCleanupReportPDF } from "@/lib/cleanupReportPdf";
+import { useTranslation } from "react-i18next";
 
 interface CleanupExercise {
   id: string;
@@ -117,6 +118,7 @@ interface Props {
 }
 
 const CleanupExercisePanel = ({ isAdmin = false }: Props) => {
+  const { t } = useTranslation();
   const { user, profile } = useAuth();
   const queryClient = useQueryClient();
   const [showForm, setShowForm] = useState(false);

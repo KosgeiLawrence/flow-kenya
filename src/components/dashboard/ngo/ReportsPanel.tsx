@@ -9,10 +9,12 @@ import jsPDF from "jspdf";
 import { format, differenceInYears } from "date-fns";
 import { loadImageAsBase64 } from "@/lib/pdfLogoUtils";
 import { addBrandedHeader, addDocMeta, addSectionTitle, finalizePdf } from "@/lib/pdfBranding";
+import { useTranslation } from "react-i18next";
 
 const CO2_FACTORS: Record<string, number> = { PET: 3.1, HDPE: 1.9, LDPE: 2.0, PP: 1.7, PS: 3.3, Aluminium: 9.1, Glass: 0.6 };
 
 const ReportsPanel = () => {
+  const { t } = useTranslation();
   const { profile } = useAuth();
 
   const { data: collections } = useQuery({ queryKey: ["ngo_report_collections"], queryFn: async () => { const { data, error } = await supabase.from("collections").select("*, material_types(name, unit, price_per_unit)").order("collected_at", { ascending: false }); if (error) throw error; return data; } });

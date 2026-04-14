@@ -16,6 +16,7 @@ import { format, subDays, subMonths, subYears, startOfDay, endOfDay, isWithinInt
 import { cn } from "@/lib/utils";
 import { useOrgInfo } from "@/hooks/useOrgInfo";
 import { PDF_COLORS, loadImageAsBase64 } from "@/lib/pdfBranding";
+import { useTranslation } from "react-i18next";
 
 // ── Logo cache ──
 let _duaraFlowLogoCache: string | null = null;
@@ -156,6 +157,7 @@ const addReportFooter = async (doc: jsPDF, orgName: string) => {
 };
 
 const ESGPanel = () => {
+  const { t } = useTranslation();
   const { user, profile } = useAuth();
   const { orgInfo } = useOrgInfo();
   const [period, setPeriod] = useState<PeriodOption>("all");

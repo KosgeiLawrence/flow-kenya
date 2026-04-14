@@ -18,6 +18,7 @@ import jsPDF from "jspdf";
 import { format } from "date-fns";
 import { addCleanHeader, addDocMeta, drawTableHeader, drawTableRow, drawVatTotalBlock, finalizeCleanPdf, loadImageAsBase64, buildPdfOrgInfo } from "@/lib/pdfBranding";
 import VatOptions, { DEFAULT_VAT, type VatConfig } from "@/components/dashboard/shared/VatOptions";
+import { useTranslation } from "react-i18next";
 
 type SaleStep = "details" | "quotation_sent" | "invoice_sent" | "receipt_done";
 
@@ -44,6 +45,7 @@ const initialSale: SaleState = {
 };
 
 const ProductCatalogPanel = () => {
+  const { t } = useTranslation();
   const { user, profile } = useAuth();
   const { orgInfo } = useOrgInfo();
   const queryClient = useQueryClient();
@@ -335,7 +337,7 @@ const ProductCatalogPanel = () => {
       <div className={`grid gap-6 ${pendingSales.length > 0 ? "grid-cols-1 lg:grid-cols-[1fr_340px]" : "grid-cols-1"}`}>
         <Card className="shadow-soft">
           <CardHeader className="flex flex-row items-center justify-between">
-            <CardTitle className="text-lg">Product Catalog & Pricing</CardTitle>
+            <CardTitle className="text-lg">{t("recyclerPanels.productCatalog")}</CardTitle>
             <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
               <DialogTrigger asChild><Button size="sm"><Plus className="w-4 h-4 mr-1" /> Add Product</Button></DialogTrigger>
               <DialogContent className="max-w-md">

@@ -7,6 +7,7 @@ import {
   ArrowDown, ArrowRight, ChevronDown, ChevronUp, CheckCircle2, ClipboardList
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useTranslation } from "react-i18next";
 
 interface WorkflowStep {
   label: string;
@@ -294,6 +295,7 @@ const OverviewDiagram = () => {
 };
 
 const WastePickerWorkflowGuidePanel = () => {
+  const { t } = useTranslation();
   return (
     <div className="space-y-6">
       <div>

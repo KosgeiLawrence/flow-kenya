@@ -17,6 +17,7 @@ import jsPDF from "jspdf";
 import { addBrandedHeader, addDocMeta, addSectionTitle, finalizePdf, drawTableHeader, drawTableRow, drawVatTotalBlock, PDF_COLORS } from "@/lib/pdfBranding";
 import { format } from "date-fns";
 import { ROLE_PRICING, type BillingPeriod } from "@/lib/stripePlans";
+import { useTranslation } from "react-i18next";
 
 interface LineItem {
   description: string;
@@ -51,6 +52,7 @@ const DUARA_SERVICES = [
 ];
 
 const AdminBillingPanel = () => {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const queryClient = useQueryClient();
   const [dialogOpen, setDialogOpen] = useState(false);

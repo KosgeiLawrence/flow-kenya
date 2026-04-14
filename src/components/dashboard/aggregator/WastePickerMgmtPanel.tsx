@@ -8,8 +8,10 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Users, UserCheck, Clock, Search, TrendingUp, Package } from "lucide-react";
 import { toast } from "sonner";
+import { useTranslation } from "react-i18next";
 
 const WastePickerMgmtPanel = () => {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const queryClient = useQueryClient();
   const [search, setSearch] = useState("");
@@ -112,7 +114,7 @@ const WastePickerMgmtPanel = () => {
       {/* Picker list with performance */}
       <Card className="shadow-soft">
         <CardHeader>
-          <CardTitle className="text-lg">Waste Pickers</CardTitle>
+          <CardTitle className="text-lg">{t("wastePickerMgmt.title")}</CardTitle>
         </CardHeader>
         <CardContent>
           {isLoading ? (
