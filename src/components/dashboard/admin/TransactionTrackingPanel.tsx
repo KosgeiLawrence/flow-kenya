@@ -36,7 +36,7 @@ const TransactionTrackingPanel = () => {
     return Object.entries(days).map(([date, amount]) => ({ date: date.slice(5), amount: Math.round(amount) }));
   })();
 
-  const chartConfig = { amount: { label: "KSh", color: "hsl(152,45%,22%)" } };
+  const chartConfig = { amount: { label: "KES", color: "hsl(152,45%,22%)" } };
   const statusBadge = (s: string) => {
     const map: Record<string, string> = { pending: "bg-secondary/20 text-secondary", completed: "bg-primary/20 text-primary", failed: "bg-destructive/20 text-destructive" };
     return <Badge className={map[s] || ""}>{s}</Badge>;
@@ -49,7 +49,7 @@ const TransactionTrackingPanel = () => {
 
     y = addSectionTitle(doc, "Financial Summary", y);
     doc.setFontSize(10);
-    [`Total Volume: KSh ${total.toLocaleString()}`, `Completed: KSh ${completedTotal.toLocaleString()} (${completed.length} txns)`, `Pending: ${pending.length} transactions`, `Failed: ${failed.length} transactions`, `Platform Commission (2.5%): KSh ${commission.toLocaleString()}`].forEach(l => { doc.text(l, 20, y); y += 7; });
+    [`Total Volume: KES ${total.toLocaleString()}`, `Completed: KES ${completedTotal.toLocaleString()} (${completed.length} txns)`, `Pending: ${pending.length} transactions`, `Failed: ${failed.length} transactions`, `Platform Commission (2.5%): KES ${commission.toLocaleString()}`].forEach(l => { doc.text(l, 20, y); y += 7; });
     y += 8;
 
     y = addSectionTitle(doc, "Recent Transactions", y);
@@ -63,7 +63,7 @@ const TransactionTrackingPanel = () => {
       doc.setFontSize(7);
       doc.text(new Date(p.created_at).toLocaleDateString(), 17, y);
       doc.text(p.phone_number, 55, y);
-      doc.text(`KSh ${Number(p.amount).toLocaleString()}`, 95, y);
+      doc.text(`KES ${Number(p.amount).toLocaleString()}`, 95, y);
       doc.text(p.status, 130, y);
       doc.text(p.mpesa_receipt_number || "—", 160, y);
       y += 5;
@@ -97,11 +97,11 @@ const TransactionTrackingPanel = () => {
 
       <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
         {[
-          { label: "Total Volume", value: `KSh ${total.toLocaleString()}`, icon: DollarSign },
-          { label: "Completed", value: `KSh ${completedTotal.toLocaleString()}`, icon: CheckCircle2 },
+          { label: "Total Volume", value: `KES ${total.toLocaleString()}`, icon: DollarSign },
+          { label: "Completed", value: `KES ${completedTotal.toLocaleString()}`, icon: CheckCircle2 },
           { label: "Pending", value: pending.length, icon: Clock },
           { label: "Failed", value: failed.length, icon: Clock },
-          { label: "Platform Commission", value: `KSh ${Math.round(commission).toLocaleString()}`, icon: TrendingUp },
+          { label: "Platform Commission", value: `KES ${Math.round(commission).toLocaleString()}`, icon: TrendingUp },
         ].map((s) => (<Card key={s.label}><CardContent className="p-4 flex items-center gap-3"><s.icon className="w-8 h-8 text-primary" /><div><p className="text-lg font-bold text-foreground">{s.value}</p><p className="text-xs text-muted-foreground">{s.label}</p></div></CardContent></Card>))}
       </div>
 
