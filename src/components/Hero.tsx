@@ -61,7 +61,7 @@ const Hero = () => {
             className="mb-10 max-w-2xl text-lg text-primary-foreground/70 md:text-xl"
           >
             End-to-end material tracking from waste picker to manufacturer.
-            Real-time compliance, M-Pesa payments, and impact analytics — all in one platform.
+            Real-time compliance, M-Pesa payments, financial management, and impact analytics — all in one platform.
           </motion.p>
 
           <motion.div
