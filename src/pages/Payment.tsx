@@ -35,6 +35,7 @@ const Payment = () => {
 
   const roleStr = (role || user?.user_metadata?.role || "") as string;
   const billingPeriod = (user?.user_metadata?.billing_period || "monthly") as BillingPeriod;
+  const isTrialUser = billingPeriod === "free_trial";
   const promoCode = user?.user_metadata?.promo_code || "";
   const promoValid = promoCode ? isPromoValidForRole(promoCode, roleStr as any) : false;
   const amount = getAmount(roleStr, billingPeriod);
@@ -50,6 +51,15 @@ const Payment = () => {
   useEffect(() => {
     if (!user) {
       navigate("/login");
+      return;
+    }
+
+    // Trial users bypass payment entirely
+    if (isTrialUser) {
+      if (role) {
+        navigate(`/dashboard/${role.replace("_", "-")}`, { replace: true });
+      }
+      setChecking(false);
       return;
     }
 
@@ -76,7 +86,7 @@ const Payment = () => {
       setChecking(false);
     };
     checkSub();
-  }, [user, role, promoValid, navigate]);
+  }, [user, role, promoValid, isTrialUser, navigate]);
 
   const handleStkPush = async () => {
     if (!amount || amount <= 0 || !phoneNumber) return;

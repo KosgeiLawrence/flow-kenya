@@ -51,6 +51,26 @@ serve(async (req) => {
 
     const meta = user.user_metadata;
 
+    // Check free trial (30 days from account creation)
+    const billingPeriod = meta?.billing_period;
+    if (billingPeriod === "free_trial") {
+      const createdAt = new Date(user.created_at);
+      const now = new Date();
+      const daysSinceCreation = (now.getTime() - createdAt.getTime()) / (1000 * 60 * 60 * 24);
+      if (daysSinceCreation <= 30) {
+        const trialEndsAt = new Date(createdAt.getTime() + 30 * 24 * 60 * 60 * 1000).toISOString();
+        return new Response(JSON.stringify({ 
+          subscribed: true, 
+          free_trial: true, 
+          trial_ends_at: trialEndsAt,
+          trial_days_remaining: Math.ceil(30 - daysSinceCreation),
+        }), {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+      // Trial expired — fall through to check for paid subscription
+    }
+
     // Check promo code
     const promoCode = meta?.promo_code;
     const userRole = meta?.role;
