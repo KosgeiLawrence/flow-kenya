@@ -3,13 +3,12 @@ import { useTeamContext } from "@/hooks/useTeamContext";
 
 /**
  * Filters nav items for team members based on their feature permissions.
- * Team owners and non-team users see all items.
- * Team members only see items they have permission for, plus always-visible items.
+ * Also exposes team branding info for the sidebar.
  */
 export const useFilteredNavItems = (
   navItems: { id: string; label: string; icon?: any }[]
 ) => {
-  const { isTeamMember, featurePermissions, isLoading } = useTeamContext();
+  const { isTeamMember, featurePermissions, isLoading, teamDisplayName, teamLogoUrl } = useTeamContext();
 
   const alwaysVisible = ["settings", "profile-settings", "team", "trash"];
 
@@ -22,5 +21,5 @@ export const useFilteredNavItems = (
     );
   }, [isTeamMember, featurePermissions, navItems]);
 
-  return { filteredNavItems, isTeamMember, isLoading };
+  return { filteredNavItems, isTeamMember, isLoading, teamDisplayName, teamLogoUrl };
 };
