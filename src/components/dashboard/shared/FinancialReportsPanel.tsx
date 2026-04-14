@@ -20,7 +20,7 @@ import { addCleanHeader, addSectionTitle, addDocMeta, drawTableHeader, drawTable
 import { useOrgInfo } from "@/hooks/useOrgInfo";
 import { toast } from "sonner";
 
-type UserRole = "waste_picker" | "aggregator" | "recycler";
+type UserRole = "waste_picker" | "aggregator" | "recycler" | "admin";
 
 interface Props {
   role: UserRole;

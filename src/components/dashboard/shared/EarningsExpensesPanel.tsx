@@ -32,7 +32,7 @@ import { CompactList } from "@/components/ui/compact-list";
 
 const COLORS = ["hsl(152,45%,22%)", "hsl(40,55%,55%)", "hsl(195,60%,50%)", "hsl(25,30%,35%)", "hsl(340,55%,50%)", "hsl(270,40%,50%)"];
 
-type UserRole = "waste_picker" | "aggregator" | "recycler";
+type UserRole = "waste_picker" | "aggregator" | "recycler" | "admin";
 
 interface Props {
   role: UserRole;
