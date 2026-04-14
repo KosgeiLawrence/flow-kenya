@@ -57,6 +57,7 @@ const generateYearOptions = () => {
 const MONTH_NAMES = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 
 const EarningsExpensesPanel = ({ role }: Props) => {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const queryClient = useQueryClient();
   const config = roleConfig[role];

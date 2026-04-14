@@ -38,6 +38,7 @@ const SUB_SECTION_OPTIONS = [
 ];
 
 const FinancialReportsPanel = ({ role }: Props) => {
+  const { t } = useTranslation();
   const { user, profile } = useAuth();
   const { orgInfo } = useOrgInfo();
   const queryClient = useQueryClient();
