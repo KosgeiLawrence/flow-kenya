@@ -754,7 +754,7 @@ const ESGAnalyticsPanel = () => {
         </Card>
         <Card className="shadow-soft">
           <CardContent className="p-4 text-center">
-            <Zap className="w-7 h-7 text-accent mx-auto mb-2" />
+            <Zap className="w-7 h-7 text-secondary mx-auto mb-2" />
             <p className="text-xl font-bold text-foreground">{energySaved.toFixed(0)}</p>
             <p className="text-xs text-muted-foreground">kWh Energy Saved</p>
           </CardContent>
@@ -779,7 +779,7 @@ const ESGAnalyticsPanel = () => {
         </Card>
         <Card className="shadow-soft">
           <CardContent className="p-4 text-center">
-            <Target className="w-7 h-7 text-accent mx-auto mb-2" />
+            <Target className="w-7 h-7 text-secondary mx-auto mb-2" />
             <p className="text-xl font-bold text-foreground">{netEmissions.toLocaleString()}</p>
             <p className="text-xs text-muted-foreground">Net Emissions (kg)</p>
           </CardContent>

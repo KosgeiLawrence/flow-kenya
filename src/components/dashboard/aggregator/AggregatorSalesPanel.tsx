@@ -448,7 +448,7 @@ const AggregatorSalesPanel = () => {
           <Card className="shadow-soft border-accent/30 h-fit">
             <CardHeader className="pb-3">
               <CardTitle className="text-base flex items-center gap-2">
-                <ShoppingCart className="w-5 h-5 text-accent" /> Pending Sales ({pendingSales.length})
+                <ShoppingCart className="w-5 h-5 text-secondary" /> Pending Sales ({pendingSales.length})
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -677,9 +677,9 @@ const AggregatorSalesPanel = () => {
               {/* Step 2: Quotation Sent */}
               {sale.step === "quotation_sent" && (
                 <div className="space-y-3">
-                  <Card className="bg-accent/10 border-accent/30">
+                  <Card className="bg-secondary/10 border-accent/30">
                     <CardContent className="p-4 text-center space-y-2">
-                      <FileText className="w-8 h-8 text-accent mx-auto" />
+                      <FileText className="w-8 h-8 text-secondary mx-auto" />
                       <p className="text-sm font-medium text-foreground">Quotation sent to {sale.client_name}</p>
                       <p className="text-xs text-muted-foreground">KES {calcTotal().toLocaleString()} for {sale.quantity} {selectedMaterial.unit}</p>
                     </CardContent>

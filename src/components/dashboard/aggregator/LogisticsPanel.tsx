@@ -101,7 +101,7 @@ const LogisticsPanel = () => {
         <div className="grid grid-cols-3 gap-4 flex-1 mr-4">
           <Card className="shadow-soft">
             <CardContent className="flex items-center gap-3 p-4">
-              <Calendar className="w-8 h-8 text-accent" />
+              <Calendar className="w-8 h-8 text-secondary" />
               <div>
                 <p className="text-2xl font-bold text-foreground">{upcoming.length}</p>
                 <p className="text-xs text-muted-foreground">Upcoming</p>

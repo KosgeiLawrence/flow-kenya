@@ -95,7 +95,7 @@ const PaymentsPanel = () => {
         </Card>
         <Card className="shadow-soft">
           <CardContent className="flex items-center gap-3 p-4">
-            <Clock className="w-8 h-8 text-accent" />
+            <Clock className="w-8 h-8 text-secondary" />
             <div>
               <p className="text-2xl font-bold text-foreground">KES {totalPending.toLocaleString()}</p>
               <p className="text-xs text-muted-foreground">Pending</p>

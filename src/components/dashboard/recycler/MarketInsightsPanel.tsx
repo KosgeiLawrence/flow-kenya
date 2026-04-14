@@ -71,7 +71,7 @@ const MarketInsightsPanel = () => {
               <p className="text-sm font-medium text-foreground">PET Demand Rising</p>
               <p className="text-xs text-muted-foreground">Regional demand for PET has increased due to new EPR regulations. Expect price stability.</p>
             </div>
-            <div className="p-3 rounded-lg bg-accent/10 border border-accent/20">
+            <div className="p-3 rounded-lg bg-secondary/10 border border-accent/20">
               <p className="text-sm font-medium text-foreground">E-Waste Premium</p>
               <p className="text-xs text-muted-foreground">E-waste commands premium pricing due to precious metal recovery value.</p>
             </div>

@@ -132,7 +132,7 @@ const GrantsDiscoveryPanel = ({ userRole = "waste_picker" }: { userRole?: string
         </Card>
         <Card className="shadow-soft">
           <CardContent className="flex items-center gap-3 p-4">
-            <Send className="w-7 h-7 text-accent" />
+            <Send className="w-7 h-7 text-secondary" />
             <div>
               <p className="text-xl font-bold text-foreground">{myApplications?.length || 0}</p>
               <p className="text-xs text-muted-foreground">My Applications</p>

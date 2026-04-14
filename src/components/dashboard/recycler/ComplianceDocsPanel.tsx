@@ -93,7 +93,7 @@ const ComplianceDocsPanel = () => {
         <CardContent className="space-y-3">
           {checks.map((c, i) => (
             <div key={i} className="flex items-start gap-3 p-3 rounded-lg bg-muted/30 border border-border">
-              {c.pass ? <CheckCircle2 className="w-5 h-5 text-primary shrink-0 mt-0.5" /> : <AlertTriangle className="w-5 h-5 text-accent shrink-0 mt-0.5" />}
+              {c.pass ? <CheckCircle2 className="w-5 h-5 text-primary shrink-0 mt-0.5" /> : <AlertTriangle className="w-5 h-5 text-secondary shrink-0 mt-0.5" />}
               <div className="flex-1">
                 <p className="text-sm font-medium text-foreground">{c.label}</p>
                 <p className="text-xs text-muted-foreground">{c.detail}</p>

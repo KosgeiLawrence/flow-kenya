@@ -90,7 +90,7 @@ const PlasticFootprintPanel = () => {
         </Card>
         <Card className="shadow-soft">
           <CardContent className="p-4 text-center">
-            <TrendingUp className="w-7 h-7 text-accent mx-auto mb-2" />
+            <TrendingUp className="w-7 h-7 text-secondary mx-auto mb-2" />
             <p className="text-xl font-bold text-foreground">{declarations?.length || 0}</p>
             <p className="text-xs text-muted-foreground">Declarations Filed</p>
           </CardContent>
