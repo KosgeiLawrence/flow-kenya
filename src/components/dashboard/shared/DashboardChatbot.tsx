@@ -153,11 +153,23 @@ const DashboardChatbot = ({ role, navItems, onNavigate }: DashboardChatbotProps)
                     <button
                       key={action}
                       onClick={() => {
-                        setInput(action);
-                        setTimeout(() => {
-                          const fakeEvent = { preventDefault: () => {} };
-                          sendMessage();
-                        }, 100);
+                        setMessages([{ role: "user", content: action }]);
+                        setIsLoading(true);
+                        supabase.functions.invoke("dashboard-chat", {
+                          body: {
+                            messages: [{ role: "user", content: action }],
+                            role,
+                            navItems: navItems.map((n) => ({ id: n.id, label: n.label })),
+                            userId: user?.id,
+                          },
+                        }).then(({ data, error }) => {
+                          if (error) throw error;
+                          const { cleanContent, panelId } = extractNavigation(data.content);
+                          setMessages((prev) => [...prev, { role: "assistant", content: cleanContent }]);
+                          if (panelId) setTimeout(() => onNavigate(panelId), 800);
+                        }).catch(() => {
+                          setMessages((prev) => [...prev, { role: "assistant", content: "Sorry, I encountered an error." }]);
+                        }).finally(() => setIsLoading(false));
                       }}
                       className="block w-full text-left text-xs px-3 py-2 rounded-lg bg-[rgba(255,255,255,0.05)] border border-[rgba(255,255,255,0.08)] text-muted-foreground hover:bg-[rgba(255,255,255,0.08)] hover:text-foreground transition-colors"
                     >
