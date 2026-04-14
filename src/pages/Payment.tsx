@@ -54,6 +54,15 @@ const Payment = () => {
       return;
     }
 
+    // Trial users bypass payment entirely
+    if (isTrialUser) {
+      if (role) {
+        navigate(`/dashboard/${role.replace("_", "-")}`, { replace: true });
+      }
+      setChecking(false);
+      return;
+    }
+
     if (promoValid) {
       if (role) {
         navigate(`/dashboard/${role.replace("_", "-")}`, { replace: true });
