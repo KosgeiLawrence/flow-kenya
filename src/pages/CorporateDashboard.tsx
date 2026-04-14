@@ -11,6 +11,7 @@ import { cn } from "@/lib/utils";
 import { useFilteredNavItems } from "@/hooks/useFilteredNavItems";
 import { useTranslatedNavItems } from "@/hooks/useTranslatedNavItems";
 import { useTranslation } from "react-i18next";
+import LanguageToggle from "@/components/dashboard/shared/LanguageToggle";
 import PlasticFootprintPanel from "@/components/dashboard/corporate/PlasticFootprintPanel";
 import RecoveryCommitmentPanel from "@/components/dashboard/corporate/RecoveryCommitmentPanel";
 import RecoveryTrackingPanel from "@/components/dashboard/corporate/RecoveryTrackingPanel";
@@ -140,7 +141,8 @@ const CorporateDashboard = () => {
           ))}
         </nav>
 
-        <div className="p-3 border-t border-sidebar-border">
+        <div className="p-3 border-t border-sidebar-border space-y-1">
+          <LanguageToggle />
           <Button variant="ghost" size="sm" onClick={handleSignOut} className="w-full justify-start gap-2 text-sidebar-foreground/70 hover:text-sidebar-foreground hover:bg-sidebar-accent/50">
             <LogOut className="w-4 h-4" /> Sign Out
           </Button>

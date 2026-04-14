@@ -11,6 +11,7 @@ import { cn } from "@/lib/utils";
 import { useTranslatedNavItems } from "@/hooks/useTranslatedNavItems";
 import { useTranslation } from "react-i18next";
 import { useFilteredNavItems } from "@/hooks/useFilteredNavItems";
+import LanguageToggle from "@/components/dashboard/shared/LanguageToggle";
 import CollectionPanel from "@/components/dashboard/waste-picker/CollectionPanel";
 import ProfileSettingsPanel from "@/components/dashboard/shared/ProfileSettingsPanel";
 import PricingPanel from "@/components/dashboard/waste-picker/PricingPanel";
@@ -158,7 +159,8 @@ const WastePickerDashboard = () => {
           ))}
         </nav>
 
-        <div className="p-3 border-t border-sidebar-border">
+        <div className="p-3 border-t border-sidebar-border space-y-1">
+          <LanguageToggle />
           <Button variant="ghost" size="sm" onClick={handleSignOut} className="w-full justify-start gap-2 text-sidebar-foreground/70 hover:text-sidebar-foreground hover:bg-sidebar-accent/50">
             <LogOut className="w-4 h-4" /> {t("dashboard.logout")}
           </Button>

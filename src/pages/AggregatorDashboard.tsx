@@ -12,6 +12,7 @@ import { cn } from "@/lib/utils";
 import { useFilteredNavItems } from "@/hooks/useFilteredNavItems";
 import { useTranslatedNavItems } from "@/hooks/useTranslatedNavItems";
 import { useTranslation } from "react-i18next";
+import LanguageToggle from "@/components/dashboard/shared/LanguageToggle";
 import WastePickerMgmtPanel from "@/components/dashboard/aggregator/WastePickerMgmtPanel";
 import InventoryPanel from "@/components/dashboard/aggregator/InventoryPanel";
 import MarketplacePanel from "@/components/dashboard/aggregator/MarketplacePanel";
@@ -186,7 +187,8 @@ const AggregatorDashboard = () => {
           ))}
         </nav>
 
-        <div className="p-3 border-t border-sidebar-border">
+        <div className="p-3 border-t border-sidebar-border space-y-1">
+          <LanguageToggle />
           <Button variant="ghost" size="sm" onClick={handleSignOut} className="w-full justify-start gap-2 text-sidebar-foreground/70 hover:text-sidebar-foreground hover:bg-sidebar-accent/50">
             <LogOut className="w-4 h-4" /> Sign Out
           </Button>
