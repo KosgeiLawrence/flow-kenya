@@ -70,6 +70,60 @@ serve(async (req) => {
       }
     }
 
+    // Check if user is an active team member — inherit inviter's subscription
+    const { data: teamMembership } = await supabaseClient
+      .from("team_members")
+      .select("invited_by")
+      .eq("user_id", user.id)
+      .eq("is_active", true)
+      .limit(1);
+
+    if (teamMembership && teamMembership.length > 0) {
+      const inviterId = teamMembership[0].invited_by;
+
+      // Check if inviter has bypass email
+      const { data: inviterData } = await supabaseClient.auth.admin.getUserById(inviterId);
+      const inviterEmail = inviterData?.user?.email;
+      if (inviterEmail && bypassEmails.includes(inviterEmail)) {
+        return new Response(JSON.stringify({ subscribed: true, team_member: true }), {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+
+      // Check if inviter has promo code
+      const inviterMeta = inviterData?.user?.user_metadata;
+      if (inviterMeta?.promo_code) {
+        const upper = inviterMeta.promo_code.toUpperCase();
+        const inviterRole = inviterMeta?.role;
+        const isValid = ngoCorpCountyRoles.includes(inviterRole)
+          ? ngoCorpCountyPromos.includes(upper)
+          : generalPromos.includes(upper);
+        if (isValid) {
+          return new Response(JSON.stringify({ subscribed: true, team_member: true, promo: true }), {
+            headers: { ...corsHeaders, "Content-Type": "application/json" },
+          });
+        }
+      }
+
+      // Check if inviter has active subscription
+      const { data: inviterSubs } = await supabaseClient
+        .from("subscriptions")
+        .select("*")
+        .eq("user_id", inviterId)
+        .eq("status", "active")
+        .order("created_at", { ascending: false })
+        .limit(1);
+
+      if (inviterSubs && inviterSubs.length > 0) {
+        const sub = inviterSubs[0];
+        if (sub.plan_tier === "one_time" || !sub.expires_at || new Date(sub.expires_at) > new Date()) {
+          return new Response(JSON.stringify({ subscribed: true, team_member: true, plan_name: sub.plan_name }), {
+            headers: { ...corsHeaders, "Content-Type": "application/json" },
+          });
+        }
+      }
+    }
+
     // Check subscriptions table for active subscription
     const { data: subs } = await supabaseClient
       .from("subscriptions")
