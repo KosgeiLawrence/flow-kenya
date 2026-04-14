@@ -533,7 +533,17 @@ const ProfileSettingsPanel = ({ role }: ProfileSettingsPanelProps) => {
 
             <Separator />
             <div className="flex justify-end">
-              <Button onClick={() => handleSaveSection(["company_registration", "kra_pin", "industry_sector", "physical_address", "county", "sub_county", "website", "social_media_links"])} disabled={updateProfile.isPending} className="gap-2">
+              <Button onClick={async () => {
+                // Update org name if changed
+                if (fullProfile?.organization_id && orgName && orgName !== organization?.name) {
+                  const { error } = await supabase.from("organizations").update({ name: orgName }).eq("id", fullProfile.organization_id);
+                  if (error) { toast.error("Failed to update organization name"); return; }
+                  queryClient.invalidateQueries({ queryKey: ["organization"] });
+                  queryClient.invalidateQueries({ queryKey: ["org_info"] });
+                  await refreshProfile();
+                }
+                handleSaveSection(["company_registration", "kra_pin", "industry_sector", "physical_address", "county", "sub_county", "website", "social_media_links"]);
+              }} disabled={updateProfile.isPending} className="gap-2">
                 <Save className="w-4 h-4" /> Save Organization Info
               </Button>
             </div>
