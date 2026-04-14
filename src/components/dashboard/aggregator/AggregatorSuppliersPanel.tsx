@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { getDisplayName } from "@/lib/displayUtils";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -16,6 +16,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Users, Plus, Edit2, Trash2, Phone, Mail, MapPin, Search, UserPlus } from "lucide-react";
 import { toast } from "sonner";
 import { useTranslation } from "react-i18next";
+import { useChatbotUIAction } from "@/hooks/useChatbotUIAction";
 
 interface SupplierForm {
   supplier_name: string;
@@ -42,6 +43,8 @@ const AggregatorSuppliersPanel = () => {
   const { user } = useAuth();
   const queryClient = useQueryClient();
   const [dialogOpen, setDialogOpen] = useState(false);
+
+  useChatbotUIAction(["add-supplier"], useCallback(() => setDialogOpen(true), []));
   const [editId, setEditId] = useState<string | null>(null);
   const [form, setForm] = useState<SupplierForm>(emptyForm);
   const [search, setSearch] = useState("");

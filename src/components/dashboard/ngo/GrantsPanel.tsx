@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useCallback } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
@@ -16,6 +16,7 @@ import { Briefcase, Target, DollarSign, Calendar, Plus, Upload, FileText, Trash2
 import { toast } from "sonner";
 import { format } from "date-fns";
 import { useTranslation } from "react-i18next";
+import { useChatbotUIAction } from "@/hooks/useChatbotUIAction";
 
 const COUNTIES = [
   "Nairobi", "Mombasa", "Kisumu", "Nakuru", "Kiambu",
@@ -27,6 +28,8 @@ const GrantsPanel = () => {
   const { user } = useAuth();
   const queryClient = useQueryClient();
   const [open, setOpen] = useState(false);
+
+  useChatbotUIAction(["add-program"], useCallback(() => setOpen(true), []));
   const fileRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState<string | null>(null);
 

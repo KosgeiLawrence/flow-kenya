@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
@@ -20,6 +20,7 @@ import {
   PDF_COLORS, addCleanHeader, addDocMeta, drawTableHeader,
   drawTableRow, drawVatTotalBlock, finalizeCleanPdf, loadImageAsBase64, buildPdfOrgInfo,
 } from "@/lib/pdfBranding";
+import { useChatbotUIAction } from "@/hooks/useChatbotUIAction";
 
 const CollectionPanel = () => {
   const { t } = useTranslation();
@@ -30,6 +31,8 @@ const CollectionPanel = () => {
   const [quantity, setQuantity] = useState("");
   const [locationName, setLocationName] = useState("");
   const [showForm, setShowForm] = useState(false);
+
+  useChatbotUIAction(["add-collection"], useCallback(() => setShowForm(true), []));
 
   const { data: materialTypes } = useQuery({
     queryKey: ["material_types"],

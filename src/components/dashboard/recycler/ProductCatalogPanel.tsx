@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
@@ -19,6 +19,7 @@ import { format } from "date-fns";
 import { addCleanHeader, addDocMeta, drawTableHeader, drawTableRow, drawVatTotalBlock, finalizeCleanPdf, loadImageAsBase64, buildPdfOrgInfo } from "@/lib/pdfBranding";
 import VatOptions, { DEFAULT_VAT, type VatConfig } from "@/components/dashboard/shared/VatOptions";
 import { useTranslation } from "react-i18next";
+import { useChatbotUIAction } from "@/hooks/useChatbotUIAction";
 
 type SaleStep = "details" | "quotation_sent" | "invoice_sent" | "receipt_done";
 
@@ -50,6 +51,8 @@ const ProductCatalogPanel = () => {
   const { orgInfo } = useOrgInfo();
   const queryClient = useQueryClient();
   const [dialogOpen, setDialogOpen] = useState(false);
+
+  useChatbotUIAction(["add-product", "add-invoice", "add-quotation", "add-receipt"], useCallback(() => setDialogOpen(true), []));
   const [saleDialog, setSaleDialog] = useState(false);
   const [sale, setSale] = useState<SaleState>(initialSale);
   const [pendingSales, setPendingSales] = useState<(SaleState & { vat: VatConfig })[]>(() => {

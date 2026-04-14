@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
@@ -11,6 +11,7 @@ import { Progress } from "@/components/ui/progress";
 import { toast } from "sonner";
 import { HandCoins, Plus, MapPin, TrendingUp, CheckCircle2 } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { useChatbotUIAction } from "@/hooks/useChatbotUIAction";
 
 const COUNTIES = [
   "Nairobi", "Mombasa", "Kisumu", "Nakuru", "Kiambu", "Machakos",
@@ -22,6 +23,8 @@ const RecoveryCommitmentPanel = () => {
   const { user } = useAuth();
   const qc = useQueryClient();
   const [showForm, setShowForm] = useState(false);
+
+  useChatbotUIAction(["add-commitment"], useCallback(() => setShowForm(true), []));
   const [form, setForm] = useState({ target_kg: "", funded_amount: "", target_county: "All Counties", notes: "" });
 
   const { data: commitments, isLoading } = useQuery({

@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useTrash } from "@/hooks/useTrash";
@@ -18,6 +18,7 @@ import {
 } from "lucide-react";
 import { format } from "date-fns";
 import { useTranslation } from "react-i18next";
+import { useChatbotUIAction } from "@/hooks/useChatbotUIAction";
 
 interface Customer {
   id: string;
@@ -51,6 +52,8 @@ const CRMPanel = ({ role }: CRMPanelProps) => {
   const [categoryFilter, setCategoryFilter] = useState("all");
   const [sortBy, setSortBy] = useState<"name" | "revenue" | "recent">("name");
   const [dialogOpen, setDialogOpen] = useState(false);
+
+  useChatbotUIAction(["add-customer"], useCallback(() => setDialogOpen(true), []));
   const [editing, setEditing] = useState<Customer | null>(null);
   const [viewCustomer, setViewCustomer] = useState<Customer | null>(null);
   const [transactions, setTransactions] = useState<any[]>([]);

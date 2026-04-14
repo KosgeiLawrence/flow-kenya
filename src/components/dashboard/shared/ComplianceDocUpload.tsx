@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
@@ -15,6 +15,7 @@ import { toast } from "sonner";
 import { format } from "date-fns";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { useTranslation } from "react-i18next";
+import { useChatbotUIAction } from "@/hooks/useChatbotUIAction";
 
 interface ComplianceDocUploadProps {
   documentTypes: { value: string; label: string }[];
@@ -29,6 +30,8 @@ const ComplianceDocUpload = ({ documentTypes, title = "Compliance Documents" }: 
   const [selectedType, setSelectedType] = useState("");
   const [notes, setNotes] = useState("");
   const [dialogOpen, setDialogOpen] = useState(false);
+
+  useChatbotUIAction(["add-compliance-doc", "upload-document"], useCallback(() => setDialogOpen(true), []));
 
   const { data: documents, isLoading } = useQuery({
     queryKey: ["compliance_documents", user?.id],

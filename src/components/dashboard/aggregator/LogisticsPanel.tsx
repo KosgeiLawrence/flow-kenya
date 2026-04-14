@@ -21,6 +21,8 @@ const LogisticsPanel = () => {
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState({ location_name: "", scheduled_at: "", notes: "" });
 
+  useChatbotUIAction(["add-pickup-schedule"], useCallback(() => setOpen(true), []));
+
   const { data: schedules } = useQuery({
     queryKey: ["aggregator_logistics", user?.id],
     queryFn: async () => {

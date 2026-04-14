@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
@@ -18,6 +18,7 @@ import { format } from "date-fns";
 import jsPDF from "jspdf";
 import { addCleanHeader, addDocMeta, drawTableHeader, drawTableRow, drawTotalLine, finalizeCleanPdf, loadImageAsBase64, buildPdfOrgInfo } from "@/lib/pdfBranding";
 import { useTranslation } from "react-i18next";
+import { useChatbotUIAction } from "@/hooks/useChatbotUIAction";
 
 const statusMap: Record<string, { icon: React.ElementType; variant: "default" | "secondary" | "destructive"; label: string }> = {
   pending: { icon: Clock, variant: "secondary", label: "Pending" },
@@ -32,6 +33,8 @@ const OrdersPanel = () => {
   const { orgInfo } = useOrgInfo();
   const queryClient = useQueryClient();
   const [dialogOpen, setDialogOpen] = useState(false);
+
+  useChatbotUIAction(["add-order"], useCallback(() => setDialogOpen(true), []));
   const [form, setForm] = useState({ supplier_name: "", material_type: "", quantity: "", unit: "kg", unit_price: "", delivery_date: "", notes: "" });
   const [supplierMode, setSupplierMode] = useState<"existing" | "manual">("existing");
 

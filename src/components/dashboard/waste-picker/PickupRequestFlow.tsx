@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import { getDisplayName } from "@/lib/displayUtils";
 import { useAuth } from "@/hooks/useAuth";
@@ -17,6 +17,7 @@ import {
   PDF_COLORS, addCleanHeader, addDocMeta, drawTableHeader,
   drawTableRow, drawTotalLine, finalizeCleanPdf,
 } from "@/lib/pdfBranding";
+import { useChatbotUIAction } from "@/hooks/useChatbotUIAction";
 
 interface Props {
   onBack: () => void;
@@ -27,6 +28,8 @@ const PickupRequestFlow = ({ onBack }: Props) => {
   const { user, profile } = useAuth();
   const queryClient = useQueryClient();
   const [showForm, setShowForm] = useState(false);
+
+  useChatbotUIAction(["add-pickup-schedule"], useCallback(() => setShowForm(true), []));
   const [targetRole, setTargetRole] = useState<"aggregator" | "recycler">("aggregator");
   const [targetUserId, setTargetUserId] = useState("");
   const [materialType, setMaterialType] = useState("");
