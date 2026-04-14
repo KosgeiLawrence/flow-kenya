@@ -241,6 +241,43 @@ const AdminBillingPanel = () => {
     doc.save(`${typeLabel}-${inv.invoice_number}.pdf`);
   };
 
+  const sendDocumentEmail = async (inv: any) => {
+    if (!inv.client_email) {
+      toast.error("No email address for this client");
+      return;
+    }
+    try {
+      const lineItems = (inv.items || []) as LineItem[];
+      const { error } = await supabase.functions.invoke("send-transactional-email", {
+        body: {
+          templateName: "billing-document",
+          recipientEmail: inv.client_email,
+          idempotencyKey: `billing-${inv.id}-${inv.document_type}`,
+          templateData: {
+            clientName: inv.client_name,
+            documentType: inv.document_type,
+            invoiceNumber: inv.invoice_number,
+            items: lineItems,
+            subtotal: inv.subtotal,
+            vatPercent: inv.vat_percent,
+            vatAmount: inv.vat_amount,
+            totalAmount: inv.total_amount,
+            currency: inv.currency || "KES",
+            notes: inv.notes,
+            dueDate: inv.due_date ? format(new Date(inv.due_date), "dd MMM yyyy") : undefined,
+            paymentReference: inv.payment_reference,
+            paidAt: inv.paid_at ? format(new Date(inv.paid_at), "dd MMM yyyy HH:mm") : undefined,
+            createdAt: format(new Date(inv.created_at), "dd MMM yyyy"),
+          },
+        },
+      });
+      if (error) throw error;
+      toast.success(`${inv.document_type.charAt(0).toUpperCase() + inv.document_type.slice(1)} emailed to ${inv.client_email}`);
+    } catch (e: any) {
+      toast.error(`Failed to send email: ${e.message}`);
+    }
+  };
+
   const typeFilter = (type: string) => invoices.filter((i: any) => i.document_type === type);
 
   const renderTable = (list: any[]) => (
