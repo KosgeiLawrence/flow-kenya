@@ -32,6 +32,7 @@ import CleanupRegister from "./pages/CleanupRegister";
 import PublicForm from "./pages/PublicForm";
 import JoinTeam from "./pages/JoinTeam";
 import PublicProfile from "./pages/PublicProfile";
+import Unsubscribe from "./pages/Unsubscribe";
 import PWAInstallPrompt from "./components/PWAInstallPrompt";
 import BiometricLockScreen from "./components/auth/BiometricLockScreen";
 import BiometricSetupPrompt from "./components/auth/BiometricSetupPrompt";
