@@ -14,6 +14,84 @@ export type Database = {
   }
   public: {
     Tables: {
+      admin_invoices: {
+        Row: {
+          client_email: string | null
+          client_name: string
+          client_organization: string | null
+          client_phone: string | null
+          created_at: string
+          created_by: string
+          currency: string
+          document_type: string
+          due_date: string | null
+          id: string
+          invoice_number: string
+          items: Json
+          notes: string | null
+          paid_at: string | null
+          payment_reference: string | null
+          related_payment_id: string | null
+          related_subscription_id: string | null
+          status: string
+          subtotal: number
+          total_amount: number
+          updated_at: string
+          vat_amount: number
+          vat_percent: number
+        }
+        Insert: {
+          client_email?: string | null
+          client_name: string
+          client_organization?: string | null
+          client_phone?: string | null
+          created_at?: string
+          created_by: string
+          currency?: string
+          document_type?: string
+          due_date?: string | null
+          id?: string
+          invoice_number?: string
+          items?: Json
+          notes?: string | null
+          paid_at?: string | null
+          payment_reference?: string | null
+          related_payment_id?: string | null
+          related_subscription_id?: string | null
+          status?: string
+          subtotal?: number
+          total_amount?: number
+          updated_at?: string
+          vat_amount?: number
+          vat_percent?: number
+        }
+        Update: {
+          client_email?: string | null
+          client_name?: string
+          client_organization?: string | null
+          client_phone?: string | null
+          created_at?: string
+          created_by?: string
+          currency?: string
+          document_type?: string
+          due_date?: string | null
+          id?: string
+          invoice_number?: string
+          items?: Json
+          notes?: string | null
+          paid_at?: string | null
+          payment_reference?: string | null
+          related_payment_id?: string | null
+          related_subscription_id?: string | null
+          status?: string
+          subtotal?: number
+          total_amount?: number
+          updated_at?: string
+          vat_amount?: number
+          vat_percent?: number
+        }
+        Relationships: []
+      }
       aggregator_purchase_orders: {
         Row: {
           created_at: string
