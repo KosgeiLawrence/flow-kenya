@@ -201,7 +201,7 @@ const AggregatorDashboard = () => {
             <Menu className="w-5 h-5" />
           </Button>
           <h2 className="text-lg font-display font-semibold text-foreground">
-            {navItems.find(n => n.id === activePanel)?.label}
+            {translatedNavItems.find(n => n.id === activePanel)?.label}
           </h2>
         </header>
         <main className="flex-1 p-4 md:p-6 overflow-y-auto">
