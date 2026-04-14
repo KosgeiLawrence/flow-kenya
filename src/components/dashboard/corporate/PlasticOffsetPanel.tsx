@@ -50,7 +50,7 @@ const PlasticOffsetPanel = () => {
           <div className="flex items-center gap-3 mb-4">
             <Recycle className="w-8 h-8 text-primary" />
             <div>
-              <p className="text-lg font-semibold text-foreground">Plastic Offset Progress</p>
+              <p className="text-lg font-semibold text-foreground">{t("corporatePanels.plasticOffset")}</p>
               <p className="text-xs text-muted-foreground">{totalPlasticKg.toFixed(0)} / {annualTarget} kg annual target</p>
             </div>
           </div>
@@ -64,14 +64,14 @@ const PlasticOffsetPanel = () => {
           <CardContent className="p-4 text-center">
             <Target className="w-7 h-7 text-primary mx-auto mb-2" />
             <p className="text-xl font-bold text-foreground">{totalPlasticKg.toFixed(0)} kg</p>
-            <p className="text-xs text-muted-foreground">Total Offset</p>
+            <p className="text-xs text-muted-foreground">{t("corporatePanels.totalOffset", "Total Offset")}</p>
           </CardContent>
         </Card>
         <Card className="shadow-soft">
           <CardContent className="p-4 text-center">
             <TrendingUp className="w-7 h-7 text-accent mx-auto mb-2" />
             <p className="text-xl font-bold text-foreground">{avgMonthly.toFixed(0)} kg</p>
-            <p className="text-xs text-muted-foreground">Monthly Avg</p>
+            <p className="text-xs text-muted-foreground">{t("corporatePanels.monthlyAvg", "Monthly Avg")}</p>
           </CardContent>
         </Card>
         <Card className="shadow-soft">
@@ -84,7 +84,7 @@ const PlasticOffsetPanel = () => {
       </div>
 
       <Card className="shadow-soft">
-        <CardHeader><CardTitle className="text-lg">Monthly Plastic Offset</CardTitle></CardHeader>
+        <CardHeader><CardTitle className="text-lg">{t("corporatePanels.monthlyPlasticOffset", "Monthly Plastic Offset")}</CardTitle></CardHeader>
         <CardContent>
           <ResponsiveContainer width="100%" height={250}>
             <BarChart data={monthlyData}>
