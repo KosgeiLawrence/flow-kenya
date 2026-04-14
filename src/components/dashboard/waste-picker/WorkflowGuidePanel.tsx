@@ -149,9 +149,9 @@ const workflows: Workflow[] = [
 const FlowArrow = ({ vertical = true }: { vertical?: boolean }) => (
   <div className={cn("flex items-center justify-center", vertical ? "py-1" : "px-2")}>
     {vertical ? (
-      <ArrowDown className="w-4 h-4 text-muted-foreground/50" />
+      <ArrowDown className="w-4 h-4 text-muted-foreground" />
     ) : (
-      <ArrowRight className="w-4 h-4 text-muted-foreground/50" />
+      <ArrowRight className="w-4 h-4 text-muted-foreground" />
     )}
   </div>
 );

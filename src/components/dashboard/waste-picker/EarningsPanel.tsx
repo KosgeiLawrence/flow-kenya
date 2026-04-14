@@ -170,7 +170,7 @@ const EarningsPanel = () => {
           {paymentsLoading ? (
             <div className="flex justify-center py-8"><Loader2 className="w-6 h-6 animate-spin text-muted-foreground" /></div>
           ) : !payments?.length ? (
-            <div className="text-center py-8 text-muted-foreground"><DollarSign className="w-10 h-10 mx-auto mb-2 opacity-40" /><p className="text-sm">No payments yet.</p></div>
+            <div className="text-center py-8 text-muted-foreground"><DollarSign className="w-10 h-10 mx-auto mb-2 opacity-60" /><p className="text-sm">No payments yet.</p></div>
           ) : (
             <div className="space-y-3">
               {payments.map(p => (

@@ -443,7 +443,7 @@ const ProfileSettingsPanel = ({ role }: ProfileSettingsPanelProps) => {
                       {organization?.logo_url ? (
                         <img src={organization.logo_url} alt="Org logo" className="w-full h-full object-contain p-1" />
                       ) : (
-                        <Building2 className="w-8 h-8 text-muted-foreground/40" />
+                        <Building2 className="w-8 h-8 text-muted-foreground" />
                       )}
                     </div>
                     <div className="flex flex-col gap-2">
