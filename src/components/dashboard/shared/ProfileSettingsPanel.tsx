@@ -62,6 +62,7 @@ const ProfileSettingsPanel = ({ role }: ProfileSettingsPanelProps) => {
   const [uploading, setUploading] = useState(false);
   const [uploadingLogo, setUploadingLogo] = useState(false);
   const logoInputRef = useRef<HTMLInputElement>(null);
+  const [orgName, setOrgName] = useState("");
   const [activeSection, setActiveSection] = useState("basic");
   const [passwordData, setPasswordData] = useState({ current: "", new: "", confirm: "" });
 
@@ -125,6 +126,12 @@ const ProfileSettingsPanel = ({ role }: ProfileSettingsPanelProps) => {
       });
     }
   }, [fullProfile]);
+
+  useEffect(() => {
+    if (organization) {
+      setOrgName(organization.name || "");
+    }
+  }, [organization]);
 
   // Calculate profile completeness
   const calculateCompleteness = useCallback(() => {
@@ -420,8 +427,7 @@ const ProfileSettingsPanel = ({ role }: ProfileSettingsPanelProps) => {
               {organization && (
                 <div className="sm:col-span-2 space-y-2">
                   <Label>Organization Name</Label>
-                  <Input value={organization.name} disabled className="opacity-60" />
-                  <p className="text-xs text-muted-foreground">Contact admin to change organization name</p>
+                  <Input value={orgName} onChange={e => setOrgName(e.target.value)} placeholder="Organization name" />
                 </div>
               )}
 
@@ -527,7 +533,17 @@ const ProfileSettingsPanel = ({ role }: ProfileSettingsPanelProps) => {
 
             <Separator />
             <div className="flex justify-end">
-              <Button onClick={() => handleSaveSection(["company_registration", "kra_pin", "industry_sector", "physical_address", "county", "sub_county", "website", "social_media_links"])} disabled={updateProfile.isPending} className="gap-2">
+              <Button onClick={async () => {
+                // Update org name if changed
+                if (fullProfile?.organization_id && orgName && orgName !== organization?.name) {
+                  const { error } = await supabase.from("organizations").update({ name: orgName }).eq("id", fullProfile.organization_id);
+                  if (error) { toast.error("Failed to update organization name"); return; }
+                  queryClient.invalidateQueries({ queryKey: ["organization"] });
+                  queryClient.invalidateQueries({ queryKey: ["org_info"] });
+                  await refreshProfile();
+                }
+                handleSaveSection(["company_registration", "kra_pin", "industry_sector", "physical_address", "county", "sub_county", "website", "social_media_links"]);
+              }} disabled={updateProfile.isPending} className="gap-2">
                 <Save className="w-4 h-4" /> Save Organization Info
               </Button>
             </div>
