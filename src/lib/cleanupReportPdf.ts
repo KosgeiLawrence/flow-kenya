@@ -6,6 +6,8 @@ import {
   addBrandedFooter,
   addSectionTitle,
   addDocMeta,
+  drawTableHeader,
+  drawTableRow,
 } from "./pdfBranding";
 
 interface PartnerOrg {
@@ -56,70 +58,49 @@ const LOCATION_LABELS: Record<string, string> = {
   market: "Market", industrial: "Industrial Zone", other: "Other",
 };
 
+const M = 20; // page margin
+
 // ── Drawing helpers ──
 
-const drawRoundedRect = (
-  doc: jsPDF, x: number, y: number, w: number, h: number,
-  r: number, fill: [number, number, number], stroke?: [number, number, number]
-) => {
-  if (stroke) { doc.setDrawColor(...stroke); doc.setLineWidth(0.3); }
-  doc.setFillColor(...fill);
-  doc.roundedRect(x, y, w, h, r, r, stroke ? "FD" : "F");
-};
-
-const drawHorizBar = (
-  doc: jsPDF, x: number, y: number, maxW: number, h: number,
-  pct: number, barColor: [number, number, number], bgColor: [number, number, number]
-) => {
-  doc.setFillColor(...bgColor);
-  doc.roundedRect(x, y, maxW, h, h / 2, h / 2, "F");
-  if (pct > 0) {
-    doc.setFillColor(...barColor);
-    doc.roundedRect(x, y, Math.max(maxW * pct, h), h, h / 2, h / 2, "F");
-  }
-};
-
-const drawStatCard = (
+const drawMetricCard = (
   doc: jsPDF, x: number, y: number, w: number,
-  value: string, label: string, accent: [number, number, number]
+  value: string, label: string
 ) => {
-  drawRoundedRect(doc, x, y, w, 28, 3, [250, 250, 248]);
-  // Accent top strip
-  doc.setFillColor(...accent);
-  doc.roundedRect(x, y, w, 4, 3, 3, "F");
-  doc.rect(x, y + 2, w, 2, "F"); // fill bottom corners
+  // Light card background
+  doc.setFillColor(...PDF_COLORS.offWhite);
+  doc.roundedRect(x, y, w, 24, 3, 3, "F");
+
+  // Thin top accent
+  doc.setFillColor(...PDF_COLORS.forest);
+  doc.rect(x + 4, y, w - 8, 1.5, "F");
+
   // Value
-  doc.setFontSize(16);
+  doc.setFontSize(15);
   doc.setFont("helvetica", "bold");
-  doc.setTextColor(...accent);
-  doc.text(value, x + w / 2, y + 16, { align: "center" });
+  doc.setTextColor(...PDF_COLORS.black);
+  doc.text(value, x + w / 2, y + 12, { align: "center" });
+
   // Label
   doc.setFontSize(7);
   doc.setFont("helvetica", "normal");
   doc.setTextColor(...PDF_COLORS.mutedText);
-  doc.text(label, x + w / 2, y + 23, { align: "center" });
+  doc.text(label, x + w / 2, y + 19, { align: "center" });
 };
 
-const drawWasteBarRow = (
-  doc: jsPDF, y: number, label: string, value: number,
-  maxVal: number, color: [number, number, number]
+const drawProgressBar = (
+  doc: jsPDF, x: number, y: number, maxW: number, h: number,
+  pct: number
 ) => {
-  doc.setFontSize(8);
-  doc.setFont("helvetica", "normal");
-  doc.setTextColor(...PDF_COLORS.darkText);
-  doc.text(label, 20, y + 3);
-  const barX = 65;
-  const barW = 95;
-  const pct = maxVal > 0 ? value / maxVal : 0;
-  drawHorizBar(doc, barX, y - 1, barW, 5, pct, color, [235, 235, 235]);
-  doc.setFontSize(8);
-  doc.setFont("helvetica", "bold");
-  doc.setTextColor(...color);
-  doc.text(`${value} kg`, barX + barW + 3, y + 3);
+  doc.setFillColor(...PDF_COLORS.lightGray);
+  doc.roundedRect(x, y, maxW, h, h / 2, h / 2, "F");
+  if (pct > 0) {
+    doc.setFillColor(...PDF_COLORS.forest);
+    doc.roundedRect(x, y, Math.max(maxW * pct, h), h, h / 2, h / 2, "F");
+  }
 };
 
 const ensurePage = (doc: jsPDF, y: number, needed: number): number => {
-  if (y + needed > 268) { doc.addPage(); return 20; }
+  if (y + needed > 268) { doc.addPage(); return 24; }
   return y;
 };
 
@@ -127,90 +108,65 @@ const ensurePage = (doc: jsPDF, y: number, needed: number): number => {
 
 export const generateCleanupReportPDF = async (cleanup: CleanupData) => {
   const doc = new jsPDF();
-  const pageWidth = doc.internal.pageSize.getWidth();
+  const pw = doc.internal.pageSize.getWidth();
 
-  // ── Branded header ──
+  // ── Header ──
   let y = await addBrandedHeader(
     doc,
     "Cleanup Exercise Report",
     `${cleanup.title} — ${format(new Date(cleanup.cleanup_date), "PPP")}`
   );
 
-  // ── Meta info panel ──
-  drawRoundedRect(doc, 15, y, pageWidth - 30, 30, 3, [245, 248, 245], PDF_COLORS.forest);
-  doc.setFontSize(8);
-  doc.setFont("helvetica", "normal");
-  const metaCol1 = [
-    { l: "Reference", v: cleanup.id.slice(0, 8).toUpperCase() },
-    { l: "Date", v: format(new Date(cleanup.cleanup_date), "PPP") },
-    { l: "Time", v: `${cleanup.start_time} – ${cleanup.end_time}` },
-  ];
-  const metaCol2 = [
-    { l: "Location", v: `${cleanup.location_name}` },
-    { l: "Type", v: LOCATION_LABELS[cleanup.location_type] || cleanup.location_type },
-    { l: "Organizer", v: cleanup.lead_organizer },
-  ];
-  let my = y + 8;
-  metaCol1.forEach((m) => {
-    doc.setTextColor(...PDF_COLORS.mutedText);
-    doc.text(`${m.l}:`, 20, my);
-    doc.setTextColor(...PDF_COLORS.forestDeep);
-    doc.setFont("helvetica", "bold");
-    doc.text(m.v, 48, my);
-    doc.setFont("helvetica", "normal");
-    my += 8;
-  });
-  my = y + 8;
-  metaCol2.forEach((m) => {
-    doc.setTextColor(...PDF_COLORS.mutedText);
-    doc.text(`${m.l}:`, pageWidth / 2 + 5, my);
-    doc.setTextColor(...PDF_COLORS.forestDeep);
-    doc.setFont("helvetica", "bold");
-    doc.text(m.v, pageWidth / 2 + 33, my);
-    doc.setFont("helvetica", "normal");
-    my += 8;
-  });
-  if (cleanup.location_lat && cleanup.location_lng) {
-    doc.setFontSize(6.5);
-    doc.setTextColor(...PDF_COLORS.mutedText);
-    doc.text(`GPS: ${cleanup.location_lat.toFixed(5)}, ${cleanup.location_lng.toFixed(5)}`, pageWidth - 20, y + 28, { align: "right" });
-  }
-  y += 36;
+  // ── Metadata section ──
+  y = addDocMeta(doc, [
+    { label: "Reference", value: cleanup.id.slice(0, 8).toUpperCase() },
+    { label: "Date", value: format(new Date(cleanup.cleanup_date), "PPP") },
+    { label: "Time", value: `${cleanup.start_time} – ${cleanup.end_time}` },
+    { label: "Location", value: cleanup.location_name },
+    { label: "Type", value: LOCATION_LABELS[cleanup.location_type] || cleanup.location_type },
+    { label: "Organizer", value: cleanup.lead_organizer },
+    ...(cleanup.location_lat && cleanup.location_lng
+      ? [{ label: "GPS", value: `${cleanup.location_lat.toFixed(5)}, ${cleanup.location_lng.toFixed(5)}` }]
+      : []),
+  ], y);
 
   // ── Key Metrics Cards ──
   y = ensurePage(doc, y, 38);
   y = addSectionTitle(doc, "Key Metrics", y);
-  const cardW = (pageWidth - 30 - 12) / 4; // 4 cards, 4px gap
+  const cardW = (pw - M * 2 - 12) / 4;
   const metrics = [
-    { v: `${cleanup.total_waste_kg}`, l: "Total Waste (kg)", c: PDF_COLORS.forest },
-    { v: `${cleanup.num_bags}`, l: "Bags Collected", c: PDF_COLORS.gold },
-    { v: `${cleanup.num_volunteers + cleanup.num_waste_pickers}`, l: "Total Participants", c: [59, 130, 186] as [number, number, number] },
-    { v: `${cleanup.num_partner_orgs}`, l: "Partner Orgs", c: [168, 85, 156] as [number, number, number] },
+    { v: `${cleanup.total_waste_kg}`, l: "Total Waste (kg)" },
+    { v: `${cleanup.num_bags}`, l: "Bags Collected" },
+    { v: `${cleanup.num_volunteers + cleanup.num_waste_pickers}`, l: "Total Participants" },
+    { v: `${cleanup.num_partner_orgs}`, l: "Partner Orgs" },
   ];
   metrics.forEach((m, i) => {
-    drawStatCard(doc, 15 + i * (cardW + 4), y, cardW, m.v, m.l, m.c);
+    drawMetricCard(doc, M + i * (cardW + 4), y, cardW, m.v, m.l);
   });
-  y += 36;
+  y += 32;
 
-  // ── Participation breakdown ──
-  y = ensurePage(doc, y, 30);
+  // ── Participation ──
+  y = ensurePage(doc, y, 40);
   y = addSectionTitle(doc, "Participation", y);
   const partItems = [
-    { l: "Volunteers", v: cleanup.num_volunteers, c: [59, 130, 186] as [number, number, number] },
-    { l: "Waste Pickers", v: cleanup.num_waste_pickers, c: PDF_COLORS.forest },
-    { l: "Partner Organizations", v: cleanup.num_partner_orgs, c: PDF_COLORS.gold },
+    { l: "Volunteers", v: cleanup.num_volunteers },
+    { l: "Waste Pickers", v: cleanup.num_waste_pickers },
+    { l: "Partner Organizations", v: cleanup.num_partner_orgs },
   ];
-  const totalPart = Math.max(cleanup.num_volunteers + cleanup.num_waste_pickers + cleanup.num_partner_orgs, 1);
+  const maxPart = Math.max(...partItems.map(p => p.v), 1);
   partItems.forEach((item) => {
-    const pct = item.v / totalPart;
-    drawHorizBar(doc, 60, y - 2, 90, 5, pct, item.c, [235, 235, 235]);
     doc.setFontSize(8);
     doc.setFont("helvetica", "normal");
-    doc.setTextColor(...PDF_COLORS.darkText);
-    doc.text(item.l, 20, y + 2);
+    doc.setTextColor(...PDF_COLORS.bodyText);
+    doc.text(item.l, M, y + 2);
+
+    const pct = item.v / maxPart;
+    drawProgressBar(doc, M + 50, y - 1, 90, 4, pct);
+
+    doc.setFontSize(8);
     doc.setFont("helvetica", "bold");
-    doc.setTextColor(...item.c);
-    doc.text(`${item.v}`, 155, y + 2);
+    doc.setTextColor(...PDF_COLORS.black);
+    doc.text(`${item.v}`, M + 145, y + 2);
     y += 10;
   });
   y += 4;
@@ -218,115 +174,103 @@ export const generateCleanupReportPDF = async (cleanup: CleanupData) => {
   // ── Partner Organizations ──
   const partnerOrgs = cleanup.partner_organizations || [];
   if (partnerOrgs.length > 0) {
-    y = ensurePage(doc, y, 20 + partnerOrgs.length * 8);
+    y = ensurePage(doc, y, 16 + partnerOrgs.length * 7);
     y = addSectionTitle(doc, "Partner Organizations", y);
-    const orgTypeLabels: Record<string, string> = {
-      ngo: "NGO", private_company: "Private Company", government: "Government",
-      community_group: "Community Group", cooperative: "Cooperative",
-    };
     partnerOrgs.forEach((org) => {
-      y = ensurePage(doc, y, 8);
-      doc.setFillColor(...PDF_COLORS.forest);
-      doc.circle(22, y - 1, 1.2, "F");
-      doc.setFontSize(8.5);
-      doc.setFont("helvetica", "bold");
-      doc.setTextColor(...PDF_COLORS.darkText);
-      doc.text(org.name, 26, y);
-      y += 8;
+      y = ensurePage(doc, y, 7);
+      doc.setFontSize(8);
+      doc.setFont("helvetica", "normal");
+      doc.setTextColor(...PDF_COLORS.bodyText);
+      doc.text(`·  ${org.name}`, M + 2, y);
+      y += 7;
     });
-    y += 2;
+    y += 4;
   }
 
-  y = ensurePage(doc, y, 40);
+  // ── Waste Collection Summary ──
+  y = ensurePage(doc, y, 36);
   y = addSectionTitle(doc, "Waste Collection Summary", y);
 
-  // Summary row with colored badges
   const summaryItems = [
-    { l: "Plastic", v: cleanup.plastic_waste_kg, c: [0, 150, 136] as [number, number, number] },
-    { l: "Recyclable", v: cleanup.recyclable_waste_kg, c: PDF_COLORS.forest },
-    { l: "Non-Recyclable", v: cleanup.non_recyclable_waste_kg, c: [183, 28, 28] as [number, number, number] },
+    { l: "Plastic Waste", v: `${cleanup.plastic_waste_kg} kg` },
+    { l: "Recyclable Waste", v: `${cleanup.recyclable_waste_kg} kg` },
+    { l: "Non-Recyclable Waste", v: `${cleanup.non_recyclable_waste_kg} kg` },
   ];
-  const badgeW = 50;
+  const sumCardW = (pw - M * 2 - 8) / 3;
   summaryItems.forEach((s, i) => {
-    const bx = 15 + i * (badgeW + 8);
-    drawRoundedRect(doc, bx, y, badgeW, 16, 3, s.c);
-    doc.setFontSize(10);
+    const bx = M + i * (sumCardW + 4);
+    doc.setFillColor(...PDF_COLORS.offWhite);
+    doc.roundedRect(bx, y, sumCardW, 18, 3, 3, "F");
+    doc.setFontSize(11);
     doc.setFont("helvetica", "bold");
-    doc.setTextColor(...PDF_COLORS.white);
-    doc.text(`${s.v} kg`, bx + badgeW / 2, y + 7, { align: "center" });
-    doc.setFontSize(6.5);
+    doc.setTextColor(...PDF_COLORS.black);
+    doc.text(s.v, bx + sumCardW / 2, y + 8, { align: "center" });
+    doc.setFontSize(7);
     doc.setFont("helvetica", "normal");
-    doc.text(s.l, bx + badgeW / 2, y + 13, { align: "center" });
+    doc.setTextColor(...PDF_COLORS.mutedText);
+    doc.text(s.l, bx + sumCardW / 2, y + 14, { align: "center" });
   });
-  y += 24;
+  y += 26;
 
-  // ── Detailed Waste Breakdown (bar chart) ──
-  y = ensurePage(doc, y, 70);
+  // ── Material Breakdown Table ──
+  y = ensurePage(doc, y, 60);
   y = addSectionTitle(doc, "Waste Breakdown by Material", y);
 
   const wasteItems = [
-    { l: "PET Bottles", v: cleanup.pet_bottles_kg, c: [0, 150, 136] as [number, number, number] },
-    { l: "HDPE", v: cleanup.hdpe_kg, c: [56, 142, 60] as [number, number, number] },
-    { l: "Sachets", v: cleanup.sachets_kg, c: [255, 152, 0] as [number, number, number] },
-    { l: "Fishing Nets", v: cleanup.fishing_nets_kg, c: [33, 150, 243] as [number, number, number] },
-    { l: "Glass", v: cleanup.glass_kg, c: [121, 85, 72] as [number, number, number] },
-    { l: "Metal", v: cleanup.metal_kg, c: [96, 125, 139] as [number, number, number] },
-    { l: "Other Materials", v: cleanup.other_materials_kg, c: [158, 158, 158] as [number, number, number] },
-  ];
-  const maxWaste = Math.max(...wasteItems.map((w) => w.v), 1);
-  wasteItems.forEach((w) => {
-    y = ensurePage(doc, y, 12);
-    drawWasteBarRow(doc, y, w.l, w.v, maxWaste, w.c);
-    y += 10;
-  });
-  y += 4;
+    { l: "PET Bottles", v: cleanup.pet_bottles_kg },
+    { l: "HDPE", v: cleanup.hdpe_kg },
+    { l: "Sachets", v: cleanup.sachets_kg },
+    { l: "Fishing Nets", v: cleanup.fishing_nets_kg },
+    { l: "Glass", v: cleanup.glass_kg },
+    { l: "Metal", v: cleanup.metal_kg },
+    { l: "Other Materials", v: cleanup.other_materials_kg },
+  ].filter(w => w.v > 0);
 
-  // ── Donut-style waste composition (circle segments) ──
-  y = ensurePage(doc, y, 50);
-  const totalMaterialKg = wasteItems.reduce((s, w) => s + w.v, 0) || 1;
-  // Draw a simple pie legend alongside percentages
-  doc.setFontSize(8);
-  doc.setFont("helvetica", "bold");
-  doc.setTextColor(...PDF_COLORS.forestDeep);
-  doc.text("Composition (%)", 20, y);
-  y += 6;
-  wasteItems.filter(w => w.v > 0).forEach((w) => {
-    const pct = ((w.v / totalMaterialKg) * 100).toFixed(1);
-    // Color swatch
-    doc.setFillColor(...w.c);
-    doc.roundedRect(20, y - 3, 4, 4, 1, 1, "F");
-    doc.setFontSize(7.5);
-    doc.setFont("helvetica", "normal");
-    doc.setTextColor(...PDF_COLORS.darkText);
-    doc.text(`${w.l}: ${pct}%`, 27, y);
-    y += 6;
-  });
-  y += 4;
+  if (wasteItems.length) {
+    const totalMaterialKg = wasteItems.reduce((s, w) => s + w.v, 0) || 1;
+    y = drawTableHeader(doc, [
+      { label: "Material", x: M + 2 },
+      { label: "Weight (kg)", x: pw / 2 },
+      { label: "Share (%)", x: pw - M - 20 },
+    ], y, pw - M * 2);
 
-  // ── Logistics & Operations ──
-  y = ensurePage(doc, y, 36);
+    wasteItems.forEach((w, i) => {
+      drawTableRow(doc, y, i, pw - M * 2);
+      const pct = ((w.v / totalMaterialKg) * 100).toFixed(1);
+      doc.setFontSize(8);
+      doc.setFont("helvetica", "normal");
+      doc.setTextColor(...PDF_COLORS.bodyText);
+      doc.text(w.l, M + 2, y);
+      doc.text(`${w.v}`, pw / 2, y);
+      doc.text(`${pct}%`, pw - M - 20, y);
+      y += 7;
+    });
+    y += 8;
+  }
+
+  // ── Logistics ──
+  y = ensurePage(doc, y, 30);
   y = addSectionTitle(doc, "Logistics & Operations", y);
-  drawRoundedRect(doc, 15, y, pageWidth - 30, 24, 3, [248, 248, 248]);
+
   const logItems = [
     { l: "Waste Destination", v: cleanup.waste_destination || "N/A" },
     { l: "Transport Method", v: cleanup.transport_method || "N/A" },
-    { l: "Waste Sorted", v: cleanup.waste_sorted ? "✓ Yes" : "✗ No" },
+    { l: "Waste Sorted", v: cleanup.waste_sorted ? "Yes" : "No" },
   ];
-  let lx = 20;
   logItems.forEach((item) => {
-    doc.setFontSize(7);
-    doc.setTextColor(...PDF_COLORS.mutedText);
-    doc.text(item.l, lx, y + 8);
-    doc.setFontSize(9);
-    doc.setFont("helvetica", "bold");
-    doc.setTextColor(...PDF_COLORS.forestDeep);
-    doc.text(item.v, lx, y + 15);
+    doc.setFontSize(8);
     doc.setFont("helvetica", "normal");
-    lx += 55;
+    doc.setTextColor(...PDF_COLORS.mutedText);
+    doc.text(item.l, M, y);
+    doc.setTextColor(...PDF_COLORS.darkText);
+    doc.setFont("helvetica", "bold");
+    doc.text(item.v, M + 45, y);
+    doc.setFont("helvetica", "normal");
+    y += 7;
   });
-  y += 32;
+  y += 6;
 
-  // ── Observations & Narrative ──
+  // ── Observations ──
   const narratives = [
     { title: "Observations", text: cleanup.observations },
     { title: "Environmental Issues", text: cleanup.environmental_issues },
@@ -337,55 +281,52 @@ export const generateCleanupReportPDF = async (cleanup: CleanupData) => {
     y = ensurePage(doc, y, 20);
     y = addSectionTitle(doc, "Observations & Recommendations", y);
     narratives.forEach((n) => {
-      y = ensurePage(doc, y, 20);
+      y = ensurePage(doc, y, 18);
       doc.setFontSize(9);
       doc.setFont("helvetica", "bold");
-      doc.setTextColor(...PDF_COLORS.forest);
-      doc.text(n.title, 20, y);
+      doc.setTextColor(...PDF_COLORS.darkText);
+      doc.text(n.title, M, y);
       y += 5;
       doc.setFont("helvetica", "normal");
       doc.setFontSize(8);
-      doc.setTextColor(...PDF_COLORS.darkText);
-      const lines = doc.splitTextToSize(n.text!, 165);
+      doc.setTextColor(...PDF_COLORS.bodyText);
+      const lines = doc.splitTextToSize(n.text!, pw - M * 2 - 10);
       lines.forEach((line: string) => {
-        y = ensurePage(doc, y, 6);
-        doc.text(line, 20, y);
+        y = ensurePage(doc, y, 5);
+        doc.text(line, M + 2, y);
         y += 5;
       });
       y += 4;
     });
   }
 
-  // ── Environmental Impact Estimates ──
-  y = ensurePage(doc, y, 44);
+  // ── Environmental Impact ──
+  y = ensurePage(doc, y, 40);
   y = addSectionTitle(doc, "Estimated Environmental Impact", y);
   const co2Saved = (cleanup.recyclable_waste_kg * 1.2).toFixed(1);
   const treesEquiv = Math.round(cleanup.recyclable_waste_kg * 0.06);
   const oceanPlastic = (cleanup.plastic_waste_kg * 0.8).toFixed(1);
   const impactCards = [
-    { v: `${co2Saved} kg`, l: "CO₂ Emissions Avoided", c: PDF_COLORS.forest },
-    { v: `${treesEquiv}`, l: "Trees Equivalent", c: [56, 142, 60] as [number, number, number] },
-    { v: `${oceanPlastic} kg`, l: "Ocean Plastic Diverted", c: [33, 150, 243] as [number, number, number] },
+    { v: `${co2Saved} kg`, l: "CO₂ Avoided" },
+    { v: `${treesEquiv}`, l: "Trees Equivalent" },
+    { v: `${oceanPlastic} kg`, l: "Ocean Plastic Diverted" },
   ];
-  const impW = (pageWidth - 30 - 8) / 3;
+  const impW = (pw - M * 2 - 8) / 3;
   impactCards.forEach((ic, i) => {
-    drawStatCard(doc, 15 + i * (impW + 4), y, impW, ic.v, ic.l, ic.c);
+    drawMetricCard(doc, M + i * (impW + 4), y, impW, ic.v, ic.l);
   });
-  y += 36;
+  y += 32;
 
-  // ── Status badge ──
-  y = ensurePage(doc, y, 16);
-  const statusColor = cleanup.status === "completed" ? PDF_COLORS.forest : PDF_COLORS.gold;
-  drawRoundedRect(doc, 15, y, 40, 10, 3, statusColor);
+  // ── Status ──
+  y = ensurePage(doc, y, 12);
   doc.setFontSize(8);
   doc.setFont("helvetica", "bold");
-  doc.setTextColor(...PDF_COLORS.white);
-  doc.text(cleanup.status.toUpperCase(), 35, y + 6.5, { align: "center" });
+  doc.setTextColor(...PDF_COLORS.forest);
+  doc.text(`Status: ${cleanup.status.toUpperCase()}`, M, y);
   doc.setFont("helvetica", "normal");
   doc.setFontSize(7);
   doc.setTextColor(...PDF_COLORS.mutedText);
-  doc.text(`Report generated on ${format(new Date(), "PPPp")}`, 60, y + 6.5);
-  y += 16;
+  doc.text(`Report generated on ${format(new Date(), "PPPp")}`, M + 40, y);
 
   // ── Footer ──
   await addBrandedFooter(doc);
