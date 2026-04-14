@@ -84,7 +84,7 @@ const labelKeyMap: Record<string, string> = {
 };
 
 export function useTranslatedNavItems(
-  navItems: Array<{ id: string; label: string; icon: React.ElementType }>
+  navItems: Array<{ id: string; label: string; icon?: React.ElementType; [key: string]: any }>
 ) {
   const { t } = useTranslation();
 
