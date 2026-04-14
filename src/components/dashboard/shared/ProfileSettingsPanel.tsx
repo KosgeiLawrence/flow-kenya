@@ -60,6 +60,8 @@ const ProfileSettingsPanel = ({ role }: ProfileSettingsPanelProps) => {
   const queryClient = useQueryClient();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
+  const [uploadingLogo, setUploadingLogo] = useState(false);
+  const logoInputRef = useRef<HTMLInputElement>(null);
   const [activeSection, setActiveSection] = useState("basic");
   const [passwordData, setPasswordData] = useState({ current: "", new: "", confirm: "" });
 
