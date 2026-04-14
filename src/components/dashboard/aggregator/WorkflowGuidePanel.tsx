@@ -64,10 +64,10 @@ const workflows: Workflow[] = [
     color: "text-secondary",
     tip: "List your materials on the marketplace to reach more buyers and get better prices.",
     steps: [
-      { label: "List Materials", description: "Post available materials with quantity and asking price", icon: Store, color: "bg-accent/10 text-secondary" },
-      { label: "Receive Inquiries", description: "Recyclers and buyers will contact you for materials", icon: Users, color: "bg-accent/10 text-secondary" },
-      { label: "Generate Invoice", description: "Create an invoice for the agreed sale", icon: FileText, color: "bg-accent/10 text-secondary" },
-      { label: "Arrange Logistics", description: "Coordinate pickup or delivery of materials", icon: Truck, color: "bg-accent/10 text-secondary" },
+      { label: "List Materials", description: "Post available materials with quantity and asking price", icon: Store, color: "bg-secondary/10 text-secondary" },
+      { label: "Receive Inquiries", description: "Recyclers and buyers will contact you for materials", icon: Users, color: "bg-secondary/10 text-secondary" },
+      { label: "Generate Invoice", description: "Create an invoice for the agreed sale", icon: FileText, color: "bg-secondary/10 text-secondary" },
+      { label: "Arrange Logistics", description: "Coordinate pickup or delivery of materials", icon: Truck, color: "bg-secondary/10 text-secondary" },
     ],
   },
   {
@@ -92,10 +92,10 @@ const workflows: Workflow[] = [
     color: "text-secondary",
     tip: "Record expenses daily so you always know your real profit margin.",
     steps: [
-      { label: "View Income", description: "Track money received from selling materials to recyclers", icon: TrendingUp, color: "bg-accent/10 text-secondary" },
-      { label: "Add Expenses", description: "Record costs like transport, storage, wages, and equipment", icon: FileText, color: "bg-accent/10 text-secondary" },
-      { label: "Set Budgets", description: "Set monthly spending limits for different categories", icon: BarChart3, color: "bg-accent/10 text-secondary" },
-      { label: "Download Reports", description: "Get Profit & Loss, Cash Flow, and Balance Sheet reports", icon: ClipboardList, color: "bg-accent/10 text-secondary" },
+      { label: "View Income", description: "Track money received from selling materials to recyclers", icon: TrendingUp, color: "bg-secondary/10 text-secondary" },
+      { label: "Add Expenses", description: "Record costs like transport, storage, wages, and equipment", icon: FileText, color: "bg-secondary/10 text-secondary" },
+      { label: "Set Budgets", description: "Set monthly spending limits for different categories", icon: BarChart3, color: "bg-secondary/10 text-secondary" },
+      { label: "Download Reports", description: "Get Profit & Loss, Cash Flow, and Balance Sheet reports", icon: ClipboardList, color: "bg-secondary/10 text-secondary" },
     ],
   },
   {
@@ -118,10 +118,10 @@ const workflows: Workflow[] = [
     color: "text-secondary",
     tip: "Upload your NEMA license, county permit, and transport permits to stay compliant.",
     steps: [
-      { label: "Upload Documents", description: "Add business licenses, environmental permits, and certificates", icon: Shield, color: "bg-accent/10 text-secondary" },
-      { label: "Track EPR Progress", description: "Monitor your Extended Producer Responsibility targets", icon: Leaf, color: "bg-accent/10 text-secondary" },
-      { label: "ESG Reports", description: "Generate environmental, social, and governance reports", icon: BarChart3, color: "bg-accent/10 text-secondary" },
-      { label: "Carbon Offset", description: "See how much CO₂ your collections help avoid", icon: Leaf, color: "bg-accent/10 text-secondary" },
+      { label: "Upload Documents", description: "Add business licenses, environmental permits, and certificates", icon: Shield, color: "bg-secondary/10 text-secondary" },
+      { label: "Track EPR Progress", description: "Monitor your Extended Producer Responsibility targets", icon: Leaf, color: "bg-secondary/10 text-secondary" },
+      { label: "ESG Reports", description: "Generate environmental, social, and governance reports", icon: BarChart3, color: "bg-secondary/10 text-secondary" },
+      { label: "Carbon Offset", description: "See how much CO₂ your collections help avoid", icon: Leaf, color: "bg-secondary/10 text-secondary" },
     ],
   },
 ];
@@ -208,8 +208,8 @@ const OverviewDiagram = () => {
   const mainFlow = [
     { label: "Collect from Pickers", icon: Users, color: "bg-primary/10 text-primary" },
     { label: "Store in Inventory", icon: Package, color: "bg-primary/10 text-primary" },
-    { label: "Sort & Aggregate", icon: ClipboardList, color: "bg-accent/10 text-secondary" },
-    { label: "Sell to Recyclers", icon: Store, color: "bg-accent/10 text-secondary" },
+    { label: "Sort & Aggregate", icon: ClipboardList, color: "bg-secondary/10 text-secondary" },
+    { label: "Sell to Recyclers", icon: Store, color: "bg-secondary/10 text-secondary" },
     { label: "Pay Waste Pickers", icon: DollarSign, color: "bg-primary/10 text-primary" },
     { label: "Track Earnings", icon: TrendingUp, color: "bg-primary/10 text-primary" },
   ];

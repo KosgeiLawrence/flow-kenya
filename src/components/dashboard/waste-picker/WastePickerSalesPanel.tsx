@@ -675,7 +675,7 @@ const WastePickerSalesPanel = () => {
               {/* Step 2: Quotation Sent */}
               {sale.step === "quotation_sent" && (
                 <div className="space-y-3">
-                  <Card className="bg-accent/10 border-accent/30">
+                  <Card className="bg-secondary/10 border-accent/30">
                     <CardContent className="p-4 text-center space-y-2">
                       <FileText className="w-8 h-8 text-secondary mx-auto" />
                       <p className="text-sm font-medium text-foreground">Quotation sent to {sale.client_name}</p>
