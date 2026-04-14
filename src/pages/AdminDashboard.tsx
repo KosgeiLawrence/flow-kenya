@@ -28,6 +28,7 @@ import ContactMessagesPanel from "@/components/dashboard/admin/ContactMessagesPa
 import RevenueInsightsPanel from "@/components/dashboard/admin/RevenueInsightsPanel";
 import AdminBillingPanel from "@/components/dashboard/admin/AdminBillingPanel";
 import EarningsExpensesPanel from "@/components/dashboard/shared/EarningsExpensesPanel";
+import DashboardChatbot from "@/components/dashboard/shared/DashboardChatbot";
 
 const navItems = [
   { id: "revenue", label: "Revenue Insights", icon: TrendingUp },
@@ -162,8 +163,8 @@ const AdminDashboard = () => {
           {renderPanel()}
         </main>
       </div>
+      <DashboardChatbot role="admin" navItems={navItems} onNavigate={(id) => setActiveTab(id)} />
     </div>
-  );
 };
 
 export default AdminDashboard;

@@ -26,6 +26,7 @@ import CleanupExercisePanel from "@/components/dashboard/shared/CleanupExerciseP
 import TrashPanel from "@/components/dashboard/shared/TrashPanel";
 import TeamPanel from "@/components/dashboard/shared/TeamPanel";
 import { Users as UsersIcon } from "lucide-react";
+import DashboardChatbot from "@/components/dashboard/shared/DashboardChatbot";
 
 const navItems = [
   { id: "footprint", label: "Plastic Footprint", icon: Package },
@@ -162,8 +163,8 @@ const CorporateDashboard = () => {
           {renderPanel()}
         </main>
       </div>
+      <DashboardChatbot role="corporate" navItems={navItems} onNavigate={(id) => setActivePanel(id)} />
     </div>
-  );
 };
 
 export default CorporateDashboard;

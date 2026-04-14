@@ -17,6 +17,7 @@ import TrainingManagementPanel from "@/components/dashboard/shared/TrainingManag
 import TrashPanel from "@/components/dashboard/shared/TrashPanel";
 import TeamPanel from "@/components/dashboard/shared/TeamPanel";
 import { Users as UsersIcon } from "lucide-react";
+import DashboardChatbot from "@/components/dashboard/shared/DashboardChatbot";
 
 const navItems = [
   { id: "waste-flow", label: "Waste Flow Dashboard", icon: MapPin },
@@ -134,8 +135,8 @@ const CountyGovernmentDashboard = () => {
           {renderPanel()}
         </main>
       </div>
+      <DashboardChatbot role="county_government" navItems={navItems} onNavigate={(id) => setActivePanel(id)} />
     </div>
-  );
 };
 
 export default CountyGovernmentDashboard;
