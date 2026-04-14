@@ -56,7 +56,8 @@ const AdminDashboard = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("revenue");
   const [sidebarOpen, setSidebarOpen] = useState(false);
-
+  const translatedNavItems = useTranslatedNavItems(navItems);
+  const { t } = useTranslation();
   const handleSignOut = async () => {
     await signOut();
     navigate("/");

@@ -68,6 +68,8 @@ const RecyclerDashboard = () => {
   const [activePanel, setActivePanel] = useState("inventory");
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const { filteredNavItems, teamDisplayName, teamLogoUrl } = useFilteredNavItems(navItems);
+  const translatedNavItems = useTranslatedNavItems(filteredNavItems);
+  const { t } = useTranslation();
   const effectiveDisplayName = teamDisplayName || displayName;
   const effectiveLogoUrl = teamLogoUrl || orgLogoUrl;
 
