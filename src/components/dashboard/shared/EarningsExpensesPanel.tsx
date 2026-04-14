@@ -42,6 +42,7 @@ const roleConfig = {
   waste_picker: { title: "My Earnings", simple: true },
   aggregator: { title: "Earnings & Expenses", simple: false },
   recycler: { title: "Business Insights", simple: false },
+  admin: { title: "Business Insights", simple: false },
 };
 
 // Helper to generate year options from 2020 to current+1
