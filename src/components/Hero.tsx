@@ -78,7 +78,7 @@ const Hero = () => {
           initial={{ opacity: 0, y: 40 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.9, duration: 0.8, ease: [0.4, 0, 0.2, 1] }}
-          className="border-t border-primary-foreground/10 bg-primary-foreground/5 backdrop-blur-xl"
+          className="border-t border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.06)] backdrop-blur-[20px]"
         >
           <div className="container grid grid-cols-1 divide-y divide-primary-foreground/10 py-0 md:grid-cols-3 md:divide-x md:divide-y-0">
             {stats.map((stat) => (

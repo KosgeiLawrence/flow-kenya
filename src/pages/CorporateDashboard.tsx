@@ -88,16 +88,16 @@ const CorporateDashboard = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background flex">
+    <div className="min-h-screen bg-background bg-radial-glow flex">
       {sidebarOpen && (
-        <div className="fixed inset-0 bg-foreground/30 z-40 lg:hidden" onClick={() => setSidebarOpen(false)} />
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40 lg:hidden" onClick={() => setSidebarOpen(false)} />
       )}
 
       <aside className={cn(
-        "fixed inset-y-0 left-0 z-50 w-64 bg-sidebar text-sidebar-foreground flex flex-col transition-transform duration-300 lg:relative lg:translate-x-0",
+        "fixed inset-y-0 left-0 z-50 w-64 glass-sidebar text-sidebar-foreground flex flex-col transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] lg:relative lg:translate-x-0",
         sidebarOpen ? "translate-x-0" : "-translate-x-full"
       )}>
-        <div className="p-4 border-b border-sidebar-border">
+        <div className="p-6 border-b border-[rgba(255,255,255,0.08)]">
           <div className="flex items-center justify-between">
             <h1 className="text-lg font-display font-bold">Duara Flow</h1>
             <Button variant="ghost" size="icon" className="lg:hidden text-sidebar-foreground" onClick={() => setSidebarOpen(false)}>
@@ -122,16 +122,16 @@ const CorporateDashboard = () => {
           </div>
         </div>
 
-        <nav className="flex-1 p-2 space-y-1 overflow-y-auto">
+        <nav className="flex-1 p-3 space-y-1 overflow-y-auto">
           {translatedNavItems.map((item) => (
             <button
               key={item.id}
               onClick={() => { setActivePanel(item.id); setSidebarOpen(false); }}
               className={cn(
-                "w-full flex items-center gap-3 px-3 py-2.5 rounded-md text-sm font-medium transition-colors",
+                "w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium sidebar-nav-item",
                 activePanel === item.id
-                  ? "bg-sidebar-accent text-sidebar-accent-foreground"
-                  : "text-sidebar-foreground/70 hover:bg-sidebar-accent/50 hover:text-sidebar-foreground"
+                  ? "bg-[rgba(255,255,255,0.10)] text-sidebar-accent-foreground shadow-[inset_0_0_0_1px_rgba(255,255,255,0.08)]"
+                  : "text-sidebar-foreground/60 hover:bg-[rgba(255,255,255,0.06)] hover:text-sidebar-foreground"
               )}
             >
               <item.icon className="w-4 h-4 shrink-0" />
@@ -141,7 +141,7 @@ const CorporateDashboard = () => {
           ))}
         </nav>
 
-        <div className="p-3 border-t border-sidebar-border space-y-1">
+        <div className="p-4 border-t border-[rgba(255,255,255,0.08)] space-y-1">
           <LanguageToggle />
           <Button variant="ghost" size="sm" onClick={handleSignOut} className="w-full justify-start gap-2 text-sidebar-foreground/70 hover:text-sidebar-foreground hover:bg-sidebar-accent/50">
             <LogOut className="w-4 h-4" /> Sign Out
@@ -150,7 +150,7 @@ const CorporateDashboard = () => {
       </aside>
 
       <div className="flex-1 flex flex-col min-w-0">
-        <header className="sticky top-0 z-30 bg-card border-b border-border h-14 flex items-center px-4 gap-3">
+        <header className="sticky top-0 z-30 glass-header h-16 flex items-center px-6 gap-4">
           <Button variant="ghost" size="icon" className="lg:hidden" onClick={() => setSidebarOpen(true)}>
             <Menu className="w-5 h-5" />
           </Button>
@@ -158,7 +158,7 @@ const CorporateDashboard = () => {
             {translatedNavItems.find(n => n.id === activePanel)?.label}
           </h2>
         </header>
-        <main className="flex-1 p-4 md:p-6 overflow-y-auto">
+        <main className="flex-1 p-6 md:p-8 overflow-y-auto">
           {renderPanel()}
         </main>
       </div>

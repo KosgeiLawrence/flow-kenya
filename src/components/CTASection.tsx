@@ -48,7 +48,7 @@ const Footer = () => {
   const { t } = useTranslation();
 
   return (
-    <footer className="border-t border-border bg-muted/50 backdrop-blur-sm py-12">
+    <footer className="border-t border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.04)] backdrop-blur-[20px] py-12">
       <div className="container">
         <div className="flex flex-col items-center justify-between gap-6 md:flex-row">
           <div className="flex items-center gap-2">
