@@ -17,6 +17,7 @@ import { Loader2, Plus, BookOpen, Calendar, MapPin, Clock, Pencil, Trash2, Users
 import { toast } from "sonner";
 import { format } from "date-fns";
 import { useTranslation } from "react-i18next";
+import { useChatbotUIAction } from "@/hooks/useChatbotUIAction";
 
 const targetRoleOptions = [
   { value: "waste_picker", label: "Waste Pickers" },
@@ -128,6 +129,8 @@ const TrainingManagementPanel = () => {
   const { user, role } = useAuth();
   const queryClient = useQueryClient();
   const [dialogOpen, setDialogOpen] = useState(false);
+
+  useChatbotUIAction(["add-training"], useCallback(() => setDialogOpen(true), []));
   const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState<TrainingForm>(emptyForm);
 
