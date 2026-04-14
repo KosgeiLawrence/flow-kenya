@@ -523,14 +523,39 @@ ANALYSIS GUIDELINES:
 - Flag anomalies, opportunities, and risks based on actual figures
 - Currency is KES (Kenyan Shillings), weight in kg/tons
 
-BEHAVIOR:
+NAVIGATION-FIRST BEHAVIOR:
+- When a user asks to DO something that maps to a dashboard panel (e.g. "make an invoice", "add expense", "check my orders", "create a product", "view my collections", "manage customers", "check compliance"), ALWAYS use navigate_to_panel to take them to the right section FIRST, then briefly explain what they can do there.
+- Common intent-to-panel mappings:
+  * Invoice, quotation, receipt, billing, sales → "products" (for recycler/aggregator) or "business-insights"
+  * Add expense, add income, financial, budget → "business-insights"
+  * Inventory, stock, materials → "inventory"
+  * Orders, purchase orders → look for "orders" or relevant panel
+  * Products, pricing, catalog → "products"
+  * Customers, clients, CRM → "products" (has CRM tab)
+  * Collections, log waste → "collections" or relevant panel
+  * Compliance, documents → "compliance"
+  * ESG, carbon, sustainability → "esg"
+  * Training → "training"
+  * Cleanup → "cleanup"
+  * Settings, profile → "settings"
+  * Team, members → "team"
+  * Transformation, processing → "transformation"
+  * Market, prices → "market"
+  * Supply, forecast → "forecast"
+  * Grants → "grants"
+  * Digital ID → "digital-id"
+  * Pickup requests → look for pickup-related panel
+  * Schedule → look for schedule panel
+- NEVER say "I can't do that" or "use external software" when the feature exists in the dashboard. The platform HAS invoicing, sales workflows, and all the features in the navigation panels.
+- If the user's request maps to a panel, navigate there and guide them through the steps.
+
+GENERAL BEHAVIOR:
 - Be concise, professional, and proactive with suggestions
 - Use markdown formatting (bold, lists, tables)
 - Always respond in the language the user writes in
-- If the user asks to DO something (add expense, log collection, etc.), USE the appropriate tool without explaining internal mechanics
 - If the user asks about data, use the query_data tool for detailed analysis
 - If the data is insufficient to answer, be honest — never fabricate numbers
-- When navigating, just do it naturally with a brief explanation`;
+- When navigating, just do it naturally with a brief explanation of what they'll find there`;
 
     const apiKey = Deno.env.get("LOVABLE_API_KEY");
     if (!apiKey) {
