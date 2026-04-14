@@ -153,7 +153,7 @@ const EarningsExpensesPanel = ({ role }: Props) => {
   });
 
   // Fetch transactions
-  const { data: transactions } = useQuery({
+  const { data: rawTransactions } = useQuery({
     queryKey: ["financial_transactions", user?.id],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -166,6 +166,43 @@ const EarningsExpensesPanel = ({ role }: Props) => {
     },
     enabled: !!user,
   });
+
+  // For admin: also fetch platform payments (subscription revenue) so Business Insights matches Revenue Insights
+  const { data: platformPayments } = useQuery({
+    queryKey: ["admin_platform_payments_for_insights"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("payments")
+        .select("*")
+        .eq("status", "completed")
+        .order("created_at", { ascending: false });
+      if (error) throw error;
+      return data as any[];
+    },
+    enabled: role === "admin" && !!user,
+  });
+
+  // Merge platform payments as income entries for admin
+  const transactions = useMemo(() => {
+    const base = rawTransactions || [];
+    if (role !== "admin" || !platformPayments?.length) return base;
+    const paymentTxs = platformPayments.map((p: any) => ({
+      id: `payment-${p.id}`,
+      user_id: p.user_id,
+      type: "income",
+      amount: p.amount,
+      description: p.description || "Subscription Payment",
+      transaction_date: (p.completed_at || p.created_at || "").slice(0, 10),
+      payment_method: p.mpesa_receipt_number ? "mpesa" : "other",
+      category_id: null,
+      financial_categories: { name: "Platform Revenue", icon: null, type: "income" },
+      created_at: p.created_at,
+      _isPayment: true,
+    }));
+    return [...paymentTxs, ...base].sort((a, b) =>
+      (b.transaction_date || "").localeCompare(a.transaction_date || "")
+    );
+  }, [rawTransactions, platformPayments, role]);
 
   // Fetch budgets
   const { data: budgets } = useQuery({
@@ -305,6 +342,7 @@ const EarningsExpensesPanel = ({ role }: Props) => {
   const { softDelete } = useTrash();
 
   const handleDeleteTx = async (tx: any) => {
+    if (tx._isPayment) { toast.error("Platform payments can't be deleted from here"); return; }
     const success = await softDelete("financial_transactions", tx.id, tx, `${tx.type === "income" ? "Income" : "Expense"}: KES ${Number(tx.amount).toLocaleString()}`);
     if (success) queryClient.invalidateQueries({ queryKey: ["financial_transactions"] });
   };
