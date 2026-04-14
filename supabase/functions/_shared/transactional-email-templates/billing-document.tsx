@@ -1,0 +1,201 @@
+import * as React from 'npm:react@18.3.1'
+import {
+  Body, Container, Head, Heading, Html, Preview, Text, Section, Hr,
+} from 'npm:@react-email/components@0.0.22'
+import type { TemplateEntry } from './registry.ts'
+
+const SITE_NAME = "Duara Flow"
+
+interface LineItem {
+  description: string
+  quantity: number
+  unit_price: number
+  amount: number
+}
+
+interface BillingDocumentProps {
+  clientName?: string
+  documentType?: string
+  invoiceNumber?: string
+  items?: LineItem[]
+  subtotal?: number
+  vatPercent?: number
+  vatAmount?: number
+  totalAmount?: number
+  currency?: string
+  notes?: string
+  dueDate?: string
+  paymentReference?: string
+  paidAt?: string
+  createdAt?: string
+}
+
+const BillingDocumentEmail = ({
+  clientName = 'Valued Client',
+  documentType = 'invoice',
+  invoiceNumber = 'DF-0001',
+  items = [],
+  subtotal = 0,
+  vatPercent = 0,
+  vatAmount = 0,
+  totalAmount = 0,
+  currency = 'KES',
+  notes,
+  dueDate,
+  paymentReference,
+  paidAt,
+  createdAt,
+}: BillingDocumentProps) => {
+  const typeLabel = documentType === 'invoice' ? 'Invoice' : documentType === 'quotation' ? 'Quotation' : 'Receipt'
+  const previewText = `Your ${typeLabel} ${invoiceNumber} from ${SITE_NAME}`
+
+  return (
+    <Html lang="en" dir="ltr">
+      <Head />
+      <Preview>{previewText}</Preview>
+      <Body style={main}>
+        <Container style={container}>
+          {/* Header */}
+          <Section style={headerSection}>
+            <Heading style={brandName}>{SITE_NAME}</Heading>
+            <Text style={tagline}>Circular Economy Platform</Text>
+          </Section>
+
+          <Hr style={divider} />
+
+          {/* Document Title */}
+          <Heading style={h1}>{typeLabel.toUpperCase()}</Heading>
+
+          {/* Meta Info */}
+          <Section style={metaSection}>
+            <Text style={metaText}><strong>Document No:</strong> {invoiceNumber}</Text>
+            {createdAt && <Text style={metaText}><strong>Date:</strong> {createdAt}</Text>}
+            <Text style={metaText}><strong>Client:</strong> {clientName}</Text>
+            {dueDate && <Text style={metaText}><strong>Due Date:</strong> {dueDate}</Text>}
+            {paymentReference && <Text style={metaText}><strong>Payment Ref:</strong> {paymentReference}</Text>}
+          </Section>
+
+          <Hr style={divider} />
+
+          {/* Items Table Header */}
+          <Section style={tableHeader}>
+            <table style={tableStyle} cellPadding={0} cellSpacing={0}>
+              <thead>
+                <tr>
+                  <th style={thStyle}>Description</th>
+                  <th style={{ ...thStyle, textAlign: 'center' as const, width: '60px' }}>Qty</th>
+                  <th style={{ ...thStyle, textAlign: 'right' as const, width: '100px' }}>Unit Price</th>
+                  <th style={{ ...thStyle, textAlign: 'right' as const, width: '100px' }}>Amount</th>
+                </tr>
+              </thead>
+              <tbody>
+                {items.map((item, idx) => (
+                  <tr key={idx}>
+                    <td style={tdStyle}>{item.description}</td>
+                    <td style={{ ...tdStyle, textAlign: 'center' as const }}>{item.quantity}</td>
+                    <td style={{ ...tdStyle, textAlign: 'right' as const }}>{currency} {Number(item.unit_price).toLocaleString()}</td>
+                    <td style={{ ...tdStyle, textAlign: 'right' as const }}>{currency} {Number(item.amount).toLocaleString()}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </Section>
+
+          {/* Totals */}
+          <Section style={totalsSection}>
+            <table style={{ width: '100%' }} cellPadding={0} cellSpacing={0}>
+              <tbody>
+                <tr>
+                  <td style={totalLabel}>Subtotal</td>
+                  <td style={totalValue}>{currency} {Number(subtotal).toLocaleString()}</td>
+                </tr>
+                {vatPercent > 0 && (
+                  <tr>
+                    <td style={totalLabel}>VAT ({vatPercent}%)</td>
+                    <td style={totalValue}>{currency} {Number(vatAmount).toLocaleString()}</td>
+                  </tr>
+                )}
+                <tr>
+                  <td style={grandTotalLabel}>Total</td>
+                  <td style={grandTotalValue}>{currency} {Number(totalAmount).toLocaleString()}</td>
+                </tr>
+              </tbody>
+            </table>
+          </Section>
+
+          {/* Paid Badge */}
+          {documentType === 'receipt' && (
+            <Section style={paidBadge}>
+              <Text style={paidText}>✓ PAID{paidAt ? ` — ${paidAt}` : ''}</Text>
+            </Section>
+          )}
+
+          {/* Notes */}
+          {notes && (
+            <Section>
+              <Text style={notesLabel}>Notes</Text>
+              <Text style={notesText}>{notes}</Text>
+            </Section>
+          )}
+
+          <Hr style={divider} />
+
+          <Text style={footer}>
+            This {typeLabel.toLowerCase()} was generated by {SITE_NAME}. For questions, contact us at info@duaraflow.co.ke.
+          </Text>
+        </Container>
+      </Body>
+    </Html>
+  )
+}
+
+export const template = {
+  component: BillingDocumentEmail,
+  subject: (data: Record<string, any>) => {
+    const type = data.documentType === 'invoice' ? 'Invoice' : data.documentType === 'quotation' ? 'Quotation' : 'Receipt'
+    return `${type} ${data.invoiceNumber || ''} from Duara Flow`
+  },
+  displayName: 'Billing Document (Invoice/Quotation/Receipt)',
+  previewData: {
+    clientName: 'Jane Mwangi',
+    documentType: 'invoice',
+    invoiceNumber: 'DF-INV-0042',
+    items: [
+      { description: 'Aggregator Subscription (Monthly)', quantity: 1, unit_price: 250, amount: 250 },
+      { description: 'Training & Onboarding', quantity: 2, unit_price: 5000, amount: 10000 },
+    ],
+    subtotal: 10250,
+    vatPercent: 16,
+    vatAmount: 1640,
+    totalAmount: 11890,
+    currency: 'KES',
+    notes: 'Payment due within 14 days.',
+    dueDate: '28 Apr 2026',
+    createdAt: '14 Apr 2026',
+  },
+} satisfies TemplateEntry
+
+// Styles — Duara Flow brand: forest green primary, gold accent
+const main = { backgroundColor: '#ffffff', fontFamily: "'DM Sans', Arial, sans-serif" }
+const container = { padding: '30px 25px', maxWidth: '600px', margin: '0 auto' }
+const headerSection = { textAlign: 'center' as const, marginBottom: '10px' }
+const brandName = { fontSize: '24px', fontWeight: 'bold' as const, color: '#2d5a3d', margin: '0' }
+const tagline = { fontSize: '12px', color: '#8b7a3a', margin: '4px 0 0', letterSpacing: '1px', textTransform: 'uppercase' as const }
+const divider = { borderTop: '1px solid #e8e0d0', margin: '20px 0' }
+const h1 = { fontSize: '20px', fontWeight: 'bold' as const, color: '#2d5a3d', margin: '0 0 16px', letterSpacing: '2px' }
+const metaSection = { marginBottom: '10px' }
+const metaText = { fontSize: '13px', color: '#444', margin: '3px 0', lineHeight: '1.5' }
+const tableHeader = { marginBottom: '0' }
+const tableStyle = { width: '100%', borderCollapse: 'collapse' as const, fontSize: '13px' }
+const thStyle = { textAlign: 'left' as const, padding: '8px 6px', borderBottom: '2px solid #2d5a3d', color: '#2d5a3d', fontWeight: '600' as const, fontSize: '12px' }
+const tdStyle = { padding: '8px 6px', borderBottom: '1px solid #eee', color: '#333', fontSize: '13px' }
+const totalsSection = { marginTop: '12px', paddingRight: '6px' }
+const totalLabel = { textAlign: 'right' as const, padding: '4px 12px 4px 0', color: '#666', fontSize: '13px' }
+const totalValue = { textAlign: 'right' as const, padding: '4px 6px', color: '#333', fontSize: '13px', width: '120px' }
+const grandTotalLabel = { ...totalLabel, fontWeight: 'bold' as const, color: '#2d5a3d', fontSize: '15px', borderTop: '2px solid #2d5a3d', paddingTop: '8px' }
+const grandTotalValue = { ...totalValue, fontWeight: 'bold' as const, color: '#2d5a3d', fontSize: '15px', borderTop: '2px solid #2d5a3d', paddingTop: '8px' }
+const paidBadge = { backgroundColor: '#e8f5e9', borderRadius: '6px', padding: '10px', textAlign: 'center' as const, margin: '16px 0' }
+const paidText = { color: '#2d5a3d', fontWeight: 'bold' as const, fontSize: '14px', margin: '0' }
+const notesLabel = { fontSize: '12px', fontWeight: '600' as const, color: '#2d5a3d', margin: '0 0 4px' }
+const notesText = { fontSize: '12px', color: '#666', margin: '0', lineHeight: '1.5' }
+const footer = { fontSize: '11px', color: '#999', margin: '20px 0 0', textAlign: 'center' as const }
