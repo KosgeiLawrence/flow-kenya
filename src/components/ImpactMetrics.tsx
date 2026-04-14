@@ -39,38 +39,38 @@ const ImpactMetrics = () => {
       target: Math.max(Math.round(derived?.totalTons ?? 0), 1),
       suffix: "+",
       label: "Tonnes Collected",
-      unit: "tonnes",
     },
     {
       target: Math.max(derived?.wastePickers ?? 0, 1),
       suffix: "+",
       label: "Waste Pickers Empowered",
-      unit: "people",
     },
     {
       target: Math.max(Math.round(derived?.co2Tons ?? 0), 1),
       suffix: "",
       label: "CO₂ Tonnes Avoided",
-      unit: "tCO₂e",
     },
     {
       target: Math.max(derived?.totalUsers ?? 0, 1),
       suffix: "+",
       label: "Platform Participants",
-      unit: "users",
     },
   ];
 
   return (
-    <section id="impact" className="bg-hero py-20 md:py-32" ref={ref}>
-      <div className="container">
+    <section id="impact" className="relative bg-hero py-20 md:py-32 overflow-hidden" ref={ref}>
+      {/* Decorative blurs */}
+      <div className="absolute top-1/4 -left-20 h-64 w-64 rounded-full bg-gold/8 blur-3xl" />
+      <div className="absolute bottom-1/4 -right-20 h-48 w-48 rounded-full bg-sky/8 blur-3xl" />
+
+      <div className="container relative">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={isInView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.6 }}
+          transition={{ duration: 0.6, ease: [0.4, 0, 0.2, 1] }}
           className="mb-16 text-center"
         >
-          <span className="mb-4 inline-block rounded-full border border-gold-light/30 bg-gold/10 px-4 py-1.5 text-sm font-semibold text-gold-light">
+          <span className="mb-4 inline-block rounded-full border border-gold-light/20 bg-gold/10 px-4 py-1.5 text-sm font-semibold text-gold-light backdrop-blur-md">
             Measurable Impact
           </span>
           <h2 className="mb-4 font-display text-3xl font-bold text-primary-foreground md:text-5xl">
@@ -87,8 +87,8 @@ const ImpactMetrics = () => {
               key={m.label}
               initial={{ opacity: 0, scale: 0.9 }}
               animate={isInView ? { opacity: 1, scale: 1 } : {}}
-              transition={{ delay: i * 0.1, duration: 0.5 }}
-              className="rounded-xl border border-primary-foreground/10 bg-primary-foreground/5 p-6 text-center backdrop-blur-sm"
+              transition={{ delay: i * 0.1, duration: 0.5, ease: [0.4, 0, 0.2, 1] }}
+              className="rounded-2xl border border-primary-foreground/10 bg-primary-foreground/5 p-6 text-center backdrop-blur-xl transition-all duration-300 hover:bg-primary-foreground/10 hover:-translate-y-1"
             >
               <div className="mb-2 font-display text-3xl font-bold text-gold-light md:text-4xl">
                 <Counter target={m.target} suffix={m.suffix} inView={isInView} />
@@ -108,7 +108,7 @@ const ImpactMetrics = () => {
             variant="hero"
             size="lg"
             onClick={() => navigate("/impact")}
-            className="gap-2"
+            className="gap-2 hover-glow"
           >
             View Full Impact Dashboard <ArrowRight className="w-4 h-4" />
           </Button>

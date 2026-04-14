@@ -25,28 +25,27 @@ const values = [
   },
 ];
 
-const milestones = [
-  { year: "2024", label: "Founded in Nairobi" },
-  { year: "2025", label: "Onboarded 1,000+ waste pickers" },
-  { year: "2025", label: "Partnered with 5 county governments" },
-  { year: "2026", label: "Tracking 50,000+ kg monthly" },
-];
-
 const AboutSection = () => {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: "-100px" });
 
   return (
-    <section id="about" className="bg-muted py-20 md:py-32" ref={ref}>
-      <div className="container">
+    <section id="about" className="relative py-20 md:py-32 overflow-hidden" ref={ref}>
+      {/* Background */}
+      <div className="absolute inset-0 bg-muted">
+        <div className="absolute top-0 left-1/4 h-[30%] w-[30%] rounded-full bg-forest/5 blur-3xl" />
+        <div className="absolute bottom-0 right-1/4 h-[25%] w-[25%] rounded-full bg-gold/5 blur-3xl" />
+      </div>
+
+      <div className="container relative">
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={isInView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.7 }}
+          transition={{ duration: 0.7, ease: [0.4, 0, 0.2, 1] }}
           className="mx-auto max-w-3xl text-center mb-16"
         >
-          <span className="inline-block rounded-full bg-primary/10 px-4 py-1.5 text-xs font-semibold uppercase tracking-wider text-primary mb-4">
+          <span className="inline-block rounded-full bg-primary/10 px-4 py-1.5 text-xs font-semibold uppercase tracking-wider text-primary mb-4 backdrop-blur-sm">
             About Us
           </span>
           <h2 className="font-display text-3xl font-bold text-foreground md:text-5xl mb-5">
@@ -62,11 +61,11 @@ const AboutSection = () => {
           <motion.div
             initial={{ opacity: 0, x: -30 }}
             animate={isInView ? { opacity: 1, x: 0 } : {}}
-            transition={{ duration: 0.7, delay: 0.2 }}
-            className="rounded-2xl border border-border bg-card p-8"
+            transition={{ duration: 0.7, delay: 0.2, ease: [0.4, 0, 0.2, 1] }}
+            className="rounded-2xl glass-card p-8"
           >
             <div className="flex items-center gap-3 mb-4">
-              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10">
                 <Target className="h-5 w-5 text-primary" />
               </div>
               <h3 className="font-display text-xl font-bold text-foreground">Our Mission</h3>
@@ -79,11 +78,11 @@ const AboutSection = () => {
           <motion.div
             initial={{ opacity: 0, x: 30 }}
             animate={isInView ? { opacity: 1, x: 0 } : {}}
-            transition={{ duration: 0.7, delay: 0.3 }}
-            className="rounded-2xl border border-border bg-card p-8"
+            transition={{ duration: 0.7, delay: 0.3, ease: [0.4, 0, 0.2, 1] }}
+            className="rounded-2xl glass-card p-8"
           >
             <div className="flex items-center gap-3 mb-4">
-              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10">
                 <Heart className="h-5 w-5 text-primary" />
               </div>
               <h3 className="font-display text-xl font-bold text-foreground">Our Vision</h3>
@@ -101,10 +100,10 @@ const AboutSection = () => {
               key={value.title}
               initial={{ opacity: 0, y: 30 }}
               animate={isInView ? { opacity: 1, y: 0 } : {}}
-              transition={{ duration: 0.5, delay: 0.15 * i + 0.3 }}
-              className="rounded-xl border border-border bg-card p-6 text-center"
+              transition={{ duration: 0.5, delay: 0.12 * i + 0.3, ease: [0.4, 0, 0.2, 1] }}
+              className="rounded-2xl glass-card p-6 text-center"
             >
-              <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10">
+              <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10 transition-all duration-300 hover:scale-110 hover:bg-primary/20">
                 <value.icon className="h-6 w-6 text-primary" />
               </div>
               <h4 className="font-display text-lg font-semibold text-foreground mb-2">{value.title}</h4>
@@ -112,7 +111,6 @@ const AboutSection = () => {
             </motion.div>
           ))}
         </div>
-
       </div>
     </section>
   );

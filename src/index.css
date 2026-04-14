@@ -61,6 +61,7 @@
     --shadow-soft: 0 4px 20px -4px hsl(152 45% 22% / 0.08);
     --shadow-elevated: 0 12px 40px -8px hsl(152 45% 22% / 0.12);
     --shadow-gold: 0 8px 30px -6px hsl(40 55% 55% / 0.25);
+    --shadow-glass: 0 8px 32px 0 hsl(152 45% 22% / 0.06);
 
     --font-display: 'Space Grotesk', system-ui, sans-serif;
     --font-body: 'DM Sans', system-ui, sans-serif;
@@ -92,6 +93,10 @@
 @layer base {
   * {
     @apply border-border;
+  }
+
+  html {
+    scroll-behavior: smooth;
   }
 
   body {
@@ -126,5 +131,79 @@
 
   .shadow-gold {
     box-shadow: var(--shadow-gold);
+  }
+
+  .shadow-glass {
+    box-shadow: var(--shadow-glass);
+  }
+
+  /* Glassmorphism utilities */
+  .glass {
+    background: hsl(var(--card) / 0.6);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid hsl(var(--border) / 0.5);
+  }
+
+  .glass-strong {
+    background: hsl(var(--card) / 0.8);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border: 1px solid hsl(var(--border) / 0.6);
+  }
+
+  .glass-dark {
+    background: hsl(var(--forest-deep) / 0.6);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid hsl(var(--primary-foreground) / 0.08);
+  }
+
+  .glass-card {
+    background: hsl(var(--card) / 0.55);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid hsl(var(--border) / 0.4);
+    box-shadow: var(--shadow-glass);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .glass-card:hover {
+    background: hsl(var(--card) / 0.75);
+    box-shadow: var(--shadow-elevated);
+    transform: translateY(-2px);
+  }
+
+  /* Smooth transition helpers */
+  .transition-smooth {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .transition-smooth-slow {
+    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  /* Hover glow for buttons */
+  .hover-glow:hover {
+    box-shadow: 0 0 20px hsl(var(--gold) / 0.4), 0 0 40px hsl(var(--gold) / 0.1);
+  }
+
+  /* Subtle floating animation */
+  .animate-float-gentle {
+    animation: float-gentle 8s ease-in-out infinite;
+  }
+
+  @keyframes float-gentle {
+    0%, 100% { transform: translateY(0) rotate(0deg); }
+    33% { transform: translateY(-6px) rotate(0.5deg); }
+    66% { transform: translateY(3px) rotate(-0.3deg); }
+  }
+
+  /* Gradient mesh background */
+  .bg-mesh {
+    background-image:
+      radial-gradient(at 20% 80%, hsl(var(--gold) / 0.06) 0px, transparent 50%),
+      radial-gradient(at 80% 20%, hsl(var(--forest) / 0.06) 0px, transparent 50%),
+      radial-gradient(at 50% 50%, hsl(var(--sky) / 0.04) 0px, transparent 50%);
   }
 }

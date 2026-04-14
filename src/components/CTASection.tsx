@@ -14,12 +14,13 @@ const CTA = () => {
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={isInView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.8 }}
+          transition={{ duration: 0.8, ease: [0.4, 0, 0.2, 1] }}
           className="relative overflow-hidden rounded-3xl bg-hero p-10 text-center md:p-20"
         >
-          {/* Decorative circles */}
-          <div className="absolute -right-20 -top-20 h-64 w-64 rounded-full bg-gold/5" />
-          <div className="absolute -bottom-32 -left-32 h-80 w-80 rounded-full bg-gold/5" />
+          {/* Decorative glass circles */}
+          <div className="absolute -right-20 -top-20 h-64 w-64 rounded-full bg-gold/8 blur-2xl" />
+          <div className="absolute -bottom-32 -left-32 h-80 w-80 rounded-full bg-gold/6 blur-3xl" />
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 h-[120%] w-[120%] rounded-full bg-primary-foreground/3 blur-3xl" />
 
           <div className="relative z-10">
             <h2 className="mb-4 font-display text-3xl font-bold text-primary-foreground md:text-5xl">
@@ -30,7 +31,7 @@ const CTA = () => {
               Whether you're a waste picker, aggregator, corporate, or county government — Duara Flow has a dashboard built for you.
             </p>
             <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
-              <Button variant="hero" size="lg" className="text-base" asChild>
+              <Button variant="hero" size="lg" className="text-base hover-glow" asChild>
                 <Link to="/signup">Get Started <ArrowRight className="ml-1 h-5 w-5" /></Link>
               </Button>
               <Button variant="hero-outline" size="lg" className="text-base" asChild>
@@ -45,7 +46,7 @@ const CTA = () => {
 };
 
 const Footer = () => (
-  <footer className="border-t border-border bg-muted py-12">
+  <footer className="border-t border-border bg-muted/50 backdrop-blur-sm py-12">
     <div className="container">
       <div className="flex flex-col items-center justify-between gap-6 md:flex-row">
         <div className="flex items-center gap-2">
@@ -65,7 +66,7 @@ const Footer = () => (
             { label: "Terms", to: "/terms" },
             { label: "Contact", to: "/contact" },
           ].map((link) => (
-            <Link key={link.label} to={link.to} className="text-sm text-muted-foreground transition-colors hover:text-foreground">
+            <Link key={link.label} to={link.to} className="text-sm text-muted-foreground transition-all duration-300 hover:text-foreground">
               {link.label}
             </Link>
           ))}
