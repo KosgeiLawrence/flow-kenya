@@ -102,7 +102,7 @@ const CountyGovernmentDashboard = () => {
                 "w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium sidebar-nav-item",
                 activePanel === item.id
                   ? "bg-[rgba(255,255,255,0.10)] text-sidebar-accent-foreground shadow-[inset_0_0_0_1px_rgba(255,255,255,0.08)]"
-                  : "text-sidebar-foreground/60 hover:bg-[rgba(255,255,255,0.06)] hover:text-sidebar-foreground"
+                  : "text-sidebar-foreground/75 hover:bg-[rgba(255,255,255,0.06)] hover:text-sidebar-foreground"
               )}
             >
               <item.icon className="w-4 h-4 shrink-0" />
