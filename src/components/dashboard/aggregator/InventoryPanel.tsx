@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
@@ -12,12 +12,19 @@ import { Package, Layers, TrendingUp, Plus } from "lucide-react";
 import MaterialIcon from "@/components/dashboard/shared/MaterialIcon";
 import { toast } from "sonner";
 import { useTranslation } from "react-i18next";
+import { useChatbotUIAction } from "@/hooks/useChatbotUIAction";
 
 const InventoryPanel = () => {
   const { t } = useTranslation();
   const { user } = useAuth();
   const queryClient = useQueryClient();
   const [open, setOpen] = useState(false);
+
+  // Listen for chatbot UI actions to open the add-collection dialog
+  useChatbotUIAction(
+    ["add-collection"],
+    useCallback(() => setOpen(true), [])
+  );
   const [form, setForm] = useState({ material_type_id: "", quantity: "", location_name: "" });
 
   const { data: materialTypes } = useQuery({

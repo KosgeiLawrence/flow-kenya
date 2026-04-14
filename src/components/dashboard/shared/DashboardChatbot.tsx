@@ -17,10 +17,24 @@ interface ChatMessage {
   content: string;
 }
 
+interface UIAction {
+  type: string;
+  panel_id?: string;
+  dialog_id?: string;
+  message?: string;
+}
+
 interface DashboardChatbotProps {
   role: string;
   navItems: NavItem[];
   onNavigate: (panelId: string) => void;
+}
+
+// Global event bus for UI actions triggered by the chatbot
+export const chatbotUIActionEvent = new EventTarget();
+
+export function dispatchChatbotUIAction(action: UIAction) {
+  chatbotUIActionEvent.dispatchEvent(new CustomEvent("chatbot-ui-action", { detail: action }));
 }
 
 const DashboardChatbot = ({ role, navItems, onNavigate }: DashboardChatbotProps) => {
@@ -63,16 +77,33 @@ const DashboardChatbot = ({ role, navItems, onNavigate }: DashboardChatbotProps)
     loadConversation();
   }, [isOpen, user?.id, role]);
 
-  const handleResponse = (data: { content: string; navigate?: string | null; actions?: unknown[] }) => {
+  const handleResponse = (data: { content: string; navigate?: string | null; actions?: unknown[]; ui_actions?: UIAction[] }) => {
     setMessages((prev) => [...prev, { role: "assistant", content: data.content }]);
+    
+    // Handle navigation
     if (data.navigate) {
-      setTimeout(() => onNavigate(data.navigate!), 800);
+      setTimeout(() => onNavigate(data.navigate!), 600);
     }
+    
+    // Handle UI actions (open dialogs, click buttons, etc.)
+    if (data.ui_actions?.length) {
+      for (const uiAction of data.ui_actions) {
+        // If the action includes a panel navigation, do that first
+        if (uiAction.panel_id && uiAction.panel_id !== data.navigate) {
+          setTimeout(() => onNavigate(uiAction.panel_id!), 400);
+        }
+        // Dispatch UI action after a short delay to allow panel to render
+        setTimeout(() => {
+          dispatchChatbotUIAction(uiAction);
+        }, uiAction.panel_id ? 1200 : 600);
+      }
+    }
+    
     // Show toast for completed actions
     if (data.actions?.length) {
       for (const action of data.actions) {
         const a = action as { success?: boolean; message?: string };
-        if (a.success && a.message && !a.message.startsWith("Navigating")) {
+        if (a.success && a.message && !a.message.startsWith("Navigating") && !a.message.startsWith("UI action")) {
           toast.success(a.message);
         }
       }

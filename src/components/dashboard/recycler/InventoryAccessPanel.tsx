@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
@@ -16,6 +16,7 @@ import { format } from "date-fns";
 import OrdersPanel from "./OrdersPanel";
 import SuppliersPanel from "./SuppliersPanel";
 import { useTranslation } from "react-i18next";
+import { useChatbotUIAction } from "@/hooks/useChatbotUIAction";
 
 interface InventoryItem {
   name: string;
@@ -32,6 +33,12 @@ const InventoryAccessPanel = () => {
   const queryClient = useQueryClient();
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState({ material_type_id: "", quantity: "", location_name: "" });
+
+  // Listen for chatbot UI actions
+  useChatbotUIAction(
+    ["add-collection", "add-order"],
+    useCallback(() => setOpen(true), [])
+  );
 
   const { data: materialTypes } = useQuery({
     queryKey: ["material_types"],
