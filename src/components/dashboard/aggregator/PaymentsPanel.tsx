@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
@@ -12,12 +12,15 @@ import { DollarSign, ArrowUpRight, Clock, Plus } from "lucide-react";
 import { format } from "date-fns";
 import { toast } from "sonner";
 import { useTranslation } from "react-i18next";
+import { useChatbotUIAction } from "@/hooks/useChatbotUIAction";
 
 const PaymentsPanel = () => {
   const { t } = useTranslation();
   const { user } = useAuth();
   const queryClient = useQueryClient();
   const [open, setOpen] = useState(false);
+
+  useChatbotUIAction(["add-payment"], useCallback(() => setOpen(true), []));
   const [form, setForm] = useState({ phone_number: "", amount: "", description: "" });
 
   const { data: payments } = useQuery({

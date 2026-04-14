@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useCallback } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
@@ -30,6 +30,7 @@ import {
 import { useTranslation } from "react-i18next";
 import FinancialReportsPanel from "./FinancialReportsPanel";
 import { CompactList } from "@/components/ui/compact-list";
+import { useChatbotUIAction } from "@/hooks/useChatbotUIAction";
 
 const COLORS = ["hsl(152,45%,22%)", "hsl(40,55%,55%)", "hsl(195,60%,50%)", "hsl(25,30%,35%)", "hsl(340,55%,50%)", "hsl(270,40%,50%)"];
 
@@ -64,6 +65,9 @@ const EarningsExpensesPanel = ({ role }: Props) => {
 
   const [addDialogOpen, setAddDialogOpen] = useState(false);
   const [budgetDialogOpen, setBudgetDialogOpen] = useState(false);
+
+  useChatbotUIAction(["add-transaction"], useCallback(() => setAddDialogOpen(true), []));
+  useChatbotUIAction(["add-budget"], useCallback(() => setBudgetDialogOpen(true), []));
   const [editingBudgetId, setEditingBudgetId] = useState<string | null>(null);
   const [editBudgetAmount, setEditBudgetAmount] = useState("");
   const [editBudgetNotes, setEditBudgetNotes] = useState("");

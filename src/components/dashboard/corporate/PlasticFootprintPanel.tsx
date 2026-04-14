@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
@@ -13,6 +13,7 @@ import { toast } from "sonner";
 import { Package, Plus, Target, TrendingUp, Trash2 } from "lucide-react";
 import { format } from "date-fns";
 import { useTranslation } from "react-i18next";
+import { useChatbotUIAction } from "@/hooks/useChatbotUIAction";
 
 const MATERIAL_TYPES = ["PET", "HDPE", "LDPE", "PP", "PS", "Other Plastic"];
 const RECOVERY_RATES: Record<string, number> = {
@@ -24,6 +25,8 @@ const PlasticFootprintPanel = () => {
   const { user } = useAuth();
   const qc = useQueryClient();
   const [showForm, setShowForm] = useState(false);
+
+  useChatbotUIAction(["add-declaration"], useCallback(() => setShowForm(true), []));
   const [form, setForm] = useState({
     period_type: "monthly",
     period_start: "",

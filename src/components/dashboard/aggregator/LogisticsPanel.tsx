@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useCallback } from "react";
+import { useChatbotUIAction } from "@/hooks/useChatbotUIAction";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
@@ -20,6 +21,8 @@ const LogisticsPanel = () => {
   const queryClient = useQueryClient();
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState({ location_name: "", scheduled_at: "", notes: "" });
+
+  useChatbotUIAction(["add-pickup-schedule"], useCallback(() => setOpen(true), []));
 
   const { data: schedules } = useQuery({
     queryKey: ["aggregator_logistics", user?.id],

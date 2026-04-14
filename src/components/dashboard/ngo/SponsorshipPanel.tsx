@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { getDisplayName, getDisplayInitial } from "@/lib/displayUtils";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -15,6 +15,7 @@ import { Users, Heart, MapPin, DollarSign, Plus, History, Recycle, Factory } fro
 import { toast } from "sonner";
 import { format } from "date-fns";
 import { useTranslation } from "react-i18next";
+import { useChatbotUIAction } from "@/hooks/useChatbotUIAction";
 
 const FUND_TYPES = [
   { value: "general", label: "General Support" },
@@ -39,6 +40,8 @@ const SponsorshipPanel = () => {
   const { user } = useAuth();
   const queryClient = useQueryClient();
   const [open, setOpen] = useState(false);
+
+  useChatbotUIAction(["add-sponsorship"], useCallback(() => setOpen(true), []));
   const [selectedPicker, setSelectedPicker] = useState("");
   const [county, setCounty] = useState("");
   const [community, setCommunity] = useState("");

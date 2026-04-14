@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { useTrash } from "@/hooks/useTrash";
 import { supabase } from "@/integrations/supabase/client";
@@ -22,6 +22,7 @@ import {
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { generateCleanupReportPDF } from "@/lib/cleanupReportPdf";
 import { useTranslation } from "react-i18next";
+import { useChatbotUIAction } from "@/hooks/useChatbotUIAction";
 
 interface CleanupExercise {
   id: string;
@@ -122,6 +123,8 @@ const CleanupExercisePanel = ({ isAdmin = false }: Props) => {
   const { user, profile } = useAuth();
   const queryClient = useQueryClient();
   const [showForm, setShowForm] = useState(false);
+
+  useChatbotUIAction(["add-cleanup"], useCallback(() => setShowForm(true), []));
   const [form, setForm] = useState({ ...emptyForm });
   const [editingId, setEditingId] = useState<string | null>(null);
   const [showBreakdown, setShowBreakdown] = useState(false);
