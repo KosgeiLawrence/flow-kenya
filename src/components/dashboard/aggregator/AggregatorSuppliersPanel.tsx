@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { getDisplayName } from "@/lib/displayUtils";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
@@ -74,8 +75,8 @@ const AggregatorSuppliersPanel = () => {
   });
 
   const filteredPlatformUsers = platformWastePickers?.filter((p) =>
+    getDisplayName(p).toLowerCase().includes(platformSearch.toLowerCase()) ||
     p.full_name?.toLowerCase().includes(platformSearch.toLowerCase()) ||
-    (p as any).organizations?.name?.toLowerCase().includes(platformSearch.toLowerCase()) ||
     p.email?.toLowerCase().includes(platformSearch.toLowerCase()) ||
     p.county?.toLowerCase().includes(platformSearch.toLowerCase())
   ) || [];
@@ -141,11 +142,11 @@ const AggregatorSuppliersPanel = () => {
   };
 
   const selectPlatformUser = (p: any) => {
-    const orgName = (p as any).organizations?.name;
+    const displayName = getDisplayName(p);
     setForm({
       ...form,
-      supplier_name: p.full_name,
-      contact_person: orgName || p.full_name,
+      supplier_name: displayName,
+      contact_person: p.full_name,
       phone: p.phone_number || "",
       email: p.email || "",
       location: p.county || p.area_of_operation || "",
@@ -229,9 +230,9 @@ const AggregatorSuppliersPanel = () => {
                   ) : (
                     filteredPlatformUsers.slice(0, 20).map((p) => (
                       <button key={p.id} onClick={() => selectPlatformUser(p)} className="w-full text-left p-2 hover:bg-muted/50 transition-colors">
-                        <p className="text-sm font-medium text-foreground">{p.full_name}</p>
+                        <p className="text-sm font-medium text-foreground">{getDisplayName(p)}</p>
                         <p className="text-xs text-muted-foreground">
-                          {p.county || p.area_of_operation || ""}
+                          {(p as any).organizations?.name ? p.full_name + " · " : ""}{p.county || p.area_of_operation || ""}
                           {p.phone_number ? ` · ${p.phone_number}` : ""}
                         </p>
                       </button>
