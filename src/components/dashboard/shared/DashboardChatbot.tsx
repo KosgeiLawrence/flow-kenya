@@ -173,7 +173,7 @@ const DashboardChatbot = ({ role, navItems, onNavigate }: DashboardChatbotProps)
                     <Bot className="w-4 h-4 text-primary" />
                   </div>
                   <div className="text-sm text-muted-foreground leading-relaxed">
-                    Hi! I'm your AI assistant with <strong className="text-foreground">full platform powers</strong>. I can analyze your data, add transactions, log collections, navigate anywhere, and remember our conversations. What would you like to do?
+                    Hi! I'm your Duara AI assistant. I can help you navigate your dashboard, analyze your data, and answer questions. How can I help you today?
                   </div>
                 </div>
                 <div className="space-y-2 pl-10">
