@@ -2010,6 +2010,7 @@ export type Database = {
           }
         | { Args: { _cleanup_id: string; _user_id: string }; Returns: boolean }
       get_platform_stats: { Args: never; Returns: Json }
+      get_team_user_ids: { Args: { _user_id: string }; Returns: string[] }
       get_user_role: {
         Args: { _user_id: string }
         Returns: Database["public"]["Enums"]["app_role"]

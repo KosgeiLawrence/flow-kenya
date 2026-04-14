@@ -8,6 +8,7 @@ import {
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
+import { useFilteredNavItems } from "@/hooks/useFilteredNavItems";
 import CollectionPanel from "@/components/dashboard/waste-picker/CollectionPanel";
 import ProfileSettingsPanel from "@/components/dashboard/shared/ProfileSettingsPanel";
 import PricingPanel from "@/components/dashboard/waste-picker/PricingPanel";
@@ -61,6 +62,7 @@ const WastePickerDashboard = () => {
   const navigate = useNavigate();
   const [activePanel, setActivePanel] = useState("how-it-works");
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const { filteredNavItems } = useFilteredNavItems(navItems);
 
   const status = statusConfig[profile?.approval_status || "pending"];
   const StatusIcon = status.icon;
@@ -132,7 +134,7 @@ const WastePickerDashboard = () => {
         </div>
 
         <nav className="flex-1 p-2 space-y-1 overflow-y-auto">
-          {navItems.map((item) => (
+          {filteredNavItems.map((item) => (
             <button
               key={item.id}
               onClick={() => { setActivePanel(item.id); setSidebarOpen(false); }}

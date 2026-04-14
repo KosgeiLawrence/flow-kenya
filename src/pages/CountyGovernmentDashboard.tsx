@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { LogOut, MapPin, BarChart3, FileText, Scale, Menu, X, ChevronRight, Settings, BookOpen, Trash2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
+import { useFilteredNavItems } from "@/hooks/useFilteredNavItems";
 import WasteFlowPanel from "@/components/dashboard/county/WasteFlowPanel";
 import CountyReportsPanel from "@/components/dashboard/county/CountyReportsPanel";
 import RegulatoryPanel from "@/components/dashboard/county/RegulatoryPanel";
@@ -30,6 +31,7 @@ const CountyGovernmentDashboard = () => {
   const navigate = useNavigate();
   const [activePanel, setActivePanel] = useState("waste-flow");
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const { filteredNavItems } = useFilteredNavItems(navItems);
 
   const handleSignOut = async () => {
     await signOut();
@@ -85,7 +87,7 @@ const CountyGovernmentDashboard = () => {
         </div>
 
         <nav className="flex-1 p-2 space-y-1 overflow-y-auto">
-          {navItems.map((item) => (
+          {filteredNavItems.map((item) => (
             <button
               key={item.id}
               onClick={() => { setActivePanel(item.id); setSidebarOpen(false); }}

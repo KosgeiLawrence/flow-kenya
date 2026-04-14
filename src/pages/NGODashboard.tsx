@@ -7,6 +7,7 @@ import {
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
+import { useFilteredNavItems } from "@/hooks/useFilteredNavItems";
 import SponsorshipPanel from "@/components/dashboard/ngo/SponsorshipPanel";
 import ImpactMetricsPanel from "@/components/dashboard/ngo/ImpactMetricsPanel";
 import GrantsPanel from "@/components/dashboard/ngo/GrantsPanel";
@@ -41,6 +42,7 @@ const NGODashboard = () => {
   const navigate = useNavigate();
   const [activePanel, setActivePanel] = useState("sponsorship");
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const { filteredNavItems } = useFilteredNavItems(navItems);
 
   const status = statusConfig[profile?.approval_status || "pending"];
   const StatusIcon = status.icon;
@@ -101,7 +103,7 @@ const NGODashboard = () => {
         </div>
 
         <nav className="flex-1 p-2 space-y-1 overflow-y-auto">
-          {navItems.map((item) => (
+          {filteredNavItems.map((item) => (
             <button
               key={item.id}
               onClick={() => { setActivePanel(item.id); setSidebarOpen(false); }}
