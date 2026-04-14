@@ -186,7 +186,8 @@ const AggregatorDashboard = () => {
           ))}
         </nav>
 
-        <div className="p-3 border-t border-sidebar-border">
+        <div className="p-3 border-t border-sidebar-border space-y-1">
+          <LanguageToggle />
           <Button variant="ghost" size="sm" onClick={handleSignOut} className="w-full justify-start gap-2 text-sidebar-foreground/70 hover:text-sidebar-foreground hover:bg-sidebar-accent/50">
             <LogOut className="w-4 h-4" /> Sign Out
           </Button>
