@@ -8,6 +8,8 @@ import {
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
+import { useTranslatedNavItems } from "@/hooks/useTranslatedNavItems";
+import { useTranslation } from "react-i18next";
 import { useFilteredNavItems } from "@/hooks/useFilteredNavItems";
 import CollectionPanel from "@/components/dashboard/waste-picker/CollectionPanel";
 import ProfileSettingsPanel from "@/components/dashboard/shared/ProfileSettingsPanel";
@@ -63,6 +65,8 @@ const WastePickerDashboard = () => {
   const [activePanel, setActivePanel] = useState("how-it-works");
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const { filteredNavItems, teamDisplayName, teamLogoUrl } = useFilteredNavItems(navItems);
+  const translatedNavItems = useTranslatedNavItems(filteredNavItems);
+  const { t } = useTranslation();
   const effectiveDisplayName = teamDisplayName || displayName;
   const effectiveLogoUrl = teamLogoUrl || orgLogoUrl;
 
@@ -136,7 +140,7 @@ const WastePickerDashboard = () => {
         </div>
 
         <nav className="flex-1 p-2 space-y-1 overflow-y-auto">
-          {filteredNavItems.map((item) => (
+          {translatedNavItems.map((item) => (
             <button
               key={item.id}
               onClick={() => { setActivePanel(item.id); setSidebarOpen(false); }}
@@ -156,7 +160,7 @@ const WastePickerDashboard = () => {
 
         <div className="p-3 border-t border-sidebar-border">
           <Button variant="ghost" size="sm" onClick={handleSignOut} className="w-full justify-start gap-2 text-sidebar-foreground/70 hover:text-sidebar-foreground hover:bg-sidebar-accent/50">
-            <LogOut className="w-4 h-4" /> Sign Out
+            <LogOut className="w-4 h-4" /> {t("dashboard.logout")}
           </Button>
         </div>
       </aside>
