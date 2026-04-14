@@ -11,6 +11,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import { Recycle, ArrowRight, Plus, History, BarChart3, Package, Layers } from "lucide-react";
+import MaterialIcon from "@/components/dashboard/shared/MaterialIcon";
 import { toast } from "sonner";
 import { format } from "date-fns";
 import { useTranslation } from "react-i18next";
@@ -303,7 +304,7 @@ const MaterialTransformationPanel = () => {
                 <SelectContent>
                   {inventory?.filter(m => m.qty > 0).map(m => (
                     <SelectItem key={m.id} value={m.id}>
-                      {m.icon} {m.name} — {m.qty.toFixed(1)} {m.unit} available
+                      <span className="inline-flex items-center gap-1.5"><MaterialIcon iconName={m.icon} className="w-4 h-4" /> {m.name} — {m.qty.toFixed(1)} {m.unit} available</span>
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -457,7 +458,7 @@ const MaterialTransformationPanel = () => {
                   <div className="divide-y divide-border">
                     {inventory?.filter(m => m.qty > 0).map((m, i) => (
                       <div key={i} className="flex items-center justify-between py-2">
-                        <span className="text-sm">{m.icon} {m.name}</span>
+                        <span className="text-sm inline-flex items-center gap-1.5"><MaterialIcon iconName={m.icon} className="w-4 h-4" /> {m.name}</span>
                         <span className="text-sm font-medium">{m.qty.toFixed(1)} {m.unit}</span>
                       </div>
                     ))}

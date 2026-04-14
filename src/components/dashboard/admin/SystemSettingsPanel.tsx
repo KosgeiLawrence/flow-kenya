@@ -66,7 +66,7 @@ const SystemSettingsPanel = () => {
               <TableBody>
                 {materials?.map((m) => (
                   <TableRow key={m.id}>
-                    <TableCell className="font-medium">{m.icon} {m.name}</TableCell>
+                    <TableCell className="font-medium"><span className="inline-flex items-center gap-1.5"><MaterialIcon iconName={m.icon} className="w-4 h-4" /> {m.name}</span></TableCell>
                     <TableCell className="text-muted-foreground">{m.unit}</TableCell>
                     <TableCell>KES {Number(m.price_per_unit).toFixed(2)}</TableCell>
                     <TableCell>

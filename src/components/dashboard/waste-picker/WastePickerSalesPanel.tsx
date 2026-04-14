@@ -11,6 +11,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { ShoppingCart, FileText, Receipt, CheckCircle2, ArrowRight, Users, Search, History, Trash2, Download, Package, Plus } from "lucide-react";
+import MaterialIcon from "@/components/dashboard/shared/MaterialIcon";
 import { toast } from "sonner";
 import jsPDF from "jspdf";
 import { format } from "date-fns";
@@ -423,7 +424,7 @@ const WastePickerSalesPanel = () => {
                     <div className="flex items-start gap-3 flex-1 min-w-0">
                       <Package className="w-4 h-4 text-muted-foreground mt-0.5 shrink-0" />
                       <div className="min-w-0">
-                        <p className="text-sm font-medium text-foreground">{m.icon} {m.name}</p>
+                        <p className="text-sm font-medium text-foreground inline-flex items-center gap-1.5"><MaterialIcon iconName={m.icon} className="w-4 h-4" /> {m.name}</p>
                         <div className="flex items-center gap-2 mt-1">
                           <span className="text-xs text-muted-foreground">Stock: {m.qty.toFixed(1)} {m.unit}</span>
                           <span className="text-xs font-semibold text-foreground">KES {m.pricePerUnit.toFixed(2)}/{m.unit}</span>

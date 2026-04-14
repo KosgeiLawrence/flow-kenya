@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Package, Layers, TrendingUp, Plus } from "lucide-react";
+import MaterialIcon from "@/components/dashboard/shared/MaterialIcon";
 import { toast } from "sonner";
 import { useTranslation } from "react-i18next";
 
@@ -136,7 +137,7 @@ const InventoryPanel = () => {
               <SelectTrigger><SelectValue placeholder="Select material type" /></SelectTrigger>
               <SelectContent>
                 {materialTypes?.map((mt) => (
-                  <SelectItem key={mt.id} value={mt.id}>{mt.icon || "♻️"} {mt.name} (KES {mt.price_per_unit}/{mt.unit})</SelectItem>
+                  <SelectItem key={mt.id} value={mt.id}><span className="inline-flex items-center gap-1.5"><MaterialIcon iconName={mt.icon} className="w-4 h-4" /> {mt.name} (KES {mt.price_per_unit}/{mt.unit})</span></SelectItem>
                 ))}
               </SelectContent>
             </Select>
