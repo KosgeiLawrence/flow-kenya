@@ -56,6 +56,9 @@ export default defineConfig(({ mode }) => ({
       },
     }),
   ].filter(Boolean),
+  optimizeDeps: {
+    include: ["react", "react-dom", "react-i18next", "i18next"],
+  },
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
