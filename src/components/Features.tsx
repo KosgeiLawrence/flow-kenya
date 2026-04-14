@@ -1,6 +1,6 @@
 import { motion, useInView } from "framer-motion";
 import { useRef } from "react";
-import { Smartphone, QrCode, MapPin, Wifi, Shield, BarChart3 } from "lucide-react";
+import { QrCode, MapPin, Wifi, Shield, BarChart3 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 const Features = () => {
@@ -9,7 +9,6 @@ const Features = () => {
   const { t } = useTranslation();
 
   const features = [
-    { icon: Smartphone, title: t("features.mpesa"), description: t("features.mpesaDesc") },
     { icon: QrCode, title: t("features.qr"), description: t("features.qrDesc") },
     { icon: MapPin, title: t("features.geo"), description: t("features.geoDesc") },
     { icon: Wifi, title: t("features.offline"), description: t("features.offlineDesc") },
