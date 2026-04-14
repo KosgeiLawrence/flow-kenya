@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { getDisplayName } from "@/lib/displayUtils";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
@@ -76,8 +77,8 @@ const SuppliersPanel = () => {
   const [platformSearch, setPlatformSearch] = useState("");
 
   const filteredPlatformUsers = platformUsers?.filter((p) =>
+    getDisplayName(p).toLowerCase().includes(platformSearch.toLowerCase()) ||
     p.full_name?.toLowerCase().includes(platformSearch.toLowerCase()) ||
-    (p as any).organizations?.name?.toLowerCase().includes(platformSearch.toLowerCase()) ||
     p.email?.toLowerCase().includes(platformSearch.toLowerCase())
   ) || [];
 
@@ -142,17 +143,17 @@ const SuppliersPanel = () => {
   };
 
   const selectPlatformUser = (p: any) => {
-    const orgName = (p as any).organizations?.name;
+    const displayName = getDisplayName(p);
     setForm({
       ...form,
-      supplier_name: orgName || p.full_name,
+      supplier_name: displayName,
       contact_person: p.full_name,
       phone: p.phone_number || "",
       email: p.email || "",
       location: p.county || "",
       platform_user_id: p.user_id,
     });
-    setAddMode("manual"); // switch back to form to fill remaining details
+    setAddMode("manual");
   };
 
   const filtered = suppliers?.filter((s) =>
@@ -229,10 +230,9 @@ const SuppliersPanel = () => {
                   ) : (
                     filteredPlatformUsers.slice(0, 20).map((p) => (
                       <button key={p.id} onClick={() => selectPlatformUser(p)} className="w-full text-left p-2 hover:bg-muted/50 transition-colors">
-                        <p className="text-sm font-medium text-foreground">{p.full_name}</p>
+                        <p className="text-sm font-medium text-foreground">{getDisplayName(p)}</p>
                         <p className="text-xs text-muted-foreground">
-                          {(p as any).organizations?.name ? `${(p as any).organizations.name} · ` : ""}
-                          {p.county || ""}
+                          {(p as any).organizations?.name ? p.full_name + " · " : ""}{p.county || ""}
                           {p.phone_number ? ` · ${p.phone_number}` : ""}
                         </p>
                       </button>

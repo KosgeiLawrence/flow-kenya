@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { getDisplayName } from "@/lib/displayUtils";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -37,7 +38,7 @@ const RequestedPickupsPanel = () => {
       if (!requesterIds.length) return [];
       const { data } = await supabase
         .from("profiles")
-        .select("user_id, full_name, phone_number, email, county")
+        .select("user_id, full_name, phone_number, email, county, organization_id, organizations(name)")
         .in("user_id", requesterIds);
       return data || [];
     },
@@ -84,7 +85,8 @@ const RequestedPickupsPanel = () => {
   });
 
   const getPickerName = (pickerId: string) => {
-    return pickerProfiles?.find(p => p.user_id === pickerId)?.full_name || "Unknown Requester";
+    const p = pickerProfiles?.find(p => p.user_id === pickerId);
+    return getDisplayName(p, "Unknown Requester");
   };
 
   const getPickerContact = (pickerId: string) => {

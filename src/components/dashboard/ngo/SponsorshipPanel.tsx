@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { getDisplayName, getDisplayInitial } from "@/lib/displayUtils";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
@@ -227,7 +228,7 @@ const SponsorshipPanel = () => {
                   <SelectContent>
                     {filteredParticipants.map(p => (
                       <SelectItem key={p.id} value={p.id}>
-                        {p.full_name} {p.is_independent ? "(Ind.)" : (p as any).organizations?.name ? `(${(p as any).organizations.name})` : ""}
+                        {getDisplayName(p)}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -303,10 +304,10 @@ const SponsorshipPanel = () => {
                   <div key={s.id} className="flex items-center justify-between py-3 gap-3">
                     <div className="flex items-center gap-3 min-w-0">
                       <div className="w-9 h-9 rounded-full bg-muted flex items-center justify-center text-sm font-bold text-foreground shrink-0">
-                        {picker?.full_name?.charAt(0) || "?"}
+                        {getDisplayInitial(picker)}
                       </div>
                       <div className="min-w-0">
-                        <p className="text-sm font-medium text-foreground truncate">{picker?.full_name || "Participant"}</p>
+                        <p className="text-sm font-medium text-foreground truncate">{getDisplayName(picker, "Participant")}</p>
                         <p className="text-xs text-muted-foreground">
                           {getRoleLabel(role)} · {s.county || "—"} · {FUND_TYPES.find(f => f.value === s.fund_type)?.label || s.fund_type} · KES {Number(s.amount_allocated).toLocaleString()}
                         </p>
