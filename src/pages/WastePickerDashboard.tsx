@@ -26,7 +26,7 @@ import CRMPanel from "@/components/dashboard/shared/CRMPanel";
 import WastePickerWorkflowGuidePanel from "@/components/dashboard/waste-picker/WorkflowGuidePanel";
 import WastePickerSalesPanel from "@/components/dashboard/waste-picker/WastePickerSalesPanel";
 import RequestedPickupsPanel from "@/components/dashboard/shared/RequestedPickupsPanel";
-import MarketplacePanel from "@/components/dashboard/aggregator/MarketplacePanel";
+import MarketplacePanelShared from "@/components/dashboard/shared/MarketplacePanel";
 import ESGPanel from "@/components/dashboard/aggregator/ESGPanel";
 import CompliancePanel from "@/components/dashboard/aggregator/CompliancePanel";
 import TrashPanel from "@/components/dashboard/shared/TrashPanel";
@@ -88,7 +88,7 @@ const WastePickerDashboard = () => {
       case "schedule": return <SchedulePanel />;
       case "my-earnings": return <EarningsExpensesPanel role="waste_picker" />;
       case "crm": return <CRMPanel role="waste_picker" />;
-      case "marketplace": return <MarketplacePanel />;
+      case "marketplace": return <MarketplacePanelShared role="waste_picker" />;
       case "training": return <TrainingPanel viewerRole="waste_picker" />;
       case "esg": return <ESGPanel />;
       case "compliance": return <CompliancePanel />;

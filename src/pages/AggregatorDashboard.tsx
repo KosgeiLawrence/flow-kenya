@@ -15,7 +15,7 @@ import { useTranslation } from "react-i18next";
 import LanguageToggle from "@/components/dashboard/shared/LanguageToggle";
 import WastePickerMgmtPanel from "@/components/dashboard/aggregator/WastePickerMgmtPanel";
 import InventoryPanel from "@/components/dashboard/aggregator/InventoryPanel";
-import MarketplacePanel from "@/components/dashboard/aggregator/MarketplacePanel";
+import MarketplacePanelShared from "@/components/dashboard/shared/MarketplacePanel";
 import LogisticsPanel from "@/components/dashboard/aggregator/LogisticsPanel";
 import PaymentsPanel from "@/components/dashboard/aggregator/PaymentsPanel";
 import BulkReceiptsPanel from "@/components/dashboard/aggregator/BulkReceiptsPanel";
@@ -114,7 +114,7 @@ const AggregatorDashboard = () => {
           <TabsContent value="recycler-requests"><RecyclerPickupRequestPanel /></TabsContent>
         </Tabs>
       );
-      case "marketplace": return <MarketplacePanel />;
+      case "marketplace": return <MarketplacePanelShared role="aggregator" />;
       case "logistics": return <LogisticsPanel />;
       case "payments": return <PaymentsPanel />;
       case "receipts": return <BulkReceiptsPanel />;
