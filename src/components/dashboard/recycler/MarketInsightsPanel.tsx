@@ -68,12 +68,12 @@ const MarketInsightsPanel = () => {
         <CardContent>
           <div className="space-y-3">
             <div className="p-3 rounded-lg bg-primary/5 border border-primary/20">
-              <p className="text-sm font-medium text-foreground">PET Demand Rising</p>
-              <p className="text-xs text-muted-foreground">Regional demand for PET has increased due to new EPR regulations. Expect price stability.</p>
+              <p className="text-sm font-medium text-foreground">{t("recyclerPanels.petDemand", "PET Demand Rising")}</p>
+              <p className="text-xs text-muted-foreground">{t("recyclerPanels.petDemandDesc", "Regional demand for PET has increased due to new EPR regulations. Expect price stability.")}</p>
             </div>
             <div className="p-3 rounded-lg bg-secondary/10 border border-accent/20">
-              <p className="text-sm font-medium text-foreground">E-Waste Premium</p>
-              <p className="text-xs text-muted-foreground">E-waste commands premium pricing due to precious metal recovery value.</p>
+              <p className="text-sm font-medium text-foreground">{t("recyclerPanels.eWastePremium", "E-Waste Premium")}</p>
+              <p className="text-xs text-muted-foreground">{t("recyclerPanels.eWastePremiumDesc", "E-waste commands premium pricing due to precious metal recovery value.")}</p>
             </div>
           </div>
         </CardContent>

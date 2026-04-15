@@ -963,6 +963,11 @@ const en = {
     pricesTrend: "Price Trends",
     demandForecast: "Demand Forecast",
     competitorAnalysis: "Competitor Analysis",
+    marketNotes: "Market Notes",
+    petDemand: "PET Demand Rising",
+    petDemandDesc: "Regional demand for PET has increased due to new EPR regulations. Expect price stability.",
+    eWastePremium: "E-Waste Premium",
+    eWastePremiumDesc: "E-waste commands premium pricing due to precious metal recovery value.",
 
     supplyForecast: "Supply Forecast",
     projectedSupply: "Projected Supply",
@@ -1080,6 +1085,8 @@ const en = {
     generateReport: "Generate Report",
     monthlyReport: "Monthly Report",
     annualReport: "Annual Report",
+    waterSaved: "Water Saved",
+    energySaved: "Energy Saved",
   },
 
   // Admin panels
@@ -1118,10 +1125,19 @@ const en = {
     investigateCase: "Investigate",
 
     inviteUsers: "Invite Users",
+    inviteDesc: "Send email invitations to join Duara Flow. Each invite automatically includes the PILOT2026 coupon for free access.",
     sendInvite: "Send Invite",
     inviteEmail: "Email Address",
     inviteRole: "Role",
     inviteSent: "Invitation sent!",
+    recentInvites: "Recently Sent Invitations",
+    materialPricesMgmt: "Material Price Management",
+    managePricesDesc: "Manage material prices and platform configuration",
+    currentPrice: "Current Price (KES)",
+    documentType: "Document Type",
+    invoice: "Invoice",
+    quotation: "Quotation",
+    receipt: "Receipt",
 
     auditLogs: "Audit Logs",
     recentActivity: "Recent Activity",

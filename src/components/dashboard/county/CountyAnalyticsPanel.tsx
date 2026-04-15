@@ -40,10 +40,10 @@ const CountyAnalyticsPanel = () => {
 
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         {[
-          { label: "Active Users", value: d.totalUsers, icon: Users, color: "text-primary" },
-          { label: "CO₂ Offset", value: `${(d.co2Avoided / 1000).toFixed(1)} t`, icon: Leaf, color: "text-primary" },
-          { label: "Water Saved", value: `${(d.waterSaved / 1000).toFixed(0)} m³`, icon: Droplets, color: "text-sky-500" },
-          { label: "Energy Saved", value: `${(d.energySaved / 1000).toFixed(1)} MWh`, icon: Zap, color: "text-secondary" },
+          { label: t("adminPanels.activeUsers", "Active Users"), value: d.totalUsers, icon: Users, color: "text-primary" },
+          { label: t("esgPanel.co2Avoided", "CO₂ Offset"), value: `${(d.co2Avoided / 1000).toFixed(1)} t`, icon: Leaf, color: "text-primary" },
+          { label: t("countyPanels.waterSaved", "Water Saved"), value: `${(d.waterSaved / 1000).toFixed(0)} m³`, icon: Droplets, color: "text-sky-500" },
+          { label: t("countyPanels.energySaved", "Energy Saved"), value: `${(d.energySaved / 1000).toFixed(1)} MWh`, icon: Zap, color: "text-secondary" },
         ].map((s) => (
           <Card key={s.label}>
             <CardContent className="p-4 flex items-center gap-3">

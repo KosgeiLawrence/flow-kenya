@@ -963,6 +963,11 @@ const sw = {
     pricesTrend: "Mwenendo wa Bei",
     demandForecast: "Utabiri wa Mahitaji",
     competitorAnalysis: "Uchambuzi wa Washindani",
+    marketNotes: "Maelezo ya Soko",
+    petDemand: "Mahitaji ya PET Yanaongezeka",
+    petDemandDesc: "Mahitaji ya kikanda ya PET yameongezeka kutokana na kanuni mpya za EPR. Tarajia utulivu wa bei.",
+    eWastePremium: "Bei ya Juu ya E-Taka",
+    eWastePremiumDesc: "E-taka ina bei ya juu kutokana na thamani ya urejeshaji wa metali za thamani.",
 
     supplyForecast: "Utabiri wa Usambazaji",
     projectedSupply: "Usambazaji Unaotarajiwa",
@@ -1080,6 +1085,8 @@ const sw = {
     generateReport: "Tengeneza Ripoti",
     monthlyReport: "Ripoti ya Kila Mwezi",
     annualReport: "Ripoti ya Kila Mwaka",
+    waterSaved: "Maji Yaliyookolewa",
+    energySaved: "Nishati Iliyookolewa",
   },
 
   // Admin panels
@@ -1118,10 +1125,19 @@ const sw = {
     investigateCase: "Chunguza",
 
     inviteUsers: "Alika Watumiaji",
+    inviteDesc: "Tuma mialiko ya barua pepe kujiunga na Duara Flow. Kila mwaliko unajumuisha kuponi ya PILOT2026 kwa ufikiaji wa bure.",
     sendInvite: "Tuma Mwaliko",
     inviteEmail: "Anwani ya Barua Pepe",
     inviteRole: "Jukumu",
     inviteSent: "Mwaliko umetumwa!",
+    recentInvites: "Mialiko Iliyotumwa Hivi Karibuni",
+    materialPricesMgmt: "Usimamizi wa Bei za Nyenzo",
+    managePricesDesc: "Simamia bei za nyenzo na usanidi wa jukwaa",
+    currentPrice: "Bei ya Sasa (KES)",
+    documentType: "Aina ya Hati",
+    invoice: "Ankara",
+    quotation: "Nukuu",
+    receipt: "Risiti",
 
     auditLogs: "Kumbukumbu za Ukaguzi",
     recentActivity: "Shughuli za Hivi Karibuni",

@@ -13,13 +13,13 @@ import { useTranslation } from "react-i18next";
 
 const COLORS = ["hsl(152,45%,22%)", "hsl(40,55%,55%)", "hsl(195,60%,50%)", "hsl(25,30%,35%)", "hsl(340,55%,50%)", "hsl(270,40%,50%)", "hsl(80,40%,40%)"];
 
-const ROLE_LABELS: Record<string, string> = {
-  waste_picker: "Waste Picker",
-  aggregator: "Aggregator",
-  recycler: "Recycler",
-  ngo: "NGO",
-  corporate: "Corporate",
-  county_government: "County Gov",
+const ROLE_KEY_MAP: Record<string, string> = {
+  waste_picker: "roles.wastePicker",
+  aggregator: "roles.aggregator",
+  recycler: "roles.recycler",
+  ngo: "roles.ngo",
+  corporate: "roles.corporate",
+  county_government: "roles.countyGovernment",
 };
 
 type ViewPeriod = "today" | "week" | "month" | "year" | "all";
@@ -109,7 +109,7 @@ const RevenueInsightsPanel = () => {
       roleMap[role] = (roleMap[role] || 0) + Number(p.amount);
     });
     return Object.entries(roleMap).map(([role, amount]) => ({
-      name: ROLE_LABELS[role] || "Other",
+      name: ROLE_KEY_MAP[role] ? t(ROLE_KEY_MAP[role]) : role,
       value: amount,
     })).sort((a, b) => b.value - a.value);
   }, [completedPayments]);
@@ -139,7 +139,7 @@ const RevenueInsightsPanel = () => {
       map[r] = (map[r] || 0) + 1;
     });
     return Object.entries(map).map(([role, count]) => ({
-      name: ROLE_LABELS[role] || role,
+      name: ROLE_KEY_MAP[role] ? t(ROLE_KEY_MAP[role]) : role,
       value: count,
     }));
   }, [userRoles]);
@@ -170,7 +170,7 @@ const RevenueInsightsPanel = () => {
             className="cursor-pointer capitalize"
             onClick={() => setViewPeriod(p)}
           >
-            {p === "all" ? "All Time" : p === "week" ? "This Week" : p === "month" ? "This Month" : p === "year" ? "This Year" : "Today"}
+            {p === "all" ? t("common.all") : p === "week" ? t("common.thisWeek") : p === "month" ? t("common.thisMonth") : p === "year" ? t("common.thisYear") : t("common.today")}
           </Badge>
         ))}
       </div>

@@ -44,10 +44,10 @@ const navItems = [
   { id: "profile-settings", label: "Profile Settings", icon: User },
 ];
 
-const statusConfig: Record<string, { icon: React.ElementType; label: string; color: string }> = {
-  pending: { icon: Clock, label: "Pending", color: "text-gold" },
-  approved: { icon: CheckCircle2, label: "Verified", color: "text-primary" },
-  rejected: { icon: AlertTriangle, label: "Rejected", color: "text-destructive" },
+const statusKeys: Record<string, { icon: React.ElementType; labelKey: string; color: string }> = {
+  pending: { icon: Clock, labelKey: "common.pending", color: "text-gold" },
+  approved: { icon: CheckCircle2, labelKey: "common.verified", color: "text-primary" },
+  rejected: { icon: AlertTriangle, labelKey: "common.rejected", color: "text-destructive" },
 };
 
 const CorporateDashboard = () => {
@@ -61,8 +61,8 @@ const CorporateDashboard = () => {
   const effectiveDisplayName = teamDisplayName || displayName;
   const effectiveLogoUrl = teamLogoUrl || orgLogoUrl;
 
-  const status = statusConfig[profile?.approval_status || "pending"];
-  const StatusIcon = status.icon;
+  const statusEntry = statusKeys[profile?.approval_status || "pending"];
+  const StatusIcon = statusEntry.icon;
 
   const handleSignOut = async () => {
     await signOut();
@@ -114,10 +114,10 @@ const CorporateDashboard = () => {
               </div>
             )}
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium truncate">{effectiveDisplayName || "Corporate"}</p>
+              <p className="text-sm font-medium truncate">{effectiveDisplayName || t("roles.corporate")}</p>
               <div className="flex items-center gap-1">
-                <StatusIcon className={cn("w-3 h-3", status.color)} />
-                <span className={cn("text-xs", status.color)}>{status.label}</span>
+                <StatusIcon className={cn("w-3 h-3", statusEntry.color)} />
+                <span className={cn("text-xs", statusEntry.color)}>{t(statusEntry.labelKey)}</span>
               </div>
             </div>
           </div>
@@ -145,7 +145,7 @@ const CorporateDashboard = () => {
         <div className="p-4 border-t border-[rgba(255,255,255,0.08)] space-y-1">
           <LanguageToggle />
           <Button variant="ghost" size="sm" onClick={handleSignOut} className="w-full justify-start gap-2 text-sidebar-foreground/70 hover:text-sidebar-foreground hover:bg-sidebar-accent/50">
-            <LogOut className="w-4 h-4" /> Sign Out
+            <LogOut className="w-4 h-4" /> {t("dashboard.signOut")}
           </Button>
         </div>
       </aside>
