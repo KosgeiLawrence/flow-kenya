@@ -1080,6 +1080,8 @@ const en = {
     generateReport: "Generate Report",
     monthlyReport: "Monthly Report",
     annualReport: "Annual Report",
+    waterSaved: "Water Saved",
+    energySaved: "Energy Saved",
   },
 
   // Admin panels
