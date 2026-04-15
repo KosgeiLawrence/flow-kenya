@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { ArrowLeft, Recycle, Mail, Phone, MapPin, Send } from "lucide-react";
+import { ArrowLeft, Recycle, Mail, Phone, MapPin, Send, Clock, MessageSquare } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -11,9 +11,9 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 
 const contactInfo = [
-  { icon: Mail, label: "Email", value: "hello@duaraflow.co.ke", href: "mailto:hello@duaraflow.co.ke" },
-  { icon: Phone, label: "Phone", value: "+254 741 027 140", href: "tel:+254741027140" },
-  { icon: MapPin, label: "Office", value: "Nairobi, Kenya", href: null },
+  { icon: Mail, label: "Email", value: "hello@duaraflow.co.ke", href: "mailto:hello@duaraflow.co.ke", description: "Send us an email anytime" },
+  { icon: Phone, label: "Phone", value: "+254 741 027 140", href: "tel:+254741027140", description: "Mon-Fri, 8am to 6pm EAT" },
+  { icon: MapPin, label: "Office", value: "Nairobi, Kenya", href: null, description: "Visit our headquarters" },
 ];
 
 const Contact = () => {
@@ -37,6 +37,7 @@ const Contact = () => {
 
   return (
     <div className="min-h-screen bg-mesh">
+      {/* Header */}
       <header className="border-b border-border/50 glass-strong sticky top-0 z-30">
         <div className="container flex items-center justify-between h-16">
           <Link to="/" className="flex items-center gap-2 group">
@@ -51,64 +52,102 @@ const Contact = () => {
         </div>
       </header>
 
-      <main className="container max-w-5xl py-12 md:py-20">
+      <main className="container max-w-6xl py-16 md:py-24 px-4">
+        {/* Hero heading */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, ease: [0.4, 0, 0.2, 1] }}
-          className="text-center mb-12"
+          className="text-center mb-16"
         >
-          <h1 className="font-display text-3xl md:text-4xl font-bold text-foreground mb-3">Get in Touch</h1>
-          <p className="text-muted-foreground max-w-lg mx-auto">
-            Have questions about Duara Flow? We'd love to hear from you. Reach out and our team will respond within 24 hours.
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-primary/20 bg-primary/5 mb-6">
+            <MessageSquare className="h-4 w-4 text-primary" />
+            <span className="text-sm font-medium text-primary">We'd love to hear from you</span>
+          </div>
+          <h1 className="font-display text-4xl md:text-5xl font-bold text-foreground mb-4">
+            Get in Touch
+          </h1>
+          <p className="text-muted-foreground text-lg max-w-xl mx-auto leading-relaxed">
+            Have questions about Duara Flow? Reach out and our team will respond within 24 hours.
           </p>
         </motion.div>
 
-        <div className="grid md:grid-cols-5 gap-8">
-          <div className="md:col-span-2 space-y-4">
-            {contactInfo.map((item, i) => (
-              <motion.div
-                key={item.label}
-                initial={{ opacity: 0, y: 15 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.1 + i * 0.08, duration: 0.4 }}
-                className="glass-card rounded-2xl p-5 flex items-center gap-4"
-              >
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/10">
-                  <item.icon className="h-5 w-5 text-primary" />
-                </div>
-                <div>
-                  <p className="text-sm font-medium text-muted-foreground">{item.label}</p>
-                  {item.href ? (
-                    <a href={item.href} className="text-foreground font-medium hover:text-primary transition-smooth">{item.value}</a>
-                  ) : (
-                    <p className="text-foreground font-medium">{item.value}</p>
-                  )}
-                </div>
-              </motion.div>
-            ))}
-          </div>
+        {/* Contact cards row */}
+        <div className="grid sm:grid-cols-3 gap-4 mb-12">
+          {contactInfo.map((item, i) => (
+            <motion.div
+              key={item.label}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.1 + i * 0.1, duration: 0.4 }}
+              className="glass-card rounded-2xl p-6 text-center group hover:border-primary/30 transition-all duration-300"
+            >
+              <div className="flex h-12 w-12 mx-auto mb-4 items-center justify-center rounded-xl bg-primary/10 group-hover:bg-primary/20 transition-colors duration-300">
+                <item.icon className="h-5 w-5 text-primary" />
+              </div>
+              <p className="text-sm font-medium text-muted-foreground mb-1">{item.label}</p>
+              {item.href ? (
+                <a href={item.href} className="text-foreground font-semibold hover:text-primary transition-smooth block mb-1">
+                  {item.value}
+                </a>
+              ) : (
+                <p className="text-foreground font-semibold mb-1">{item.value}</p>
+              )}
+              <p className="text-xs text-muted-foreground/70">{item.description}</p>
+            </motion.div>
+          ))}
+        </div>
 
-          <motion.div
-            initial={{ opacity: 0, y: 15 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3, duration: 0.5 }}
-            className="md:col-span-3 glass-card rounded-2xl p-6 md:p-8"
-          >
+        {/* Form section */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.4, duration: 0.5 }}
+          className="max-w-2xl mx-auto"
+        >
+          <div className="glass-card rounded-2xl p-8 md:p-10">
+            <div className="flex items-center gap-3 mb-8">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10">
+                <Send className="h-5 w-5 text-primary" />
+              </div>
+              <div>
+                <h2 className="text-lg font-semibold text-foreground">Send us a message</h2>
+                <p className="text-sm text-muted-foreground">Fill out the form below and we'll get back to you</p>
+              </div>
+            </div>
+
             <form onSubmit={handleSubmit} className="space-y-5">
               <div className="grid sm:grid-cols-2 gap-4">
-                <div className="space-y-2"><Label htmlFor="name">Full Name</Label><Input id="name" name="name" placeholder="Jane Wanjiku" required /></div>
-                <div className="space-y-2"><Label htmlFor="email">Email</Label><Input id="email" name="email" type="email" placeholder="jane@example.com" required /></div>
+                <div className="space-y-2">
+                  <Label htmlFor="name">Full Name</Label>
+                  <Input id="name" name="name" placeholder="Jane Wanjiku" required className="h-11" />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="email">Email Address</Label>
+                  <Input id="email" name="email" type="email" placeholder="jane@example.com" required className="h-11" />
+                </div>
               </div>
-              <div className="space-y-2"><Label htmlFor="subject">Subject</Label><Input id="subject" name="subject" placeholder="How can we help?" required /></div>
-              <div className="space-y-2"><Label htmlFor="message">Message</Label><Textarea id="message" name="message" placeholder="Tell us more..." rows={5} required /></div>
-              <Button type="submit" className="w-full" disabled={sending}>
+              <div className="space-y-2">
+                <Label htmlFor="subject">Subject</Label>
+                <Input id="subject" name="subject" placeholder="How can we help?" required className="h-11" />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="message">Message</Label>
+                <Textarea id="message" name="message" placeholder="Tell us more about your inquiry..." rows={5} required className="resize-none" />
+              </div>
+              <Button type="submit" className="w-full h-12 text-base font-medium" disabled={sending}>
                 {sending ? "Sending…" : <><Send className="mr-2 h-4 w-4" /> Send Message</>}
               </Button>
             </form>
-          </motion.div>
-        </div>
+
+            <div className="flex items-center justify-center gap-2 mt-6 pt-5 border-t border-border/50">
+              <Clock className="h-4 w-4 text-muted-foreground/60" />
+              <p className="text-sm text-muted-foreground/70">We typically respond within 24 hours</p>
+            </div>
+          </div>
+        </motion.div>
       </main>
+
       <Footer />
     </div>
   );
