@@ -1017,6 +1017,78 @@ export type Database = {
         }
         Relationships: []
       }
+      marketplace_listings: {
+        Row: {
+          category: string
+          condition: string
+          contact_email: string | null
+          contact_phone: string | null
+          county: string | null
+          created_at: string
+          currency: string
+          description: string | null
+          id: string
+          images: string[] | null
+          location: string | null
+          material_type: string | null
+          price_per_unit: number
+          quantity: number
+          seller_role: string
+          seller_user_id: string
+          status: string
+          title: string
+          unit: string
+          updated_at: string
+          views_count: number
+        }
+        Insert: {
+          category?: string
+          condition?: string
+          contact_email?: string | null
+          contact_phone?: string | null
+          county?: string | null
+          created_at?: string
+          currency?: string
+          description?: string | null
+          id?: string
+          images?: string[] | null
+          location?: string | null
+          material_type?: string | null
+          price_per_unit?: number
+          quantity?: number
+          seller_role: string
+          seller_user_id: string
+          status?: string
+          title: string
+          unit?: string
+          updated_at?: string
+          views_count?: number
+        }
+        Update: {
+          category?: string
+          condition?: string
+          contact_email?: string | null
+          contact_phone?: string | null
+          county?: string | null
+          created_at?: string
+          currency?: string
+          description?: string | null
+          id?: string
+          images?: string[] | null
+          location?: string | null
+          material_type?: string | null
+          price_per_unit?: number
+          quantity?: number
+          seller_role?: string
+          seller_user_id?: string
+          status?: string
+          title?: string
+          unit?: string
+          updated_at?: string
+          views_count?: number
+        }
+        Relationships: []
+      }
       material_transformations: {
         Row: {
           created_at: string
