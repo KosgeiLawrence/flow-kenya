@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { QrCode, MapPin, Wifi, Shield, BarChart3 } from "lucide-react";
+import { QrCode, MapPin, Wifi, Shield, BarChart3, Store } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 const Features = () => {
@@ -11,6 +11,7 @@ const Features = () => {
     { icon: Wifi, title: t("features.offline"), description: t("features.offlineDesc") },
     { icon: Shield, title: t("features.epr"), description: t("features.eprDesc") },
     { icon: BarChart3, title: t("features.financial"), description: t("features.financialDesc") },
+    { icon: Store, title: t("features.marketplace"), description: t("features.marketplaceDesc") },
   ];
 
   return (
