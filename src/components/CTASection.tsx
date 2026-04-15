@@ -48,11 +48,9 @@ const footerLinks = {
   menu: [
     { label: "Platform", to: "/#platform" },
     { label: "Features", to: "/#features" },
-    { label: "Dashboards", to: "/#dashboards" },
     { label: "Traceability", to: "/#traceability" },
     { label: "Impact", to: "/#impact" },
     { label: "About", to: "/#about" },
-    { label: "Contact", to: "/contact" },
   ],
   legal: [
     { label: "Terms", to: "/terms" },
