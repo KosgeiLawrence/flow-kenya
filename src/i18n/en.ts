@@ -1260,6 +1260,43 @@ const en = {
     submit: "Submit Request",
     note: "We typically respond within 24 hours during business days.",
   },
+
+  // Trending Marketplace (landing page)
+  trending: {
+    badge: "Trending Now",
+    title1: "Circular Economy",
+    title2: "Marketplace",
+    subtitle: "Browse waste materials, recycled products, and equipment from verified sellers across Kenya — all in one marketplace.",
+    available: "available",
+    viewAll: "View All Listings",
+  },
+
+  // Marketplace page
+  marketplacePage: {
+    badge: "Duara Flow Marketplace",
+    title1: "Circular Economy",
+    title2: "Marketplace",
+    subtitle: "Browse waste materials, recycled products, and equipment from verified waste pickers, aggregators, and recyclers across Kenya.",
+    activeListings: "Active Listings",
+    verifiedSellers: "Verified Sellers",
+    counties: "Counties",
+    searchPlaceholder: "Search materials, products, equipment...",
+    filterByCounty: "Filter by county...",
+    allCategories: "All Categories",
+    rawMaterials: "Raw Materials",
+    recycledProducts: "Recycled Products",
+    equipment: "Equipment",
+    services: "Services",
+    noListings: "No listings available yet",
+    noListingsHint: "Sign up as a seller to post the first listing!",
+    getStarted: "Get Started",
+    wastePicker: "Waste Picker",
+    aggregator: "Aggregator",
+    recycler: "Recycler",
+    rawMaterial: "Raw Material",
+    recycledProduct: "Recycled Product",
+    service: "Service",
+  },
 };
 
 export default en;

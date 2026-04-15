@@ -3,25 +3,26 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Badge } from "@/components/ui/badge";
-import { Store, Search, ArrowLeft, Package } from "lucide-react";
+import { Store, Search, Package } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import Navbar from "@/components/Navbar";
 import MarketplaceListingCard from "@/components/dashboard/shared/MarketplaceListingCard";
-
-const categoryFilters = [
-  { value: "all", label: "All Categories" },
-  { value: "raw_material", label: "Raw Materials" },
-  { value: "recycled_product", label: "Recycled Products" },
-  { value: "equipment", label: "Equipment" },
-  { value: "service", label: "Services" },
-];
+import { useTranslation } from "react-i18next";
 
 const Marketplace = () => {
+  const { t } = useTranslation();
   const [search, setSearch] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("all");
   const [countyFilter, setCountyFilter] = useState("");
+
+  const categoryFilters = [
+    { value: "all", label: t("marketplacePage.allCategories") },
+    { value: "raw_material", label: t("marketplacePage.rawMaterials") },
+    { value: "recycled_product", label: t("marketplacePage.recycledProducts") },
+    { value: "equipment", label: t("marketplacePage.equipment") },
+    { value: "service", label: t("marketplacePage.services") },
+  ];
 
   const { data: listings, isLoading } = useQuery({
     queryKey: ["public_marketplace", categoryFilter, countyFilter],
@@ -64,13 +65,13 @@ const Marketplace = () => {
         {/* Hero */}
         <div className="text-center mb-10">
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-sm text-primary mb-4">
-            <Store className="w-4 h-4" /> Duara Flow Marketplace
+            <Store className="w-4 h-4" /> {t("marketplacePage.badge")}
           </div>
           <h1 className="text-3xl sm:text-4xl font-display font-bold text-foreground mb-3">
-            Circular Economy <span className="text-primary">Marketplace</span>
+            {t("marketplacePage.title1")} <span className="text-primary">{t("marketplacePage.title2")}</span>
           </h1>
           <p className="text-muted-foreground max-w-xl mx-auto">
-            Browse waste materials, recycled products, and equipment from verified waste pickers, aggregators, and recyclers across Kenya.
+            {t("marketplacePage.subtitle")}
           </p>
         </div>
 
@@ -78,15 +79,15 @@ const Marketplace = () => {
         <div className="flex justify-center gap-6 mb-8">
           <div className="text-center">
             <p className="text-2xl font-bold text-primary">{listings?.length || 0}</p>
-            <p className="text-xs text-muted-foreground">Active Listings</p>
+            <p className="text-xs text-muted-foreground">{t("marketplacePage.activeListings")}</p>
           </div>
           <div className="text-center">
             <p className="text-2xl font-bold text-primary">{new Set(listings?.map(l => l.seller_user_id) || []).size}</p>
-            <p className="text-xs text-muted-foreground">Verified Sellers</p>
+            <p className="text-xs text-muted-foreground">{t("marketplacePage.verifiedSellers")}</p>
           </div>
           <div className="text-center">
             <p className="text-2xl font-bold text-primary">{new Set(listings?.map(l => l.county).filter(Boolean) || []).size}</p>
-            <p className="text-xs text-muted-foreground">Counties</p>
+            <p className="text-xs text-muted-foreground">{t("marketplacePage.counties")}</p>
           </div>
         </div>
 
@@ -94,7 +95,7 @@ const Marketplace = () => {
         <div className="flex flex-col sm:flex-row gap-3 mb-6">
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-            <Input placeholder="Search materials, products, equipment..." value={search} onChange={e => setSearch(e.target.value)} className="pl-9" />
+            <Input placeholder={t("marketplacePage.searchPlaceholder")} value={search} onChange={e => setSearch(e.target.value)} className="pl-9" />
           </div>
           <Select value={categoryFilter} onValueChange={setCategoryFilter}>
             <SelectTrigger className="w-full sm:w-48"><SelectValue /></SelectTrigger>
@@ -102,7 +103,7 @@ const Marketplace = () => {
               {categoryFilters.map(c => <SelectItem key={c.value} value={c.value}>{c.label}</SelectItem>)}
             </SelectContent>
           </Select>
-          <Input placeholder="Filter by county..." value={countyFilter} onChange={e => setCountyFilter(e.target.value)} className="w-full sm:w-40" />
+          <Input placeholder={t("marketplacePage.filterByCounty")} value={countyFilter} onChange={e => setCountyFilter(e.target.value)} className="w-full sm:w-40" />
         </div>
 
         {/* Listings */}
@@ -115,10 +116,10 @@ const Marketplace = () => {
         ) : !filteredListings.length ? (
           <div className="text-center py-20">
             <Package className="w-16 h-16 text-muted-foreground/20 mx-auto mb-4" />
-            <p className="text-lg font-medium text-muted-foreground">No listings available yet</p>
-            <p className="text-sm text-muted-foreground mt-1">Sign up as a seller to post the first listing!</p>
+            <p className="text-lg font-medium text-muted-foreground">{t("marketplacePage.noListings")}</p>
+            <p className="text-sm text-muted-foreground mt-1">{t("marketplacePage.noListingsHint")}</p>
             <Link to="/signup">
-              <Button className="mt-4">Get Started</Button>
+              <Button className="mt-4">{t("marketplacePage.getStarted")}</Button>
             </Link>
           </div>
         ) : (
