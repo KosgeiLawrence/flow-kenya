@@ -1,11 +1,8 @@
-import { motion, useInView } from "framer-motion";
-import { useRef } from "react";
+import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 const TraceabilityFlow = () => {
-  const ref = useRef(null);
-  const isInView = useInView(ref, { once: true, margin: "-100px" });
   const { t } = useTranslation();
 
   const steps = [
@@ -16,7 +13,7 @@ const TraceabilityFlow = () => {
   ];
 
   return (
-    <section id="traceability" className="relative py-20 md:py-32 overflow-hidden" ref={ref}>
+    <section id="traceability" className="relative py-20 md:py-32 overflow-hidden">
       <div className="absolute inset-0 bg-muted">
         <div className="absolute top-0 right-0 h-[40%] w-[40%] rounded-full bg-gold/5 blur-3xl" />
         <div className="absolute bottom-0 left-0 h-[30%] w-[30%] rounded-full bg-forest/5 blur-3xl" />
@@ -25,7 +22,8 @@ const TraceabilityFlow = () => {
       <div className="container relative">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
-          animate={isInView ? { opacity: 1, y: 0 } : {}}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-100px" }}
           transition={{ duration: 0.6, ease: [0.4, 0, 0.2, 1] }}
           className="mb-16 text-center"
         >
@@ -45,7 +43,8 @@ const TraceabilityFlow = () => {
             <motion.div
               key={step.step}
               initial={{ opacity: 0, y: 30 }}
-              animate={isInView ? { opacity: 1, y: 0 } : {}}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-50px" }}
               transition={{ delay: i * 0.12, duration: 0.5, ease: [0.4, 0, 0.2, 1] }}
               className="relative"
             >
