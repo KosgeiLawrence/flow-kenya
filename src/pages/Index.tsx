@@ -12,14 +12,16 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-background bg-radial-glow relative">
       <NeuralBackground />
-      <Navbar />
-      <Hero />
-      <Features />
-      <TraceabilityFlow />
-      <Dashboards />
-      <ImpactMetrics />
-      <AboutSection />
-      <CTASection />
+      <div className="relative z-10">
+        <Navbar />
+        <Hero />
+        <Features />
+        <TraceabilityFlow />
+        <Dashboards />
+        <ImpactMetrics />
+        <AboutSection />
+        <CTASection />
+      </div>
     </div>
   );
 };

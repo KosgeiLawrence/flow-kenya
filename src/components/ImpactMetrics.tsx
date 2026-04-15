@@ -42,13 +42,7 @@ const ImpactMetrics = () => {
       <div className="absolute bottom-1/4 -right-20 h-48 w-48 rounded-full bg-sky/8 blur-3xl" />
 
       <div className="container relative">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-100px" }}
-          transition={{ duration: 0.6, ease: [0.4, 0, 0.2, 1] }}
-          className="mb-16 text-center"
-        >
+        <div className="mb-16 text-center">
           <span className="mb-4 inline-block rounded-full border border-gold-light/20 bg-gold/10 px-4 py-1.5 text-sm font-semibold text-gold-light backdrop-blur-md">
             {t("impact.badge")}
           </span>
@@ -56,7 +50,7 @@ const ImpactMetrics = () => {
             {t("impact.title")}
           </h2>
           <p className="mx-auto max-w-2xl text-primary-foreground/60">{t("impact.subtitle")}</p>
-        </motion.div>
+        </div>
 
         <div className="grid grid-cols-2 gap-6 md:grid-cols-4">
           {metrics.map((m, i) => (
@@ -64,7 +58,7 @@ const ImpactMetrics = () => {
               key={i}
               initial={{ opacity: 0, scale: 0.9 }}
               whileInView={{ opacity: 1, scale: 1 }}
-              viewport={{ once: true, margin: "-50px" }}
+              viewport={{ once: true, amount: 0.1 }}
               transition={{ delay: i * 0.1, duration: 0.5, ease: [0.4, 0, 0.2, 1] }}
               className="rounded-2xl border border-primary-foreground/10 bg-primary-foreground/5 p-6 text-center backdrop-blur-xl transition-all duration-300 hover:bg-primary-foreground/10 hover:-translate-y-1"
             >
@@ -76,17 +70,11 @@ const ImpactMetrics = () => {
           ))}
         </div>
 
-        <motion.div
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: true }}
-          transition={{ delay: 0.5, duration: 0.5 }}
-          className="mt-10 text-center"
-        >
+        <div className="mt-10 text-center">
           <Button variant="hero" size="lg" onClick={() => navigate("/impact")} className="gap-2 hover-glow">
             {t("impact.viewFull")} <ArrowRight className="w-4 h-4" />
           </Button>
-        </motion.div>
+        </div>
       </div>
     </section>
   );
