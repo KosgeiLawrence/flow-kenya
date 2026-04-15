@@ -85,14 +85,14 @@ const WasteFlowPanel = () => {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Card>
+        <Card className="overflow-hidden">
           <CardHeader><CardTitle className="text-base">Daily Collections (30 days)</CardTitle></CardHeader>
           <CardContent>
-            <ChartContainer config={chartConfig} className="h-[250px]">
+            <ChartContainer config={chartConfig} className="h-[200px] sm:h-[250px]">
               <BarChart data={dailyData}>
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey="date" fontSize={10} />
-                <YAxis fontSize={11} />
+                <YAxis fontSize={10} />
                 <ChartTooltip content={<ChartTooltipContent />} />
                 <Bar dataKey="kg" fill="hsl(152,45%,22%)" radius={[3, 3, 0, 0]} />
               </BarChart>
@@ -100,12 +100,12 @@ const WasteFlowPanel = () => {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="overflow-hidden">
           <CardHeader><CardTitle className="text-base">Material Composition</CardTitle></CardHeader>
           <CardContent>
-            <ChartContainer config={chartConfig} className="h-[250px]">
+            <ChartContainer config={chartConfig} className="h-[200px] sm:h-[250px]">
               <PieChart>
-                <Pie data={materialData} cx="50%" cy="50%" outerRadius={80} dataKey="value" label={({ name, value }) => `${name}: ${value}kg`}>
+                <Pie data={materialData} cx="50%" cy="50%" outerRadius={65} dataKey="value" label={({ name, value }) => `${name}: ${value}kg`}>
                   {materialData.map((_, i) => <Cell key={i} fill={COLORS[i % COLORS.length]} />)}
                 </Pie>
                 <ChartTooltip content={<ChartTooltipContent />} />

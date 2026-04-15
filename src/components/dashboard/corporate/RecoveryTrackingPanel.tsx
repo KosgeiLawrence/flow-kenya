@@ -130,13 +130,13 @@ const RecoveryTrackingPanel = () => {
 
       {/* Charts */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        <Card className="shadow-soft">
+        <Card className="overflow-hidden shadow-soft">
           <CardHeader><CardTitle className="text-sm">Material Breakdown</CardTitle></CardHeader>
           <CardContent>
             {pieData.length ? (
               <ResponsiveContainer width="100%" height={220}>
                 <PieChart>
-                  <Pie data={pieData} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={80} label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}>
+                  <Pie data={pieData} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={65} label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}>
                     {pieData.map((_, i) => <Cell key={i} fill={COLORS[i % COLORS.length]} />)}
                   </Pie>
                   <Tooltip />
@@ -147,7 +147,7 @@ const RecoveryTrackingPanel = () => {
             )}
           </CardContent>
         </Card>
-        <Card className="shadow-soft">
+        <Card className="overflow-hidden shadow-soft">
           <CardHeader><CardTitle className="text-sm">Geographic Distribution</CardTitle></CardHeader>
           <CardContent>
             {countyData.length ? (

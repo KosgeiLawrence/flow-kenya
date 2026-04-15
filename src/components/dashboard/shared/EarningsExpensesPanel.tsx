@@ -991,13 +991,13 @@ const EarningsExpensesPanel = ({ role }: Props) => {
               <TabsTrigger value="breakdown">🥧 Breakdown</TabsTrigger>
             </TabsList>
             <TabsContent value="trend">
-              <Card className="shadow-soft">
+              <Card className="overflow-hidden shadow-soft">
                 <CardHeader className="pb-2"><CardTitle className="text-sm">7-Day Trend</CardTitle></CardHeader>
                 <CardContent>
                   <ResponsiveContainer width="100%" height={200}>
                     <BarChart data={dailyChartData}>
-                      <XAxis dataKey="day" tick={{ fontSize: 11 }} />
-                      <YAxis tick={{ fontSize: 11 }} />
+                      <XAxis dataKey="day" tick={{ fontSize: 9 }} />
+                      <YAxis tick={{ fontSize: 9 }} />
                       <Tooltip formatter={(v: number) => `KES ${v.toLocaleString()}`} />
                       <Bar dataKey="income" fill="hsl(152,45%,22%)" radius={[3, 3, 0, 0]} name="Income" />
                       <Bar dataKey="expenses" fill="hsl(0,70%,50%)" radius={[3, 3, 0, 0]} name="Expenses" />
@@ -1007,7 +1007,7 @@ const EarningsExpensesPanel = ({ role }: Props) => {
               </Card>
             </TabsContent>
             <TabsContent value="breakdown">
-              <Card className="shadow-soft">
+              <Card className="overflow-hidden shadow-soft">
                 <CardHeader className="pb-2"><CardTitle className="text-sm">Expense Breakdown</CardTitle></CardHeader>
                 <CardContent>
                   {expenseByCategory.length === 0 ? (
@@ -1369,7 +1369,7 @@ const EarningsExpensesPanel = ({ role }: Props) => {
 
           {/* Budget vs Actual comparison chart */}
           {activeGroups.length > 0 && (
-            <Card className="shadow-soft">
+            <Card className="overflow-hidden shadow-soft">
               <CardHeader className="pb-2">
                 <CardTitle className="text-sm flex items-center gap-2"><BarChart3 className="w-4 h-4" /> Budget vs Actual</CardTitle>
               </CardHeader>

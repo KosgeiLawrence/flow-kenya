@@ -238,10 +238,10 @@ const RevenueInsightsPanel = () => {
         </TabsList>
 
         <TabsContent value="trend">
-          <Card>
+          <Card className="overflow-hidden">
             <CardHeader><CardTitle className="text-base">Monthly Revenue (Last 12 Months)</CardTitle></CardHeader>
             <CardContent>
-              <div className="h-64">
+              <div className="h-48 sm:h-64">
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart data={monthlyTrend}>
                     <CartesianGrid strokeDasharray="3 3" />
@@ -257,16 +257,16 @@ const RevenueInsightsPanel = () => {
         </TabsContent>
 
         <TabsContent value="roles">
-          <Card>
+          <Card className="overflow-hidden">
             <CardHeader><CardTitle className="text-base">Revenue by Role</CardTitle></CardHeader>
             <CardContent>
               {revenueByRole.length === 0 ? (
                 <p className="text-sm text-muted-foreground text-center py-8">No revenue data yet</p>
               ) : (
-                <div className="h-64 flex items-center justify-center">
+                <div className="h-48 sm:h-64 flex items-center justify-center">
                   <ResponsiveContainer width="100%" height="100%">
                     <PieChart>
-                      <Pie data={revenueByRole} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={80} label={({ name, value }) => `${name}: ${formatKES(value)}`}>
+                      <Pie data={revenueByRole} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={65} label={({ name, value }) => `${name}: ${formatKES(value)}`}>
                         {revenueByRole.map((_, i) => <Cell key={i} fill={COLORS[i % COLORS.length]} />)}
                       </Pie>
                       <Tooltip formatter={(v: number) => formatKES(v)} />
@@ -279,14 +279,14 @@ const RevenueInsightsPanel = () => {
         </TabsContent>
 
         <TabsContent value="users">
-          <Card>
+          <Card className="overflow-hidden">
             <CardHeader><CardTitle className="text-base">Users by Role</CardTitle></CardHeader>
             <CardContent>
-              <div className="h-64">
+              <div className="h-48 sm:h-64">
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart data={roleDistribution} layout="vertical">
                     <XAxis type="number" tick={{ fontSize: 10 }} />
-                    <YAxis type="category" dataKey="name" tick={{ fontSize: 10 }} width={100} />
+                    <YAxis type="category" dataKey="name" tick={{ fontSize: 10 }} width={70} />
                     <Tooltip />
                     <Bar dataKey="value" fill="hsl(40,55%,55%)" radius={[0, 4, 4, 0]} />
                   </BarChart>
@@ -297,16 +297,16 @@ const RevenueInsightsPanel = () => {
         </TabsContent>
 
         <TabsContent value="subs">
-          <Card>
+          <Card className="overflow-hidden">
             <CardHeader><CardTitle className="text-base">Subscription Status</CardTitle></CardHeader>
             <CardContent>
               {subStatusDist.length === 0 ? (
                 <p className="text-sm text-muted-foreground text-center py-8">No subscriptions yet</p>
               ) : (
-                <div className="h-64 flex items-center justify-center">
+                <div className="h-48 sm:h-64 flex items-center justify-center">
                   <ResponsiveContainer width="100%" height="100%">
                     <PieChart>
-                      <Pie data={subStatusDist} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={80} label>
+                      <Pie data={subStatusDist} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={65} label>
                         {subStatusDist.map((_, i) => <Cell key={i} fill={COLORS[i % COLORS.length]} />)}
                       </Pie>
                       <Tooltip />

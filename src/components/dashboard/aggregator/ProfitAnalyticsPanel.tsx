@@ -119,13 +119,13 @@ const ProfitAnalyticsPanel = () => {
 
       {/* Charts */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Card className="shadow-soft">
+        <Card className="overflow-hidden shadow-soft">
           <CardHeader><CardTitle className="text-lg">7-Day Revenue</CardTitle></CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={220}>
               <BarChart data={dailyData}>
-                <XAxis dataKey="day" tick={{ fontSize: 12 }} />
-                <YAxis tick={{ fontSize: 12 }} />
+                <XAxis dataKey="day" tick={{ fontSize: 10 }} />
+                <YAxis tick={{ fontSize: 10 }} />
                 <Tooltip formatter={(v: number) => `KES ${v.toLocaleString()}`} />
                 <Bar dataKey="revenue" fill="hsl(152,45%,22%)" radius={[4, 4, 0, 0]} />
               </BarChart>
@@ -133,7 +133,7 @@ const ProfitAnalyticsPanel = () => {
           </CardContent>
         </Card>
 
-        <Card className="shadow-soft">
+        <Card className="overflow-hidden shadow-soft">
           <CardHeader><CardTitle className="text-lg">Revenue by Material</CardTitle></CardHeader>
           <CardContent>
             {!pieData.length ? (
@@ -141,7 +141,7 @@ const ProfitAnalyticsPanel = () => {
             ) : (
               <ResponsiveContainer width="100%" height={220}>
                 <PieChart>
-                  <Pie data={pieData} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={80} label={({ name }) => name}>
+                  <Pie data={pieData} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={65} label={({ name }) => name}>
                     {pieData.map((_, i) => (
                       <Cell key={i} fill={COLORS[i % COLORS.length]} />
                     ))}

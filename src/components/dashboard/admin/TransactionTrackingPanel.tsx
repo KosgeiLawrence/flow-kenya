@@ -104,10 +104,10 @@ const TransactionTrackingPanel = () => {
           { label: "Pending", value: pending.length, icon: Clock },
           { label: "Failed", value: failed.length, icon: Clock },
           { label: "Platform Commission", value: `KES ${Math.round(commission).toLocaleString()}`, icon: TrendingUp },
-        ].map((s) => (<Card key={s.label}><CardContent className="p-4 flex items-center gap-3"><s.icon className="w-8 h-8 text-primary" /><div><p className="text-lg font-bold text-foreground">{s.value}</p><p className="text-xs text-muted-foreground">{s.label}</p></div></CardContent></Card>))}
+        ].map((s) => (<Card key={s.label}><CardContent className="overflow-hidden p-4 flex items-center gap-3"><s.icon className="overflow-hidden w-8 h-8 text-primary" /><div><p className="overflow-hidden text-lg font-bold text-foreground">{s.value}</p><p className="overflow-hidden text-xs text-muted-foreground">{s.label}</p></div></CardContent></Card>))}
       </div>
 
-      <Card><CardHeader><CardTitle className="text-base">Daily Revenue (14 days)</CardTitle></CardHeader><CardContent><ChartContainer config={chartConfig} className="h-[220px]"><LineChart data={dailyRevenue}><CartesianGrid strokeDasharray="3 3" /><XAxis dataKey="date" fontSize={10} /><YAxis fontSize={10} /><ChartTooltip content={<ChartTooltipContent />} /><Line type="monotone" dataKey="amount" stroke="hsl(152,45%,22%)" strokeWidth={2} dot={{ r: 3 }} /></LineChart></ChartContainer></CardContent></Card>
+      <Card className="overflow-hidden"><CardHeader><CardTitle className="text-base">Daily Revenue (14 days)</CardTitle></CardHeader><CardContent><ChartContainer config={chartConfig} className="h-[220px]"><LineChart data={dailyRevenue}><CartesianGrid strokeDasharray="3 3" /><XAxis dataKey="date" fontSize={10} /><YAxis fontSize={10} /><ChartTooltip content={<ChartTooltipContent />} /><Line type="monotone" dataKey="amount" stroke="hsl(152,45%,22%)" strokeWidth={2} dot={{ r: 3 }} /></LineChart></ChartContainer></CardContent></Card>
 
       <Card>
         <CardHeader className="flex flex-row items-center justify-between"><CardTitle className="text-base">Transactions</CardTitle><Select value={statusFilter} onValueChange={setStatusFilter}><SelectTrigger className="w-36"><SelectValue /></SelectTrigger><SelectContent><SelectItem value="all">All</SelectItem><SelectItem value="completed">Completed</SelectItem><SelectItem value="pending">Pending</SelectItem><SelectItem value="failed">Failed</SelectItem></SelectContent></Select></CardHeader>

@@ -123,20 +123,20 @@ const ImpactMetricsPanel = () => {
 
       {/* Charts */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Card className="shadow-soft">
+        <Card className="overflow-hidden shadow-soft">
           <CardHeader><CardTitle className="text-lg">14-Day Collection Trend</CardTitle></CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={220}>
               <BarChart data={dailyData}>
-                <XAxis dataKey="day" tick={{ fontSize: 11 }} />
-                <YAxis tick={{ fontSize: 11 }} />
+                <XAxis dataKey="day" tick={{ fontSize: 9 }} />
+                <YAxis tick={{ fontSize: 9 }} />
                 <Tooltip formatter={(v: number) => `${v} kg`} />
                 <Bar dataKey="qty" fill="hsl(152,45%,22%)" radius={[4, 4, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </CardContent>
         </Card>
-        <Card className="shadow-soft">
+        <Card className="overflow-hidden shadow-soft">
           <CardHeader><CardTitle className="text-lg">Material Breakdown</CardTitle></CardHeader>
           <CardContent>
             {!pieData.length ? (
@@ -144,7 +144,7 @@ const ImpactMetricsPanel = () => {
             ) : (
               <ResponsiveContainer width="100%" height={220}>
                 <PieChart>
-                  <Pie data={pieData} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={80} label={({ name }) => name}>
+                  <Pie data={pieData} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={65} label={({ name }) => name}>
                     {pieData.map((_, i) => <Cell key={i} fill={COLORS[i % COLORS.length]} />)}
                   </Pie>
                   <Tooltip formatter={(v: number) => `${v} kg`} />
@@ -156,7 +156,7 @@ const ImpactMetricsPanel = () => {
       </div>
 
       {/* Geographic Distribution */}
-      <Card className="shadow-soft">
+      <Card className="overflow-hidden shadow-soft">
         <CardHeader><CardTitle className="text-lg">Geographic Impact Distribution</CardTitle></CardHeader>
         <CardContent>
           {!geoData.length ? (
@@ -164,8 +164,8 @@ const ImpactMetricsPanel = () => {
           ) : (
             <ResponsiveContainer width="100%" height={Math.max(200, geoData.length * 35)}>
               <BarChart data={geoData} layout="vertical" margin={{ left: 80 }}>
-                <XAxis type="number" tick={{ fontSize: 11 }} />
-                <YAxis type="category" dataKey="name" tick={{ fontSize: 11 }} width={75} />
+                <XAxis type="number" tick={{ fontSize: 9 }} />
+                <YAxis type="category" dataKey="name" tick={{ fontSize: 9 }} width={75} />
                 <Tooltip formatter={(v: number) => `${v} kg`} />
                 <Bar dataKey="kg" fill="hsl(40,55%,55%)" radius={[0, 4, 4, 0]} />
               </BarChart>

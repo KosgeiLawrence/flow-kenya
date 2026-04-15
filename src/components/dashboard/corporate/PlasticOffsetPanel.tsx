@@ -83,13 +83,13 @@ const PlasticOffsetPanel = () => {
         </Card>
       </div>
 
-      <Card className="shadow-soft">
+      <Card className="overflow-hidden shadow-soft">
         <CardHeader><CardTitle className="text-lg">{t("corporatePanels.monthlyPlasticOffset", "Monthly Plastic Offset")}</CardTitle></CardHeader>
         <CardContent>
           <ResponsiveContainer width="100%" height={250}>
             <BarChart data={monthlyData}>
-              <XAxis dataKey="month" tick={{ fontSize: 11 }} />
-              <YAxis tick={{ fontSize: 11 }} />
+              <XAxis dataKey="month" tick={{ fontSize: 9 }} />
+              <YAxis tick={{ fontSize: 9 }} />
               <Tooltip formatter={(v: number) => `${v} kg`} />
               <Bar dataKey="kg" fill="hsl(152,45%,22%)" radius={[4, 4, 0, 0]} />
             </BarChart>
