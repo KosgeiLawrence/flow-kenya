@@ -47,12 +47,12 @@ const SystemSettingsPanel = () => {
       <Card>
         <CardHeader>
           <CardTitle className="text-base flex items-center gap-2">
-            <Settings className="w-4 h-4" /> Material Price Management
+            <Settings className="w-4 h-4" /> {t("adminPanels.materialPricesMgmt", "Material Price Management")}
           </CardTitle>
         </CardHeader>
         <CardContent>
           {isLoading ? (
-            <p className="text-sm text-muted-foreground">Loading...</p>
+            <p className="text-sm text-muted-foreground">{t("common.loading")}</p>
           ) : (
             <Table>
               <TableHeader>

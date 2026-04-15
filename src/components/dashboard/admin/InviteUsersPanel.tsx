@@ -49,15 +49,15 @@ const InviteUsersPanel = () => {
         <CardHeader>
           <CardTitle className="flex items-center gap-2 font-display">
             <Mail className="w-5 h-5 text-primary" />
-            Invite Users
+            {t("adminPanels.inviteUsers")}
           </CardTitle>
           <CardDescription>
-            Send email invitations to join Duara Flow. Each invite automatically includes the PILOT2026 coupon for free access.
+            {t("adminPanels.inviteDesc", "Send email invitations to join Duara Flow. Each invite automatically includes the PILOT2026 coupon for free access.")}
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-5">
           <div className="space-y-2">
-            <Label htmlFor="invite-email">Email Address</Label>
+            <Label htmlFor="invite-email">{t("adminPanels.inviteEmail")}</Label>
             <Input
               id="invite-email"
               type="email"
@@ -70,7 +70,7 @@ const InviteUsersPanel = () => {
 
           <Button onClick={handleSend} disabled={sending} className="w-full gap-2">
             {sending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
-            {sending ? "Sending…" : "Send Invitation"}
+            {sending ? t("common.sending") : t("adminPanels.sendInvite")}
           </Button>
         </CardContent>
       </Card>
@@ -78,7 +78,7 @@ const InviteUsersPanel = () => {
       {sentEmails.length > 0 && (
         <Card>
           <CardHeader>
-            <CardTitle className="text-base font-display">Recently Sent Invitations</CardTitle>
+            <CardTitle className="text-base font-display">{t("adminPanels.recentInvites", "Recently Sent Invitations")}</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-3">
