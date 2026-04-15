@@ -49,6 +49,6 @@ const logoSection = { display: 'flex' as const, alignItems: 'center' as const, g
 const logoImg = { borderRadius: '12px' }
 const h1 = { fontSize: '24px', fontWeight: 'bold' as const, color: '#12211A', fontFamily: "'Space Grotesk', 'Segoe UI', Arial, sans-serif", margin: '0 0 20px' }
 const text = { fontSize: '15px', color: '#677A6F', lineHeight: '1.6', margin: '0 0 20px' }
-const codeStyle = { fontFamily: "'Space Grotesk', Courier, monospace", fontSize: '28px', fontWeight: 'bold' as const, color: '#1F6B45', margin: '0 0 30px', letterSpacing: '4px' }
+const codeStyle = { fontFamily: "'Space Grotesk', Courier, monospace", fontSize: '28px', fontWeight: 'bold' as const, color: '#3B9B62', margin: '0 0 30px', letterSpacing: '4px' }
 const footer = { fontSize: '13px', color: '#999999', margin: '24px 0 0', lineHeight: '1.5' }
 const footerBrand = { fontSize: '12px', color: '#BBBBBB', margin: '16px 0 0' }
