@@ -97,16 +97,23 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       if (!error && data) {
         setSubscribed(data.subscribed || data.free_plan || data.promo || false);
       } else {
-        setSubscribed(false);
+        // On edge-function timeout/network error, grant temporary access instead of blocking
+        const isTimeout = error && (String(error).includes("timeout") || String(error).includes("Failed to fetch"));
+        if (isTimeout && subscribed !== null) {
+          console.warn("Subscription check timed out, keeping previous state");
+        } else {
+          setSubscribed(false);
+        }
       }
     } catch {
-      setSubscribed(false);
+      // Keep previous subscription state on network errors if we had one
+      if (subscribed === null) setSubscribed(false);
     } finally {
       setCheckingSubscription(false);
     }
   };
 
-  const fetchUserData = async (userId: string) => {
+  const fetchUserData = async (userId: string, isRetry = false) => {
     try {
       const [roleRes, profileRes] = await Promise.all([
         supabase.from("user_roles").select("role").eq("user_id", userId).single(),
@@ -114,7 +121,26 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       ]);
 
       if (roleRes.error && profileRes.error) {
-        console.warn("No profile/role found for user, signing out...");
+        // On transient network errors, don't sign out — just log and keep existing state
+        const isNetworkError =
+          String(roleRes.error.message).includes("fetch") ||
+          String(profileRes.error.message).includes("fetch") ||
+          String(roleRes.error.message).includes("network") ||
+          String(profileRes.error.message).includes("network");
+
+        if (isNetworkError || roleRes.error.code === "PGRST301") {
+          console.warn("Transient error fetching user data, keeping current state");
+          return;
+        }
+
+        // Retry once before giving up
+        if (!isRetry) {
+          console.warn("Profile/role fetch failed, retrying in 2s...");
+          await new Promise((r) => setTimeout(r, 2000));
+          return fetchUserData(userId, true);
+        }
+
+        console.warn("No profile/role found for user after retry, signing out...");
         await supabase.auth.signOut();
         setUser(null);
         setSession(null);
@@ -130,7 +156,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       if (roleRes.data) setRole(roleRes.data.role as AppRole);
       if (profileRes.data) {
         setProfile(profileRes.data as Profile);
-        // Fetch org name if has organization
         if (profileRes.data.organization_id) {
           const { data: orgData } = await supabase
             .from("organizations")
@@ -148,6 +173,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       }
     } catch (error) {
       console.error("Error fetching user data:", error);
+      // Don't sign out on catch — transient errors shouldn't destroy the session
     }
   };
 
