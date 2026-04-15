@@ -16,7 +16,7 @@ const TraceabilityFlow = () => {
   ];
 
   return (
-    <section id="platform" className="relative py-20 md:py-32 overflow-hidden" ref={ref}>
+    <section id="traceability" className="relative py-20 md:py-32 overflow-hidden" ref={ref}>
       <div className="absolute inset-0 bg-muted">
         <div className="absolute top-0 right-0 h-[40%] w-[40%] rounded-full bg-gold/5 blur-3xl" />
         <div className="absolute bottom-0 left-0 h-[30%] w-[30%] rounded-full bg-forest/5 blur-3xl" />
