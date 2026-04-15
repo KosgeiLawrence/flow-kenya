@@ -149,6 +149,40 @@ const en = {
     contact: "Contact",
   },
 
+  // Footer
+  footer: {
+    brandDescription: "Africa's leading waste traceability platform — connecting waste pickers, aggregators, recyclers, and corporates for a circular economy.",
+    menuHeading: "Menu",
+    legalHeading: "Legal",
+    productOf: "A product of",
+    marketplace: "Marketplace",
+    platform: "Platform",
+    about: "About",
+    features: "Features",
+    traceability: "Traceability",
+    impact: "Impact",
+    contact: "Contact",
+    terms: "Terms",
+    privacy: "Privacy",
+  },
+
+  // Consultation interests
+  consultationInterests: {
+    wastePickerReg: "Waste Picker Registration",
+    aggregatorOnboarding: "Aggregator Onboarding",
+    recyclerPartnership: "Recycler Partnership",
+    corporateEPR: "Corporate EPR Compliance",
+    ngoCollab: "NGO Collaboration",
+    countyIntegration: "County Government Integration",
+    platformDemo: "Platform Demo",
+    pricingPlans: "Pricing & Plans",
+    other: "Other",
+    selectArea: "Select an area",
+    fillRequired: "Please fill in all required fields",
+    submitSuccess: "Request submitted! We'll get back to you within 24 hours.",
+    submitError: "Something went wrong. Please try again.",
+  },
+
   // Auth Pages
   auth: {
     signInTitle: "Welcome Back",

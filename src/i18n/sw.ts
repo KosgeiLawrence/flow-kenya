@@ -149,6 +149,40 @@ const sw = {
     contact: "Wasiliana",
   },
 
+  // Footer
+  footer: {
+    brandDescription: "Jukwaa kuu la ufuatiliaji wa taka barani Afrika — linaunganisha wakusanyaji taka, wasambazaji, wasindikaji, na makampuni kwa uchumi wa mzunguko.",
+    menuHeading: "Menyu",
+    legalHeading: "Kisheria",
+    productOf: "Bidhaa ya",
+    marketplace: "Soko",
+    platform: "Jukwaa",
+    about: "Kuhusu",
+    features: "Huduma",
+    traceability: "Ufuatiliaji",
+    impact: "Athari",
+    contact: "Wasiliana",
+    terms: "Masharti",
+    privacy: "Faragha",
+  },
+
+  // Consultation interests
+  consultationInterests: {
+    wastePickerReg: "Usajili wa Mkusanyaji Taka",
+    aggregatorOnboarding: "Kuanza kwa Msambazaji",
+    recyclerPartnership: "Ushirikiano wa Msindikaji",
+    corporateEPR: "Uzingatiaji wa EPR ya Kampuni",
+    ngoCollab: "Ushirikiano wa NGO",
+    countyIntegration: "Ushirikiano wa Serikali ya Kaunti",
+    platformDemo: "Onyesho la Jukwaa",
+    pricingPlans: "Bei na Mipango",
+    other: "Nyingine",
+    selectArea: "Chagua eneo",
+    fillRequired: "Tafadhali jaza sehemu zote zinazohitajika",
+    submitSuccess: "Ombi limetumwa! Tutawasiliana nawe ndani ya saa 24.",
+    submitError: "Kitu kimekwenda vibaya. Tafadhali jaribu tena.",
+  },
+
   // Auth Pages
   auth: {
     signInTitle: "Karibu Tena",
