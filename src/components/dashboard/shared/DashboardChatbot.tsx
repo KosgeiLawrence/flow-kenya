@@ -47,6 +47,8 @@ const DashboardChatbot = ({ role, navItems, onNavigate }: DashboardChatbotProps)
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const { user } = useAuth();
+  const { t, i18n } = useTranslation();
+  const currentLang = i18n.language;
 
   const scrollToBottom = useCallback(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -129,6 +131,7 @@ const DashboardChatbot = ({ role, navItems, onNavigate }: DashboardChatbotProps)
           navItems: navItems.map((n) => ({ id: n.id, label: n.label })),
           userId: user?.id,
           conversationId,
+          language: currentLang,
         },
       });
       if (error) throw error;
