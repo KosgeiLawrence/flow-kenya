@@ -1133,7 +1133,6 @@ const en = {
     invoice: "Invoice",
     quotation: "Quotation",
     receipt: "Receipt",
-    activeUsers: "Active Users",
 
     auditLogs: "Audit Logs",
     recentActivity: "Recent Activity",
