@@ -1,12 +1,25 @@
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { useTranslation } from "react-i18next";
 import heroBg from "@/assets/hero-bg.jpg";
+import heroPlaceholder from "@/assets/hero-bg-placeholder.jpg";
 
 const Hero = () => {
   const { t } = useTranslation();
+  const [loaded, setLoaded] = useState(false);
+
+  useEffect(() => {
+    const img = new Image();
+    img.src = heroBg;
+    if (img.complete) {
+      setLoaded(true);
+    } else {
+      img.onload = () => setLoaded(true);
+    }
+  }, []);
 
   const stats = [
     { value: t("hero.stat1Value"), label: t("hero.stat1Label") },
@@ -17,7 +30,22 @@ const Hero = () => {
   return (
     <section className="relative min-h-screen overflow-hidden">
       <div className="absolute inset-0">
-        <img src={heroBg} alt="Waste collection in Kenya" className="h-full w-full object-cover blur-[2px]" loading="eager" />
+        {/* Tiny placeholder shown instantly */}
+        <img
+          src={heroPlaceholder}
+          alt=""
+          aria-hidden
+          className="absolute inset-0 h-full w-full object-cover blur-[2px] scale-105"
+        />
+        {/* Full image fades in once loaded */}
+        <img
+          src={heroBg}
+          alt="Waste collection in Kenya"
+          className={`absolute inset-0 h-full w-full object-cover blur-[2px] transition-opacity duration-700 ${loaded ? "opacity-100" : "opacity-0"}`}
+          loading="eager"
+          fetchPriority="high"
+          decoding="async"
+        />
         <div className="absolute inset-0 bg-hero opacity-60" />
         <div className="absolute inset-0 opacity-40">
           <div className="absolute -top-1/4 -right-1/4 h-[60%] w-[60%] rounded-full bg-gold/5 blur-3xl" />
