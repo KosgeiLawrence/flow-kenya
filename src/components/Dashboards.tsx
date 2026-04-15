@@ -47,30 +47,32 @@ const Dashboards = () => {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {dashboards.map((dash, i) => (
-            <motion.div
-              key={i}
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, amount: 0.1 }}
-              transition={{ delay: i * 0.08, duration: 0.5, ease: [0.4, 0, 0.2, 1] }}
-              className="group rounded-2xl glass-card p-6"
-            >
-              <div className={`mb-4 flex h-12 w-12 items-center justify-center rounded-xl ${dash.accent} transition-all duration-300 group-hover:scale-110 group-hover:shadow-lg`}>
-                <dash.icon className="h-6 w-6 text-primary-foreground" />
-              </div>
-              <h3 className="mb-3 font-display text-lg font-bold text-foreground">{dash.role}</h3>
-              <ul className="space-y-2">
-                {dash.features.map((f, fi) => (
-                  <li key={fi} className="flex items-center gap-2 text-sm text-muted-foreground">
-                    <div className="h-1.5 w-1.5 rounded-full bg-gold" />
-                    {f}
-                  </li>
-                ))}
-              </ul>
-            </motion.div>
-          ))}
+        <div className="rounded-3xl border border-border/40 bg-card/30 backdrop-blur-xl p-6 md:p-10">
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {dashboards.map((dash, i) => (
+              <motion.div
+                key={i}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, amount: 0.1 }}
+                transition={{ delay: i * 0.08, duration: 0.5, ease: [0.4, 0, 0.2, 1] }}
+                className="group rounded-2xl glass-card p-6"
+              >
+                <div className={`mb-4 flex h-12 w-12 items-center justify-center rounded-xl ${dash.accent} transition-all duration-300 group-hover:scale-110 group-hover:shadow-lg`}>
+                  <dash.icon className="h-6 w-6 text-primary-foreground" />
+                </div>
+                <h3 className="mb-3 font-display text-lg font-bold text-foreground">{dash.role}</h3>
+                <ul className="space-y-2">
+                  {dash.features.map((f, fi) => (
+                    <li key={fi} className="flex items-center gap-2 text-sm text-muted-foreground">
+                      <div className="h-1.5 w-1.5 rounded-full bg-gold" />
+                      {f}
+                    </li>
+                  ))}
+                </ul>
+              </motion.div>
+            ))}
+          </div>
         </div>
       </div>
     </section>

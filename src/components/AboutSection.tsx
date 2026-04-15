@@ -30,57 +30,61 @@ const AboutSection = () => {
           <p className="text-lg text-muted-foreground leading-relaxed">{t("about.description")}</p>
         </div>
 
-        <div className="grid md:grid-cols-2 gap-6 mb-16">
-          <motion.div
-            initial={{ opacity: 0, x: -30 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true, amount: 0.1 }}
-            transition={{ duration: 0.7, delay: 0.1, ease: [0.4, 0, 0.2, 1] }}
-            className="rounded-2xl glass-card p-8"
-          >
-            <div className="flex items-center gap-3 mb-4">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10">
-                <Target className="h-5 w-5 text-primary" />
+        <div className="rounded-3xl border border-border/40 bg-card/30 backdrop-blur-xl p-6 md:p-10 mb-16">
+          <div className="grid md:grid-cols-2 gap-6">
+            <motion.div
+              initial={{ opacity: 0, x: -30 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true, amount: 0.1 }}
+              transition={{ duration: 0.7, delay: 0.1, ease: [0.4, 0, 0.2, 1] }}
+              className="rounded-2xl glass-card p-8"
+            >
+              <div className="flex items-center gap-3 mb-4">
+                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10">
+                  <Target className="h-5 w-5 text-primary" />
+                </div>
+                <h3 className="font-display text-xl font-bold text-foreground">{t("about.missionTitle")}</h3>
               </div>
-              <h3 className="font-display text-xl font-bold text-foreground">{t("about.missionTitle")}</h3>
-            </div>
-            <p className="text-muted-foreground leading-relaxed">{t("about.missionText")}</p>
-          </motion.div>
+              <p className="text-muted-foreground leading-relaxed">{t("about.missionText")}</p>
+            </motion.div>
 
-          <motion.div
-            initial={{ opacity: 0, x: 30 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true, amount: 0.1 }}
-            transition={{ duration: 0.7, delay: 0.2, ease: [0.4, 0, 0.2, 1] }}
-            className="rounded-2xl glass-card p-8"
-          >
-            <div className="flex items-center gap-3 mb-4">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10">
-                <Heart className="h-5 w-5 text-primary" />
+            <motion.div
+              initial={{ opacity: 0, x: 30 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true, amount: 0.1 }}
+              transition={{ duration: 0.7, delay: 0.2, ease: [0.4, 0, 0.2, 1] }}
+              className="rounded-2xl glass-card p-8"
+            >
+              <div className="flex items-center gap-3 mb-4">
+                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10">
+                  <Heart className="h-5 w-5 text-primary" />
+                </div>
+                <h3 className="font-display text-xl font-bold text-foreground">{t("about.visionTitle")}</h3>
               </div>
-              <h3 className="font-display text-xl font-bold text-foreground">{t("about.visionTitle")}</h3>
-            </div>
-            <p className="text-muted-foreground leading-relaxed">{t("about.visionText")}</p>
-          </motion.div>
+              <p className="text-muted-foreground leading-relaxed">{t("about.visionText")}</p>
+            </motion.div>
+          </div>
         </div>
 
-        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
-          {values.map((value, i) => (
-            <motion.div
-              key={i}
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, amount: 0.1 }}
-              transition={{ duration: 0.5, delay: 0.08 * i, ease: [0.4, 0, 0.2, 1] }}
-              className="rounded-2xl glass-card p-6 text-center"
-            >
-              <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10 transition-all duration-300 hover:scale-110 hover:bg-primary/20">
-                <value.icon className="h-6 w-6 text-primary" />
-              </div>
-              <h4 className="font-display text-lg font-semibold text-foreground mb-2">{value.title}</h4>
-              <p className="text-sm text-muted-foreground leading-relaxed">{value.description}</p>
-            </motion.div>
-          ))}
+        <div className="rounded-3xl border border-border/40 bg-card/30 backdrop-blur-xl p-6 md:p-10 mb-16">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {values.map((value, i) => (
+              <motion.div
+                key={i}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, amount: 0.1 }}
+                transition={{ duration: 0.5, delay: 0.08 * i, ease: [0.4, 0, 0.2, 1] }}
+                className="rounded-2xl glass-card p-6 text-center"
+              >
+                <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10 transition-all duration-300 hover:scale-110 hover:bg-primary/20">
+                  <value.icon className="h-6 w-6 text-primary" />
+                </div>
+                <h4 className="font-display text-lg font-semibold text-foreground mb-2">{value.title}</h4>
+                <p className="text-sm text-muted-foreground leading-relaxed">{value.description}</p>
+              </motion.div>
+            ))}
+          </div>
         </div>
       </div>
     </section>
