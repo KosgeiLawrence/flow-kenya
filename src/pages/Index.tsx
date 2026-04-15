@@ -4,6 +4,7 @@ import Navbar from "@/components/Navbar";
 import Hero from "@/components/Hero";
 import NeuralBackground from "@/components/NeuralBackground";
 import Features from "@/components/Features";
+import TrendingMarketplace from "@/components/TrendingMarketplace";
 import TraceabilityFlow from "@/components/TraceabilityFlow";
 import Dashboards from "@/components/Dashboards";
 import ImpactMetrics from "@/components/ImpactMetrics";
@@ -30,6 +31,7 @@ const Index = () => {
         <Navbar />
         <Hero />
         <Features />
+        <TrendingMarketplace />
         <TraceabilityFlow />
         <Dashboards />
         <ImpactMetrics />
