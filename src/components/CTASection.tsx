@@ -2,7 +2,7 @@ import { motion, useInView } from "framer-motion";
 import { useRef } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Recycle } from "lucide-react";
+import { ArrowRight, Recycle, Mail, Phone, MapPin, ExternalLink } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 const CTA = () => {
@@ -44,37 +44,99 @@ const CTA = () => {
   );
 };
 
+const footerLinks = {
+  product: [
+    { label: "Features", to: "/#features" },
+    { label: "Dashboards", to: "/#dashboards" },
+    { label: "Traceability", to: "/#traceability" },
+    { label: "Impact", to: "/#impact" },
+  ],
+  company: [
+    { label: "About", to: "/#about" },
+    { label: "Contact", to: "/contact" },
+    { label: "Terms", to: "/terms" },
+    { label: "Privacy", to: "/privacy" },
+  ],
+};
+
 const Footer = () => {
   const { t } = useTranslation();
 
   return (
-    <footer className="border-t border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.04)] backdrop-blur-[20px] py-12">
-      <div className="container">
-        <div className="flex flex-col items-center justify-between gap-6 md:flex-row">
-          <div className="flex items-center gap-2">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary">
-              <Recycle className="h-5 w-5 text-primary-foreground" />
+    <footer className="relative border-t border-[rgba(255,255,255,0.06)] bg-[rgba(0,0,0,0.4)] backdrop-blur-[24px]">
+      <div className="absolute inset-0 bg-gradient-to-b from-transparent to-[rgba(0,0,0,0.3)] pointer-events-none" />
+      <div className="container relative z-10">
+        {/* Main footer grid */}
+        <div className="grid grid-cols-1 gap-10 py-16 md:grid-cols-12 md:gap-8">
+          {/* Brand column */}
+          <div className="md:col-span-5 space-y-5">
+            <Link to="/" className="inline-flex items-center gap-2.5 group">
+              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary transition-transform duration-300 group-hover:scale-110">
+                <Recycle className="h-5 w-5 text-primary-foreground" />
+              </div>
+              <span className="font-display text-xl font-bold text-foreground tracking-tight">Duara Flow</span>
+            </Link>
+            <p className="text-sm leading-relaxed text-muted-foreground max-w-xs">
+              Africa's leading waste traceability platform — connecting waste pickers, aggregators, recyclers, and corporates for a circular economy.
+            </p>
+            <div className="flex flex-col gap-2.5 pt-1">
+              <a href="mailto:hello@duaraflow.co.ke" className="inline-flex items-center gap-2 text-sm text-muted-foreground transition-colors duration-200 hover:text-foreground">
+                <Mail className="h-3.5 w-3.5 text-primary/70" />
+                hello@duaraflow.co.ke
+              </a>
+              <a href="tel:+254741027140" className="inline-flex items-center gap-2 text-sm text-muted-foreground transition-colors duration-200 hover:text-foreground">
+                <Phone className="h-3.5 w-3.5 text-primary/70" />
+                +254 741 027 140
+              </a>
+              <span className="inline-flex items-center gap-2 text-sm text-muted-foreground">
+                <MapPin className="h-3.5 w-3.5 text-primary/70" />
+                Nairobi, Kenya
+              </span>
             </div>
-            <span className="font-display text-lg font-bold text-foreground">Duara Flow</span>
           </div>
-          <p className="text-sm text-muted-foreground">{t("cta.copyright")}</p>
-          <div className="flex gap-6">
-            {[
-              { label: t("cta.privacy"), to: "/privacy" },
-              { label: t("cta.terms"), to: "/terms" },
-              { label: t("cta.contact"), to: "/contact" },
-            ].map((link) => (
-              <Link key={link.to} to={link.to} className="text-sm text-muted-foreground transition-all duration-300 hover:text-foreground">
-                {link.label}
-              </Link>
-            ))}
+
+          {/* Product links */}
+          <div className="md:col-span-3 md:col-start-7">
+            <h4 className="mb-4 font-display text-xs font-semibold uppercase tracking-widest text-foreground/60">Product</h4>
+            <ul className="space-y-2.5">
+              {footerLinks.product.map((link) => (
+                <li key={link.to}>
+                  <Link to={link.to} className="text-sm text-muted-foreground transition-colors duration-200 hover:text-foreground">
+                    {link.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
           </div>
+
+          {/* Company links */}
+          <div className="md:col-span-3">
+            <h4 className="mb-4 font-display text-xs font-semibold uppercase tracking-widest text-foreground/60">Company</h4>
+            <ul className="space-y-2.5">
+              {footerLinks.company.map((link) => (
+                <li key={link.to}>
+                  <Link to={link.to} className="text-sm text-muted-foreground transition-colors duration-200 hover:text-foreground">
+                    {link.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+
+        {/* Bottom bar */}
+        <div className="flex flex-col items-center justify-between gap-4 border-t border-[rgba(255,255,255,0.06)] py-6 md:flex-row">
+          <p className="text-xs text-muted-foreground/60">
+            {t("cta.copyright")}
+          </p>
+          <p className="text-xs text-muted-foreground/40">
+            A product of <span className="text-muted-foreground/60 font-medium">Duara Intelligence</span>
+          </p>
         </div>
       </div>
     </footer>
   );
 };
-
 const CTASection = () => (
   <>
     <CTA />
