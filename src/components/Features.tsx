@@ -17,7 +17,7 @@ const Features = () => {
   ];
 
   return (
-    <section className="relative py-20 md:py-32 bg-mesh" ref={ref}>
+    <section id="features" className="relative py-20 md:py-32 bg-mesh" ref={ref}>
       <div className="container">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
