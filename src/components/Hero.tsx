@@ -33,9 +33,9 @@ const Hero = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2, duration: 0.7, ease: [0.4, 0, 0.2, 1] }}
-            className="mb-6 inline-flex items-center gap-2 rounded-full border border-gold-light/20 bg-gold/10 px-5 py-2.5 backdrop-blur-md"
+            className="mb-6 inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-5 py-2.5 backdrop-blur-md"
           >
-            <span className="text-sm font-medium text-gold-light">{t("hero.badge")}</span>
+            <span className="text-sm font-medium text-primary">{t("hero.badge")}</span>
           </motion.div>
 
           <motion.h1
@@ -45,9 +45,9 @@ const Hero = () => {
             className="mb-6 max-w-4xl font-display text-4xl font-bold leading-tight text-primary-foreground md:text-6xl lg:text-7xl"
           >
             {t("hero.title1")}{" "}
-            <span className="text-gradient-gold">{t("hero.traceability")}</span>{" "}
+            <span className="text-primary">{t("hero.traceability")}</span>{" "}
             {t("hero.title2")}{" "}
-            <span className="text-gradient-gold">{t("hero.circularEconomy")}</span>
+            <span className="text-primary">{t("hero.circularEconomy")}</span>
           </motion.h1>
 
           <motion.p
