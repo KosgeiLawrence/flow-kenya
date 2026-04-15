@@ -94,12 +94,16 @@ const PricingPlans = ({
 
   if (!pricing) return null;
 
-  const periods: { id: BillingPeriod; label: string; badge?: string }[] = [
+  const allPeriods: { id: BillingPeriod; label: string; badge?: string }[] = [
     { id: "free_trial", label: "Free Trial", badge: "30 days" },
     { id: "monthly", label: "Monthly" },
     { id: "yearly", label: "Yearly" },
     { id: "one_time", label: "One-Time" },
   ];
+
+  const periods = role === "county_government"
+    ? allPeriods.filter((p) => p.id !== "free_trial")
+    : allPeriods;
 
   return (
     <div className="space-y-5">
