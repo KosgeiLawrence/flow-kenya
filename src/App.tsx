@@ -37,6 +37,7 @@ import PWAInstallPrompt from "./components/PWAInstallPrompt";
 import BiometricLockScreen from "./components/auth/BiometricLockScreen";
 import BiometricSetupPrompt from "./components/auth/BiometricSetupPrompt";
 import SplashScreen from "./components/SplashScreen";
+import ErrorBoundary from "./components/ErrorBoundary";
 
 const queryClient = new QueryClient();
 
