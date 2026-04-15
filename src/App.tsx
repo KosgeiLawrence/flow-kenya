@@ -34,6 +34,7 @@ import JoinTeam from "./pages/JoinTeam";
 import PublicProfile from "./pages/PublicProfile";
 import Unsubscribe from "./pages/Unsubscribe";
 import PWAInstallPrompt from "./components/PWAInstallPrompt";
+import PWAUpdatePrompt from "./components/PWAUpdatePrompt";
 import BiometricLockScreen from "./components/auth/BiometricLockScreen";
 import BiometricSetupPrompt from "./components/auth/BiometricSetupPrompt";
 import SplashScreen from "./components/SplashScreen";
@@ -130,6 +131,7 @@ const App = () => {
             <AuthProvider>
               <BiometricGate>
                 <PWAInstallPrompt />
+                <PWAUpdatePrompt />
                 <Routes>
                   <Route path="/" element={<Index />} />
                   <Route path="/impact" element={<ImpactDashboard />} />
