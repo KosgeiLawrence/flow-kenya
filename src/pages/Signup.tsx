@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate, Link, useSearchParams } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowLeft, ArrowRight, Loader2, Eye, EyeOff, X } from "lucide-react";
+import { ArrowLeft, ArrowRight, Loader2, Eye, EyeOff, X, Shield, BarChart3, Leaf } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -13,7 +13,6 @@ import { useToast } from "@/hooks/use-toast";
 import RoleSelector from "@/components/auth/RoleSelector";
 import PricingPlans, { isPromoValidForRole } from "@/components/auth/PricingPlans";
 import { useTranslation } from "react-i18next";
-import authHeroSignup from "@/assets/auth-hero-signup.png";
 
 type AppRole = "waste_picker" | "aggregator" | "recycler" | "ngo" | "corporate" | "county_government";
 
@@ -93,48 +92,44 @@ const Signup = () => {
     } finally { setLoading(false); }
   };
 
-  const featuresList = [
-    t("features.mpesa").replace("M-Pesa Integration", "M-Pesa integrated payments"),
-    "Real-time material tracking",
-    "Impact analytics & reporting",
+  const highlights = [
+    { icon: Shield, text: "Secure & verified platform" },
+    { icon: BarChart3, text: "Real-time analytics & reporting" },
+    { icon: Leaf, text: "Environmental impact tracking" },
   ];
 
   return (
-    <div className="min-h-screen flex bg-mesh">
-      {/* Left panel */}
-      <div className="hidden lg:flex lg:w-2/5 bg-hero relative items-center justify-center p-12 overflow-hidden">
-        <div className="absolute inset-0 opacity-30">
-          <div className="absolute -top-1/4 -right-1/4 h-[60%] w-[60%] rounded-full bg-gold/10 blur-3xl" />
-          <div className="absolute -bottom-1/4 -left-1/4 h-[50%] w-[50%] rounded-full bg-sky/10 blur-3xl" />
+    <div className="min-h-screen flex">
+      {/* Left panel — deep green */}
+      <div
+        className="hidden lg:flex lg:w-2/5 relative items-center justify-center p-12 overflow-hidden"
+        style={{ background: "linear-gradient(160deg, hsl(152 50% 18%) 0%, hsl(152 45% 28%) 40%, hsl(160 40% 22%) 100%)" }}
+      >
+        <div className="absolute inset-0 opacity-40">
+          <div className="absolute -top-1/4 -right-1/4 h-[60%] w-[60%] rounded-full bg-primary/20 blur-3xl" />
+          <div className="absolute -bottom-1/4 -left-1/4 h-[50%] w-[50%] rounded-full bg-primary/10 blur-3xl" />
         </div>
         <motion.div
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.6, ease: [0.4, 0, 0.2, 1] }}
-          className="relative z-10 text-primary-foreground max-w-md"
+          className="relative z-10 text-white max-w-md"
         >
           <h1 className="text-4xl font-display font-bold mb-4">{t("auth.heroSignUpTitle")}</h1>
           <p className="text-lg opacity-80 font-body">{t("auth.heroSignUpSubtitle")}</p>
-          <div className="mt-8 space-y-3 text-sm opacity-70">
-            {featuresList.map((feat) => (
-              <div key={feat} className="flex items-center gap-2">
-                <div className="w-2 h-2 rounded-full bg-gold" />
-                <span>{feat}</span>
+          <div className="mt-10 space-y-4">
+            {highlights.map((h) => (
+              <div key={h.text} className="flex items-center gap-3 rounded-xl px-4 py-3" style={{ background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.12)" }}>
+                <h.icon className="w-5 h-5 text-white/80 shrink-0" />
+                <span className="text-sm font-medium text-white/90">{h.text}</span>
               </div>
             ))}
           </div>
-          <img
-            src={authHeroSignup}
-            alt="Platform collaboration illustration"
-            className="mt-8 w-full max-w-xs mx-auto drop-shadow-2xl"
-            width={800}
-            height={800}
-          />
         </motion.div>
       </div>
 
-      {/* Right panel */}
-      <div className="relative flex-1 flex items-center justify-center p-6 sm:p-12 overflow-y-auto">
+      {/* Right panel — dark */}
+      <div className="relative flex-1 flex items-center justify-center p-6 sm:p-12 overflow-y-auto" style={{ background: "linear-gradient(180deg, hsl(220 16% 10%) 0%, hsl(220 14% 13%) 100%)" }}>
         <button
           onClick={() => navigate("/")}
           className="absolute top-6 right-6 p-2 rounded-full glass hover:bg-muted/80 text-muted-foreground hover:text-foreground transition-smooth z-10"
