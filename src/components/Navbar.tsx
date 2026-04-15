@@ -16,7 +16,7 @@ const Navbar = () => {
     { label: t("nav.platform"), href: "#stakeholders" },
     { label: t("nav.about"), href: "#about" },
     { label: t("nav.impact"), href: "#impact" },
-    { label: "Marketplace", href: "/marketplace", isRoute: true },
+    { label: t("dashboard.marketplace"), href: "/marketplace", isRoute: true },
     { label: t("nav.contact"), href: "/contact", isRoute: true },
   ];
 

@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Recycle, Mail, Phone, MapPin, ExternalLink } from "lucide-react";
+import { ArrowRight, Recycle, Mail, Phone, MapPin } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { useHashNavigation } from "@/hooks/useHashNavigation";
 import ConsultationDialog from "@/components/ConsultationDialog";
@@ -76,24 +76,23 @@ const CTA = () => {
   );
 };
 
-const footerLinks = {
-  menu: [
-    { label: "Platform", to: "/#stakeholders" },
-    { label: "About", to: "/#about" },
-    { label: "Features", to: "/#features" },
-    { label: "Traceability", to: "/#traceability" },
-    { label: "Impact", to: "/#impact" },
-    { label: "Marketplace", to: "/marketplace", isRoute: true },
-    { label: "Contact", to: "/contact", isRoute: true },
-  ],
-  legal: [
-    { label: "Terms", to: "/terms" },
-    { label: "Privacy", to: "/privacy" },
-  ],
-};
-
 const Footer = () => {
   const { t } = useTranslation();
+
+  const menuLinks = [
+    { label: t("footer.platform"), to: "/#stakeholders" },
+    { label: t("footer.about"), to: "/#about" },
+    { label: t("footer.features"), to: "/#features" },
+    { label: t("footer.traceability"), to: "/#traceability" },
+    { label: t("footer.impact"), to: "/#impact" },
+    { label: t("footer.marketplace"), to: "/marketplace", isRoute: true },
+    { label: t("footer.contact"), to: "/contact", isRoute: true },
+  ];
+
+  const legalLinks = [
+    { label: t("footer.terms"), to: "/terms" },
+    { label: t("footer.privacy"), to: "/privacy" },
+  ];
 
   return (
     <footer className="relative border-t border-[rgba(255,255,255,0.06)] bg-[rgba(0,0,0,0.4)] backdrop-blur-[24px]">
@@ -110,7 +109,7 @@ const Footer = () => {
               <span className="font-display text-xl font-bold text-foreground tracking-tight">Duara Flow</span>
             </Link>
             <p className="text-sm leading-relaxed text-muted-foreground max-w-xs">
-              Africa's leading waste traceability platform — connecting waste pickers, aggregators, recyclers, and corporates for a circular economy.
+              {t("footer.brandDescription")}
             </p>
             <div className="flex flex-col gap-2.5 pt-1">
               <a href="mailto:hello@duaraflow.co.ke" className="inline-flex items-center gap-2 text-sm text-muted-foreground transition-colors duration-200 hover:text-foreground">
@@ -130,15 +129,15 @@ const Footer = () => {
 
           {/* Menu links */}
           <div className="md:col-span-3 md:col-start-7">
-            <h4 className="mb-4 font-display text-xs font-semibold uppercase tracking-widest text-foreground/60">Menu</h4>
-             <FooterMenuLinks links={footerLinks.menu} />
+            <h4 className="mb-4 font-display text-xs font-semibold uppercase tracking-widest text-foreground/60">{t("footer.menuHeading")}</h4>
+             <FooterMenuLinks links={menuLinks} />
           </div>
 
           {/* Legal links */}
           <div className="md:col-span-2">
-            <h4 className="mb-4 font-display text-xs font-semibold uppercase tracking-widest text-foreground/60">Legal</h4>
+            <h4 className="mb-4 font-display text-xs font-semibold uppercase tracking-widest text-foreground/60">{t("footer.legalHeading")}</h4>
             <ul className="space-y-2.5">
-              {footerLinks.legal.map((link) => (
+              {legalLinks.map((link) => (
                 <li key={link.to}>
                   <Link to={link.to} className="text-sm text-muted-foreground transition-colors duration-200 hover:text-foreground">
                     {link.label}
@@ -155,7 +154,7 @@ const Footer = () => {
             {t("cta.copyright")}
           </p>
           <p className="text-xs text-muted-foreground/40">
-            A product of <span className="text-muted-foreground/60 font-medium">Duara Intelligence</span>
+            {t("footer.productOf")} <span className="text-muted-foreground/60 font-medium">Duara Intelligence</span>
           </p>
         </div>
       </div>
