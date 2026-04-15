@@ -5,6 +5,7 @@ const en = {
     impact: "Impact",
     stakeholders: "Stakeholders",
     about: "About",
+    contact: "Contact",
     signIn: "Sign In",
     getStarted: "Get Started",
     language: "SW",

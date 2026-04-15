@@ -5,6 +5,7 @@ const sw = {
     impact: "Athari",
     stakeholders: "Wadau",
     about: "Kuhusu",
+    contact: "Wasiliana",
     signIn: "Ingia",
     getStarted: "Anza Sasa",
     language: "EN",
