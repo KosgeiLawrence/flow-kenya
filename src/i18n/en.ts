@@ -19,7 +19,7 @@ const en = {
     title2: "Infrastructure for the",
     circularEconomy: "Circular Economy",
     subtitle: "End-to-end material tracking from waste picker to manufacturer. Real-time compliance, financial management, and impact analytics — all in one platform.",
-    joinPlatform: "Join the Platform",
+    joinPlatform: "Get a Free Consultation",
     stat1Value: "22M+",
     stat1Label: "Tonnes waste/year in Kenya",
     stat2Value: "70%",

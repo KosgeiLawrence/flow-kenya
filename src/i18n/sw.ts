@@ -19,7 +19,7 @@ const sw = {
     title2: "ya Kenya kwa",
     circularEconomy: "Uchumi wa Mzunguko",
     subtitle: "Ufuatiliaji kamili wa nyenzo kutoka kwa mkusanyaji hadi kwa mtengenezaji. Uzingatiaji wa wakati halisi, usimamizi wa fedha, na uchambuzi wa athari — yote katika jukwaa moja.",
-    joinPlatform: "Jiunge na Jukwaa",
+    joinPlatform: "Pata Ushauri Bure",
     stat1Value: "22M+",
     stat1Label: "Tani za taka/mwaka nchini Kenya",
     stat2Value: "70%",
