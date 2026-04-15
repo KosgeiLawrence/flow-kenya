@@ -1,7 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, PieChart, Pie, Cell, LineChart, Line } from "recharts";
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, PieChart, Pie, Cell, LineChart, Line, ResponsiveContainer } from "recharts";
 import { Download, Recycle, DollarSign, Leaf, Users, Heart, TrendingUp, ArrowLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import jsPDF from "jspdf";
@@ -92,40 +92,146 @@ const ImpactDashboard = () => {
 
   const fadeIn = { initial: { opacity: 0, y: 20 }, animate: { opacity: 1, y: 0 }, transition: { duration: 0.5 } };
 
+  const kpis = [
+    { label: "Total Collected", value: `${d.totalTons.toFixed(1)}t`, sub: `${d.totalKg.toLocaleString()} kg`, icon: Recycle, color: "text-primary" },
+    { label: "Income Generated", value: `KES ${(estimatedIncome / 1000).toFixed(0)}K`, sub: `${estimatedIncome.toLocaleString()} total`, icon: DollarSign, color: "text-secondary" },
+    { label: "CO₂ Avoided", value: `${d.co2Tons.toFixed(1)}t`, sub: `${d.co2Avoided.toLocaleString()} kg CO₂e`, icon: Leaf, color: "text-primary" },
+    { label: "Jobs Created", value: d.totalJobs, sub: `${d.wastePickers} pickers`, icon: Users, color: "text-foreground" },
+    { label: "Women Rate", value: `${d.womenRate.toFixed(1)}%`, sub: `${d.womenCount} participants`, icon: Heart, color: "text-destructive" },
+    { label: "Youth Rate", value: `${d.youthRate.toFixed(1)}%`, sub: `${d.youthCount} under 35`, icon: TrendingUp, color: "text-secondary" },
+  ];
+
   return (
     <div className="min-h-screen bg-background">
+      {/* Header — mobile responsive */}
       <header className="border-b border-border bg-card">
-        <div className="container mx-auto flex items-center justify-between h-16 px-4">
-          <div className="flex items-center gap-3">
-            <Button variant="ghost" size="sm" onClick={() => navigate("/")} className="gap-1"><ArrowLeft className="w-4 h-4" /> Back</Button>
-            <h1 className="text-lg font-display font-bold text-foreground">Impact Measurement Framework</h1>
+        <div className="container mx-auto px-4 py-3">
+          <div className="flex items-center justify-between gap-2">
+            <div className="flex items-center gap-2 min-w-0">
+              <Button variant="ghost" size="icon" onClick={() => navigate("/")} className="shrink-0">
+                <ArrowLeft className="w-4 h-4" />
+              </Button>
+              <h1 className="text-sm sm:text-lg font-display font-bold text-foreground truncate">
+                Impact Dashboard
+              </h1>
+            </div>
+            <Button onClick={exportReport} size="sm" className="gap-1.5 shrink-0 text-xs sm:text-sm">
+              <Download className="w-3.5 h-3.5" />
+              <span className="hidden sm:inline">Download</span> Report
+            </Button>
           </div>
-          <Button onClick={exportReport} className="gap-2"><Download className="w-4 h-4" /> Download Report</Button>
         </div>
       </header>
 
-      <main className="container mx-auto p-6 space-y-8">
-        <motion.div {...fadeIn} className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
-          {[
-            { label: "Total Collected", value: `${d.totalTons.toFixed(1)}t`, sub: `${d.totalKg.toLocaleString()} kg`, icon: Recycle, color: "text-primary" },
-            { label: "Income Generated", value: `KES ${(estimatedIncome / 1000).toFixed(0)}K`, sub: `${estimatedIncome.toLocaleString()} total`, icon: DollarSign, color: "text-secondary" },
-            { label: "CO₂ Avoided", value: `${d.co2Tons.toFixed(1)}t`, sub: `${d.co2Avoided.toLocaleString()} kg CO₂e`, icon: Leaf, color: "text-primary" },
-            { label: "Jobs Created", value: d.totalJobs, sub: `${d.wastePickers} pickers`, icon: Users, color: "text-foreground" },
-            { label: "Women Rate", value: `${d.womenRate.toFixed(1)}%`, sub: `${d.womenCount} participants`, icon: Heart, color: "text-destructive" },
-            { label: "Youth Rate", value: `${d.youthRate.toFixed(1)}%`, sub: `${d.youthCount} under 35`, icon: TrendingUp, color: "text-secondary" },
-          ].map((kpi) => (
-            <Card key={kpi.label} className="hover:shadow-soft transition-shadow"><CardContent className="p-5 text-center"><kpi.icon className={`w-7 h-7 mx-auto mb-2 ${kpi.color}`} /><p className="text-2xl font-display font-bold text-foreground">{kpi.value}</p><p className="text-xs text-muted-foreground mt-1">{kpi.label}</p><p className="text-[10px] text-muted-foreground/60">{kpi.sub}</p></CardContent></Card>
+      <main className="container mx-auto p-4 sm:p-6 space-y-6 sm:space-y-8">
+        {/* KPI grid — 2 cols on mobile, scales up */}
+        <motion.div {...fadeIn} className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-6 gap-3 sm:gap-4">
+          {kpis.map((kpi) => (
+            <Card key={kpi.label} className="hover:shadow-soft transition-shadow">
+              <CardContent className="p-3 sm:p-5 text-center">
+                <kpi.icon className={`w-5 h-5 sm:w-7 sm:h-7 mx-auto mb-1.5 sm:mb-2 ${kpi.color}`} />
+                <p className="text-lg sm:text-2xl font-display font-bold text-foreground">{kpi.value}</p>
+                <p className="text-[10px] sm:text-xs text-muted-foreground mt-0.5 sm:mt-1 leading-tight">{kpi.label}</p>
+                <p className="text-[9px] sm:text-[10px] text-muted-foreground/60">{kpi.sub}</p>
+              </CardContent>
+            </Card>
           ))}
         </motion.div>
 
-        <motion.div {...fadeIn} transition={{ delay: 0.1 }}><Card><CardHeader><CardTitle className="text-base">Monthly Impact Trend (12 months)</CardTitle></CardHeader><CardContent><ChartContainer config={chartConfig} className="h-[300px]"><LineChart data={monthlyTrend}><CartesianGrid strokeDasharray="3 3" /><XAxis dataKey="month" fontSize={11} /><YAxis fontSize={11} /><ChartTooltip content={<ChartTooltipContent />} /><Line type="monotone" dataKey="kg" stroke="hsl(152,45%,22%)" strokeWidth={2} name="Kg Collected" /><Line type="monotone" dataKey="co2" stroke="hsl(40,55%,55%)" strokeWidth={2} name="CO₂ Avoided" /></LineChart></ChartContainer></CardContent></Card></motion.div>
+        {/* Monthly trend chart */}
+        <motion.div {...fadeIn} transition={{ delay: 0.1 }}>
+          <Card>
+            <CardHeader className="pb-2 sm:pb-4">
+              <CardTitle className="text-sm sm:text-base">Monthly Impact Trend (12 months)</CardTitle>
+            </CardHeader>
+            <CardContent className="px-2 sm:px-6">
+              <ChartContainer config={chartConfig} className="h-[220px] sm:h-[300px]">
+                <LineChart data={monthlyTrend}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="month" fontSize={10} tick={{ fontSize: 9 }} />
+                  <YAxis fontSize={10} tick={{ fontSize: 9 }} width={35} />
+                  <ChartTooltip content={<ChartTooltipContent />} />
+                  <Line type="monotone" dataKey="kg" stroke="hsl(152,45%,22%)" strokeWidth={2} name="Kg Collected" dot={false} />
+                  <Line type="monotone" dataKey="co2" stroke="hsl(40,55%,55%)" strokeWidth={2} name="CO₂ Avoided" dot={false} />
+                </LineChart>
+              </ChartContainer>
+            </CardContent>
+          </Card>
+        </motion.div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <motion.div {...fadeIn} transition={{ delay: 0.2 }}><Card className="h-full"><CardHeader><CardTitle className="text-base">Impact by Material</CardTitle></CardHeader><CardContent><ChartContainer config={chartConfig} className="h-[280px]"><BarChart data={materialData}><CartesianGrid strokeDasharray="3 3" /><XAxis dataKey="name" fontSize={10} angle={-20} textAnchor="end" height={60} /><YAxis fontSize={11} /><ChartTooltip content={<ChartTooltipContent />} /><Bar dataKey="kg" fill="hsl(152,45%,22%)" radius={[4, 4, 0, 0]} name="Kg Collected" /><Bar dataKey="co2" fill="hsl(40,55%,55%)" radius={[4, 4, 0, 0]} name="CO₂ Avoided" /></BarChart></ChartContainer></CardContent></Card></motion.div>
-          <motion.div {...fadeIn} transition={{ delay: 0.3 }}><Card className="h-full"><CardHeader><CardTitle className="text-base">Livelihoods Supported</CardTitle></CardHeader><CardContent>{jobsData.length > 0 ? (<ChartContainer config={chartConfig} className="h-[280px]"><PieChart><Pie data={jobsData} cx="50%" cy="50%" outerRadius={90} innerRadius={45} dataKey="value" label={({ name, value }) => `${name}: ${value}`}>{jobsData.map((_, i) => <Cell key={i} fill={COLORS[i % COLORS.length]} />)}</Pie><ChartTooltip content={<ChartTooltipContent />} /></PieChart></ChartContainer>) : (<div className="h-[280px] flex items-center justify-center"><p className="text-muted-foreground text-sm">No registered operators yet</p></div>)}</CardContent></Card></motion.div>
+        {/* Material & Jobs charts */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
+          <motion.div {...fadeIn} transition={{ delay: 0.2 }}>
+            <Card className="h-full">
+              <CardHeader className="pb-2 sm:pb-4">
+                <CardTitle className="text-sm sm:text-base">Impact by Material</CardTitle>
+              </CardHeader>
+              <CardContent className="px-2 sm:px-6">
+                <ChartContainer config={chartConfig} className="h-[220px] sm:h-[280px]">
+                  <BarChart data={materialData}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="name" fontSize={9} angle={-25} textAnchor="end" height={50} tick={{ fontSize: 8 }} />
+                    <YAxis fontSize={10} tick={{ fontSize: 9 }} width={35} />
+                    <ChartTooltip content={<ChartTooltipContent />} />
+                    <Bar dataKey="kg" fill="hsl(152,45%,22%)" radius={[4, 4, 0, 0]} name="Kg Collected" />
+                    <Bar dataKey="co2" fill="hsl(40,55%,55%)" radius={[4, 4, 0, 0]} name="CO₂ Avoided" />
+                  </BarChart>
+                </ChartContainer>
+              </CardContent>
+            </Card>
+          </motion.div>
+
+          <motion.div {...fadeIn} transition={{ delay: 0.3 }}>
+            <Card className="h-full">
+              <CardHeader className="pb-2 sm:pb-4">
+                <CardTitle className="text-sm sm:text-base">Livelihoods Supported</CardTitle>
+              </CardHeader>
+              <CardContent className="px-2 sm:px-6">
+                {jobsData.length > 0 ? (
+                  <ChartContainer config={chartConfig} className="h-[220px] sm:h-[280px]">
+                    <PieChart>
+                      <Pie data={jobsData} cx="50%" cy="50%" outerRadius={70} innerRadius={35} dataKey="value" label={({ name, value }) => `${name}: ${value}`} fontSize={10}>
+                        {jobsData.map((_, i) => <Cell key={i} fill={COLORS[i % COLORS.length]} />)}
+                      </Pie>
+                      <ChartTooltip content={<ChartTooltipContent />} />
+                    </PieChart>
+                  </ChartContainer>
+                ) : (
+                  <div className="h-[220px] sm:h-[280px] flex items-center justify-center">
+                    <p className="text-muted-foreground text-sm">No registered operators yet</p>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </motion.div>
         </div>
 
-        <motion.div {...fadeIn} transition={{ delay: 0.4 }}><Card className="bg-muted/30"><CardContent className="p-6"><h3 className="font-display font-semibold text-foreground mb-2">📐 Calculation Methodology</h3><div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-muted-foreground"><div><p className="font-medium text-foreground mb-1">CO₂ Emissions Avoided</p><p>Material-specific emission factors (IPCC/EPA baseline): PET 3.1, HDPE 2.8, Glass 0.6, Aluminium 9.1, Paper 1.1, Organic 0.5 kg CO₂e per kg recycled.</p></div><div><p className="font-medium text-foreground mb-1">Income & Livelihoods</p><p>Income calculated from recorded M-Pesa payments and material price × quantity. Jobs counted as active registered waste pickers, aggregators, and recyclers.</p></div><div><p className="font-medium text-foreground mb-1">Demographics</p><p>Women and youth (&lt;35 years) participation rates derived from self-reported profile data.</p></div><div><p className="font-medium text-foreground mb-1">Data Integrity</p><p>All metrics sourced from batch-tracked, QR-verified collection records with geo-tagged timestamps.</p></div></div></CardContent></Card></motion.div>
+        {/* Methodology */}
+        <motion.div {...fadeIn} transition={{ delay: 0.4 }}>
+          <Card className="bg-muted/30">
+            <CardContent className="p-4 sm:p-6">
+              <h3 className="font-display font-semibold text-foreground mb-2 text-sm sm:text-base">📐 Calculation Methodology</h3>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 text-xs sm:text-sm text-muted-foreground">
+                <div>
+                  <p className="font-medium text-foreground mb-1">CO₂ Emissions Avoided</p>
+                  <p>Material-specific emission factors (IPCC/EPA baseline): PET 3.1, HDPE 2.8, Glass 0.6, Aluminium 9.1, Paper 1.1, Organic 0.5 kg CO₂e per kg recycled.</p>
+                </div>
+                <div>
+                  <p className="font-medium text-foreground mb-1">Income & Livelihoods</p>
+                  <p>Income calculated from recorded M-Pesa payments and material price × quantity. Jobs counted as active registered waste pickers, aggregators, and recyclers.</p>
+                </div>
+                <div>
+                  <p className="font-medium text-foreground mb-1">Demographics</p>
+                  <p>Women and youth (&lt;35 years) participation rates derived from self-reported profile data.</p>
+                </div>
+                <div>
+                  <p className="font-medium text-foreground mb-1">Data Integrity</p>
+                  <p>All metrics sourced from batch-tracked, QR-verified collection records with geo-tagged timestamps.</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </motion.div>
       </main>
     </div>
   );
