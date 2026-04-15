@@ -116,7 +116,18 @@ const Navbar = () => {
                 <a
                   key={item.href}
                   href={item.href}
-                  onClick={() => setMobileOpen(false)}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    setMobileOpen(false);
+                    const id = item.href.replace("#", "");
+                    setTimeout(() => {
+                      const el = document.getElementById(id);
+                      if (el) {
+                        el.scrollIntoView({ behavior: "smooth" });
+                        window.history.replaceState(null, "", item.href);
+                      }
+                    }, 350);
+                  }}
                   className="px-4 py-3 rounded-xl text-sm font-medium text-primary-foreground/80 hover:text-gold-light hover:bg-primary-foreground/5 transition-all duration-300"
                 >
                   {item.label}
