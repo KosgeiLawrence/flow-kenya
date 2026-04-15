@@ -117,8 +117,8 @@ const AdminDashboard = () => {
               </div>
             )}
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium truncate">{displayName || "Administrator"}</p>
-              <span className="text-xs text-sidebar-primary font-medium">Admin Panel</span>
+              <p className="text-sm font-medium truncate">{displayName || t("roles.admin")}</p>
+              <span className="text-xs text-sidebar-primary font-medium">{t("roles.admin")}</span>
             </div>
           </div>
         </div>
@@ -145,7 +145,7 @@ const AdminDashboard = () => {
         <div className="p-4 border-t border-[rgba(255,255,255,0.08)] space-y-1">
           <LanguageToggle />
           <Button variant="ghost" size="sm" onClick={handleSignOut} className="w-full justify-start gap-2 text-sidebar-foreground/70 hover:text-sidebar-foreground hover:bg-sidebar-accent/50">
-            <LogOut className="w-4 h-4" /> Sign Out
+            <LogOut className="w-4 h-4" /> {t("dashboard.signOut")}
           </Button>
         </div>
       </aside>
@@ -156,7 +156,7 @@ const AdminDashboard = () => {
             <Menu className="w-5 h-5" />
           </Button>
           <h2 className="text-lg font-display font-semibold text-foreground">
-            {navItems.find(n => n.id === activeTab)?.label}
+            {translatedNavItems.find(n => n.id === activeTab)?.label}
           </h2>
         </header>
         <main className="flex-1 p-6 md:p-8 overflow-y-auto">
