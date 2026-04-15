@@ -38,8 +38,8 @@ const Navbar = () => {
       <div className="container flex items-center justify-between h-16 md:h-20 pt-2">
         {/* Logo */}
         <Link to="/" className="flex items-center gap-2.5 group">
-          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gold transition-all duration-300 group-hover:scale-110 group-hover:shadow-gold">
-            <Recycle className="h-5 w-5 text-forest-deep" />
+          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary transition-all duration-300 group-hover:scale-110 group-hover:shadow-primary">
+            <Recycle className="h-5 w-5 text-primary-foreground" />
           </div>
           <span className="font-display text-lg font-bold text-primary-foreground tracking-tight">
             Duara Flow
