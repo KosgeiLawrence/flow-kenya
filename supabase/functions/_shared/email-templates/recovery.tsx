@@ -61,5 +61,5 @@ const logoImg = { borderRadius: '12px' }
 const h1 = { fontSize: '24px', fontWeight: 'bold' as const, color: '#12211A', fontFamily: "'Space Grotesk', 'Segoe UI', Arial, sans-serif", margin: '0 0 20px' }
 const text = { fontSize: '15px', color: '#677A6F', lineHeight: '1.6', margin: '0 0 20px' }
 const buttonSection = { margin: '8px 0 32px' }
-const button = { backgroundColor: '#D4A843', color: '#12211A', fontSize: '15px', fontWeight: '600' as const, borderRadius: '12px', padding: '14px 28px', textDecoration: 'none', fontFamily: "'Space Grotesk', 'Segoe UI', Arial, sans-serif" }
+const button = { backgroundColor: '#3B9B62', color: '#FFFFFF', fontSize: '15px', fontWeight: '600' as const, borderRadius: '16px', padding: '14px 28px', textDecoration: 'none', fontFamily: "'Space Grotesk', 'Segoe UI', Arial, sans-serif" }
 const footerBrand = { fontSize: '12px', color: '#BBBBBB', margin: '16px 0 0' }
