@@ -1080,6 +1080,8 @@ const sw = {
     generateReport: "Tengeneza Ripoti",
     monthlyReport: "Ripoti ya Kila Mwezi",
     annualReport: "Ripoti ya Kila Mwaka",
+    waterSaved: "Maji Yaliyookolewa",
+    energySaved: "Nishati Iliyookolewa",
   },
 
   // Admin panels
