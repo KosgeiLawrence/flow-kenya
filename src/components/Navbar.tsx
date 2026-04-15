@@ -15,6 +15,7 @@ const Navbar = () => {
     { label: t("nav.impact"), href: "#impact" },
     { label: t("nav.stakeholders"), href: "#stakeholders" },
     { label: t("nav.about"), href: "#about" },
+    { label: t("nav.contact"), href: "/contact", isRoute: true },
   ];
 
   const toggleLang = () => {
