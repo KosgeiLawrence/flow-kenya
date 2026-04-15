@@ -57,14 +57,14 @@ const CountyAnalyticsPanel = () => {
         ))}
       </div>
 
-      <Card>
+      <Card className="overflow-hidden">
         <CardHeader><CardTitle className="text-base">{t("countyPanels.monthlyTrend", "Monthly Collection Trend (12 months)")}</CardTitle></CardHeader>
         <CardContent>
-          <ChartContainer config={chartConfig} className="h-[300px]">
+          <ChartContainer config={chartConfig} className="h-[220px] sm:h-[300px]">
             <LineChart data={monthlyData}>
               <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="month" fontSize={11} />
-              <YAxis fontSize={11} />
+              <XAxis dataKey="month" fontSize={10} />
+              <YAxis fontSize={10} />
               <ChartTooltip content={<ChartTooltipContent />} />
               <Line type="monotone" dataKey="kg" stroke="hsl(152,45%,22%)" strokeWidth={2} dot={{ r: 4 }} />
             </LineChart>

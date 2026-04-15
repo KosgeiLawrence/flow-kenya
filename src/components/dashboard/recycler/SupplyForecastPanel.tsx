@@ -94,13 +94,13 @@ const SupplyForecastPanel = () => {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Card className="shadow-soft">
+        <Card className="overflow-hidden shadow-soft">
           <CardHeader><CardTitle className="text-lg">14-Day Supply Trend</CardTitle></CardHeader>
           <CardContent>
-            <ResponsiveContainer width="100%" height={220}>
+            <ResponsiveContainer width="100%" height={180}>
               <BarChart data={dailyData}>
-                <XAxis dataKey="day" tick={{ fontSize: 11 }} />
-                <YAxis tick={{ fontSize: 11 }} />
+                <XAxis dataKey="day" tick={{ fontSize: 9 }} />
+                <YAxis tick={{ fontSize: 9 }} />
                 <Tooltip formatter={(v: number) => `${v} kg`} />
                 <Bar dataKey="qty" fill="hsl(152,45%,22%)" radius={[4, 4, 0, 0]} />
               </BarChart>
@@ -108,13 +108,13 @@ const SupplyForecastPanel = () => {
           </CardContent>
         </Card>
 
-        <Card className="shadow-soft">
+        <Card className="overflow-hidden shadow-soft">
           <CardHeader><CardTitle className="text-lg">Supply Forecast (4 weeks)</CardTitle></CardHeader>
           <CardContent>
-            <ResponsiveContainer width="100%" height={220}>
+            <ResponsiveContainer width="100%" height={180}>
               <LineChart data={forecastData}>
-                <XAxis dataKey="week" tick={{ fontSize: 11 }} />
-                <YAxis tick={{ fontSize: 11 }} />
+                <XAxis dataKey="week" tick={{ fontSize: 9 }} />
+                <YAxis tick={{ fontSize: 9 }} />
                 <Tooltip formatter={(v: number) => `${v} kg`} />
                 <Line type="monotone" dataKey="supply" stroke="hsl(40,55%,55%)" strokeWidth={2} dot={{ r: 4 }} />
               </LineChart>

@@ -829,7 +829,7 @@ const ESGPanel = () => {
       )}
 
       {/* Material breakdown */}
-      <Card className="shadow-soft">
+      <Card className="overflow-hidden shadow-soft">
         <CardHeader><CardTitle className="text-lg">Material Recovery Breakdown</CardTitle></CardHeader>
         <CardContent>
           {!pieData.length ? (

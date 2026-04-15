@@ -71,14 +71,14 @@ const PlatformAnalyticsPanel = () => {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Card>
+        <Card className="overflow-hidden">
           <CardHeader><CardTitle className="text-base">Monthly Collections (12 months)</CardTitle></CardHeader>
           <CardContent>
-            <ChartContainer config={chartConfig} className="h-[250px]">
+            <ChartContainer config={chartConfig} className="h-[200px] sm:h-[250px]">
               <BarChart data={monthlyData}>
                 <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="date" fontSize={11} />
-                <YAxis fontSize={11} />
+                <XAxis dataKey="date" fontSize={10} />
+                <YAxis fontSize={10} />
                 <ChartTooltip content={<ChartTooltipContent />} />
                 <Bar dataKey="kg" fill="hsl(152,45%,22%)" radius={[4, 4, 0, 0]} />
               </BarChart>
@@ -86,12 +86,12 @@ const PlatformAnalyticsPanel = () => {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="overflow-hidden">
           <CardHeader><CardTitle className="text-base">User Roles Distribution</CardTitle></CardHeader>
           <CardContent>
-            <ChartContainer config={chartConfig} className="h-[250px]">
+            <ChartContainer config={chartConfig} className="h-[200px] sm:h-[250px]">
               <PieChart>
-                <Pie data={roleData} cx="50%" cy="50%" outerRadius={80} dataKey="value" label={({ name, value }) => `${name}: ${value}`}>
+                <Pie data={roleData} cx="50%" cy="50%" outerRadius={65} dataKey="value" label={({ name, value }) => `${name}: ${value}`}>
                   {roleData.map((_, i) => <Cell key={i} fill={COLORS[i % COLORS.length]} />)}
                 </Pie>
                 <ChartTooltip content={<ChartTooltipContent />} />
@@ -100,14 +100,14 @@ const PlatformAnalyticsPanel = () => {
           </CardContent>
         </Card>
 
-        <Card className="lg:col-span-2">
+        <Card className="overflow-hidden lg:col-span-2">
           <CardHeader><CardTitle className="text-base">Material Breakdown</CardTitle></CardHeader>
           <CardContent>
-            <ChartContainer config={chartConfig} className="h-[250px]">
+            <ChartContainer config={chartConfig} className="h-[200px] sm:h-[250px]">
               <BarChart data={materialBreakdown} layout="vertical">
                 <CartesianGrid strokeDasharray="3 3" />
-                <XAxis type="number" fontSize={11} />
-                <YAxis dataKey="name" type="category" fontSize={11} width={100} />
+                <XAxis type="number" fontSize={10} />
+                <YAxis dataKey="name" type="category" fontSize={10} width={70} />
                 <ChartTooltip content={<ChartTooltipContent />} />
                 <Bar dataKey="value" fill="hsl(40,55%,55%)" radius={[0, 4, 4, 0]} />
               </BarChart>

@@ -92,26 +92,26 @@ const CarbonTrackerPanel = () => {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Card className="shadow-soft">
+        <Card className="overflow-hidden shadow-soft">
           <CardHeader><CardTitle className="text-lg">Monthly CO₂ Offset</CardTitle></CardHeader>
           <CardContent>
-            <ResponsiveContainer width="100%" height={220}>
+            <ResponsiveContainer width="100%" height={180}>
               <AreaChart data={monthlyData}>
-                <XAxis dataKey="month" tick={{ fontSize: 11 }} />
-                <YAxis tick={{ fontSize: 11 }} />
+                <XAxis dataKey="month" tick={{ fontSize: 9 }} />
+                <YAxis tick={{ fontSize: 9 }} />
                 <Tooltip formatter={(v: number) => `${v} kg CO₂`} />
                 <Area type="monotone" dataKey="offset" fill="hsl(152,45%,22%)" fillOpacity={0.2} stroke="hsl(152,45%,22%)" strokeWidth={2} />
               </AreaChart>
             </ResponsiveContainer>
           </CardContent>
         </Card>
-        <Card className="shadow-soft">
+        <Card className="overflow-hidden shadow-soft">
           <CardHeader><CardTitle className="text-lg">Cumulative Offset</CardTitle></CardHeader>
           <CardContent>
-            <ResponsiveContainer width="100%" height={220}>
+            <ResponsiveContainer width="100%" height={180}>
               <LineChart data={monthlyData}>
-                <XAxis dataKey="month" tick={{ fontSize: 11 }} />
-                <YAxis tick={{ fontSize: 11 }} />
+                <XAxis dataKey="month" tick={{ fontSize: 9 }} />
+                <YAxis tick={{ fontSize: 9 }} />
                 <Tooltip formatter={(v: number) => `${v} kg CO₂`} />
                 <Line type="monotone" dataKey="cumulative" stroke="hsl(40,55%,55%)" strokeWidth={2} dot={{ r: 3 }} />
               </LineChart>
