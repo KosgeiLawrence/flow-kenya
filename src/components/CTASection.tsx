@@ -45,15 +45,16 @@ const CTA = () => {
 };
 
 const footerLinks = {
-  product: [
+  menu: [
+    { label: "Platform", to: "/#platform" },
     { label: "Features", to: "/#features" },
     { label: "Dashboards", to: "/#dashboards" },
     { label: "Traceability", to: "/#traceability" },
     { label: "Impact", to: "/#impact" },
-  ],
-  company: [
     { label: "About", to: "/#about" },
     { label: "Contact", to: "/contact" },
+  ],
+  legal: [
     { label: "Terms", to: "/terms" },
     { label: "Privacy", to: "/privacy" },
   ],
@@ -95,11 +96,11 @@ const Footer = () => {
             </div>
           </div>
 
-          {/* Product links */}
+          {/* Menu links */}
           <div className="md:col-span-3 md:col-start-7">
-            <h4 className="mb-4 font-display text-xs font-semibold uppercase tracking-widest text-foreground/60">Product</h4>
+            <h4 className="mb-4 font-display text-xs font-semibold uppercase tracking-widest text-foreground/60">Menu</h4>
             <ul className="space-y-2.5">
-              {footerLinks.product.map((link) => (
+              {footerLinks.menu.map((link) => (
                 <li key={link.to}>
                   <Link to={link.to} className="text-sm text-muted-foreground transition-colors duration-200 hover:text-foreground">
                     {link.label}
@@ -109,11 +110,11 @@ const Footer = () => {
             </ul>
           </div>
 
-          {/* Company links */}
-          <div className="md:col-span-3">
-            <h4 className="mb-4 font-display text-xs font-semibold uppercase tracking-widest text-foreground/60">Company</h4>
+          {/* Legal links */}
+          <div className="md:col-span-2">
+            <h4 className="mb-4 font-display text-xs font-semibold uppercase tracking-widest text-foreground/60">Legal</h4>
             <ul className="space-y-2.5">
-              {footerLinks.company.map((link) => (
+              {footerLinks.legal.map((link) => (
                 <li key={link.to}>
                   <Link to={link.to} className="text-sm text-muted-foreground transition-colors duration-200 hover:text-foreground">
                     {link.label}
