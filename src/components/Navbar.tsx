@@ -49,16 +49,27 @@ const Navbar = () => {
 
         {/* Desktop nav */}
         <nav className="hidden md:flex items-center gap-1">
-          {navItems.map((item) => (
-            <a
-              key={item.href}
-              href={item.href}
-              className="relative px-4 py-2 text-sm font-medium text-primary-foreground/70 transition-all duration-300 hover:text-gold-light group"
-            >
-              {item.label}
-              <span className="absolute bottom-0 left-1/2 -translate-x-1/2 h-0.5 w-0 bg-gold rounded-full transition-all duration-300 group-hover:w-1/2" />
-            </a>
-          ))}
+          {navItems.map((item) =>
+            item.isRoute ? (
+              <Link
+                key={item.href}
+                to={item.href}
+                className="relative px-4 py-2 text-sm font-medium text-primary-foreground/70 transition-all duration-300 hover:text-gold-light group"
+              >
+                {item.label}
+                <span className="absolute bottom-0 left-1/2 -translate-x-1/2 h-0.5 w-0 bg-gold rounded-full transition-all duration-300 group-hover:w-1/2" />
+              </Link>
+            ) : (
+              <a
+                key={item.href}
+                href={item.href}
+                className="relative px-4 py-2 text-sm font-medium text-primary-foreground/70 transition-all duration-300 hover:text-gold-light group"
+              >
+                {item.label}
+                <span className="absolute bottom-0 left-1/2 -translate-x-1/2 h-0.5 w-0 bg-gold rounded-full transition-all duration-300 group-hover:w-1/2" />
+              </a>
+            )
+          )}
         </nav>
 
         {/* Desktop CTA + Lang */}
@@ -113,27 +124,38 @@ const Navbar = () => {
             className="md:hidden overflow-hidden bg-[rgba(255,255,255,0.06)] backdrop-blur-[20px] border-t border-[rgba(255,255,255,0.08)]"
           >
             <div className="container py-6 flex flex-col gap-2">
-              {navItems.map((item) => (
-                <a
-                  key={item.href}
-                  href={item.href}
-                  onClick={(e) => {
-                    e.preventDefault();
-                    setMobileOpen(false);
-                    const id = item.href.replace("#", "");
-                    setTimeout(() => {
-                      const el = document.getElementById(id);
-                      if (el) {
-                        el.scrollIntoView({ behavior: "smooth" });
-                        window.history.replaceState(null, "", item.href);
-                      }
-                    }, 350);
-                  }}
-                  className="px-4 py-3 rounded-xl text-sm font-medium text-primary-foreground/80 hover:text-gold-light hover:bg-primary-foreground/5 transition-all duration-300"
-                >
-                  {item.label}
-                </a>
-              ))}
+              {navItems.map((item) =>
+                item.isRoute ? (
+                  <Link
+                    key={item.href}
+                    to={item.href}
+                    onClick={() => setMobileOpen(false)}
+                    className="px-4 py-3 rounded-xl text-sm font-medium text-primary-foreground/80 hover:text-gold-light hover:bg-primary-foreground/5 transition-all duration-300"
+                  >
+                    {item.label}
+                  </Link>
+                ) : (
+                  <a
+                    key={item.href}
+                    href={item.href}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      setMobileOpen(false);
+                      const id = item.href.replace("#", "");
+                      setTimeout(() => {
+                        const el = document.getElementById(id);
+                        if (el) {
+                          el.scrollIntoView({ behavior: "smooth" });
+                          window.history.replaceState(null, "", item.href);
+                        }
+                      }, 350);
+                    }}
+                    className="px-4 py-3 rounded-xl text-sm font-medium text-primary-foreground/80 hover:text-gold-light hover:bg-primary-foreground/5 transition-all duration-300"
+                  >
+                    {item.label}
+                  </a>
+                )
+              )}
               <div className="mt-4 pt-4 border-t border-primary-foreground/10 flex flex-col gap-3">
                 <Button variant="hero-outline" asChild className="w-full">
                   <Link to="/login" onClick={() => setMobileOpen(false)}>{t("nav.signIn")}</Link>
