@@ -963,6 +963,11 @@ const sw = {
     pricesTrend: "Mwenendo wa Bei",
     demandForecast: "Utabiri wa Mahitaji",
     competitorAnalysis: "Uchambuzi wa Washindani",
+    marketNotes: "Maelezo ya Soko",
+    petDemand: "Mahitaji ya PET Yanaongezeka",
+    petDemandDesc: "Mahitaji ya kikanda ya PET yameongezeka kutokana na kanuni mpya za EPR. Tarajia utulivu wa bei.",
+    eWastePremium: "Bei ya Juu ya E-Taka",
+    eWastePremiumDesc: "E-taka ina bei ya juu kutokana na thamani ya urejeshaji wa metali za thamani.",
 
     supplyForecast: "Utabiri wa Usambazaji",
     projectedSupply: "Usambazaji Unaotarajiwa",

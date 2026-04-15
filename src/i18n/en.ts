@@ -963,6 +963,11 @@ const en = {
     pricesTrend: "Price Trends",
     demandForecast: "Demand Forecast",
     competitorAnalysis: "Competitor Analysis",
+    marketNotes: "Market Notes",
+    petDemand: "PET Demand Rising",
+    petDemandDesc: "Regional demand for PET has increased due to new EPR regulations. Expect price stability.",
+    eWastePremium: "E-Waste Premium",
+    eWastePremiumDesc: "E-waste commands premium pricing due to precious metal recovery value.",
 
     supplyForecast: "Supply Forecast",
     projectedSupply: "Projected Supply",
