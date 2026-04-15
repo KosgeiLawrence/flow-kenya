@@ -38,6 +38,13 @@ const Signup = () => {
   const [searchParams] = useSearchParams();
   const [selectedPlan, setSelectedPlan] = useState<string | null>(null);
   const [billingPeriod, setBillingPeriod] = useState<"monthly" | "yearly" | "one_time" | "free_trial">("free_trial");
+
+  // Reset billing period when county_government is selected (no free trial)
+  useEffect(() => {
+    if (role === "county_government" && billingPeriod === "free_trial") {
+      setBillingPeriod("monthly");
+    }
+  }, [role, billingPeriod]);
   const [promoCode, setPromoCode] = useState("");
   const promoValid = isPromoValidForRole(promoCode, role);
 
