@@ -10,6 +10,14 @@ import { useToast } from "@/hooks/use-toast";
 
 type PageState = "verifying" | "ready" | "success" | "error";
 
+const CenterWrapper = ({ children }: { children: React.ReactNode }) => (
+  <div className="min-h-screen bg-mesh flex items-center justify-center p-6">
+    <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }} className="w-full max-w-md">
+      <div className="glass-card rounded-2xl p-8">{children}</div>
+    </motion.div>
+  </div>
+);
+
 const ResetPassword = () => {
   const { toast } = useToast();
   const [searchParams] = useSearchParams();
