@@ -114,7 +114,7 @@ const AnalyticsPanel = () => {
         <Card className="overflow-hidden shadow-soft">
           <CardHeader><CardTitle className="text-base flex items-center gap-2"><TrendingUp className="w-4 h-4" /> Last 7 Days</CardTitle></CardHeader>
           <CardContent>
-            <ResponsiveContainer width="100%" height={220}>
+            <ResponsiveContainer width="100%" height={180}>
               <BarChart data={last7Days}>
                 <XAxis dataKey="day" tick={{ fontSize: 10 }} />
                 <YAxis tick={{ fontSize: 10 }} />
@@ -129,7 +129,7 @@ const AnalyticsPanel = () => {
           <CardHeader><CardTitle className="text-base flex items-center gap-2"><Leaf className="w-4 h-4" /> Material Breakdown</CardTitle></CardHeader>
           <CardContent>
             {pieData.length > 0 ? (
-              <ResponsiveContainer width="100%" height={220}>
+              <ResponsiveContainer width="100%" height={180}>
                 <PieChart>
                   <Pie data={pieData} cx="50%" cy="50%" innerRadius={50} outerRadius={65} dataKey="value" label={({ name, value }) => `${name}: ${value}`}>
                     {pieData.map((_, i) => <Cell key={i} fill={COLORS[i % COLORS.length]} />)}

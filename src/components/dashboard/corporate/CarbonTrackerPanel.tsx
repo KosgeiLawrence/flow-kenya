@@ -95,7 +95,7 @@ const CarbonTrackerPanel = () => {
         <Card className="overflow-hidden shadow-soft">
           <CardHeader><CardTitle className="text-lg">Monthly CO₂ Offset</CardTitle></CardHeader>
           <CardContent>
-            <ResponsiveContainer width="100%" height={220}>
+            <ResponsiveContainer width="100%" height={180}>
               <AreaChart data={monthlyData}>
                 <XAxis dataKey="month" tick={{ fontSize: 9 }} />
                 <YAxis tick={{ fontSize: 9 }} />
@@ -108,7 +108,7 @@ const CarbonTrackerPanel = () => {
         <Card className="overflow-hidden shadow-soft">
           <CardHeader><CardTitle className="text-lg">Cumulative Offset</CardTitle></CardHeader>
           <CardContent>
-            <ResponsiveContainer width="100%" height={220}>
+            <ResponsiveContainer width="100%" height={180}>
               <LineChart data={monthlyData}>
                 <XAxis dataKey="month" tick={{ fontSize: 9 }} />
                 <YAxis tick={{ fontSize: 9 }} />

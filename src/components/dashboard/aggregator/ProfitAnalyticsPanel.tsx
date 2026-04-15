@@ -122,7 +122,7 @@ const ProfitAnalyticsPanel = () => {
         <Card className="overflow-hidden shadow-soft">
           <CardHeader><CardTitle className="text-lg">7-Day Revenue</CardTitle></CardHeader>
           <CardContent>
-            <ResponsiveContainer width="100%" height={220}>
+            <ResponsiveContainer width="100%" height={180}>
               <BarChart data={dailyData}>
                 <XAxis dataKey="day" tick={{ fontSize: 10 }} />
                 <YAxis tick={{ fontSize: 10 }} />
@@ -139,7 +139,7 @@ const ProfitAnalyticsPanel = () => {
             {!pieData.length ? (
               <p className="text-sm text-muted-foreground">No data yet.</p>
             ) : (
-              <ResponsiveContainer width="100%" height={220}>
+              <ResponsiveContainer width="100%" height={180}>
                 <PieChart>
                   <Pie data={pieData} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={65} label={({ name }) => name}>
                     {pieData.map((_, i) => (

@@ -1374,7 +1374,7 @@ const EarningsExpensesPanel = ({ role }: Props) => {
                 <CardTitle className="text-sm flex items-center gap-2"><BarChart3 className="w-4 h-4" /> Budget vs Actual</CardTitle>
               </CardHeader>
               <CardContent>
-                <ResponsiveContainer width="100%" height={220}>
+                <ResponsiveContainer width="100%" height={180}>
                   <BarChart data={activeGroups.slice(0, 6).map(g => ({
                     name: g.baseName.substring(0, 12),
                     budget: g.totalBudgeted,

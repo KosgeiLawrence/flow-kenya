@@ -97,7 +97,7 @@ const SupplyForecastPanel = () => {
         <Card className="overflow-hidden shadow-soft">
           <CardHeader><CardTitle className="text-lg">14-Day Supply Trend</CardTitle></CardHeader>
           <CardContent>
-            <ResponsiveContainer width="100%" height={220}>
+            <ResponsiveContainer width="100%" height={180}>
               <BarChart data={dailyData}>
                 <XAxis dataKey="day" tick={{ fontSize: 9 }} />
                 <YAxis tick={{ fontSize: 9 }} />
@@ -111,7 +111,7 @@ const SupplyForecastPanel = () => {
         <Card className="overflow-hidden shadow-soft">
           <CardHeader><CardTitle className="text-lg">Supply Forecast (4 weeks)</CardTitle></CardHeader>
           <CardContent>
-            <ResponsiveContainer width="100%" height={220}>
+            <ResponsiveContainer width="100%" height={180}>
               <LineChart data={forecastData}>
                 <XAxis dataKey="week" tick={{ fontSize: 9 }} />
                 <YAxis tick={{ fontSize: 9 }} />

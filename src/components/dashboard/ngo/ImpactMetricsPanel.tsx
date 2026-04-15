@@ -126,7 +126,7 @@ const ImpactMetricsPanel = () => {
         <Card className="overflow-hidden shadow-soft">
           <CardHeader><CardTitle className="text-lg">14-Day Collection Trend</CardTitle></CardHeader>
           <CardContent>
-            <ResponsiveContainer width="100%" height={220}>
+            <ResponsiveContainer width="100%" height={180}>
               <BarChart data={dailyData}>
                 <XAxis dataKey="day" tick={{ fontSize: 9 }} />
                 <YAxis tick={{ fontSize: 9 }} />
@@ -142,7 +142,7 @@ const ImpactMetricsPanel = () => {
             {!pieData.length ? (
               <p className="text-sm text-muted-foreground">No data yet.</p>
             ) : (
-              <ResponsiveContainer width="100%" height={220}>
+              <ResponsiveContainer width="100%" height={180}>
                 <PieChart>
                   <Pie data={pieData} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={65} label={({ name }) => name}>
                     {pieData.map((_, i) => <Cell key={i} fill={COLORS[i % COLORS.length]} />)}

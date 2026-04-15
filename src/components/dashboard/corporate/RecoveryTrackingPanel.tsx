@@ -134,7 +134,7 @@ const RecoveryTrackingPanel = () => {
           <CardHeader><CardTitle className="text-sm">Material Breakdown</CardTitle></CardHeader>
           <CardContent>
             {pieData.length ? (
-              <ResponsiveContainer width="100%" height={220}>
+              <ResponsiveContainer width="100%" height={180}>
                 <PieChart>
                   <Pie data={pieData} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={65} label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}>
                     {pieData.map((_, i) => <Cell key={i} fill={COLORS[i % COLORS.length]} />)}
@@ -151,7 +151,7 @@ const RecoveryTrackingPanel = () => {
           <CardHeader><CardTitle className="text-sm">Geographic Distribution</CardTitle></CardHeader>
           <CardContent>
             {countyData.length ? (
-              <ResponsiveContainer width="100%" height={220}>
+              <ResponsiveContainer width="100%" height={180}>
                 <BarChart data={countyData}>
                   <CartesianGrid strokeDasharray="3 3" />
                   <XAxis dataKey="name" tick={{ fontSize: 10 }} />
