@@ -13,8 +13,8 @@ const TraceabilityFlow = () => {
   ];
 
   return (
-    <section id="traceability" className="relative py-20 md:py-32 overflow-hidden">
-      <div className="absolute inset-0 bg-muted">
+    <section id="traceability" className="relative py-20 md:py-32 overflow-hidden bg-mesh">
+      <div className="absolute inset-0">
         <div className="absolute top-0 right-0 h-[40%] w-[40%] rounded-full bg-gold/5 blur-3xl" />
         <div className="absolute bottom-0 left-0 h-[30%] w-[30%] rounded-full bg-forest/5 blur-3xl" />
       </div>
@@ -32,31 +32,34 @@ const TraceabilityFlow = () => {
           </p>
         </div>
 
-        <div className="relative grid grid-cols-1 gap-6 md:grid-cols-4">
-          {steps.map((step, i) => (
-            <motion.div
-              key={step.step}
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, amount: 0.1 }}
-              transition={{ delay: i * 0.12, duration: 0.5, ease: [0.4, 0, 0.2, 1] }}
-              className="relative"
-            >
-              <div className="rounded-2xl glass-card p-6">
-                <div className={`mb-4 flex h-12 w-12 items-center justify-center rounded-xl ${step.color} transition-transform duration-300 hover:scale-110`}>
-                  <span className="font-display text-lg font-bold text-primary-foreground">{step.step}</span>
+        {/* Background container for the flow steps */}
+        <div className="rounded-3xl border border-border/40 bg-card/30 backdrop-blur-xl p-6 md:p-10">
+          <div className="relative grid grid-cols-1 gap-6 md:grid-cols-4">
+            {steps.map((step, i) => (
+              <motion.div
+                key={step.step}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, amount: 0.1 }}
+                transition={{ delay: i * 0.12, duration: 0.5, ease: [0.4, 0, 0.2, 1] }}
+                className="relative"
+              >
+                <div className="rounded-2xl glass-card p-6">
+                  <div className={`mb-4 flex h-12 w-12 items-center justify-center rounded-xl ${step.color} transition-transform duration-300 hover:scale-110`}>
+                    <span className="font-display text-lg font-bold text-primary-foreground">{step.step}</span>
+                  </div>
+                  <h3 className="mb-1 font-display text-lg font-bold text-foreground">{step.title}</h3>
+                  <p className="mb-2 text-sm font-semibold text-gold">{step.actor}</p>
+                  <p className="text-sm text-muted-foreground">{step.description}</p>
                 </div>
-                <h3 className="mb-1 font-display text-lg font-bold text-foreground">{step.title}</h3>
-                <p className="mb-2 text-sm font-semibold text-gold">{step.actor}</p>
-                <p className="text-sm text-muted-foreground">{step.description}</p>
-              </div>
-              {i < steps.length - 1 && (
-                <div className="flex justify-center py-2 md:absolute md:-right-3 md:top-1/2 md:-translate-y-1/2 md:py-0">
-                  <ArrowRight className="h-5 w-5 rotate-90 text-muted-foreground/40 md:rotate-0" />
-                </div>
-              )}
-            </motion.div>
-          ))}
+                {i < steps.length - 1 && (
+                  <div className="flex justify-center py-2 md:absolute md:-right-3 md:top-1/2 md:-translate-y-1/2 md:py-0">
+                    <ArrowRight className="h-5 w-5 rotate-90 text-muted-foreground/40 md:rotate-0" />
+                  </div>
+                )}
+              </motion.div>
+            ))}
+          </div>
         </div>
       </div>
     </section>

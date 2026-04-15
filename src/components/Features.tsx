@@ -28,25 +28,27 @@ const Features = () => {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {features.map((f, i) => (
-            <motion.div
-              key={i}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, amount: 0.1 }}
-              transition={{ delay: i * 0.08, duration: 0.5, ease: [0.4, 0, 0.2, 1] }}
-              className="group flex gap-4 glass p-6"
-            >
-              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-primary/10 transition-all duration-300 group-hover:bg-primary group-hover:scale-110">
-                <f.icon className="h-6 w-6 text-primary transition-colors duration-300 group-hover:text-primary-foreground" />
-              </div>
-              <div>
-                <h3 className="mb-1 font-display text-base font-bold text-foreground">{f.title}</h3>
-                <p className="text-sm text-muted-foreground">{f.description}</p>
-              </div>
-            </motion.div>
-          ))}
+        <div className="rounded-3xl border border-border/40 bg-card/30 backdrop-blur-xl p-6 md:p-10">
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {features.map((f, i) => (
+              <motion.div
+                key={i}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, amount: 0.1 }}
+                transition={{ delay: i * 0.08, duration: 0.5, ease: [0.4, 0, 0.2, 1] }}
+                className="group flex gap-4 glass p-6"
+              >
+                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-primary/10 transition-all duration-300 group-hover:bg-primary group-hover:scale-110">
+                  <f.icon className="h-6 w-6 text-primary transition-colors duration-300 group-hover:text-primary-foreground" />
+                </div>
+                <div>
+                  <h3 className="mb-1 font-display text-base font-bold text-foreground">{f.title}</h3>
+                  <p className="text-sm text-muted-foreground">{f.description}</p>
+                </div>
+              </motion.div>
+            ))}
+          </div>
         </div>
       </div>
     </section>
