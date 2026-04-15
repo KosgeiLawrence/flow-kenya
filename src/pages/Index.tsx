@@ -1,5 +1,6 @@
 import Navbar from "@/components/Navbar";
 import Hero from "@/components/Hero";
+import NeuralBackground from "@/components/NeuralBackground";
 import Features from "@/components/Features";
 import TraceabilityFlow from "@/components/TraceabilityFlow";
 import Dashboards from "@/components/Dashboards";
