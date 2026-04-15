@@ -140,16 +140,16 @@ const ImpactDashboard = () => {
 
         {/* Monthly trend chart */}
         <motion.div {...fadeIn} transition={{ delay: 0.1 }}>
-          <Card>
+          <Card className="overflow-hidden">
             <CardHeader className="pb-2 sm:pb-4">
               <CardTitle className="text-sm sm:text-base">Monthly Impact Trend (12 months)</CardTitle>
             </CardHeader>
             <CardContent className="px-2 sm:px-6">
-              <ChartContainer config={chartConfig} className="h-[220px] sm:h-[300px]">
-                <LineChart data={monthlyTrend}>
+              <ChartContainer config={chartConfig} className="h-[220px] sm:h-[300px] w-full">
+                <LineChart data={monthlyTrend} margin={{ top: 5, right: 10, left: 0, bottom: 5 }}>
                   <CartesianGrid strokeDasharray="3 3" />
                   <XAxis dataKey="month" fontSize={10} tick={{ fontSize: 9 }} />
-                  <YAxis fontSize={10} tick={{ fontSize: 9 }} width={35} />
+                  <YAxis fontSize={10} tick={{ fontSize: 9 }} width={40} />
                   <ChartTooltip content={<ChartTooltipContent />} />
                   <Line type="monotone" dataKey="kg" stroke="hsl(152,45%,22%)" strokeWidth={2} name="Kg Collected" dot={false} />
                   <Line type="monotone" dataKey="co2" stroke="hsl(40,55%,55%)" strokeWidth={2} name="CO₂ Avoided" dot={false} />
@@ -162,16 +162,16 @@ const ImpactDashboard = () => {
         {/* Material & Jobs charts */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
           <motion.div {...fadeIn} transition={{ delay: 0.2 }}>
-            <Card className="h-full">
+            <Card className="h-full overflow-hidden">
               <CardHeader className="pb-2 sm:pb-4">
                 <CardTitle className="text-sm sm:text-base">Impact by Material</CardTitle>
               </CardHeader>
-              <CardContent className="px-2 sm:px-6">
-                <ChartContainer config={chartConfig} className="h-[220px] sm:h-[280px]">
-                  <BarChart data={materialData}>
+              <CardContent className="px-1 sm:px-6">
+                <ChartContainer config={chartConfig} className="h-[220px] sm:h-[280px] w-full">
+                  <BarChart data={materialData} margin={{ top: 5, right: 5, left: 0, bottom: 5 }}>
                     <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="name" fontSize={9} angle={-25} textAnchor="end" height={50} tick={{ fontSize: 8 }} />
-                    <YAxis fontSize={10} tick={{ fontSize: 9 }} width={35} />
+                    <XAxis dataKey="name" fontSize={8} angle={-30} textAnchor="end" height={55} tick={{ fontSize: 7 }} interval={0} />
+                    <YAxis fontSize={9} tick={{ fontSize: 8 }} width={40} />
                     <ChartTooltip content={<ChartTooltipContent />} />
                     <Bar dataKey="kg" fill="hsl(152,45%,22%)" radius={[4, 4, 0, 0]} name="Kg Collected" />
                     <Bar dataKey="co2" fill="hsl(40,55%,55%)" radius={[4, 4, 0, 0]} name="CO₂ Avoided" />
@@ -182,15 +182,15 @@ const ImpactDashboard = () => {
           </motion.div>
 
           <motion.div {...fadeIn} transition={{ delay: 0.3 }}>
-            <Card className="h-full">
+            <Card className="h-full overflow-hidden">
               <CardHeader className="pb-2 sm:pb-4">
                 <CardTitle className="text-sm sm:text-base">Livelihoods Supported</CardTitle>
               </CardHeader>
-              <CardContent className="px-2 sm:px-6">
+              <CardContent className="px-1 sm:px-6">
                 {jobsData.length > 0 ? (
-                  <ChartContainer config={chartConfig} className="h-[220px] sm:h-[280px]">
-                    <PieChart>
-                      <Pie data={jobsData} cx="50%" cy="50%" outerRadius={70} innerRadius={35} dataKey="value" label={({ name, value }) => `${name}: ${value}`} fontSize={10}>
+                  <ChartContainer config={chartConfig} className="h-[220px] sm:h-[280px] w-full">
+                    <PieChart margin={{ top: 5, right: 5, left: 5, bottom: 5 }}>
+                      <Pie data={jobsData} cx="50%" cy="50%" outerRadius={60} innerRadius={30} dataKey="value" label={({ name, value }) => `${name}: ${value}`} fontSize={9}>
                         {jobsData.map((_, i) => <Cell key={i} fill={COLORS[i % COLORS.length]} />)}
                       </Pie>
                       <ChartTooltip content={<ChartTooltipContent />} />
