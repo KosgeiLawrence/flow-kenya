@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { ArrowRight, Recycle, Mail, Phone, MapPin, ExternalLink } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { useHashNavigation } from "@/hooks/useHashNavigation";
+import ConsultationDialog from "@/components/ConsultationDialog";
 
 function FooterMenuLinks({ links }: { links: { label: string; to: string; isRoute?: boolean }[] }) {
   const handleHashClick = useHashNavigation();
@@ -59,9 +60,11 @@ const CTA = () => {
             </h2>
             <p className="mx-auto mb-10 max-w-xl text-primary-foreground/70">{t("cta.subtitle")}</p>
             <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
-              <Button variant="hero" size="lg" className="text-base hover-glow" asChild>
-                <Link to="/signup">{t("cta.getStarted")} <ArrowRight className="ml-1 h-5 w-5" /></Link>
-              </Button>
+              <ConsultationDialog>
+                <Button variant="hero" size="lg" className="text-base hover-glow">
+                  {t("cta.getStarted")} <ArrowRight className="ml-1 h-5 w-5" />
+                </Button>
+              </ConsultationDialog>
               <Button variant="hero-outline" size="lg" className="text-base" asChild>
                 <Link to="/login">{t("cta.signIn")}</Link>
               </Button>

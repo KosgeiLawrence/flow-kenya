@@ -19,7 +19,7 @@ const en = {
     title2: "Infrastructure for the",
     circularEconomy: "Circular Economy",
     subtitle: "End-to-end material tracking from waste picker to manufacturer. Real-time compliance, financial management, and impact analytics — all in one platform.",
-    joinPlatform: "Join the Platform",
+    joinPlatform: "Get a Free Consultation",
     stat1Value: "22M+",
     stat1Label: "Tonnes waste/year in Kenya",
     stat2Value: "70%",
@@ -1246,6 +1246,19 @@ const en = {
     materialType: "Material Type",
     quantity: "Quantity",
     supplier: "Supplier",
+  },
+
+  // Consultation
+  consultation: {
+    title: "Get a Free Consultation",
+    subtitle: "Fill in your details and our team will get back to you within 24 hours.",
+    name: "Full Name",
+    email: "Email Address",
+    phone: "Phone Number",
+    interest: "Area of Interest",
+    message: "Your Message",
+    submit: "Submit Request",
+    note: "We typically respond within 24 hours during business days.",
   },
 };
 

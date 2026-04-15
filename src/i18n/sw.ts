@@ -19,7 +19,7 @@ const sw = {
     title2: "ya Kenya kwa",
     circularEconomy: "Uchumi wa Mzunguko",
     subtitle: "Ufuatiliaji kamili wa nyenzo kutoka kwa mkusanyaji hadi kwa mtengenezaji. Uzingatiaji wa wakati halisi, usimamizi wa fedha, na uchambuzi wa athari — yote katika jukwaa moja.",
-    joinPlatform: "Jiunge na Jukwaa",
+    joinPlatform: "Pata Ushauri Bure",
     stat1Value: "22M+",
     stat1Label: "Tani za taka/mwaka nchini Kenya",
     stat2Value: "70%",
@@ -1246,6 +1246,19 @@ const sw = {
     materialType: "Aina ya Nyenzo",
     quantity: "Kiasi",
     supplier: "Msambazaji",
+  },
+
+  // Consultation
+  consultation: {
+    title: "Pata Ushauri Bure",
+    subtitle: "Jaza maelezo yako na timu yetu itawasiliana nawe ndani ya saa 24.",
+    name: "Jina Kamili",
+    email: "Barua Pepe",
+    phone: "Nambari ya Simu",
+    interest: "Eneo la Kupendezwa",
+    message: "Ujumbe Wako",
+    submit: "Tuma Ombi",
+    note: "Kwa kawaida tunajibu ndani ya saa 24 wakati wa siku za kazi.",
   },
 };
 
