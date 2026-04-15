@@ -12,9 +12,9 @@ const Navbar = () => {
 
   const navItems = [
     { label: t("nav.platform"), href: "#stakeholders" },
+    { label: t("nav.about"), href: "#about" },
     { label: t("nav.impact"), href: "#impact" },
     { label: t("nav.stakeholders"), href: "#stakeholders" },
-    { label: t("nav.about"), href: "#about" },
     { label: t("nav.contact"), href: "/contact", isRoute: true },
   ];
 
