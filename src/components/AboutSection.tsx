@@ -1,11 +1,8 @@
-import { motion, useInView } from "framer-motion";
-import { useRef } from "react";
+import { motion } from "framer-motion";
 import { Globe, Users, Leaf, BarChart3, Target, Heart } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 const AboutSection = () => {
-  const ref = useRef(null);
-  const isInView = useInView(ref, { once: true, margin: "-100px" });
   const { t } = useTranslation();
 
   const values = [
@@ -16,7 +13,7 @@ const AboutSection = () => {
   ];
 
   return (
-    <section id="about" className="relative py-20 md:py-32 overflow-hidden" ref={ref}>
+    <section id="about" className="relative py-20 md:py-32 overflow-hidden">
       <div className="absolute inset-0 bg-[rgba(255,255,255,0.02)]">
         <div className="absolute top-0 left-1/4 h-[30%] w-[30%] rounded-full bg-primary/5 blur-3xl" />
         <div className="absolute bottom-0 right-1/4 h-[25%] w-[25%] rounded-full bg-gold/5 blur-3xl" />
@@ -25,7 +22,8 @@ const AboutSection = () => {
       <div className="container relative">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
-          animate={isInView ? { opacity: 1, y: 0 } : {}}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-100px" }}
           transition={{ duration: 0.7, ease: [0.4, 0, 0.2, 1] }}
           className="mx-auto max-w-3xl text-center mb-16"
         >
@@ -41,7 +39,8 @@ const AboutSection = () => {
         <div className="grid md:grid-cols-2 gap-6 mb-16">
           <motion.div
             initial={{ opacity: 0, x: -30 }}
-            animate={isInView ? { opacity: 1, x: 0 } : {}}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true, margin: "-50px" }}
             transition={{ duration: 0.7, delay: 0.2, ease: [0.4, 0, 0.2, 1] }}
             className="rounded-2xl glass-card p-8"
           >
@@ -56,7 +55,8 @@ const AboutSection = () => {
 
           <motion.div
             initial={{ opacity: 0, x: 30 }}
-            animate={isInView ? { opacity: 1, x: 0 } : {}}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true, margin: "-50px" }}
             transition={{ duration: 0.7, delay: 0.3, ease: [0.4, 0, 0.2, 1] }}
             className="rounded-2xl glass-card p-8"
           >
@@ -75,8 +75,9 @@ const AboutSection = () => {
             <motion.div
               key={i}
               initial={{ opacity: 0, y: 30 }}
-              animate={isInView ? { opacity: 1, y: 0 } : {}}
-              transition={{ duration: 0.5, delay: 0.12 * i + 0.3, ease: [0.4, 0, 0.2, 1] }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-50px" }}
+              transition={{ duration: 0.5, delay: 0.12 * i, ease: [0.4, 0, 0.2, 1] }}
               className="rounded-2xl glass-card p-6 text-center"
             >
               <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10 transition-all duration-300 hover:scale-110 hover:bg-primary/20">

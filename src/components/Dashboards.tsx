@@ -1,11 +1,8 @@
-import { motion, useInView } from "framer-motion";
-import { useRef } from "react";
+import { motion } from "framer-motion";
 import { User, Warehouse, Factory, Heart, Building2, Shield } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 const Dashboards = () => {
-  const ref = useRef(null);
-  const isInView = useInView(ref, { once: true, margin: "-100px" });
   const { t } = useTranslation();
 
   const dashboards = [
@@ -36,11 +33,12 @@ const Dashboards = () => {
   ];
 
   return (
-    <section id="stakeholders" className="relative py-20 md:py-32 bg-mesh" ref={ref}>
+    <section id="stakeholders" className="relative py-20 md:py-32 bg-mesh">
       <div className="container">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
-          animate={isInView ? { opacity: 1, y: 0 } : {}}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-100px" }}
           transition={{ duration: 0.6, ease: [0.4, 0, 0.2, 1] }}
           className="mb-16 text-center"
         >
@@ -60,7 +58,8 @@ const Dashboards = () => {
             <motion.div
               key={i}
               initial={{ opacity: 0, y: 30 }}
-              animate={isInView ? { opacity: 1, y: 0 } : {}}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-50px" }}
               transition={{ delay: i * 0.08, duration: 0.5, ease: [0.4, 0, 0.2, 1] }}
               className="group rounded-2xl glass-card p-6"
             >

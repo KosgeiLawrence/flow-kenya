@@ -24,7 +24,7 @@ const Counter = ({ target, suffix, inView }: { target: number; suffix: string; i
 
 const ImpactMetrics = () => {
   const ref = useRef(null);
-  const isInView = useInView(ref, { once: true, margin: "-100px" });
+  const isInView = useInView(ref, { once: true, amount: 0.2 });
   const navigate = useNavigate();
   const { derived } = usePlatformStats();
   const { t } = useTranslation();
@@ -44,7 +44,8 @@ const ImpactMetrics = () => {
       <div className="container relative">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
-          animate={isInView ? { opacity: 1, y: 0 } : {}}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-100px" }}
           transition={{ duration: 0.6, ease: [0.4, 0, 0.2, 1] }}
           className="mb-16 text-center"
         >
@@ -62,7 +63,8 @@ const ImpactMetrics = () => {
             <motion.div
               key={i}
               initial={{ opacity: 0, scale: 0.9 }}
-              animate={isInView ? { opacity: 1, scale: 1 } : {}}
+              whileInView={{ opacity: 1, scale: 1 }}
+              viewport={{ once: true, margin: "-50px" }}
               transition={{ delay: i * 0.1, duration: 0.5, ease: [0.4, 0, 0.2, 1] }}
               className="rounded-2xl border border-primary-foreground/10 bg-primary-foreground/5 p-6 text-center backdrop-blur-xl transition-all duration-300 hover:bg-primary-foreground/10 hover:-translate-y-1"
             >
@@ -76,7 +78,8 @@ const ImpactMetrics = () => {
 
         <motion.div
           initial={{ opacity: 0 }}
-          animate={isInView ? { opacity: 1 } : {}}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true }}
           transition={{ delay: 0.5, duration: 0.5 }}
           className="mt-10 text-center"
         >
