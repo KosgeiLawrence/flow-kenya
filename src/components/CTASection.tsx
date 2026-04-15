@@ -97,39 +97,7 @@ const Footer = () => {
           {/* Menu links */}
           <div className="md:col-span-3 md:col-start-7">
             <h4 className="mb-4 font-display text-xs font-semibold uppercase tracking-widest text-foreground/60">Menu</h4>
-            <ul className="space-y-2.5">
-              {footerLinks.menu.map((link) => {
-                if ((link as any).isRoute) {
-                  return (
-                    <li key={link.to}>
-                      <Link to={link.to} className="text-sm text-muted-foreground transition-colors duration-200 hover:text-foreground">
-                        {link.label}
-                      </Link>
-                    </li>
-                  );
-                }
-                const hash = link.to.replace("/", "");
-                return (
-                  <li key={link.to}>
-                    <a
-                      href={link.to}
-                      onClick={(e) => {
-                        e.preventDefault();
-                        const id = hash.replace("#", "");
-                        const el = document.getElementById(id);
-                        if (el) {
-                          el.scrollIntoView({ behavior: "smooth" });
-                          window.history.replaceState(null, "", hash);
-                        }
-                      }}
-                      className="text-sm text-muted-foreground transition-colors duration-200 hover:text-foreground cursor-pointer"
-                    >
-                      {link.label}
-                    </a>
-                  </li>
-                );
-              })}
-            </ul>
+             <FooterMenuLinks links={footerLinks.menu} />
           </div>
 
           {/* Legal links */}
