@@ -45,10 +45,10 @@ const CTA = () => {
 const footerLinks = {
   menu: [
     { label: "Platform", to: "/#stakeholders" },
+    { label: "About", to: "/#about" },
     { label: "Features", to: "/#features" },
     { label: "Traceability", to: "/#traceability" },
     { label: "Impact", to: "/#impact" },
-    { label: "About", to: "/#about" },
     { label: "Contact", to: "/contact", isRoute: true },
   ],
   legal: [
