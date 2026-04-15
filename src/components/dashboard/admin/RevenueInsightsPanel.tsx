@@ -109,7 +109,7 @@ const RevenueInsightsPanel = () => {
       roleMap[role] = (roleMap[role] || 0) + Number(p.amount);
     });
     return Object.entries(roleMap).map(([role, amount]) => ({
-      name: ROLE_LABELS[role] || "Other",
+      name: ROLE_KEY_MAP[role] ? t(ROLE_KEY_MAP[role]) : role,
       value: amount,
     })).sort((a, b) => b.value - a.value);
   }, [completedPayments]);
@@ -139,7 +139,7 @@ const RevenueInsightsPanel = () => {
       map[r] = (map[r] || 0) + 1;
     });
     return Object.entries(map).map(([role, count]) => ({
-      name: ROLE_LABELS[role] || role,
+      name: ROLE_KEY_MAP[role] ? t(ROLE_KEY_MAP[role]) : role,
       value: count,
     }));
   }, [userRoles]);
