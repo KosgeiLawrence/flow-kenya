@@ -4,11 +4,13 @@ import { Recycle, Menu, X, Globe } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { useTranslation } from "react-i18next";
+import { useHashNavigation } from "@/hooks/useHashNavigation";
 
 const Navbar = () => {
   const { t, i18n } = useTranslation();
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const handleHashClick = useHashNavigation();
 
   const navItems = [
     { label: t("nav.platform"), href: "#stakeholders" },
@@ -60,14 +62,14 @@ const Navbar = () => {
                 <span className="absolute bottom-0 left-1/2 -translate-x-1/2 h-0.5 w-0 bg-gold rounded-full transition-all duration-300 group-hover:w-1/2" />
               </Link>
             ) : (
-              <a
+              <button
                 key={item.href}
-                href={item.href}
+                onClick={() => handleHashClick(item.href)}
                 className="relative px-4 py-2 text-sm font-medium text-primary-foreground/70 transition-all duration-300 hover:text-gold-light group"
               >
                 {item.label}
                 <span className="absolute bottom-0 left-1/2 -translate-x-1/2 h-0.5 w-0 bg-gold rounded-full transition-all duration-300 group-hover:w-1/2" />
-              </a>
+              </button>
             )
           )}
         </nav>
@@ -135,25 +137,13 @@ const Navbar = () => {
                     {item.label}
                   </Link>
                 ) : (
-                  <a
+                  <button
                     key={item.href}
-                    href={item.href}
-                    onClick={(e) => {
-                      e.preventDefault();
-                      setMobileOpen(false);
-                      const id = item.href.replace("#", "");
-                      setTimeout(() => {
-                        const el = document.getElementById(id);
-                        if (el) {
-                          el.scrollIntoView({ behavior: "smooth" });
-                          window.history.replaceState(null, "", item.href);
-                        }
-                      }, 350);
-                    }}
-                    className="px-4 py-3 rounded-xl text-sm font-medium text-primary-foreground/80 hover:text-gold-light hover:bg-primary-foreground/5 transition-all duration-300"
+                    onClick={() => handleHashClick(item.href, () => setMobileOpen(false))}
+                    className="px-4 py-3 rounded-xl text-sm font-medium text-primary-foreground/80 hover:text-gold-light hover:bg-primary-foreground/5 transition-all duration-300 text-left"
                   >
                     {item.label}
-                  </a>
+                  </button>
                 )
               )}
               <div className="mt-4 pt-4 border-t border-primary-foreground/10 flex flex-col gap-3">
