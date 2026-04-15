@@ -11,7 +11,7 @@ const Navbar = () => {
   const [mobileOpen, setMobileOpen] = useState(false);
 
   const navItems = [
-    { label: t("nav.platform"), href: "#platform" },
+    { label: t("nav.platform"), href: "#stakeholders" },
     { label: t("nav.impact"), href: "#impact" },
     { label: t("nav.stakeholders"), href: "#stakeholders" },
     { label: t("nav.about"), href: "#about" },
