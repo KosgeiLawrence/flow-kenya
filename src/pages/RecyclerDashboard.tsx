@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import {
   LogOut, Package, ClipboardList, FileText, ClipboardCheck, TrendingUp,
   BarChart3, Leaf, Shield, Clock, CheckCircle2, AlertTriangle,
-  Menu, X, ChevronRight, ShoppingBag, Briefcase, Settings, Truck, BookOpen, Recycle, HelpCircle, Trash2
+  Menu, X, ChevronRight, ShoppingBag, Briefcase, Settings, Truck, BookOpen, Recycle, HelpCircle, Trash2, Store
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
@@ -35,6 +35,7 @@ import TeamPanel from "@/components/dashboard/shared/TeamPanel";
 import DigitalIDPanel from "@/components/dashboard/waste-picker/DigitalIDPanel";
 import { Users as UsersIcon, CreditCard } from "lucide-react";
 import LanguageToggle from "@/components/dashboard/shared/LanguageToggle";
+import MarketplacePanelShared from "@/components/dashboard/shared/MarketplacePanel";
 import DashboardChatbot from "@/components/dashboard/shared/DashboardChatbot";
 
 const navItems = [
@@ -43,6 +44,7 @@ const navItems = [
   { id: "transformation", label: "Transformation", icon: Recycle },
   { id: "products", label: "Products & Pricing", icon: ShoppingBag },
   { id: "business-insights", label: "Business Insights", icon: TrendingUp },
+  { id: "marketplace", label: "Marketplace", icon: Store },
   
   { id: "market", label: "Market Insights", icon: TrendingUp },
   { id: "forecast", label: "Supply Forecast", icon: BarChart3 },
@@ -99,6 +101,7 @@ const RecyclerDashboard = () => {
           <TabsContent value="customers"><CRMPanel role="recycler" /></TabsContent>
         </Tabs>
       );
+      case "marketplace": return <MarketplacePanelShared role="recycler" />;
       case "market": return <MarketInsightsPanel />;
       case "forecast": return <SupplyForecastPanel />;
       case "esg": return <ESGPanel />;

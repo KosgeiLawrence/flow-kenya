@@ -49,6 +49,7 @@ const footerLinks = {
     { label: "Features", to: "/#features" },
     { label: "Traceability", to: "/#traceability" },
     { label: "Impact", to: "/#impact" },
+    { label: "Marketplace", to: "/marketplace", isRoute: true },
     { label: "Contact", to: "/contact", isRoute: true },
   ],
   legal: [
