@@ -1,21 +1,19 @@
-import { motion, useInView } from "framer-motion";
-import { useRef } from "react";
+import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Recycle, Mail, Phone, MapPin, ExternalLink } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 const CTA = () => {
-  const ref = useRef(null);
-  const isInView = useInView(ref, { once: true, margin: "-100px" });
   const { t } = useTranslation();
 
   return (
-    <section className="py-20 md:py-32" ref={ref}>
+    <section className="py-20 md:py-32">
       <div className="container">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
-          animate={isInView ? { opacity: 1, y: 0 } : {}}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-100px" }}
           transition={{ duration: 0.8, ease: [0.4, 0, 0.2, 1] }}
           className="relative overflow-hidden rounded-3xl bg-hero p-10 text-center md:p-20"
         >
