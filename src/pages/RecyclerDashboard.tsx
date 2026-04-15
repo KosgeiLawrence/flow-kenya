@@ -101,6 +101,7 @@ const RecyclerDashboard = () => {
           <TabsContent value="customers"><CRMPanel role="recycler" /></TabsContent>
         </Tabs>
       );
+      case "marketplace": return <MarketplacePanelShared role="recycler" />;
       case "market": return <MarketInsightsPanel />;
       case "forecast": return <SupplyForecastPanel />;
       case "esg": return <ESGPanel />;

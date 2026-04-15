@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import {
-  LogOut, Heart, BarChart3, Briefcase, FileText, Package,
+  LogOut, Heart, BarChart3, Briefcase, FileText, Package, Store,
   Clock, CheckCircle2, AlertTriangle, Menu, X, ChevronRight, Settings, BookOpen, Trash2
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
@@ -22,12 +22,14 @@ import TrashPanel from "@/components/dashboard/shared/TrashPanel";
 import TeamPanel from "@/components/dashboard/shared/TeamPanel";
 import { Users as UsersIcon } from "lucide-react";
 import DashboardChatbot from "@/components/dashboard/shared/DashboardChatbot";
+import MarketplacePanelShared from "@/components/dashboard/shared/MarketplacePanel";
 
 const navItems = [
   { id: "sponsorship", label: "Community & Pickers", icon: Heart },
   { id: "impact", label: "Impact & Mapping", icon: BarChart3 },
   { id: "grants", label: "Grants & Programs", icon: Briefcase },
   { id: "reports", label: "Reports", icon: FileText },
+  { id: "marketplace", label: "Marketplace", icon: Store },
   { id: "cleanup", label: "Cleanup Exercise", icon: Package },
   { id: "training-mgmt", label: "Training Management", icon: BookOpen },
   { id: "team", label: "My Team", icon: UsersIcon },
@@ -66,6 +68,7 @@ const NGODashboard = () => {
       case "impact": return <ImpactMetricsPanel />;
       case "grants": return <GrantsPanel />;
       case "reports": return <ReportsPanel />;
+      case "marketplace": return <MarketplacePanelShared />;
       case "cleanup": return <CleanupExercisePanel />;
       case "training-mgmt": return <TrainingManagementPanel />;
       case "team": return <TeamPanel role="ngo" navItems={navItems} />;
