@@ -1260,6 +1260,43 @@ const sw = {
     submit: "Tuma Ombi",
     note: "Kwa kawaida tunajibu ndani ya saa 24 wakati wa siku za kazi.",
   },
+
+  // Trending Marketplace (landing page)
+  trending: {
+    badge: "Inayovuma Sasa",
+    title1: "Soko la Uchumi",
+    title2: "wa Mzunguko",
+    subtitle: "Vinjari nyenzo za taka, bidhaa zilizosindikwa, na vifaa kutoka kwa wauzaji waliothibitishwa kote Kenya — soko moja.",
+    available: "inapatikana",
+    viewAll: "Tazama Orodha Zote",
+  },
+
+  // Marketplace page
+  marketplacePage: {
+    badge: "Soko la Duara Flow",
+    title1: "Soko la Uchumi",
+    title2: "wa Mzunguko",
+    subtitle: "Vinjari nyenzo za taka, bidhaa zilizosindikwa, na vifaa kutoka kwa wakusanyaji taka, wasambazaji, na wasindikaji waliothibitishwa kote Kenya.",
+    activeListings: "Orodha Hai",
+    verifiedSellers: "Wauzaji Waliothibitishwa",
+    counties: "Kaunti",
+    searchPlaceholder: "Tafuta nyenzo, bidhaa, vifaa...",
+    filterByCounty: "Chuja kwa kaunti...",
+    allCategories: "Kategoria Zote",
+    rawMaterials: "Nyenzo Ghafi",
+    recycledProducts: "Bidhaa Zilizosindikwa",
+    equipment: "Vifaa",
+    services: "Huduma",
+    noListings: "Hakuna orodha bado",
+    noListingsHint: "Jisajili kama muuzaji ili kuweka orodha ya kwanza!",
+    getStarted: "Anza Sasa",
+    wastePicker: "Mkusanyaji Taka",
+    aggregator: "Msambazaji",
+    recycler: "Msindikaji",
+    rawMaterial: "Nyenzo Ghafi",
+    recycledProduct: "Bidhaa Iliyosindikwa",
+    service: "Huduma",
+  },
 };
 
 export default sw;
