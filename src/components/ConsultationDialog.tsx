@@ -14,6 +14,18 @@ interface ConsultationDialogProps {
   children: React.ReactNode;
 }
 
+const interestKeys = [
+  "wastePickerReg",
+  "aggregatorOnboarding",
+  "recyclerPartnership",
+  "corporateEPR",
+  "ngoCollab",
+  "countyIntegration",
+  "platformDemo",
+  "pricingPlans",
+  "other",
+] as const;
+
 const ConsultationDialog = ({ children }: ConsultationDialogProps) => {
   const { t } = useTranslation();
   const [open, setOpen] = useState(false);
@@ -26,38 +38,27 @@ const ConsultationDialog = ({ children }: ConsultationDialogProps) => {
     message: "",
   });
 
-  const interests = [
-    "Waste Picker Registration",
-    "Aggregator Onboarding",
-    "Recycler Partnership",
-    "Corporate EPR Compliance",
-    "NGO Collaboration",
-    "County Government Integration",
-    "Platform Demo",
-    "Pricing & Plans",
-    "Other",
-  ];
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!form.full_name.trim() || !form.email.trim() || !form.interest || !form.message.trim()) {
-      toast.error("Please fill in all required fields");
+      toast.error(t("consultationInterests.fillRequired"));
       return;
     }
     setLoading(true);
     try {
+      const interestLabel = t(`consultationInterests.${form.interest}`);
       const { error } = await supabase.from("contact_messages").insert({
         full_name: form.full_name.trim(),
         email: form.email.trim(),
-        subject: `Free Consultation — ${form.interest}`,
-        message: `Phone: ${form.phone || "N/A"}\nInterest: ${form.interest}\n\n${form.message}`,
+        subject: `Free Consultation — ${interestLabel}`,
+        message: `Phone: ${form.phone || "N/A"}\nInterest: ${interestLabel}\n\n${form.message}`,
       });
       if (error) throw error;
-      toast.success("Request submitted! We'll get back to you within 24 hours.");
+      toast.success(t("consultationInterests.submitSuccess"));
       setForm({ full_name: "", email: "", phone: "", interest: "", message: "" });
       setOpen(false);
     } catch {
-      toast.error("Something went wrong. Please try again.");
+      toast.error(t("consultationInterests.submitError"));
     } finally {
       setLoading(false);
     }
@@ -116,11 +117,11 @@ const ConsultationDialog = ({ children }: ConsultationDialogProps) => {
               <Label>{t("consultation.interest")} *</Label>
               <Select value={form.interest} onValueChange={(v) => setForm({ ...form, interest: v })}>
                 <SelectTrigger>
-                  <SelectValue placeholder="Select an area" />
+                  <SelectValue placeholder={t("consultationInterests.selectArea")} />
                 </SelectTrigger>
                 <SelectContent>
-                  {interests.map((i) => (
-                    <SelectItem key={i} value={i}>{i}</SelectItem>
+                  {interestKeys.map((key) => (
+                    <SelectItem key={key} value={key}>{t(`consultationInterests.${key}`)}</SelectItem>
                   ))}
                 </SelectContent>
               </Select>
@@ -130,7 +131,7 @@ const ConsultationDialog = ({ children }: ConsultationDialogProps) => {
             <Label htmlFor="cons-msg">{t("consultation.message")} *</Label>
             <Textarea
               id="cons-msg"
-              placeholder="Tell us about your needs and how we can help..."
+              placeholder={t("consultation.message")}
               value={form.message}
               onChange={(e) => setForm({ ...form, message: e.target.value })}
               maxLength={1000}
