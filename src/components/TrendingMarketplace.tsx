@@ -100,7 +100,7 @@ export default function TrendingMarketplace() {
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-            {listings?.slice(0, 8).map((listing, i) => {
+          {(listings as any[])?.slice(0, 8).map((listing: any, i: number) => {
               const sellerName = listing.seller_profile?.organizations?.name || listing.seller_profile?.full_name || "Seller";
               return (
                 <motion.div
