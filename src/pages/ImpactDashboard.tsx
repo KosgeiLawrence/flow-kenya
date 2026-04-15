@@ -182,15 +182,15 @@ const ImpactDashboard = () => {
           </motion.div>
 
           <motion.div {...fadeIn} transition={{ delay: 0.3 }}>
-            <Card className="h-full">
+            <Card className="h-full overflow-hidden">
               <CardHeader className="pb-2 sm:pb-4">
                 <CardTitle className="text-sm sm:text-base">Livelihoods Supported</CardTitle>
               </CardHeader>
-              <CardContent className="px-2 sm:px-6">
+              <CardContent className="px-1 sm:px-6">
                 {jobsData.length > 0 ? (
-                  <ChartContainer config={chartConfig} className="h-[220px] sm:h-[280px]">
-                    <PieChart>
-                      <Pie data={jobsData} cx="50%" cy="50%" outerRadius={70} innerRadius={35} dataKey="value" label={({ name, value }) => `${name}: ${value}`} fontSize={10}>
+                  <ChartContainer config={chartConfig} className="h-[220px] sm:h-[280px] w-full">
+                    <PieChart margin={{ top: 5, right: 5, left: 5, bottom: 5 }}>
+                      <Pie data={jobsData} cx="50%" cy="50%" outerRadius={60} innerRadius={30} dataKey="value" label={({ name, value }) => `${name}: ${value}`} fontSize={9}>
                         {jobsData.map((_, i) => <Cell key={i} fill={COLORS[i % COLORS.length]} />)}
                       </Pie>
                       <ChartTooltip content={<ChartTooltipContent />} />
