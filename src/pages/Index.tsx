@@ -14,6 +14,7 @@ const Index = () => {
       <NeuralBackground />
       <Navbar />
       <Hero />
+      <div style={{ padding: '40px', background: 'red', color: 'white', fontSize: '24px', textAlign: 'center' }}>DEBUG: Content after Hero</div>
       <Features />
       <TraceabilityFlow />
       <Dashboards />
