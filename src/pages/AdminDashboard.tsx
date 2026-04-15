@@ -86,7 +86,7 @@ const AdminDashboard = () => {
       case "training-mgmt": return <TrainingManagementPanel />;
       case "forms": return <FormBuilderPanel />;
       case "messages": return <ContactMessagesPanel />;
-      case "marketplace": return <MarketplacePanelShared />;
+      case "marketplace": return <MarketplacePanelShared role="admin" />;
       case "team": return <TeamPanel role="admin" navItems={navItems} />;
       case "trash": return <TrashPanel />;
       case "profile-settings": return <ProfileSettingsPanel role="admin" />;
