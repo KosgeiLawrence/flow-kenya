@@ -20,13 +20,7 @@ const AboutSection = () => {
       </div>
 
       <div className="container relative">
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-100px" }}
-          transition={{ duration: 0.7, ease: [0.4, 0, 0.2, 1] }}
-          className="mx-auto max-w-3xl text-center mb-16"
-        >
+        <div className="mx-auto max-w-3xl text-center mb-16">
           <span className="inline-block rounded-full bg-primary/10 px-4 py-1.5 text-xs font-semibold uppercase tracking-wider text-primary mb-4 backdrop-blur-sm">
             {t("about.badge")}
           </span>
@@ -34,14 +28,14 @@ const AboutSection = () => {
             {t("about.title")} <span className="text-primary">{t("about.titleHighlight")}</span> {t("about.titleEnd")}
           </h2>
           <p className="text-lg text-muted-foreground leading-relaxed">{t("about.description")}</p>
-        </motion.div>
+        </div>
 
         <div className="grid md:grid-cols-2 gap-6 mb-16">
           <motion.div
             initial={{ opacity: 0, x: -30 }}
             whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true, margin: "-50px" }}
-            transition={{ duration: 0.7, delay: 0.2, ease: [0.4, 0, 0.2, 1] }}
+            viewport={{ once: true, amount: 0.1 }}
+            transition={{ duration: 0.7, delay: 0.1, ease: [0.4, 0, 0.2, 1] }}
             className="rounded-2xl glass-card p-8"
           >
             <div className="flex items-center gap-3 mb-4">
@@ -56,8 +50,8 @@ const AboutSection = () => {
           <motion.div
             initial={{ opacity: 0, x: 30 }}
             whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true, margin: "-50px" }}
-            transition={{ duration: 0.7, delay: 0.3, ease: [0.4, 0, 0.2, 1] }}
+            viewport={{ once: true, amount: 0.1 }}
+            transition={{ duration: 0.7, delay: 0.2, ease: [0.4, 0, 0.2, 1] }}
             className="rounded-2xl glass-card p-8"
           >
             <div className="flex items-center gap-3 mb-4">
@@ -76,8 +70,8 @@ const AboutSection = () => {
               key={i}
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-50px" }}
-              transition={{ duration: 0.5, delay: 0.12 * i, ease: [0.4, 0, 0.2, 1] }}
+              viewport={{ once: true, amount: 0.1 }}
+              transition={{ duration: 0.5, delay: 0.08 * i, ease: [0.4, 0, 0.2, 1] }}
               className="rounded-2xl glass-card p-6 text-center"
             >
               <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10 transition-all duration-300 hover:scale-110 hover:bg-primary/20">

@@ -35,13 +35,7 @@ const Dashboards = () => {
   return (
     <section id="stakeholders" className="relative py-20 md:py-32 bg-mesh">
       <div className="container">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-100px" }}
-          transition={{ duration: 0.6, ease: [0.4, 0, 0.2, 1] }}
-          className="mb-16 text-center"
-        >
+        <div className="mb-16 text-center">
           <span className="mb-4 inline-block rounded-full bg-gold/10 px-4 py-1.5 text-sm font-semibold text-gold backdrop-blur-sm">
             {t("dashboards.badge")}
           </span>
@@ -51,7 +45,7 @@ const Dashboards = () => {
           <p className="mx-auto max-w-2xl text-muted-foreground">
             {t("dashboards.subtitle")}
           </p>
-        </motion.div>
+        </div>
 
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {dashboards.map((dash, i) => (
@@ -59,7 +53,7 @@ const Dashboards = () => {
               key={i}
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-50px" }}
+              viewport={{ once: true, amount: 0.1 }}
               transition={{ delay: i * 0.08, duration: 0.5, ease: [0.4, 0, 0.2, 1] }}
               className="group rounded-2xl glass-card p-6"
             >

@@ -20,13 +20,7 @@ const TraceabilityFlow = () => {
       </div>
 
       <div className="container relative">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-100px" }}
-          transition={{ duration: 0.6, ease: [0.4, 0, 0.2, 1] }}
-          className="mb-16 text-center"
-        >
+        <div className="mb-16 text-center">
           <span className="mb-4 inline-block rounded-full bg-primary/10 px-4 py-1.5 text-sm font-semibold text-primary backdrop-blur-sm">
             {t("traceability.badge")}
           </span>
@@ -36,7 +30,7 @@ const TraceabilityFlow = () => {
           <p className="mx-auto max-w-2xl text-muted-foreground">
             {t("traceability.subtitle")}
           </p>
-        </motion.div>
+        </div>
 
         <div className="relative grid grid-cols-1 gap-6 md:grid-cols-4">
           {steps.map((step, i) => (
@@ -44,7 +38,7 @@ const TraceabilityFlow = () => {
               key={step.step}
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-50px" }}
+              viewport={{ once: true, amount: 0.1 }}
               transition={{ delay: i * 0.12, duration: 0.5, ease: [0.4, 0, 0.2, 1] }}
               className="relative"
             >

@@ -16,13 +16,7 @@ const Features = () => {
   return (
     <section id="features" className="relative py-20 md:py-32 bg-mesh">
       <div className="container">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-100px" }}
-          transition={{ duration: 0.6, ease: [0.4, 0, 0.2, 1] }}
-          className="mb-16 text-center"
-        >
+        <div className="mb-16 text-center">
           <span className="mb-4 inline-block rounded-full bg-primary/10 px-4 py-1.5 text-sm font-semibold text-primary backdrop-blur-sm">
             {t("features.badge")}
           </span>
@@ -32,7 +26,7 @@ const Features = () => {
           <p className="mx-auto max-w-2xl text-muted-foreground">
             {t("features.subtitle")}
           </p>
-        </motion.div>
+        </div>
 
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {features.map((f, i) => (
@@ -40,7 +34,7 @@ const Features = () => {
               key={i}
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-50px" }}
+              viewport={{ once: true, amount: 0.1 }}
               transition={{ delay: i * 0.08, duration: 0.5, ease: [0.4, 0, 0.2, 1] }}
               className="group flex gap-4 glass p-6"
             >
