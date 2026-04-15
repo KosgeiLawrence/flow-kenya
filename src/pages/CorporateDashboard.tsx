@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import {
   LogOut, Shield, Recycle, Award, Leaf, BookOpen,
   Clock, CheckCircle2, AlertTriangle, Menu, X, ChevronRight,
-  Package, HandCoins, BarChart3, Settings, User, Trash2
+  Package, HandCoins, BarChart3, Settings, User, Trash2, Store
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
@@ -27,6 +27,7 @@ import TrashPanel from "@/components/dashboard/shared/TrashPanel";
 import TeamPanel from "@/components/dashboard/shared/TeamPanel";
 import { Users as UsersIcon } from "lucide-react";
 import DashboardChatbot from "@/components/dashboard/shared/DashboardChatbot";
+import MarketplacePanelShared from "@/components/dashboard/shared/MarketplacePanel";
 
 const navItems = [
   { id: "footprint", label: "Plastic Footprint", icon: Package },
@@ -36,6 +37,7 @@ const navItems = [
   { id: "offset", label: "Plastic Offset", icon: Recycle },
   { id: "certificates", label: "Impact Certificates", icon: Award },
   { id: "esg", label: "ESG & Carbon", icon: Leaf },
+  { id: "marketplace", label: "Marketplace", icon: Store },
   { id: "settings", label: "Settings", icon: Settings },
   { id: "cleanup", label: "Cleanup Exercise", icon: Package },
   { id: "team", label: "My Team", icon: UsersIcon },
@@ -79,6 +81,7 @@ const CorporateDashboard = () => {
       case "certificates": return <ImpactCertificatesPanel />;
       case "esg": return <ESGAnalyticsPanel />;
       case "settings": return <CorporateSettingsPanel />;
+      case "marketplace": return <MarketplacePanelShared />;
       case "cleanup": return <CleanupExercisePanel />;
       case "team": return <TeamPanel role="corporate" navItems={navItems} />;
       case "training-mgmt": return <TrainingManagementPanel />;

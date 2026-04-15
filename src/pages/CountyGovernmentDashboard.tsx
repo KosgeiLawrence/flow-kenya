@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
-import { LogOut, MapPin, BarChart3, FileText, Scale, Menu, X, ChevronRight, Settings, BookOpen, Trash2 } from "lucide-react";
+import { LogOut, MapPin, BarChart3, FileText, Scale, Menu, X, ChevronRight, Settings, BookOpen, Trash2, Store } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { useFilteredNavItems } from "@/hooks/useFilteredNavItems";
@@ -18,6 +18,7 @@ import TrashPanel from "@/components/dashboard/shared/TrashPanel";
 import TeamPanel from "@/components/dashboard/shared/TeamPanel";
 import { Users as UsersIcon } from "lucide-react";
 import DashboardChatbot from "@/components/dashboard/shared/DashboardChatbot";
+import MarketplacePanelShared from "@/components/dashboard/shared/MarketplacePanel";
 
 const navItems = [
   { id: "waste-flow", label: "Waste Flow Dashboard", icon: MapPin },
@@ -25,6 +26,7 @@ const navItems = [
   { id: "reports", label: "Monthly Reports", icon: FileText },
   { id: "regulatory", label: "Regulatory Reporting", icon: Scale },
   { id: "training-mgmt", label: "Training Management", icon: BookOpen },
+  { id: "marketplace", label: "Marketplace", icon: Store },
   { id: "team", label: "My Team", icon: UsersIcon },
   { id: "trash", label: "Trash", icon: Trash2 },
   { id: "settings", label: "Profile Settings", icon: Settings },
@@ -53,6 +55,7 @@ const CountyGovernmentDashboard = () => {
       case "reports": return <CountyReportsPanel />;
       case "regulatory": return <RegulatoryPanel />;
       case "training-mgmt": return <TrainingManagementPanel />;
+      case "marketplace": return <MarketplacePanelShared />;
       case "team": return <TeamPanel role="county_government" navItems={navItems} />;
       case "trash": return <TrashPanel />;
       case "settings": return <ProfileSettingsPanel role="county_government" />;

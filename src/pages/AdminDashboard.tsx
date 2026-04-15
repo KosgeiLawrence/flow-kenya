@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
-import { LogOut, Users, BarChart3, DollarSign, ShieldAlert, FileText, Settings, MapPin, Menu, X, ChevronRight, User, BookOpen, Mail, Eye, EyeOff, Trash2, ClipboardList, MessageSquare, TrendingUp, Receipt, Wallet } from "lucide-react";
+import { LogOut, Users, BarChart3, DollarSign, ShieldAlert, FileText, Settings, MapPin, Menu, X, ChevronRight, User, BookOpen, Mail, Eye, EyeOff, Trash2, ClipboardList, MessageSquare, TrendingUp, Receipt, Wallet, Store } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { useTranslatedNavItems } from "@/hooks/useTranslatedNavItems";
@@ -29,6 +29,7 @@ import RevenueInsightsPanel from "@/components/dashboard/admin/RevenueInsightsPa
 import AdminBillingPanel from "@/components/dashboard/admin/AdminBillingPanel";
 import EarningsExpensesPanel from "@/components/dashboard/shared/EarningsExpensesPanel";
 import DashboardChatbot from "@/components/dashboard/shared/DashboardChatbot";
+import MarketplacePanelShared from "@/components/dashboard/shared/MarketplacePanel";
 
 const navItems = [
   { id: "revenue", label: "Revenue Insights", icon: TrendingUp },
@@ -48,6 +49,7 @@ const navItems = [
   { id: "training-mgmt", label: "Training Management", icon: BookOpen },
   { id: "forms", label: "Form Builder", icon: ClipboardList },
   { id: "messages", label: "Contact Messages", icon: MessageSquare },
+  { id: "marketplace", label: "Marketplace", icon: Store },
   { id: "team", label: "My Team", icon: UsersIcon },
   { id: "trash", label: "Trash", icon: Trash2 },
   { id: "profile-settings", label: "Profile Settings", icon: User },
@@ -84,6 +86,7 @@ const AdminDashboard = () => {
       case "training-mgmt": return <TrainingManagementPanel />;
       case "forms": return <FormBuilderPanel />;
       case "messages": return <ContactMessagesPanel />;
+      case "marketplace": return <MarketplacePanelShared />;
       case "team": return <TeamPanel role="admin" navItems={navItems} />;
       case "trash": return <TrashPanel />;
       case "profile-settings": return <ProfileSettingsPanel role="admin" />;
