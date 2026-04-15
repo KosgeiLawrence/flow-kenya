@@ -3,6 +3,37 @@ import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Recycle, Mail, Phone, MapPin, ExternalLink } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { useHashNavigation } from "@/hooks/useHashNavigation";
+
+function FooterMenuLinks({ links }: { links: { label: string; to: string; isRoute?: boolean }[] }) {
+  const handleHashClick = useHashNavigation();
+  return (
+    <ul className="space-y-2.5">
+      {links.map((link) => {
+        if (link.isRoute) {
+          return (
+            <li key={link.to}>
+              <Link to={link.to} className="text-sm text-muted-foreground transition-colors duration-200 hover:text-foreground">
+                {link.label}
+              </Link>
+            </li>
+          );
+        }
+        const hash = link.to.replace("/", "");
+        return (
+          <li key={link.to}>
+            <button
+              onClick={() => handleHashClick(hash)}
+              className="text-sm text-muted-foreground transition-colors duration-200 hover:text-foreground cursor-pointer"
+            >
+              {link.label}
+            </button>
+          </li>
+        );
+      })}
+    </ul>
+  );
+}
 
 const CTA = () => {
   const { t } = useTranslation();
