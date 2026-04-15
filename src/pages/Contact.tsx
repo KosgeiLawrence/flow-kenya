@@ -13,7 +13,7 @@ import { supabase } from "@/integrations/supabase/client";
 const contactInfo = [
   { icon: Mail, label: "Email", value: "hello@duaraflow.co.ke", href: "mailto:hello@duaraflow.co.ke", description: "Send us an email anytime" },
   { icon: Phone, label: "Phone", value: "+254 741 027 140", href: "tel:+254741027140", description: "Mon-Fri, 8am to 6pm EAT" },
-  { icon: MapPin, label: "Office", value: "Nairobi, Kenya", href: null, description: "Visit our headquarters" },
+  { icon: MapPin, label: "Office", value: "Mombasa, Kenya", href: null, description: "Visit our headquarters" },
 ];
 
 const Contact = () => {
