@@ -1247,6 +1247,19 @@ const sw = {
     quantity: "Kiasi",
     supplier: "Msambazaji",
   },
+
+  // Consultation
+  consultation: {
+    title: "Pata Ushauri Bure",
+    subtitle: "Jaza maelezo yako na timu yetu itawasiliana nawe ndani ya saa 24.",
+    name: "Jina Kamili",
+    email: "Barua Pepe",
+    phone: "Nambari ya Simu",
+    interest: "Eneo la Kupendezwa",
+    message: "Ujumbe Wako",
+    submit: "Tuma Ombi",
+    note: "Kwa kawaida tunajibu ndani ya saa 24 wakati wa siku za kazi.",
+  },
 };
 
 export default sw;
