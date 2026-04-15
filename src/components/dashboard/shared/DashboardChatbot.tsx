@@ -138,7 +138,7 @@ const DashboardChatbot = ({ role, navItems, onNavigate }: DashboardChatbotProps)
       handleResponse(data);
     } catch (err) {
       console.error("Chat error:", err);
-      setMessages((prev) => [...prev, { role: "assistant", content: "Sorry, I encountered an error. Please try again." }]);
+      setMessages((prev) => [...prev, { role: "assistant", content: currentLang === "sw" ? "Samahani, kuna tatizo. Tafadhali jaribu tena." : "Sorry, I encountered an error. Please try again." }]);
     } finally {
       setIsLoading(false);
     }
@@ -152,11 +152,17 @@ const DashboardChatbot = ({ role, navItems, onNavigate }: DashboardChatbotProps)
     setConversationId(crypto.randomUUID());
   };
 
-  const quickActions = [
-    "📊 Analyze my performance this month",
-    "💰 Show my financial summary",
-    "🔍 What can you help me with?",
-  ];
+  const quickActions = currentLang === "sw"
+    ? [
+        "📊 Changanua utendaji wangu wa mwezi huu",
+        "💰 Onyesha muhtasari wangu wa fedha",
+        "🔍 Unaweza kunisaidia nini?",
+      ]
+    : [
+        "📊 Analyze my performance this month",
+        "💰 Show my financial summary",
+        "🔍 What can you help me with?",
+      ];
 
   return (
     <>
