@@ -4,6 +4,7 @@ import { ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { useTranslation } from "react-i18next";
+import ConsultationDialog from "@/components/ConsultationDialog";
 import heroBg from "@/assets/hero-bg.jpg";
 import heroPlaceholder from "@/assets/hero-bg-placeholder.jpg";
 
@@ -93,9 +94,11 @@ const Hero = () => {
             transition={{ delay: 0.7, duration: 0.7, ease: [0.4, 0, 0.2, 1] }}
             className="flex flex-col gap-4 sm:flex-row"
           >
-            <Button variant="hero" size="lg" className="text-base hover-glow" asChild>
-              <Link to="/signup">{t("hero.joinPlatform")} <ArrowRight className="ml-1 h-5 w-5" /></Link>
-            </Button>
+            <ConsultationDialog>
+              <Button variant="hero" size="lg" className="text-base hover-glow">
+                {t("hero.joinPlatform")} <ArrowRight className="ml-1 h-5 w-5" />
+              </Button>
+            </ConsultationDialog>
             <Button variant="hero-outline" size="lg" className="text-base" asChild>
               <Link to="/login">{t("nav.signIn")}</Link>
             </Button>
