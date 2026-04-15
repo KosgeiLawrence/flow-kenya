@@ -6,6 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import ReactMarkdown from "react-markdown";
 import { toast } from "sonner";
+import { useTranslation } from "react-i18next";
 
 interface NavItem {
   id: string;
@@ -46,6 +47,8 @@ const DashboardChatbot = ({ role, navItems, onNavigate }: DashboardChatbotProps)
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const { user } = useAuth();
+  const { t, i18n } = useTranslation();
+  const currentLang = i18n.language;
 
   const scrollToBottom = useCallback(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -128,13 +131,14 @@ const DashboardChatbot = ({ role, navItems, onNavigate }: DashboardChatbotProps)
           navItems: navItems.map((n) => ({ id: n.id, label: n.label })),
           userId: user?.id,
           conversationId,
+          language: currentLang,
         },
       });
       if (error) throw error;
       handleResponse(data);
     } catch (err) {
       console.error("Chat error:", err);
-      setMessages((prev) => [...prev, { role: "assistant", content: "Sorry, I encountered an error. Please try again." }]);
+      setMessages((prev) => [...prev, { role: "assistant", content: currentLang === "sw" ? "Samahani, kuna tatizo. Tafadhali jaribu tena." : "Sorry, I encountered an error. Please try again." }]);
     } finally {
       setIsLoading(false);
     }
@@ -148,11 +152,17 @@ const DashboardChatbot = ({ role, navItems, onNavigate }: DashboardChatbotProps)
     setConversationId(crypto.randomUUID());
   };
 
-  const quickActions = [
-    "📊 Analyze my performance this month",
-    "💰 Show my financial summary",
-    "🔍 What can you help me with?",
-  ];
+  const quickActions = currentLang === "sw"
+    ? [
+        "📊 Changanua utendaji wangu wa mwezi huu",
+        "💰 Onyesha muhtasari wangu wa fedha",
+        "🔍 Unaweza kunisaidia nini?",
+      ]
+    : [
+        "📊 Analyze my performance this month",
+        "💰 Show my financial summary",
+        "🔍 What can you help me with?",
+      ];
 
   return (
     <>
@@ -187,10 +197,14 @@ const DashboardChatbot = ({ role, navItems, onNavigate }: DashboardChatbotProps)
               <Sparkles className="w-5 h-5 text-primary" />
             </div>
             <div className="flex-1">
-              <h3 className="text-sm font-semibold text-foreground">Duara AI Assistant</h3>
-              <p className="text-xs text-muted-foreground">I can do actions, analyze data & navigate</p>
+              <h3 className="text-sm font-semibold text-foreground">
+                {currentLang === "sw" ? "Msaidizi wa Duara AI" : "Duara AI Assistant"}
+              </h3>
+              <p className="text-xs text-muted-foreground">
+                {currentLang === "sw" ? "Ninaweza kufanya vitendo, kuchambua data na kusogeza" : "I can do actions, analyze data & navigate"}
+              </p>
             </div>
-            <button onClick={clearConversation} className="p-1.5 rounded-lg hover:bg-[rgba(255,255,255,0.08)] text-muted-foreground hover:text-foreground transition-colors" title="Clear conversation">
+            <button onClick={clearConversation} className="p-1.5 rounded-lg hover:bg-[rgba(255,255,255,0.08)] text-muted-foreground hover:text-foreground transition-colors" title={currentLang === "sw" ? "Futa mazungumzo" : "Clear conversation"}>
               <Trash2 className="w-4 h-4" />
             </button>
           </div>
@@ -203,9 +217,11 @@ const DashboardChatbot = ({ role, navItems, onNavigate }: DashboardChatbotProps)
                   <div className="w-7 h-7 rounded-lg bg-primary/20 flex items-center justify-center shrink-0 mt-0.5">
                     <Bot className="w-4 h-4 text-primary" />
                   </div>
-                  <div className="text-sm text-muted-foreground leading-relaxed">
-                    Hi! I'm your Duara AI assistant. I can help you navigate your dashboard, analyze your data, and answer questions. How can I help you today?
-                  </div>
+                   <div className="text-sm text-muted-foreground leading-relaxed">
+                     {currentLang === "sw"
+                       ? "Habari! Mimi ni msaidizi wako wa Duara AI. Ninaweza kukusaidia kusogeza dashibodi yako, kuchambua data yako, na kujibu maswali. Ninawezaje kukusaidia leo?"
+                       : "Hi! I'm your Duara AI assistant. I can help you navigate your dashboard, analyze your data, and answer questions. How can I help you today?"}
+                   </div>
                 </div>
                 <div className="space-y-2 pl-10">
                   {quickActions.map((action) => (
@@ -243,7 +259,7 @@ const DashboardChatbot = ({ role, navItems, onNavigate }: DashboardChatbotProps)
                 </div>
                 <div className="bg-[rgba(255,255,255,0.06)] rounded-xl px-3.5 py-2.5 flex items-center gap-2">
                   <Loader2 className="w-4 h-4 animate-spin text-muted-foreground" />
-                  <span className="text-sm text-muted-foreground">Working on it...</span>
+                  <span className="text-sm text-muted-foreground">{currentLang === "sw" ? "Ninafanya kazi..." : "Working on it..."}</span>
                 </div>
               </div>
             )}
@@ -257,7 +273,7 @@ const DashboardChatbot = ({ role, navItems, onNavigate }: DashboardChatbotProps)
                 ref={inputRef}
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
-                placeholder="Ask anything or give a command..."
+                placeholder={currentLang === "sw" ? "Uliza chochote au toa amri..." : "Ask anything or give a command..."}
                 disabled={isLoading}
                 className={cn(
                   "flex-1 h-10 rounded-xl px-4 text-sm",

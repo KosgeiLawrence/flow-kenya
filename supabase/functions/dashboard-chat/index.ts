@@ -596,7 +596,8 @@ Deno.serve(async (req) => {
   }
 
   try {
-    const { messages, role, navItems, userId, conversationId } = await req.json();
+    const { messages, role, navItems, userId, conversationId, language } = await req.json();
+    const lang = language || "en";
 
     if (!messages || !Array.isArray(messages) || !role) {
       return new Response(JSON.stringify({ error: "messages and role required" }), {
@@ -632,6 +633,10 @@ Deno.serve(async (req) => {
       Object.values(panelRegistry).flatMap(p => p.actions)
     )];
     const dialogIdsList = allDialogIds.map(id => `"${id}"`).join(", ");
+
+    const langInstruction = lang === "sw"
+      ? `\n\nLANGUAGE INSTRUCTION: The user's interface is set to Swahili (Kiswahili). You MUST respond ENTIRELY in Swahili. Use natural, fluent Kiswahili — not machine-translated text. All greetings, explanations, summaries, labels, and action confirmations must be in Swahili. If the user writes in English, still respond in Swahili since their interface language is Swahili. Use "KES" for currency.`
+      : `\n\nLANGUAGE INSTRUCTION: The user's interface is set to English. Respond in English. If the user writes in Swahili or Sheng, you may respond in the language they write in, but default to English.`;
 
     const systemPrompt = `You are Duara Flow AI Assistant — an intelligent, action-oriented AI embedded in the ${role.replace(/_/g, " ")} dashboard of a waste management and recycling platform in Kenya.
 The current date is ${new Date().toISOString().split("T")[0]} (year ${new Date().getFullYear()}).
@@ -685,10 +690,10 @@ ACTION-FIRST BEHAVIOR:
 GENERAL BEHAVIOR:
 - Be concise, professional, and proactive
 - Use markdown formatting (bold, lists, tables)
-- Respond in the language the user writes in (English, Swahili, Sheng, etc.)
 - Use query_data for detailed analysis when needed
 - If data is insufficient, be honest — never fabricate numbers
-- When navigating, do it naturally with a brief explanation`;
+- When navigating, do it naturally with a brief explanation
+${langInstruction}`;
 
     const apiKey = Deno.env.get("LOVABLE_API_KEY");
     if (!apiKey) {
