@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -10,6 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Label } from "@/components/ui/label";
 import { Plus, Upload, X, Loader2 } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
+import { useChatbotUIAction } from "@/hooks/useChatbotUIAction";
 
 const categories = [
   { value: "raw_material", label: "Raw Material (e.g. PET bottles, HDPE, scrap metal)" },
@@ -34,6 +35,8 @@ export default function CreateListingDialog({ sellerRole }: Props) {
   const [open, setOpen] = useState(false);
   const [images, setImages] = useState<string[]>([]);
   const [uploading, setUploading] = useState(false);
+
+  useChatbotUIAction(["add-listing"], useCallback(() => setOpen(true), []));
 
   const [form, setForm] = useState({
     title: "",

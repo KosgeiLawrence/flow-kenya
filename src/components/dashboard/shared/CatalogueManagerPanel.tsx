@@ -1,4 +1,5 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useChatbotUIAction } from "@/hooks/useChatbotUIAction";
 import { useAuth } from "@/hooks/useAuth";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -36,6 +37,9 @@ export default function CatalogueManagerPanel({ role }: Props) {
   const [shareOpen, setShareOpen] = useState(false);
   const [copied, setCopied] = useState(false);
   const qrRef = useRef<HTMLDivElement>(null);
+
+  useChatbotUIAction(["add-catalogue-item"], useCallback(() => setNewItemOpen(true), []));
+  useChatbotUIAction(["share-catalogue"], useCallback(() => setShareOpen(true), []));
 
   // Catalogue
   const { data: catalogue, isLoading } = useQuery({

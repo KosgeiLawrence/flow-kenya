@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useCallback, useState } from "react";
+import { useChatbotUIAction } from "@/hooks/useChatbotUIAction";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
@@ -58,6 +59,8 @@ const WasteDeliveredPanel = () => {
   const [createOpen, setCreateOpen] = useState(false);
   const [grnOpen, setGrnOpen] = useState(false);
   const [selectedPO, setSelectedPO] = useState<PurchaseOrder | null>(null);
+
+  useChatbotUIAction(["add-purchase-order"], useCallback(() => setCreateOpen(true), []));
   const [viewPO, setViewPO] = useState<PurchaseOrder | null>(null);
 
   const [form, setForm] = useState({
