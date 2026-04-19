@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Recycle, Mail, Phone, MapPin } from "lucide-react";
+import { ArrowRight, Recycle, Mail, Phone, MapPin, Instagram, Facebook, Linkedin } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { useHashNavigation } from "@/hooks/useHashNavigation";
 import ConsultationDialog from "@/components/ConsultationDialog";
@@ -124,6 +124,47 @@ const Footer = () => {
                 <MapPin className="h-3.5 w-3.5 text-primary/70" />
                 Mombasa, Kenya
               </span>
+            </div>
+            {/* Social media */}
+            <div className="flex items-center gap-3 pt-2">
+              <a
+                href="https://instagram.com/duaraintelligence"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Instagram"
+                className="flex h-9 w-9 items-center justify-center rounded-lg bg-[rgba(255,255,255,0.04)] border border-[rgba(255,255,255,0.06)] text-muted-foreground transition-all duration-200 hover:text-foreground hover:bg-primary/10 hover:border-primary/30"
+              >
+                <Instagram className="h-4 w-4" />
+              </a>
+              <a
+                href="https://facebook.com/duaraintelligence"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Facebook"
+                className="flex h-9 w-9 items-center justify-center rounded-lg bg-[rgba(255,255,255,0.04)] border border-[rgba(255,255,255,0.06)] text-muted-foreground transition-all duration-200 hover:text-foreground hover:bg-primary/10 hover:border-primary/30"
+              >
+                <Facebook className="h-4 w-4" />
+              </a>
+              <a
+                href="https://x.com/duarainell"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="X (Twitter)"
+                className="flex h-9 w-9 items-center justify-center rounded-lg bg-[rgba(255,255,255,0.04)] border border-[rgba(255,255,255,0.06)] text-muted-foreground transition-all duration-200 hover:text-foreground hover:bg-primary/10 hover:border-primary/30"
+              >
+                <svg viewBox="0 0 24 24" fill="currentColor" className="h-3.5 w-3.5" aria-hidden="true">
+                  <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+                </svg>
+              </a>
+              <a
+                href="https://www.linkedin.com/company/duaraintelligence/"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="LinkedIn"
+                className="flex h-9 w-9 items-center justify-center rounded-lg bg-[rgba(255,255,255,0.04)] border border-[rgba(255,255,255,0.06)] text-muted-foreground transition-all duration-200 hover:text-foreground hover:bg-primary/10 hover:border-primary/30"
+              >
+                <Linkedin className="h-4 w-4" />
+              </a>
             </div>
           </div>
 
