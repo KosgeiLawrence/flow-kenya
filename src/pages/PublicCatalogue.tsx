@@ -84,7 +84,7 @@ export default function PublicCatalogue() {
   const c = data.catalogue;
   const businessName = c.business_name;
   const items = data.items || [];
-  const orgLogo = data.organization?.logo_url || data.seller.avatar_url;
+  const orgLogo = c.logo_url || data.organization?.logo_url || data.seller.avatar_url;
   const fullAddress = [c.physical_address, c.sub_county, c.county].filter(Boolean).join(", ");
   const waUrl = c.contact_whatsapp
     ? `https://wa.me/${c.contact_whatsapp.replace(/[^0-9]/g, "")}?text=${encodeURIComponent(`Hi ${businessName}, I saw your catalogue and I'm interested in your products.`)}`
