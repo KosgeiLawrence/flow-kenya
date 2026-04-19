@@ -23,6 +23,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { generateCleanupReportPDF } from "@/lib/cleanupReportPdf";
 import { useTranslation } from "react-i18next";
 import { useChatbotUIAction } from "@/hooks/useChatbotUIAction";
+import { encodeImageForUpload } from "@/lib/imageEncoder";
 
 interface CleanupExercise {
   id: string;
@@ -358,8 +359,12 @@ const CleanupExercisePanel = ({ isAdmin = false }: Props) => {
 
   const uploadPhoto = async (file: File, category: string) => {
     setUploading(category);
-    const path = `${user!.id}/${Date.now()}-${file.name}`;
-    const { error } = await supabase.storage.from("cleanup-photos").upload(path, file);
+    const encoded = await encodeImageForUpload(file);
+    const ext = encoded.name.split(".").pop() || "jpg";
+    const path = `${user!.id}/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+    const { error } = await supabase.storage
+      .from("cleanup-photos")
+      .upload(path, encoded, { contentType: encoded.type });
     if (error) {
       toast.error("Upload failed: " + error.message);
       setUploading(null);
