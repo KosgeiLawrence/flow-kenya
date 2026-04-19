@@ -93,6 +93,7 @@ export default function EditListingDialog({ listing, open, onOpenChange }: EditL
         contact_email: form.contact_email || null,
         condition: form.condition,
         status: form.status,
+        images,
       }).eq("id", listing.id);
       if (error) throw error;
     },
@@ -198,6 +199,32 @@ export default function EditListingDialog({ listing, open, onOpenChange }: EditL
               <Input value={form.contact_email} onChange={e => handleChange("contact_email", e.target.value)} />
             </div>
           </div>
+
+          {/* Images */}
+          <div>
+            <Label>Photos (up to 5)</Label>
+            <div className="flex flex-wrap gap-2 mt-1">
+              {images.map((url, i) => (
+                <div key={i} className="relative w-16 h-16 rounded-lg overflow-hidden border border-border">
+                  <img src={url} alt="" className="w-full h-full object-cover" />
+                  <button
+                    type="button"
+                    onClick={() => setImages(prev => prev.filter((_, j) => j !== i))}
+                    className="absolute top-0 right-0 bg-black/60 rounded-bl p-0.5"
+                  >
+                    <X className="w-3 h-3 text-white" />
+                  </button>
+                </div>
+              ))}
+              {images.length < 5 && (
+                <label className="w-16 h-16 rounded-lg border-2 border-dashed border-border flex items-center justify-center cursor-pointer hover:border-primary/50 transition-colors">
+                  {uploading ? <Loader2 className="w-5 h-5 animate-spin text-muted-foreground" /> : <Upload className="w-5 h-5 text-muted-foreground" />}
+                  <input type="file" accept="image/*" multiple className="hidden" onChange={handleImageUpload} disabled={uploading} />
+                </label>
+              )}
+            </div>
+          </div>
+
           <Button
             className="w-full"
             onClick={() => updateMutation.mutate()}
