@@ -38,6 +38,9 @@ export default function CatalogueManagerPanel({ role }: Props) {
   const [copied, setCopied] = useState(false);
   const qrRef = useRef<HTMLDivElement>(null);
 
+  useChatbotUIAction(["add-catalogue-item"], useCallback(() => setNewItemOpen(true), []));
+  useChatbotUIAction(["share-catalogue"], useCallback(() => setShareOpen(true), []));
+
   // Catalogue
   const { data: catalogue, isLoading } = useQuery({
     queryKey: ["my_catalogue", user?.id],

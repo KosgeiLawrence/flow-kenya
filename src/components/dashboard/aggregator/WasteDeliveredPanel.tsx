@@ -59,6 +59,8 @@ const WasteDeliveredPanel = () => {
   const [createOpen, setCreateOpen] = useState(false);
   const [grnOpen, setGrnOpen] = useState(false);
   const [selectedPO, setSelectedPO] = useState<PurchaseOrder | null>(null);
+
+  useChatbotUIAction(["add-purchase-order"], useCallback(() => setCreateOpen(true), []));
   const [viewPO, setViewPO] = useState<PurchaseOrder | null>(null);
 
   const [form, setForm] = useState({
