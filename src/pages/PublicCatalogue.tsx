@@ -51,7 +51,7 @@ export default function PublicCatalogue() {
     supabase.rpc("increment_catalogue_view", { _slug: slug }).then(() => {});
   }, [slug]);
 
-  const c = data?.catalogue;
+  
   const themeStyle = useMemo(() => ({
     "--brand": data?.catalogue?.theme_color || "#2b5e3f",
   } as React.CSSProperties), [data?.catalogue?.theme_color]);
