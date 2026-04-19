@@ -6,8 +6,7 @@
 // so it only runs once.
 
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
-import { encode as encodeWebp } from "https://deno.land/x/wasm_image_encoder@0.0.6/mod.ts";
-import { decode as decodeImage } from "https://deno.land/x/imagescript@1.2.17/mod.ts";
+import { Image, decode as decodeImage } from "https://deno.land/x/imagescript@1.2.17/mod.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
