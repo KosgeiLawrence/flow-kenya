@@ -244,7 +244,7 @@ export const drawTableHeader = (
   y: number,
   width: number = 170
 ) => {
-  // Light gray background strip
+  // Light gray background strip — aligned to match data row strips below
   doc.setFillColor(...PDF_COLORS.offWhite);
   doc.rect(S.margin, y - 5, width, 8, "F");
 
@@ -268,16 +268,52 @@ export const drawTableHeader = (
 
 /**
  * Table row — subtle alternating background, no borders.
+ * Background height matches the 8mm row stride used by callers so text
+ * always sits visually inside the tinted strip.
  */
 export const drawTableRow = (
   doc: jsPDF,
   y: number,
   index: number,
-  width: number = 170
+  width: number = 170,
+  rowHeight: number = 8
 ) => {
   if (index % 2 === 0) {
     doc.setFillColor(...PDF_COLORS.tableRowAlt);
-    doc.rect(S.margin, y - 4, width, S.rowHeight, "F");
+    // Center the strip vertically around the text baseline at `y`.
+    // Text baseline at y, ascender ~3mm above => start strip at y - 5.
+    doc.rect(S.margin, y - 5, width, rowHeight, "F");
+  }
+};
+
+/**
+ * Draw a text cell that is automatically truncated with an ellipsis if it
+ * would overflow `maxWidth` (mm). Use for table columns so long values
+ * (e.g. category names) never bleed into the next column or out of the
+ * row background.
+ */
+export const drawTextCell = (
+  doc: jsPDF,
+  text: string,
+  x: number,
+  y: number,
+  maxWidth: number,
+  options?: { align?: "left" | "right" | "center" }
+) => {
+  if (!text) return;
+  let str = String(text);
+  const tw = (s: string) => doc.getTextWidth(s);
+  if (tw(str) > maxWidth) {
+    // Trim until fits with ellipsis
+    while (str.length > 1 && tw(str + "…") > maxWidth) {
+      str = str.slice(0, -1);
+    }
+    str = str.trimEnd() + "…";
+  }
+  if (options?.align && options.align !== "left") {
+    doc.text(str, x, y, { align: options.align });
+  } else {
+    doc.text(str, x, y);
   }
 };
 
