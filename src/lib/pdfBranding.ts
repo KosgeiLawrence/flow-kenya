@@ -41,6 +41,56 @@ const S = {
   rowHeight: 7,    // table row height
 };
 
+// Safe vertical bounds (A4 = 297mm). Footer occupies ph - 18 to ph - 4.
+// Content must stop before the footer divider with a small breathing margin.
+export const PDF_BOTTOM_LIMIT = 262;   // last safe Y for body content on A4
+export const PDF_TOP_RESET = 24;       // Y to reset to after addPage()
+
+/**
+ * Ensure there's room for `needed` mm of content; otherwise add a page and
+ * return the new top Y. Use before drawing any block of content.
+ */
+export const ensureSpace = (doc: jsPDF, y: number, needed: number): number => {
+  if (y + needed > PDF_BOTTOM_LIMIT) {
+    doc.addPage();
+    return PDF_TOP_RESET;
+  }
+  return y;
+};
+
+/**
+ * Draw text that auto-wraps to the available width and auto-paginates.
+ * Returns the new Y after the last line. Use for any user-supplied or
+ * variable-length string (names, notes, addresses, descriptions).
+ */
+export const safeText = (
+  doc: jsPDF,
+  text: string,
+  x: number,
+  y: number,
+  options?: {
+    maxWidth?: number;     // wrap width in mm; defaults to right-margin
+    lineHeight?: number;   // mm between lines
+    align?: "left" | "right" | "center";
+  }
+): number => {
+  if (!text) return y;
+  const pw = doc.internal.pageSize.getWidth();
+  const maxW = options?.maxWidth ?? pw - S.margin - x;
+  const lh = options?.lineHeight ?? 5;
+  const lines = doc.splitTextToSize(String(text), Math.max(maxW, 10)) as string[];
+  for (const line of lines) {
+    y = ensureSpace(doc, y, lh);
+    if (options?.align && options.align !== "left") {
+      doc.text(line, x, y, { align: options.align });
+    } else {
+      doc.text(line, x, y);
+    }
+    y += lh;
+  }
+  return y;
+};
+
 // ── Logo Cache ──
 let _duaraLogoCache: string | null = null;
 let _intelligenceLogoCache: string | null = null;
@@ -112,7 +162,8 @@ export const addBrandedHeader = async (
     doc.addImage(options.orgLogoBase64, "PNG", pw - S.margin - 28, 12, 28, 18);
   }
 
-  // Contact info — right aligned, small & muted
+  // Contact info — right aligned, small & muted.
+  // Shift further left when org logo present so the two never collide.
   const contactX = options?.orgLogoBase64 ? pw - S.margin - 32 : pw - S.margin;
   doc.setFontSize(7);
   doc.setFont("helvetica", "normal");
@@ -327,14 +378,24 @@ export const addDocMeta = (
   startY: number
 ): number => {
   let y = startY;
+  const pw = doc.internal.pageSize.getWidth();
+  const valueX = S.margin + 40;
+  const valueMaxW = pw - S.margin - valueX; // stop at right margin
   doc.setFontSize(9);
   fields.forEach((f) => {
+    y = ensureSpace(doc, y, 6);
     doc.setFont("helvetica", "normal");
     doc.setTextColor(...PDF_COLORS.mutedText);
     doc.text(`${f.label}`, S.margin, y);
     doc.setTextColor(...PDF_COLORS.darkText);
     doc.setFont("helvetica", "bold");
-    doc.text(f.value, S.margin + 40, y);
+    // Wrap long values (e.g. multi-line address) so they never bleed off page
+    const lines = doc.splitTextToSize(String(f.value ?? ""), valueMaxW) as string[];
+    lines.forEach((line, idx) => {
+      if (idx > 0) y = ensureSpace(doc, y, 5);
+      doc.text(line, valueX, y);
+      if (idx < lines.length - 1) y += 5;
+    });
     y += 6;
   });
   doc.setFont("helvetica", "normal");
