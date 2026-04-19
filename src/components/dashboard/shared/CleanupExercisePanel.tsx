@@ -23,6 +23,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { generateCleanupReportPDF } from "@/lib/cleanupReportPdf";
 import { useTranslation } from "react-i18next";
 import { useChatbotUIAction } from "@/hooks/useChatbotUIAction";
+import { optimizedImageUrl, imagePresets } from "@/lib/imageUtils";
 
 interface CleanupExercise {
   id: string;
