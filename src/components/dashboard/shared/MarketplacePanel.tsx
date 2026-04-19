@@ -272,6 +272,7 @@ export default function MarketplacePanelShared({ role }: Props) {
           <TabsList>
             <TabsTrigger value="browse" className="gap-1.5"><ShoppingBag className="w-4 h-4" /> Browse</TabsTrigger>
             <TabsTrigger value="my-listings" className="gap-1.5"><Package className="w-4 h-4" /> My Listings ({myListings?.length || 0})</TabsTrigger>
+            <TabsTrigger value="my-catalogue" className="gap-1.5"><LayoutGrid className="w-4 h-4" /> My Catalogue</TabsTrigger>
           </TabsList>
 
           <TabsContent value="browse">
@@ -305,6 +306,10 @@ export default function MarketplacePanelShared({ role }: Props) {
                 )}
               </CardContent>
             </Card>
+          </TabsContent>
+
+          <TabsContent value="my-catalogue">
+            <CatalogueManagerPanel />
           </TabsContent>
         </Tabs>
       ) : (
