@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ArrowRight, Store, MapPin, TrendingUp, Package, Eye } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { optimizedImageUrl, imagePresets } from "@/lib/imageUtils";
 
 const roleBadgeColors: Record<string, string> = {
   waste_picker: "bg-emerald-500/20 text-emerald-400 border-emerald-500/30",
@@ -112,10 +113,11 @@ export default function TrendingMarketplace() {
                     <div className="relative h-40 bg-muted/20 overflow-hidden">
                       {listing.images?.length > 0 ? (
                         <img
-                          src={listing.images[0]}
+                          src={optimizedImageUrl(listing.images[0], imagePresets.card)}
                           alt={listing.title}
                           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                           loading="lazy"
+                          decoding="async"
                         />
                       ) : (
                         <div className="w-full h-full flex items-center justify-center">
