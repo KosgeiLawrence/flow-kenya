@@ -39,6 +39,9 @@ interface EditListingDialogProps {
 
 export default function EditListingDialog({ listing, open, onOpenChange }: EditListingDialogProps) {
   const queryClient = useQueryClient();
+  const { user } = useAuth();
+  const [images, setImages] = useState<string[]>([]);
+  const [uploading, setUploading] = useState(false);
   const [form, setForm] = useState({
     title: "",
     description: "",
@@ -72,10 +75,34 @@ export default function EditListingDialog({ listing, open, onOpenChange }: EditL
         condition: listing.condition || "bulk",
         status: listing.status || "active",
       });
+      setImages(Array.isArray(listing.images) ? listing.images : []);
     }
   }, [listing]);
 
   const handleChange = (field: string, value: string) => setForm(prev => ({ ...prev, [field]: value }));
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files || !user) return;
+    setUploading(true);
+    try {
+      for (const original of Array.from(files).slice(0, 5 - images.length)) {
+        const file = await encodeImageForUpload(original);
+        const ext = file.name.split(".").pop();
+        const path = `${user.id}/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+        const { error } = await supabase.storage.from("marketplace-images").upload(path, file, {
+          contentType: file.type,
+        });
+        if (error) throw error;
+        const { data: urlData } = supabase.storage.from("marketplace-images").getPublicUrl(path);
+        setImages(prev => [...prev, urlData.publicUrl]);
+      }
+    } catch (err: any) {
+      toast({ title: "Upload failed", description: err.message, variant: "destructive" });
+    } finally {
+      setUploading(false);
+    }
+  };
 
   const updateMutation = useMutation({
     mutationFn: async () => {
