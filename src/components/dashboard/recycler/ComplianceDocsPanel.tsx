@@ -40,6 +40,7 @@ const ComplianceDocsPanel = () => {
 
   const downloadComplianceReport = async () => {
     const doc = new jsPDF();
+    const pw = doc.internal.pageSize.getWidth();
 
     let y = await addBrandedHeader(doc, "Compliance Report", "Regulatory requirements for recycling operations");
 
@@ -51,14 +52,27 @@ const ComplianceDocsPanel = () => {
 
     y = addSectionTitle(doc, "Compliance Checklist", y);
 
+    const labelMaxW = pw - 17 - 20;   // body width minus indent + right margin
+    const detailMaxW = pw - 25 - 20;
+
     checks.forEach((c) => {
+      // Use plain ASCII tokens — Helvetica in jsPDF can render unicode ✓/✗ as boxes.
+      const status = c.pass ? "[OK] " : "[--] ";
       doc.setFontSize(10);
-      doc.text(`${c.pass ? "✓" : "✗"} ${c.label}`, 17, y);
+      doc.setFont("helvetica", "bold");
+      doc.setTextColor(30, 30, 30);
+      const labelLines = doc.splitTextToSize(`${status}${c.label}`, labelMaxW) as string[];
+      labelLines.forEach((line, i) => { doc.text(line, 17, y + i * 5); });
+      let cursor = y + labelLines.length * 5;
+
+      doc.setFont("helvetica", "normal");
       doc.setFontSize(8);
       doc.setTextColor(120, 120, 120);
-      doc.text(c.detail, 25, y + 6);
+      const detailLines = doc.splitTextToSize(c.detail, detailMaxW) as string[];
+      detailLines.forEach((line, i) => { doc.text(line, 25, cursor + 1 + i * 4); });
+
       doc.setTextColor(30, 30, 30);
-      y += 16;
+      y = cursor + 1 + detailLines.length * 4 + 6;
     });
 
     await finalizePdf(doc);

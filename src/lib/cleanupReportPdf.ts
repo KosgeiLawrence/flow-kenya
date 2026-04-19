@@ -8,6 +8,9 @@ import {
   addDocMeta,
   drawTableHeader,
   drawTableRow,
+  ensureSpace,
+  safeText,
+  PDF_BOTTOM_LIMIT,
 } from "./pdfBranding";
 
 interface PartnerOrg {
@@ -100,8 +103,8 @@ const drawProgressBar = (
 };
 
 const ensurePage = (doc: jsPDF, y: number, needed: number): number => {
-  if (y + needed > 268) { doc.addPage(); return 24; }
-  return y;
+  // Delegate to shared safe-bounds helper so footer never gets overlapped.
+  return ensureSpace(doc, y, needed);
 };
 
 // ── Main generator ──
@@ -174,15 +177,15 @@ export const generateCleanupReportPDF = async (cleanup: CleanupData) => {
   // ── Partner Organizations ──
   const partnerOrgs = cleanup.partner_organizations || [];
   if (partnerOrgs.length > 0) {
-    y = ensurePage(doc, y, 16 + partnerOrgs.length * 7);
+    y = ensurePage(doc, y, 16 + Math.min(partnerOrgs.length, 4) * 7);
     y = addSectionTitle(doc, "Partner Organizations", y);
+    doc.setFontSize(8);
+    doc.setFont("helvetica", "normal");
+    doc.setTextColor(...PDF_COLORS.bodyText);
     partnerOrgs.forEach((org) => {
-      y = ensurePage(doc, y, 7);
-      doc.setFontSize(8);
-      doc.setFont("helvetica", "normal");
-      doc.setTextColor(...PDF_COLORS.bodyText);
-      doc.text(`·  ${org.name}`, M + 2, y);
-      y += 7;
+      // Wrap long partner names so they don't bleed into the right margin.
+      y = safeText(doc, `·  ${org.name}`, M + 2, y, { maxWidth: pw - M * 2 - 4, lineHeight: 6 });
+      y += 1;
     });
     y += 4;
   }
@@ -257,16 +260,20 @@ export const generateCleanupReportPDF = async (cleanup: CleanupData) => {
     { l: "Transport Method", v: cleanup.transport_method || "N/A" },
     { l: "Waste Sorted", v: cleanup.waste_sorted ? "Yes" : "No" },
   ];
+  const logValueX = M + 45;
+  const logValueMaxW = pw - M - logValueX;
   logItems.forEach((item) => {
+    y = ensurePage(doc, y, 7);
     doc.setFontSize(8);
     doc.setFont("helvetica", "normal");
     doc.setTextColor(...PDF_COLORS.mutedText);
     doc.text(item.l, M, y);
     doc.setTextColor(...PDF_COLORS.darkText);
     doc.setFont("helvetica", "bold");
-    doc.text(item.v, M + 45, y);
+    // Wrap long destination/transport entries
+    y = safeText(doc, item.v, logValueX, y, { maxWidth: logValueMaxW, lineHeight: 5 });
     doc.setFont("helvetica", "normal");
-    y += 7;
+    y += 2;
   });
   y += 6;
 
