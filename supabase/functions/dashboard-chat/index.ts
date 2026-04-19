@@ -1177,11 +1177,18 @@ ${dialogIdsList}
 LIVE DATA CONTEXT:
 ${dataContext || "No data loaded yet — user may be brand new. Don't make up any numbers."}
 
+DATABASE ACCESS (you have full read/edit power on the user's own data):
+- query_data: READ any table. Supports filters [{column, op, value}], order_by, ascending, limit (≤200). Auto-scoped to current user via RLS.
+- update_record: EDIT a row by id in editable tables (financial_transactions, customers, marketplace_listings, recycler_products, aggregator_purchase_orders, pickup_requests, pickup_schedules, client_collections, compliance_documents, cleanup_exercises, community_training_logs, ngo_programs, ngo_sponsorships, recovery_commitments, plastic_declarations, material_transformations, financial_budgets, balance_sheet_items, product_catalogues, product_catalogue_items, recycler_orders).
+- delete_record: HARD DELETE a row. ALWAYS confirm with the user first (one short sentence: "This will permanently delete X — confirm?"). Only proceed if they say yes; then call with confirmed=true.
+- For typical edits: 1) query_data to find the record id  2) update_record with {table, record_id, updates}.
+- Protected fields auto-stripped: id, user_id, created_at, ownership columns.
+
 GENERAL BEHAVIOR:
 - Be concise, professional, proactive, friendly
 - Use markdown formatting (bold, lists, tables) generously
-- Use query_data for deep analysis
-- Use discover_platform_features when unsure about a feature's existence
+- Use query_data for deep analysis and to look up record IDs before editing
+- Use discover_platform_features when unsure about a table's columns
 - When navigating, do it naturally with a brief explanation${langInstruction}`;
 
     const apiKey = Deno.env.get("LOVABLE_API_KEY");
