@@ -43,7 +43,6 @@ const navItems = [
   { id: "my-earnings", label: "My Earnings", icon: DollarSign },
   { id: "crm", label: "My Clients", icon: User },
   { id: "marketplace", label: "Marketplace", icon: Store },
-  { id: "catalogue", label: "My Catalogue", icon: Store },
   { id: "training", label: "Training", icon: BookOpen },
   { id: "esg", label: "ESG & Carbon", icon: Leaf },
   { id: "compliance", label: "Compliance", icon: Shield },
@@ -91,7 +90,6 @@ const WastePickerDashboard = () => {
       case "my-earnings": return <EarningsExpensesPanel role="waste_picker" />;
       case "crm": return <CRMPanel role="waste_picker" />;
       case "marketplace": return <MarketplacePanelShared role="waste_picker" />;
-      case "catalogue": return <CatalogueManagerPanel role="waste_picker" />;
       case "training": return <TrainingPanel viewerRole="waste_picker" />;
       case "esg": return <ESGPanel />;
       case "compliance": return <CompliancePanel />;
