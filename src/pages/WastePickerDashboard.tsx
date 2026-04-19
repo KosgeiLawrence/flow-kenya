@@ -27,6 +27,7 @@ import WastePickerWorkflowGuidePanel from "@/components/dashboard/waste-picker/W
 import WastePickerSalesPanel from "@/components/dashboard/waste-picker/WastePickerSalesPanel";
 import RequestedPickupsPanel from "@/components/dashboard/shared/RequestedPickupsPanel";
 import MarketplacePanelShared from "@/components/dashboard/shared/MarketplacePanel";
+import CatalogueManagerPanel from "@/components/dashboard/shared/CatalogueManagerPanel";
 import ESGPanel from "@/components/dashboard/aggregator/ESGPanel";
 import CompliancePanel from "@/components/dashboard/aggregator/CompliancePanel";
 import TrashPanel from "@/components/dashboard/shared/TrashPanel";
@@ -42,6 +43,7 @@ const navItems = [
   { id: "my-earnings", label: "My Earnings", icon: DollarSign },
   { id: "crm", label: "My Clients", icon: User },
   { id: "marketplace", label: "Marketplace", icon: Store },
+  { id: "catalogue", label: "My Catalogue", icon: Store },
   { id: "training", label: "Training", icon: BookOpen },
   { id: "esg", label: "ESG & Carbon", icon: Leaf },
   { id: "compliance", label: "Compliance", icon: Shield },
@@ -89,6 +91,7 @@ const WastePickerDashboard = () => {
       case "my-earnings": return <EarningsExpensesPanel role="waste_picker" />;
       case "crm": return <CRMPanel role="waste_picker" />;
       case "marketplace": return <MarketplacePanelShared role="waste_picker" />;
+      case "catalogue": return <CatalogueManagerPanel role="waste_picker" />;
       case "training": return <TrainingPanel viewerRole="waste_picker" />;
       case "esg": return <ESGPanel />;
       case "compliance": return <CompliancePanel />;

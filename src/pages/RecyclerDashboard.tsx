@@ -36,6 +36,7 @@ import DigitalIDPanel from "@/components/dashboard/waste-picker/DigitalIDPanel";
 import { Users as UsersIcon, CreditCard } from "lucide-react";
 import LanguageToggle from "@/components/dashboard/shared/LanguageToggle";
 import MarketplacePanelShared from "@/components/dashboard/shared/MarketplacePanel";
+import CatalogueManagerPanel from "@/components/dashboard/shared/CatalogueManagerPanel";
 import DashboardChatbot from "@/components/dashboard/shared/DashboardChatbot";
 
 const navItems = [
@@ -45,6 +46,7 @@ const navItems = [
   { id: "products", label: "Products & Pricing", icon: ShoppingBag },
   { id: "business-insights", label: "Business Insights", icon: TrendingUp },
   { id: "marketplace", label: "Marketplace", icon: Store },
+  { id: "catalogue", label: "My Catalogue", icon: Store },
   
   { id: "market", label: "Market Insights", icon: TrendingUp },
   { id: "forecast", label: "Supply Forecast", icon: BarChart3 },
@@ -102,6 +104,7 @@ const RecyclerDashboard = () => {
         </Tabs>
       );
       case "marketplace": return <MarketplacePanelShared role="recycler" />;
+      case "catalogue": return <CatalogueManagerPanel role="recycler" />;
       case "market": return <MarketInsightsPanel />;
       case "forecast": return <SupplyForecastPanel />;
       case "esg": return <ESGPanel />;
