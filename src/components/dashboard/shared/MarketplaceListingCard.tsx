@@ -177,18 +177,34 @@ export default function MarketplaceListingCard({ listing, isPublic = false }: { 
           {/* Seller info */}
           <div className="border-t border-border pt-3 space-y-2">
             <h4 className="text-sm font-semibold">Seller</h4>
-            <div className="flex items-center gap-3">
-              {listing.seller_profile?.avatar_url ? (
-                <img src={listing.seller_profile.avatar_url} alt="" className="w-10 h-10 rounded-full object-cover" />
-              ) : (
-                <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-sm font-bold text-primary">
-                  {sellerName[0]?.toUpperCase()}
+            <div className="flex items-center justify-between gap-3">
+              <div className="flex items-center gap-3 min-w-0">
+                {listing.seller_profile?.avatar_url ? (
+                  <img src={listing.seller_profile.avatar_url} alt="" className="w-10 h-10 rounded-full object-cover" />
+                ) : (
+                  <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-sm font-bold text-primary">
+                    {sellerName[0]?.toUpperCase()}
+                  </div>
+                )}
+                <div className="min-w-0">
+                  <p className="text-sm font-medium truncate">{sellerName}</p>
+                  <p className="text-xs text-muted-foreground">{roleLabels[listing.seller_role]}</p>
                 </div>
-              )}
-              <div>
-                <p className="text-sm font-medium">{sellerName}</p>
-                <p className="text-xs text-muted-foreground">{roleLabels[listing.seller_role]}</p>
               </div>
+              {listing.catalogue_slug && (
+                <Link
+                  to={`/catalogue/${listing.catalogue_slug}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <Button variant="outline" size="sm" className="gap-1.5 shrink-0">
+                    <Store className="w-3.5 h-3.5" />
+                    <span className="hidden sm:inline">Visit storefront</span>
+                    <ExternalLink className="w-3 h-3" />
+                  </Button>
+                </Link>
+              )}
             </div>
           </div>
 
