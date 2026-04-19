@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Recycle, Mail, Phone, MapPin } from "lucide-react";
+import { ArrowRight, Recycle, Mail, Phone, MapPin, Instagram, Facebook, Linkedin } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { useHashNavigation } from "@/hooks/useHashNavigation";
 import ConsultationDialog from "@/components/ConsultationDialog";
