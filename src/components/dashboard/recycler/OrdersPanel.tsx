@@ -16,7 +16,7 @@ import { ClipboardList, Plus, FileText, CheckCircle2, Clock, XCircle, Truck, Dow
 import { toast } from "sonner";
 import { format } from "date-fns";
 import jsPDF from "jspdf";
-import { addCleanHeader, addDocMeta, drawTableHeader, drawTableRow, drawTotalLine, finalizeCleanPdf, loadImageAsBase64, buildPdfOrgInfo } from "@/lib/pdfBranding";
+import { addCleanHeader, addDocMeta, drawTableHeader, drawTableRow, drawTotalLine, finalizeCleanPdf, loadImageAsBase64, buildPdfOrgInfo, safeText } from "@/lib/pdfBranding";
 import { useTranslation } from "react-i18next";
 import { useChatbotUIAction } from "@/hooks/useChatbotUIAction";
 
@@ -138,16 +138,22 @@ const OrdersPanel = () => {
 
     drawTableRow(doc, y, 0, 180);
     doc.setFontSize(8);
-    doc.text(o.material_type, 17, y);
+    // Truncate/wrap material name to fit Quantity column edge.
+    const mat1 = doc.splitTextToSize(String(o.material_type ?? ""), 60) as string[];
+    doc.text(mat1[0] || "", 17, y);
     doc.text(`${Number(o.quantity).toFixed(1)} ${o.unit}`, 85, y);
     doc.text(Number(o.unit_price).toFixed(2), 120, y);
     doc.text(Number(o.total_amount).toLocaleString(), 155, y);
-    y += 10;
+    y += mat1.length > 1 ? 6 + (mat1.length - 1) * 4 : 10;
+    if (mat1.length > 1) {
+      mat1.slice(1).forEach((line, i) => doc.text(line, 17, y - 6 + (i + 1) * 4));
+      y += 4;
+    }
 
     drawTotalLine(doc, `Total: KES ${Number(o.total_amount).toLocaleString()}`, y);
 
     if (o.delivery_date) { y += 10; doc.setFontSize(9); doc.text(`Expected Delivery: ${format(new Date(o.delivery_date), "MMM d, yyyy")}`, 15, y); }
-    if (o.notes) { y += 8; doc.setFontSize(9); doc.text(`Notes: ${o.notes}`, 15, y); }
+    if (o.notes) { y += 8; doc.setFontSize(9); y = safeText(doc, `Notes: ${o.notes}`, 15, y, { maxWidth: 180, lineHeight: 5 }); }
 
     finalizeCleanPdf(doc);
     doc.save(`order-${o.id.slice(0, 8)}.pdf`);
@@ -175,7 +181,9 @@ const OrdersPanel = () => {
 
     drawTableRow(doc, y, 0, 180);
     doc.setFontSize(8);
-    doc.text(o.material_type, 17, y);
+    // Truncate material to first column width
+    const mat2 = doc.splitTextToSize(String(o.material_type ?? ""), 55) as string[];
+    doc.text(mat2[0] || "", 17, y);
     doc.text(Number(o.quantity).toFixed(1), 80, y);
     doc.text(o.unit, 110, y);
     doc.text(Number(o.unit_price).toFixed(2), 135, y);
@@ -185,7 +193,7 @@ const OrdersPanel = () => {
     drawTotalLine(doc, `Total Value: KES ${Number(o.total_amount).toLocaleString()}`, y);
 
     if (o.delivery_date) { y += 10; doc.setFontSize(9); doc.text(`Delivery Date: ${format(new Date(o.delivery_date), "MMM d, yyyy")}`, 15, y); }
-    if (o.notes) { y += 8; doc.setFontSize(9); doc.text(`Notes: ${o.notes}`, 15, y); }
+    if (o.notes) { y += 8; doc.setFontSize(9); y = safeText(doc, `Notes: ${o.notes}`, 15, y, { maxWidth: 180, lineHeight: 5 }); }
 
     y += 20;
     doc.setFontSize(9);

@@ -41,10 +41,13 @@ const ImpactCertificatesPanel = () => {
     doc.text("This certifies that", 105, y, { align: "center" });
     y += 14;
 
+    // Wrap long org names so they never bleed past the certificate borders.
     doc.setFontSize(18);
     doc.setTextColor(...PDF_COLORS.forest);
-    doc.text(org?.name || profile?.full_name || "Corporate Entity", 105, y, { align: "center" });
-    y += 14;
+    const orgDisplayName = org?.name || profile?.full_name || "Corporate Entity";
+    const nameLines = doc.splitTextToSize(orgDisplayName, 160) as string[];
+    nameLines.forEach((line) => { doc.text(line, 105, y, { align: "center" }); y += 9; });
+    y += 5;
 
     doc.setTextColor(30, 30, 30);
     doc.setFontSize(11);
@@ -52,7 +55,7 @@ const ImpactCertificatesPanel = () => {
     y += 16;
 
     doc.setFontSize(12);
-    [`Total Waste Diverted: ${totalKg.toFixed(0)} kg`, `CO₂ Emissions Offset: ${co2Saved} kg`, `Water Saved: ${(totalKg * 18).toLocaleString()} liters`, `Energy Conserved: ${(totalKg * 5.8).toFixed(0)} kWh`]
+    [`Total Waste Diverted: ${totalKg.toFixed(0)} kg`, `CO2 Emissions Offset: ${co2Saved} kg`, `Water Saved: ${(totalKg * 18).toLocaleString()} liters`, `Energy Conserved: ${(totalKg * 5.8).toFixed(0)} kWh`]
       .forEach((m) => { doc.text(`• ${m}`, 40, y); y += 12; });
 
     y += 6;
