@@ -534,15 +534,22 @@ const ESGAnalyticsPanel = () => {
     doc.text("This is to certify that", pw / 2, y, { align: "center" });
 
     y += 12;
+    // Wrap long org names so they never bleed past the certificate border.
     doc.setFontSize(20);
     doc.setTextColor(...PDF_COLORS.forestDeep);
-    doc.text(org.name, pw / 2, y, { align: "center" });
+    const certNameMaxW = pw - 60;
+    const certNameLines = doc.splitTextToSize(org.name, certNameMaxW) as string[];
+    certNameLines.forEach((line, i) => {
+      doc.text(line, pw / 2, y + i * 9, { align: "center" });
+    });
+    y += certNameLines.length * 9 - 6;
 
     y += 3;
-    const nameWidth = doc.getTextWidth(org.name);
+    const widest = certNameLines.reduce((w, l) => Math.max(w, doc.getTextWidth(l)), 0);
+    const underlineW = Math.min(widest, certNameMaxW);
     doc.setDrawColor(...PDF_COLORS.gold);
     doc.setLineWidth(0.5);
-    doc.line(pw / 2 - nameWidth / 2, y, pw / 2 + nameWidth / 2, y);
+    doc.line(pw / 2 - underlineW / 2, y, pw / 2 + underlineW / 2, y);
 
     y += 12;
     doc.setFontSize(9);
