@@ -599,19 +599,79 @@ async function executeAction(
 
       case "query_data": {
         const table = args.table as string;
-        const limit = (args.limit as number) || 50;
-        const userIdCol = ["client_collections"].includes(table) ? "waste_picker_id"
-          : ["ngo_programs", "ngo_sponsorships", "ngo_program_documents"].includes(table) ? "ngo_user_id"
-          : ["marketplace_listings"].includes(table) ? "seller_user_id"
-          : "user_id";
-        const globalTables = ["material_types"];
-        let query = supabase.from(table).select("*").limit(limit);
+        const limit = Math.min((args.limit as number) || 50, 200);
+        const select = (args.select as string) || "*";
+        const filters = (args.filters as Array<{ column: string; op: string; value: unknown }>) || [];
+        const orderBy = args.order_by as string | undefined;
+        const ascending = args.ascending as boolean | undefined;
+        const ownerCol = ownerColumnFor(table);
+        const globalTables = ["material_types", "financial_categories", "organizations", "forms"];
+
+        let query = supabase.from(table).select(select).limit(limit);
         if (!globalTables.includes(table)) {
-          query = query.eq(userIdCol, userId);
+          query = query.eq(ownerCol, userId);
         }
+        for (const f of filters) {
+          // deno-lint-ignore no-explicit-any
+          query = (query as any)[f.op](f.column, f.value);
+        }
+        if (orderBy) query = query.order(orderBy, { ascending: ascending ?? false });
+
         const { data, error } = await query;
         if (error) throw error;
         return { success: true, message: `Retrieved ${data?.length || 0} records from ${table}`, data };
+      }
+
+      case "update_record": {
+        const table = args.table as string;
+        const recordId = args.record_id as string;
+        const updates = (args.updates as Record<string, unknown>) || {};
+        if (!EDITABLE_TABLES.has(table)) {
+          return { success: false, message: `Table "${table}" is not editable via the assistant.` };
+        }
+        const safeUpdates: Record<string, unknown> = {};
+        for (const [k, v] of Object.entries(updates)) {
+          if (!PROTECTED_COLUMNS.has(k)) safeUpdates[k] = v;
+        }
+        if (!Object.keys(safeUpdates).length) {
+          return { success: false, message: "No valid fields to update." };
+        }
+        const ownerCol = ownerColumnFor(table);
+        const { data, error } = await supabase
+          .from(table)
+          .update(safeUpdates)
+          .eq("id", recordId)
+          .eq(ownerCol, userId)
+          .select();
+        if (error) throw error;
+        if (!data?.length) {
+          return { success: false, message: `No matching record found (or you don't own it).` };
+        }
+        return { success: true, message: `Updated record in ${table}.`, data };
+      }
+
+      case "delete_record": {
+        const table = args.table as string;
+        const recordId = args.record_id as string;
+        const confirmed = args.confirmed as boolean;
+        if (!confirmed) {
+          return { success: false, message: "Deletion requires explicit user confirmation (confirmed=true)." };
+        }
+        if (!EDITABLE_TABLES.has(table)) {
+          return { success: false, message: `Table "${table}" cannot be deleted via the assistant.` };
+        }
+        const ownerCol = ownerColumnFor(table);
+        const { data, error } = await supabase
+          .from(table)
+          .delete()
+          .eq("id", recordId)
+          .eq(ownerCol, userId)
+          .select();
+        if (error) throw error;
+        if (!data?.length) {
+          return { success: false, message: `No matching record found (or you don't own it).` };
+        }
+        return { success: true, message: `Deleted record from ${table}.` };
       }
 
       case "update_profile": {
