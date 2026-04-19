@@ -16,7 +16,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import { Download, FileText, FileSpreadsheet, TrendingUp, TrendingDown, DollarSign, Loader2, Plus, Trash2, Edit2 } from "lucide-react";
 import { format, startOfDay, endOfDay, startOfWeek, startOfMonth, endOfMonth, startOfYear, endOfYear } from "date-fns";
 import jsPDF from "jspdf";
-import { addCleanHeader, addSectionTitle, addDocMeta, drawTableHeader, drawTableRow, drawTotalLine, finalizeCleanPdf, PDF_COLORS, buildPdfOrgInfo, loadImageAsBase64 } from "@/lib/pdfBranding";
+import { addCleanHeader, addSectionTitle, addDocMeta, drawTableHeader, drawTableRow, drawTextCell, drawTotalLine, finalizeCleanPdf, PDF_COLORS, buildPdfOrgInfo, loadImageAsBase64 } from "@/lib/pdfBranding";
 import { useOrgInfo } from "@/hooks/useOrgInfo";
 import { toast } from "sonner";
 import { useTranslation } from "react-i18next";
