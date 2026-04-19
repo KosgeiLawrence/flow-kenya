@@ -128,13 +128,7 @@ export default function MarketplaceListingCard({ listing, isPublic = false }: { 
           {/* Images carousel */}
           {listing.images?.length > 0 && (
             <div className="relative h-56 rounded-lg overflow-hidden bg-muted/30">
-              <img
-                src={optimizedImageUrl(listing.images[0], imagePresets.detail)}
-                alt={listing.title}
-                loading="lazy"
-                decoding="async"
-                className="w-full h-full object-cover"
-              />
+              <img src={listing.images[0]} alt={listing.title} className="w-full h-full object-cover" />
               {listing.images.length > 1 && (
                 <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1">
                   {listing.images.map((_, i) => (
@@ -183,13 +177,7 @@ export default function MarketplaceListingCard({ listing, isPublic = false }: { 
             <h4 className="text-sm font-semibold">Seller</h4>
             <div className="flex items-center gap-3">
               {listing.seller_profile?.avatar_url ? (
-                <img
-                  src={optimizedImageUrl(listing.seller_profile.avatar_url, imagePresets.avatar)}
-                  alt=""
-                  loading="lazy"
-                  decoding="async"
-                  className="w-10 h-10 rounded-full object-cover"
-                />
+                <img src={listing.seller_profile.avatar_url} alt="" className="w-10 h-10 rounded-full object-cover" />
               ) : (
                 <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-sm font-bold text-primary">
                   {sellerName[0]?.toUpperCase()}
