@@ -74,9 +74,9 @@ export default function MarketplaceListingCard({ listing, isPublic = false }: { 
     <>
       <Card className="group hover:border-primary/30 transition-all duration-300 cursor-pointer overflow-hidden" onClick={() => setOpen(true)}>
         {/* Image */}
-        <div className="relative h-40 bg-muted/30 overflow-hidden">
+        <div className="relative h-48 bg-muted/30 overflow-hidden flex items-center justify-center">
           {listing.images?.length > 0 ? (
-            <img src={cdnImage(listing.images[0], imagePresets.card)} alt={listing.title} loading="lazy" decoding="async" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+            <img src={cdnImage(listing.images[0], imagePresets.card)} alt={listing.title} loading="lazy" decoding="async" className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-500" />
           ) : (
             <div className="w-full h-full flex items-center justify-center">
               <Package className="w-12 h-12 text-muted-foreground/30" />
