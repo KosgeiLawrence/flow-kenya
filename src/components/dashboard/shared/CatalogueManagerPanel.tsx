@@ -557,20 +557,24 @@ function BrandingTab({ catalogue, onSave, saving }: { catalogue: any; onSave: (p
     tagline: catalogue.tagline || "",
     about: catalogue.about || "",
     banner_url: catalogue.banner_url || "",
+    logo_url: catalogue.logo_url || "",
     theme_color: catalogue.theme_color || "#2b5e3f",
     slug: catalogue.slug,
   });
-  const [uploading, setUploading] = useState(false);
+  const [uploading, setUploading] = useState<"logo" | "banner" | null>(null);
 
-  const uploadBanner = async (file: File) => {
-    setUploading(true);
+  const uploadImage = async (file: File, kind: "logo" | "banner") => {
+    setUploading(kind);
     try {
-      const path = `${user!.id}/banner-${Date.now()}-${file.name}`;
+      const path = `${user!.id}/${kind}-${Date.now()}-${file.name}`;
       const { error } = await supabase.storage.from("marketplace-images").upload(path, file);
       if (error) throw error;
       const { data: { publicUrl } } = supabase.storage.from("marketplace-images").getPublicUrl(path);
-      setForm({ ...form, banner_url: publicUrl });
-    } finally { setUploading(false); }
+      setForm((f) => ({ ...f, [kind === "logo" ? "logo_url" : "banner_url"]: publicUrl }));
+      toast({ title: `${kind === "logo" ? "Logo" : "Banner"} uploaded` });
+    } catch (e: any) {
+      toast({ title: "Upload failed", description: e.message, variant: "destructive" });
+    } finally { setUploading(null); }
   };
 
   return (
