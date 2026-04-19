@@ -46,7 +46,6 @@ const navItems = [
   { id: "products", label: "Products & Pricing", icon: ShoppingBag },
   { id: "business-insights", label: "Business Insights", icon: TrendingUp },
   { id: "marketplace", label: "Marketplace", icon: Store },
-  { id: "catalogue", label: "My Catalogue", icon: Store },
   
   { id: "market", label: "Market Insights", icon: TrendingUp },
   { id: "forecast", label: "Supply Forecast", icon: BarChart3 },
@@ -104,7 +103,6 @@ const RecyclerDashboard = () => {
         </Tabs>
       );
       case "marketplace": return <MarketplacePanelShared role="recycler" />;
-      case "catalogue": return <CatalogueManagerPanel role="recycler" />;
       case "market": return <MarketInsightsPanel />;
       case "forecast": return <SupplyForecastPanel />;
       case "esg": return <ESGPanel />;

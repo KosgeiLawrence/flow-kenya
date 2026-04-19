@@ -48,7 +48,6 @@ const navItems = [
   { id: "crm", label: "Customers", icon: Users },
   { id: "earnings-expenses", label: "Earnings & Expenses", icon: TrendingUp },
   { id: "marketplace", label: "Marketplace", icon: Store },
-  { id: "catalogue", label: "My Catalogue", icon: Store },
   
   { id: "esg", label: "ESG & Carbon", icon: Leaf },
   { id: "pickers", label: "Waste Pickers", icon: Users },
@@ -117,7 +116,6 @@ const AggregatorDashboard = () => {
         </Tabs>
       );
       case "marketplace": return <MarketplacePanelShared role="aggregator" />;
-      case "catalogue": return <CatalogueManagerPanel role="aggregator" />;
       case "logistics": return <LogisticsPanel />;
       case "payments": return <PaymentsPanel />;
       case "receipts": return <BulkReceiptsPanel />;
