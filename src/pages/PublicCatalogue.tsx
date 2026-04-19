@@ -16,7 +16,7 @@ interface Item {
 interface CataloguePayload {
   catalogue: {
     id: string; slug: string; business_name: string; tagline: string | null;
-    about: string | null; banner_url: string | null; theme_color: string | null;
+    about: string | null; banner_url: string | null; logo_url: string | null; theme_color: string | null;
     contact_phone: string | null; contact_email: string | null; contact_whatsapp: string | null;
     website: string | null; physical_address: string | null;
     county: string | null; sub_county: string | null; view_count: number;
