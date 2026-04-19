@@ -146,7 +146,7 @@ const Footer = () => {
                 <Facebook className="h-4 w-4" />
               </a>
               <a
-                href="https://x.com/duarainell"
+                href="https://x.com/duaraintell"
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="X (Twitter)"
