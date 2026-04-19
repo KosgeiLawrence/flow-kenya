@@ -337,22 +337,26 @@ const FinancialReportsPanel = ({ role }: Props) => {
         y = drawTableHeader(doc, [{ label: "Category", x: 17 }, { label: "Amount (KES)", x: 150 }], y, 180);
         pnl.incomeLines.forEach((line, i) => {
           drawTableRow(doc, y, i, 180);
-          doc.setFontSize(9); doc.text(line.name, 17, y); doc.text(line.amount.toLocaleString(), 150, y);
+          doc.setFontSize(9);
+          drawTextCell(doc, line.name, 17, y, 125);
+          drawTextCell(doc, line.amount.toLocaleString(), 195, y, 40, { align: "right" });
           y += 8;
         });
         doc.setFontSize(10); doc.setTextColor(...PDF_COLORS.forest);
-        y += 2; doc.text(`Total Income: KES ${pnl.totalIncome.toLocaleString()}`, 120, y); y += 12;
+        y += 2; doc.text(`Total Income: KES ${pnl.totalIncome.toLocaleString()}`, 195, y, { align: "right" }); y += 12;
 
         doc.setTextColor(...PDF_COLORS.darkText);
         y = addSectionTitle(doc, "Expenses", y);
         y = drawTableHeader(doc, [{ label: "Category", x: 17 }, { label: "Amount (KES)", x: 150 }], y, 180);
         pnl.expenseLines.forEach((line, i) => {
           drawTableRow(doc, y, i, 180);
-          doc.setFontSize(9); doc.text(line.name, 17, y); doc.text(line.amount.toLocaleString(), 150, y);
+          doc.setFontSize(9);
+          drawTextCell(doc, line.name, 17, y, 125);
+          drawTextCell(doc, line.amount.toLocaleString(), 195, y, 40, { align: "right" });
           y += 8;
         });
         doc.setFontSize(10); doc.setTextColor(...PDF_COLORS.forest);
-        y += 2; doc.text(`Total Expenses: KES ${pnl.totalExpenses.toLocaleString()}`, 120, y); y += 10;
+        y += 2; doc.text(`Total Expenses: KES ${pnl.totalExpenses.toLocaleString()}`, 195, y, { align: "right" }); y += 10;
 
         y = drawTotalLine(doc, `Net Profit: KES ${pnl.netProfit.toLocaleString()}`, y);
       }
@@ -366,8 +370,10 @@ const FinancialReportsPanel = ({ role }: Props) => {
         cashFlow.methods.forEach((m, i) => {
           drawTableRow(doc, y, i, 180);
           doc.setFontSize(9);
-          doc.text(m.method, 17, y); doc.text(m.inflow.toLocaleString(), 90, y);
-          doc.text(m.outflow.toLocaleString(), 130, y); doc.text(m.net.toLocaleString(), 165, y);
+          drawTextCell(doc, m.method, 17, y, 70);
+          drawTextCell(doc, m.inflow.toLocaleString(), 90, y, 38);
+          drawTextCell(doc, m.outflow.toLocaleString(), 130, y, 33);
+          drawTextCell(doc, m.net.toLocaleString(), 165, y, 30);
           y += 8;
         });
         y += 4;
@@ -384,11 +390,13 @@ const FinancialReportsPanel = ({ role }: Props) => {
         y = drawTableHeader(doc, [{ label: "Account", x: 17 }, { label: "Amount (KES)", x: 150 }], y, 180);
         balanceSheet.currentAssets.forEach((a, i) => {
           drawTableRow(doc, y, i, 180);
-          doc.setFontSize(9); doc.text(a.name, 17, y); doc.text(a.amount.toLocaleString(), 150, y);
+          doc.setFontSize(9);
+          drawTextCell(doc, a.name, 17, y, 125);
+          drawTextCell(doc, a.amount.toLocaleString(), 195, y, 40, { align: "right" });
           y += 8;
         });
         doc.setFontSize(9); doc.setTextColor(...PDF_COLORS.forest);
-        y += 2; doc.text(`Total Current Assets: KES ${balanceSheet.totalCurrentAssets.toLocaleString()}`, 110, y); y += 10;
+        y += 2; doc.text(`Total Current Assets: KES ${balanceSheet.totalCurrentAssets.toLocaleString()}`, 195, y, { align: "right" }); y += 10;
         doc.setTextColor(...PDF_COLORS.darkText);
 
         if (balanceSheet.nonCurrentAssets.length > 0) {
@@ -396,15 +404,17 @@ const FinancialReportsPanel = ({ role }: Props) => {
           y = drawTableHeader(doc, [{ label: "Account", x: 17 }, { label: "Amount (KES)", x: 150 }], y, 180);
           balanceSheet.nonCurrentAssets.forEach((a, i) => {
             drawTableRow(doc, y, i, 180);
-            doc.setFontSize(9); doc.text(a.name, 17, y); doc.text(a.amount.toLocaleString(), 150, y);
+            doc.setFontSize(9);
+            drawTextCell(doc, a.name, 17, y, 125);
+            drawTextCell(doc, a.amount.toLocaleString(), 195, y, 40, { align: "right" });
             y += 8;
           });
           doc.setFontSize(9); doc.setTextColor(...PDF_COLORS.forest);
-          y += 2; doc.text(`Total Non-Current Assets: KES ${balanceSheet.totalNonCurrentAssets.toLocaleString()}`, 100, y); y += 10;
+          y += 2; doc.text(`Total Non-Current Assets: KES ${balanceSheet.totalNonCurrentAssets.toLocaleString()}`, 195, y, { align: "right" }); y += 10;
           doc.setTextColor(...PDF_COLORS.darkText);
         }
         doc.setFontSize(10); doc.setTextColor(...PDF_COLORS.forest);
-        doc.text(`TOTAL ASSETS: KES ${balanceSheet.totalAssets.toLocaleString()}`, 110, y); y += 14;
+        doc.text(`TOTAL ASSETS: KES ${balanceSheet.totalAssets.toLocaleString()}`, 195, y, { align: "right" }); y += 14;
         doc.setTextColor(...PDF_COLORS.darkText);
 
         // Liabilities
@@ -414,26 +424,30 @@ const FinancialReportsPanel = ({ role }: Props) => {
           y = drawTableHeader(doc, [{ label: "Account", x: 17 }, { label: "Amount (KES)", x: 150 }], y, 180);
           balanceSheet.currentLiabilities.forEach((a, i) => {
             drawTableRow(doc, y, i, 180);
-            doc.setFontSize(9); doc.text(a.name, 17, y); doc.text(a.amount.toLocaleString(), 150, y);
+            doc.setFontSize(9);
+            drawTextCell(doc, a.name, 17, y, 125);
+            drawTextCell(doc, a.amount.toLocaleString(), 195, y, 40, { align: "right" });
             y += 8;
           });
-          doc.setFontSize(9); y += 2; doc.text(`Total Current Liabilities: KES ${balanceSheet.totalCurrentLiabilities.toLocaleString()}`, 100, y); y += 10;
+          doc.setFontSize(9); y += 2; doc.text(`Total Current Liabilities: KES ${balanceSheet.totalCurrentLiabilities.toLocaleString()}`, 195, y, { align: "right" }); y += 10;
         }
         if (balanceSheet.longTermLiabilities.length > 0) {
           y = addSectionTitle(doc, "Long-Term Liabilities", y);
           y = drawTableHeader(doc, [{ label: "Account", x: 17 }, { label: "Amount (KES)", x: 150 }], y, 180);
           balanceSheet.longTermLiabilities.forEach((a, i) => {
             drawTableRow(doc, y, i, 180);
-            doc.setFontSize(9); doc.text(a.name, 17, y); doc.text(a.amount.toLocaleString(), 150, y);
+            doc.setFontSize(9);
+            drawTextCell(doc, a.name, 17, y, 125);
+            drawTextCell(doc, a.amount.toLocaleString(), 195, y, 40, { align: "right" });
             y += 8;
           });
-          doc.setFontSize(9); y += 2; doc.text(`Total Long-Term Liabilities: KES ${balanceSheet.totalLongTermLiabilities.toLocaleString()}`, 95, y); y += 10;
+          doc.setFontSize(9); y += 2; doc.text(`Total Long-Term Liabilities: KES ${balanceSheet.totalLongTermLiabilities.toLocaleString()}`, 195, y, { align: "right" }); y += 10;
         }
         if (balanceSheet.currentLiabilities.length === 0 && balanceSheet.longTermLiabilities.length === 0) {
           doc.setFontSize(9); doc.text("No liabilities recorded", 17, y); y += 10;
         }
         doc.setFontSize(10); doc.setTextColor(...PDF_COLORS.forest);
-        doc.text(`TOTAL LIABILITIES: KES ${balanceSheet.totalLiabilities.toLocaleString()}`, 100, y); y += 14;
+        doc.text(`TOTAL LIABILITIES: KES ${balanceSheet.totalLiabilities.toLocaleString()}`, 195, y, { align: "right" }); y += 14;
         doc.setTextColor(...PDF_COLORS.darkText);
 
         // Equity
@@ -441,11 +455,13 @@ const FinancialReportsPanel = ({ role }: Props) => {
         y = drawTableHeader(doc, [{ label: "Account", x: 17 }, { label: "Amount (KES)", x: 150 }], y, 180);
         balanceSheet.equityItems.forEach((a, i) => {
           drawTableRow(doc, y, i, 180);
-          doc.setFontSize(9); doc.text(a.name, 17, y); doc.text(a.amount.toLocaleString(), 150, y);
+          doc.setFontSize(9);
+          drawTextCell(doc, a.name, 17, y, 125);
+          drawTextCell(doc, a.amount.toLocaleString(), 195, y, 40, { align: "right" });
           y += 8;
         });
         doc.setFontSize(10); doc.setTextColor(...PDF_COLORS.forest);
-        y += 2; doc.text(`TOTAL EQUITY: KES ${balanceSheet.totalEquity.toLocaleString()}`, 110, y); y += 12;
+        y += 2; doc.text(`TOTAL EQUITY: KES ${balanceSheet.totalEquity.toLocaleString()}`, 195, y, { align: "right" }); y += 12;
 
         y = drawTotalLine(doc, `Total Liabilities + Equity: KES ${(balanceSheet.totalLiabilities + balanceSheet.totalEquity).toLocaleString()}`, y);
       }
