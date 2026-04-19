@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/useAuth";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -7,8 +8,9 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
-import { Loader2 } from "lucide-react";
+import { Loader2, Upload, X } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
+import { encodeImageForUpload } from "@/lib/imageEncoder";
 
 const categories = [
   { value: "raw_material", label: "Raw Material" },
@@ -37,6 +39,9 @@ interface EditListingDialogProps {
 
 export default function EditListingDialog({ listing, open, onOpenChange }: EditListingDialogProps) {
   const queryClient = useQueryClient();
+  const { user } = useAuth();
+  const [images, setImages] = useState<string[]>([]);
+  const [uploading, setUploading] = useState(false);
   const [form, setForm] = useState({
     title: "",
     description: "",
@@ -70,10 +75,34 @@ export default function EditListingDialog({ listing, open, onOpenChange }: EditL
         condition: listing.condition || "bulk",
         status: listing.status || "active",
       });
+      setImages(Array.isArray(listing.images) ? listing.images : []);
     }
   }, [listing]);
 
   const handleChange = (field: string, value: string) => setForm(prev => ({ ...prev, [field]: value }));
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files || !user) return;
+    setUploading(true);
+    try {
+      for (const original of Array.from(files).slice(0, 5 - images.length)) {
+        const file = await encodeImageForUpload(original);
+        const ext = file.name.split(".").pop();
+        const path = `${user.id}/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+        const { error } = await supabase.storage.from("marketplace-images").upload(path, file, {
+          contentType: file.type,
+        });
+        if (error) throw error;
+        const { data: urlData } = supabase.storage.from("marketplace-images").getPublicUrl(path);
+        setImages(prev => [...prev, urlData.publicUrl]);
+      }
+    } catch (err: any) {
+      toast({ title: "Upload failed", description: err.message, variant: "destructive" });
+    } finally {
+      setUploading(false);
+    }
+  };
 
   const updateMutation = useMutation({
     mutationFn: async () => {
@@ -91,6 +120,7 @@ export default function EditListingDialog({ listing, open, onOpenChange }: EditL
         contact_email: form.contact_email || null,
         condition: form.condition,
         status: form.status,
+        images,
       }).eq("id", listing.id);
       if (error) throw error;
     },
@@ -196,6 +226,32 @@ export default function EditListingDialog({ listing, open, onOpenChange }: EditL
               <Input value={form.contact_email} onChange={e => handleChange("contact_email", e.target.value)} />
             </div>
           </div>
+
+          {/* Images */}
+          <div>
+            <Label>Photos (up to 5)</Label>
+            <div className="flex flex-wrap gap-2 mt-1">
+              {images.map((url, i) => (
+                <div key={i} className="relative w-16 h-16 rounded-lg overflow-hidden border border-border">
+                  <img src={url} alt="" className="w-full h-full object-cover" />
+                  <button
+                    type="button"
+                    onClick={() => setImages(prev => prev.filter((_, j) => j !== i))}
+                    className="absolute top-0 right-0 bg-black/60 rounded-bl p-0.5"
+                  >
+                    <X className="w-3 h-3 text-white" />
+                  </button>
+                </div>
+              ))}
+              {images.length < 5 && (
+                <label className="w-16 h-16 rounded-lg border-2 border-dashed border-border flex items-center justify-center cursor-pointer hover:border-primary/50 transition-colors">
+                  {uploading ? <Loader2 className="w-5 h-5 animate-spin text-muted-foreground" /> : <Upload className="w-5 h-5 text-muted-foreground" />}
+                  <input type="file" accept="image/*" multiple className="hidden" onChange={handleImageUpload} disabled={uploading} />
+                </label>
+              )}
+            </div>
+          </div>
+
           <Button
             className="w-full"
             onClick={() => updateMutation.mutate()}
