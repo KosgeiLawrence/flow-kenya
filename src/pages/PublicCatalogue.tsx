@@ -53,13 +53,24 @@ export default function PublicCatalogue() {
 
   const c = data?.catalogue;
   const themeStyle = useMemo(() => ({
-    "--brand": c?.theme_color || "#2b5e3f",
-  } as React.CSSProperties), [c?.theme_color]);
+    "--brand": data?.catalogue?.theme_color || "#2b5e3f",
+  } as React.CSSProperties), [data?.catalogue?.theme_color]);
+
+  // SEO — must be before any early returns
+  useEffect(() => {
+    const c = data?.catalogue;
+    if (!c) return;
+    document.title = `${c.business_name} — Product Catalogue | Duara Flow`;
+    const desc = c.tagline || c.about?.slice(0, 155) || `Browse products from ${c.business_name} on Duara Flow.`;
+    let metaDesc = document.querySelector('meta[name="description"]');
+    if (!metaDesc) { metaDesc = document.createElement("meta"); metaDesc.setAttribute("name", "description"); document.head.appendChild(metaDesc); }
+    metaDesc.setAttribute("content", desc);
+  }, [data?.catalogue]);
 
   if (isLoading) {
     return <div className="min-h-screen flex items-center justify-center bg-background"><Loader2 className="w-10 h-10 animate-spin text-primary" /></div>;
   }
-  if (error || !data || !c) {
+  if (error || !data || !data.catalogue) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center bg-background p-6 text-center">
         <Store className="w-16 h-16 text-muted-foreground/30 mb-4" />
@@ -70,6 +81,7 @@ export default function PublicCatalogue() {
     );
   }
 
+  const c = data.catalogue;
   const businessName = c.business_name;
   const items = data.items || [];
   const orgLogo = data.organization?.logo_url || data.seller.avatar_url;
@@ -86,16 +98,6 @@ export default function PublicCatalogue() {
       await navigator.clipboard.writeText(url);
     }
   };
-
-  // SEO
-  useEffect(() => {
-    if (!c) return;
-    document.title = `${c.business_name} — Product Catalogue | Duara Flow`;
-    const desc = c.tagline || c.about?.slice(0, 155) || `Browse products from ${c.business_name} on Duara Flow.`;
-    let metaDesc = document.querySelector('meta[name="description"]');
-    if (!metaDesc) { metaDesc = document.createElement("meta"); metaDesc.setAttribute("name", "description"); document.head.appendChild(metaDesc); }
-    metaDesc.setAttribute("content", desc);
-  }, [c]);
 
   return (
     <div className="min-h-screen bg-background" style={themeStyle}>

@@ -34,6 +34,7 @@ import JoinTeam from "./pages/JoinTeam";
 import PublicProfile from "./pages/PublicProfile";
 import Unsubscribe from "./pages/Unsubscribe";
 import Marketplace from "./pages/Marketplace";
+import PublicCatalogue from "./pages/PublicCatalogue";
 import PWAInstallPrompt from "./components/PWAInstallPrompt";
 
 import BiometricLockScreen from "./components/auth/BiometricLockScreen";
@@ -216,6 +217,7 @@ const App = () => {
                   <Route path="/profile/:userId" element={<PublicProfile />} />
                   <Route path="/unsubscribe" element={<Unsubscribe />} />
                   <Route path="/marketplace" element={<Marketplace />} />
+                  <Route path="/catalogue/:slug" element={<PublicCatalogue />} />
                   <Route path="*" element={<NotFound />} />
                 </Routes>
               </BiometricGate>
