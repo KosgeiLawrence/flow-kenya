@@ -133,8 +133,8 @@ export default function MarketplaceListingCard({ listing, isPublic = false }: { 
 
           {/* Images carousel */}
           {listing.images?.length > 0 && (
-            <div className="relative h-56 rounded-lg overflow-hidden bg-muted/30">
-              <img src={cdnImage(listing.images[0], imagePresets.detail)} alt={listing.title} loading="lazy" decoding="async" className="w-full h-full object-cover" />
+            <div className="relative h-64 rounded-lg overflow-hidden bg-muted/30 flex items-center justify-center">
+              <img src={cdnImage(listing.images[0], imagePresets.detail)} alt={listing.title} loading="lazy" decoding="async" className="w-full h-full object-contain" />
               {listing.images.length > 1 && (
                 <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1">
                   {listing.images.map((_, i) => (
