@@ -7,7 +7,6 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { MapPin, Phone, Mail, Globe, Package, Store, MessageCircle, Share2, ArrowLeft, Loader2 } from "lucide-react";
-import { Helmet } from "react-helmet-async";
 
 interface Item {
   id: string; title: string; description: string | null; category: string;
@@ -88,16 +87,18 @@ export default function PublicCatalogue() {
     }
   };
 
+  // SEO
+  useEffect(() => {
+    if (!c) return;
+    document.title = `${c.business_name} — Product Catalogue | Duara Flow`;
+    const desc = c.tagline || c.about?.slice(0, 155) || `Browse products from ${c.business_name} on Duara Flow.`;
+    let metaDesc = document.querySelector('meta[name="description"]');
+    if (!metaDesc) { metaDesc = document.createElement("meta"); metaDesc.setAttribute("name", "description"); document.head.appendChild(metaDesc); }
+    metaDesc.setAttribute("content", desc);
+  }, [c]);
+
   return (
     <div className="min-h-screen bg-background" style={themeStyle}>
-      <Helmet>
-        <title>{businessName} — Product Catalogue | Duara Flow</title>
-        <meta name="description" content={c.tagline || c.about?.slice(0, 155) || `Browse products from ${businessName} on Duara Flow.`} />
-        <meta property="og:title" content={`${businessName} — Product Catalogue`} />
-        <meta property="og:description" content={c.tagline || `Quality products from ${businessName}`} />
-        {orgLogo && <meta property="og:image" content={orgLogo} />}
-        <link rel="canonical" href={`${window.location.origin}/catalogue/${c.slug}`} />
-      </Helmet>
 
       {/* Top bar (hidden in embed) */}
       {!isEmbed && (
