@@ -1017,6 +1017,33 @@ export type Database = {
         }
         Relationships: []
       }
+      image_migration_runs: {
+        Row: {
+          completed_at: string | null
+          details: Json
+          id: string
+          job_name: string
+          started_at: string
+          status: string
+        }
+        Insert: {
+          completed_at?: string | null
+          details?: Json
+          id?: string
+          job_name: string
+          started_at?: string
+          status?: string
+        }
+        Update: {
+          completed_at?: string | null
+          details?: Json
+          id?: string
+          job_name?: string
+          started_at?: string
+          status?: string
+        }
+        Relationships: []
+      }
       marketplace_listings: {
         Row: {
           category: string
