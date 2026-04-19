@@ -6,7 +6,6 @@ import MaterialIcon from "@/components/dashboard/shared/MaterialIcon";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useState } from "react";
 import { formatDistanceToNow } from "date-fns";
-import { optimizedImageUrl, imagePresets } from "@/lib/imageUtils";
 
 interface Listing {
   id: string;
@@ -71,13 +70,7 @@ export default function MarketplaceListingCard({ listing, isPublic = false }: { 
         {/* Image */}
         <div className="relative h-40 bg-muted/30 overflow-hidden">
           {listing.images?.length > 0 ? (
-            <img
-              src={optimizedImageUrl(listing.images[0], imagePresets.card)}
-              alt={listing.title}
-              loading="lazy"
-              decoding="async"
-              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-            />
+            <img src={listing.images[0]} alt={listing.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
           ) : (
             <div className="w-full h-full flex items-center justify-center">
               <Package className="w-12 h-12 text-muted-foreground/30" />
