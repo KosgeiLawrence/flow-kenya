@@ -938,13 +938,13 @@ const CleanupExercisePanel = ({ isAdmin = false }: Props) => {
                     <Separator />
                     <h4 className="font-semibold text-foreground">{t("cleanupPanel.photos", "Photos")}</h4>
                     {viewCleanup.before_photos.length > 0 && (
-                      <div><p className="text-xs text-muted-foreground mb-1">Before</p><div className="flex flex-wrap gap-2">{viewCleanup.before_photos.map((url, i) => <img key={i} src={url} alt="Before" className="w-24 h-24 object-cover rounded-md border border-border" />)}</div></div>
+                      <div><p className="text-xs text-muted-foreground mb-1">Before</p><div className="flex flex-wrap gap-2">{viewCleanup.before_photos.map((url, i) => <img key={i} src={optimizedImageUrl(url, imagePresets.thumb)} alt="Before" loading="lazy" decoding="async" className="w-24 h-24 object-cover rounded-md border border-border" />)}</div></div>
                     )}
                     {viewCleanup.during_photos.length > 0 && (
-                      <div><p className="text-xs text-muted-foreground mb-1">During</p><div className="flex flex-wrap gap-2">{viewCleanup.during_photos.map((url, i) => <img key={i} src={url} alt="During" className="w-24 h-24 object-cover rounded-md border border-border" />)}</div></div>
+                      <div><p className="text-xs text-muted-foreground mb-1">During</p><div className="flex flex-wrap gap-2">{viewCleanup.during_photos.map((url, i) => <img key={i} src={optimizedImageUrl(url, imagePresets.thumb)} alt="During" loading="lazy" decoding="async" className="w-24 h-24 object-cover rounded-md border border-border" />)}</div></div>
                     )}
                     {viewCleanup.after_photos.length > 0 && (
-                      <div><p className="text-xs text-muted-foreground mb-1">After</p><div className="flex flex-wrap gap-2">{viewCleanup.after_photos.map((url, i) => <img key={i} src={url} alt="After" className="w-24 h-24 object-cover rounded-md border border-border" />)}</div></div>
+                      <div><p className="text-xs text-muted-foreground mb-1">After</p><div className="flex flex-wrap gap-2">{viewCleanup.after_photos.map((url, i) => <img key={i} src={optimizedImageUrl(url, imagePresets.thumb)} alt="After" loading="lazy" decoding="async" className="w-24 h-24 object-cover rounded-md border border-border" />)}</div></div>
                     )}
                   </>
                 )}
