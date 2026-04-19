@@ -41,12 +41,24 @@ const Marketplace = () => {
 
       if (data?.length) {
         const sellerIds = [...new Set(data.map(l => l.seller_user_id))];
-        const { data: profiles } = await supabase
-          .from("profiles")
-          .select("user_id, full_name, avatar_url, organizations(name)")
-          .in("user_id", sellerIds);
-        const profileMap = new Map(profiles?.map(p => [p.user_id, p]) || []);
-        return data.map(l => ({ ...l, seller_profile: profileMap.get(l.seller_user_id) }));
+        const [profilesRes, cataloguesRes] = await Promise.all([
+          supabase
+            .from("profiles")
+            .select("user_id, full_name, avatar_url, organizations(name)")
+            .in("user_id", sellerIds),
+          supabase
+            .from("product_catalogues")
+            .select("user_id, slug")
+            .in("user_id", sellerIds)
+            .eq("is_published", true),
+        ]);
+        const profileMap = new Map(profilesRes.data?.map(p => [p.user_id, p]) || []);
+        const catalogueMap = new Map(cataloguesRes.data?.map(c => [c.user_id, c.slug]) || []);
+        return data.map(l => ({
+          ...l,
+          seller_profile: profileMap.get(l.seller_user_id),
+          catalogue_slug: catalogueMap.get(l.seller_user_id) || null,
+        }));
       }
       return data || [];
     },

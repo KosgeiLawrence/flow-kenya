@@ -1,11 +1,12 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { MapPin, Phone, Mail, Eye, Package, Clock } from "lucide-react";
+import { MapPin, Phone, Mail, Eye, Package, Clock, Store, ExternalLink } from "lucide-react";
 import MaterialIcon from "@/components/dashboard/shared/MaterialIcon";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useState } from "react";
 import { formatDistanceToNow } from "date-fns";
+import { Link } from "react-router-dom";
 
 interface Listing {
   id: string;
@@ -32,6 +33,7 @@ interface Listing {
     avatar_url: string | null;
     organizations?: { name: string } | null;
   };
+  catalogue_slug?: string | null;
 }
 
 const categoryLabels: Record<string, string> = {
