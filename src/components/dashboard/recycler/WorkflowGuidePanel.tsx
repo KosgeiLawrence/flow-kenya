@@ -6,7 +6,8 @@ import {
   Package, Recycle, ShoppingBag, TrendingUp, FileText, ClipboardCheck,
   BarChart3, Leaf, Shield, Truck, BookOpen, Briefcase, Settings,
   ClipboardList, ArrowDown, ArrowRight, ChevronDown, ChevronUp,
-  CircleDot, CheckCircle2, Users
+  CircleDot, CheckCircle2, Users, Store, LayoutGrid, Share2, Bot,
+  Trash2, UserPlus, ClipboardSignature, Upload
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useTranslation } from "react-i18next";
