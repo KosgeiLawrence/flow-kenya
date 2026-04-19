@@ -1597,6 +1597,7 @@ export type Database = {
           created_at: string
           id: string
           is_published: boolean
+          logo_url: string | null
           physical_address: string | null
           slug: string
           sub_county: string | null
@@ -1618,6 +1619,7 @@ export type Database = {
           created_at?: string
           id?: string
           is_published?: boolean
+          logo_url?: string | null
           physical_address?: string | null
           slug: string
           sub_county?: string | null
@@ -1639,6 +1641,7 @@ export type Database = {
           created_at?: string
           id?: string
           is_published?: boolean
+          logo_url?: string | null
           physical_address?: string | null
           slug?: string
           sub_county?: string | null
