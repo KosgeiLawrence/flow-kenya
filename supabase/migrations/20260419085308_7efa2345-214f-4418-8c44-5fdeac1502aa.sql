@@ -1,0 +1,1 @@
+ALTER TABLE public.product_catalogues ADD COLUMN IF NOT EXISTS logo_url text;

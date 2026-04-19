@@ -557,20 +557,24 @@ function BrandingTab({ catalogue, onSave, saving }: { catalogue: any; onSave: (p
     tagline: catalogue.tagline || "",
     about: catalogue.about || "",
     banner_url: catalogue.banner_url || "",
+    logo_url: catalogue.logo_url || "",
     theme_color: catalogue.theme_color || "#2b5e3f",
     slug: catalogue.slug,
   });
-  const [uploading, setUploading] = useState(false);
+  const [uploading, setUploading] = useState<"logo" | "banner" | null>(null);
 
-  const uploadBanner = async (file: File) => {
-    setUploading(true);
+  const uploadImage = async (file: File, kind: "logo" | "banner") => {
+    setUploading(kind);
     try {
-      const path = `${user!.id}/banner-${Date.now()}-${file.name}`;
+      const path = `${user!.id}/${kind}-${Date.now()}-${file.name}`;
       const { error } = await supabase.storage.from("marketplace-images").upload(path, file);
       if (error) throw error;
       const { data: { publicUrl } } = supabase.storage.from("marketplace-images").getPublicUrl(path);
-      setForm({ ...form, banner_url: publicUrl });
-    } finally { setUploading(false); }
+      setForm((f) => ({ ...f, [kind === "logo" ? "logo_url" : "banner_url"]: publicUrl }));
+      toast({ title: `${kind === "logo" ? "Logo" : "Banner"} uploaded` });
+    } catch (e: any) {
+      toast({ title: "Upload failed", description: e.message, variant: "destructive" });
+    } finally { setUploading(null); }
   };
 
   return (
@@ -602,18 +606,45 @@ function BrandingTab({ catalogue, onSave, saving }: { catalogue: any; onSave: (p
         </div>
       </div>
       <div>
-        <Label>Banner / logo</Label>
-        <div className="flex items-center gap-3 mt-1">
-          {form.banner_url && <img src={form.banner_url} className="w-20 h-20 object-cover rounded border" alt="" />}
+        <Label>Logo</Label>
+        <p className="text-xs text-muted-foreground mb-2">Square image shown as your storefront avatar (overrides organization logo).</p>
+        <div className="flex items-center gap-3">
+          {form.logo_url ? (
+            <img src={form.logo_url} className="w-20 h-20 object-cover rounded-xl border" alt="Catalogue logo" />
+          ) : (
+            <div className="w-20 h-20 rounded-xl border border-dashed flex items-center justify-center bg-muted/30">
+              <ImageIcon className="w-6 h-6 text-muted-foreground/50" />
+            </div>
+          )}
+          <div className="flex flex-col gap-2">
+            <label className="cursor-pointer">
+              <input type="file" accept="image/*" hidden onChange={(e) => e.target.files?.[0] && uploadImage(e.target.files[0], "logo")} />
+              <Button variant="outline" size="sm" type="button" asChild>
+                <span>{uploading === "logo" ? "Uploading..." : form.logo_url ? "Replace logo" : "Upload logo"}</span>
+              </Button>
+            </label>
+            {form.logo_url && (
+              <Button variant="ghost" size="sm" type="button" onClick={() => setForm({ ...form, logo_url: "" })} className="text-destructive">
+                <Trash2 className="w-3.5 h-3.5 mr-1" /> Remove
+              </Button>
+            )}
+          </div>
+        </div>
+      </div>
+      <div>
+        <Label>Banner image</Label>
+        <p className="text-xs text-muted-foreground mb-2">Wide background image shown behind your storefront hero.</p>
+        <div className="flex items-center gap-3">
+          {form.banner_url && <img src={form.banner_url} className="w-32 h-20 object-cover rounded border" alt="Banner" />}
           <label className="cursor-pointer">
-            <input type="file" accept="image/*" hidden onChange={(e) => e.target.files?.[0] && uploadBanner(e.target.files[0])} />
+            <input type="file" accept="image/*" hidden onChange={(e) => e.target.files?.[0] && uploadImage(e.target.files[0], "banner")} />
             <Button variant="outline" size="sm" type="button" asChild>
-              <span>{uploading ? "Uploading..." : "Upload banner"}</span>
+              <span>{uploading === "banner" ? "Uploading..." : form.banner_url ? "Replace banner" : "Upload banner"}</span>
             </Button>
           </label>
         </div>
       </div>
-      <Button onClick={() => onSave(form)} disabled={saving} className="w-full">{saving ? "Saving..." : "Save branding"}</Button>
+      <Button onClick={() => onSave(form)} disabled={saving || !!uploading} className="w-full">{saving ? "Saving..." : "Save branding"}</Button>
     </CardContent></Card>
   );
 }

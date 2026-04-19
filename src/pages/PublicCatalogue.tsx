@@ -16,7 +16,7 @@ interface Item {
 interface CataloguePayload {
   catalogue: {
     id: string; slug: string; business_name: string; tagline: string | null;
-    about: string | null; banner_url: string | null; theme_color: string | null;
+    about: string | null; banner_url: string | null; logo_url: string | null; theme_color: string | null;
     contact_phone: string | null; contact_email: string | null; contact_whatsapp: string | null;
     website: string | null; physical_address: string | null;
     county: string | null; sub_county: string | null; view_count: number;
@@ -84,7 +84,7 @@ export default function PublicCatalogue() {
   const c = data.catalogue;
   const businessName = c.business_name;
   const items = data.items || [];
-  const orgLogo = data.organization?.logo_url || data.seller.avatar_url;
+  const orgLogo = c.logo_url || data.organization?.logo_url || data.seller.avatar_url;
   const fullAddress = [c.physical_address, c.sub_county, c.county].filter(Boolean).join(", ");
   const waUrl = c.contact_whatsapp
     ? `https://wa.me/${c.contact_whatsapp.replace(/[^0-9]/g, "")}?text=${encodeURIComponent(`Hi ${businessName}, I saw your catalogue and I'm interested in your products.`)}`
