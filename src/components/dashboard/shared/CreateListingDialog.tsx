@@ -10,6 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Label } from "@/components/ui/label";
 import { Plus, Upload, X, Loader2 } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
+import { encodeImageForUpload } from "@/lib/imageEncoder";
 
 const categories = [
   { value: "raw_material", label: "Raw Material (e.g. PET bottles, HDPE, scrap metal)" },
@@ -57,10 +58,13 @@ export default function CreateListingDialog({ sellerRole }: Props) {
     if (!files || !user) return;
     setUploading(true);
     try {
-      for (const file of Array.from(files).slice(0, 5 - images.length)) {
+      for (const original of Array.from(files).slice(0, 5 - images.length)) {
+        const file = await encodeImageForUpload(original);
         const ext = file.name.split(".").pop();
         const path = `${user.id}/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
-        const { error } = await supabase.storage.from("marketplace-images").upload(path, file);
+        const { error } = await supabase.storage.from("marketplace-images").upload(path, file, {
+          contentType: file.type,
+        });
         if (error) throw error;
         const { data: urlData } = supabase.storage.from("marketplace-images").getPublicUrl(path);
         setImages(prev => [...prev, urlData.publicUrl]);
