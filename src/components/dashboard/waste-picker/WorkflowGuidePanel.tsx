@@ -4,7 +4,8 @@ import { Badge } from "@/components/ui/badge";
 import {
   Package, Users, DollarSign, TrendingUp, FileText, BarChart3,
   Leaf, Shield, Truck, QrCode, BookOpen, Briefcase, Calendar,
-  ArrowDown, ArrowRight, ChevronDown, ChevronUp, CheckCircle2, ClipboardList
+  ArrowDown, ArrowRight, ChevronDown, ChevronUp, CheckCircle2, ClipboardList,
+  Store, LayoutGrid, Share2, Bot, Trash2, IdCard
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useTranslation } from "react-i18next";
@@ -96,15 +97,30 @@ const workflows: Workflow[] = [
     ],
   },
   {
-    id: "qr-id",
-    title: "QR ID",
-    subtitle: "Your unique digital identity",
-    icon: QrCode,
+    id: "digital-id",
+    title: "Digital ID",
+    subtitle: "Your verified identity on the platform",
+    icon: IdCard,
     color: "text-primary",
+    tip: "Show your Digital ID at collection points so aggregators can verify and pay you faster.",
     steps: [
-      { label: "View QR Code", description: "Your unique QR code identifies you on the platform", icon: QrCode, color: "bg-primary/10 text-primary" },
-      { label: "Share ID", description: "Share your QR with aggregators and clients for quick identification", icon: Users, color: "bg-primary/10 text-primary" },
-      { label: "Verify Identity", description: "Aggregators scan your QR to verify collections", icon: CheckCircle2, color: "bg-primary/10 text-primary" },
+      { label: "View Digital ID", description: "Open the Digital ID panel to see your branded ID card and QR", icon: IdCard, color: "bg-primary/10 text-primary" },
+      { label: "Share with Aggregators", description: "Let buyers scan your QR to confirm your identity and history", icon: Users, color: "bg-primary/10 text-primary" },
+      { label: "Stay Verified", description: "Keep your profile, photo and contact details up to date", icon: CheckCircle2, color: "bg-primary/10 text-primary" },
+    ],
+  },
+  {
+    id: "marketplace",
+    title: "Marketplace & My Catalogue",
+    subtitle: "List materials and share your storefront",
+    icon: Store,
+    color: "text-secondary",
+    tip: "Open Marketplace → My Catalogue to publish a branded page you can share via WhatsApp, link or QR code.",
+    steps: [
+      { label: "List Materials", description: "Post the materials you have for sale with photos and prices", icon: Store, color: "bg-secondary/10 text-secondary" },
+      { label: "Build Your Catalogue", description: "Add logo, about you, and contact details under My Catalogue", icon: LayoutGrid, color: "bg-secondary/10 text-secondary" },
+      { label: "Publish & Share", description: "Share your public storefront link or QR with buyers and clients", icon: Share2, color: "bg-secondary/10 text-secondary" },
+      { label: "Get Inquiries", description: "Buyers reach you directly via WhatsApp, phone or email", icon: Users, color: "bg-secondary/10 text-secondary" },
     ],
   },
   {
@@ -142,6 +158,31 @@ const workflows: Workflow[] = [
       { label: "Browse Grants", description: "Discover available grants and funding programs", icon: Briefcase, color: "bg-secondary/10 text-secondary" },
       { label: "Apply", description: "Submit applications for relevant programs", icon: FileText, color: "bg-secondary/10 text-secondary" },
       { label: "Track Applications", description: "Monitor the status of your grant applications", icon: CheckCircle2, color: "bg-secondary/10 text-secondary" },
+    ],
+  },
+  {
+    id: "ai-assistant",
+    title: "Duara AI Assistant",
+    subtitle: "Your in-pocket business helper",
+    icon: Bot,
+    color: "text-primary",
+    tip: "Tap the chat bubble to ask the assistant to log a collection, check prices or guide you through any feature.",
+    steps: [
+      { label: "Open Chat", description: "Tap the floating chat button on any dashboard page", icon: Bot, color: "bg-primary/10 text-primary" },
+      { label: "Ask Anything", description: "Get answers about earnings, pickups, prices and trainings", icon: BookOpen, color: "bg-primary/10 text-primary" },
+      { label: "Quick Navigation", description: "Ask it to take you straight to a specific panel or action", icon: ArrowRight, color: "bg-primary/10 text-primary" },
+    ],
+  },
+  {
+    id: "trash",
+    title: "Trash & Recovery",
+    subtitle: "Safely delete and restore records",
+    icon: Trash2,
+    color: "text-secondary",
+    steps: [
+      { label: "Delete Anywhere", description: "Deletions across all panels move items to Trash instead of erasing them", icon: Trash2, color: "bg-secondary/10 text-secondary" },
+      { label: "Review in Trash", description: "Open the Trash panel to see what was removed and when", icon: ClipboardList, color: "bg-secondary/10 text-secondary" },
+      { label: "Restore or Purge", description: "Restore items back, or permanently delete them when sure", icon: CheckCircle2, color: "bg-secondary/10 text-secondary" },
     ],
   },
 ];

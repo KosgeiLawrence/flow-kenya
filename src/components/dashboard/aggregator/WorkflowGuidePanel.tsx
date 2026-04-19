@@ -5,7 +5,8 @@ import {
   Package, Users, Store, TrendingUp, FileText, BarChart3,
   Leaf, Shield, Truck, BookOpen, Briefcase, DollarSign,
   Printer, ClipboardList, ArrowDown, ArrowRight, ChevronDown, ChevronUp,
-  CheckCircle2
+  CheckCircle2, LayoutGrid, Share2, Bot, Trash2, UserPlus,
+  ClipboardSignature, Settings
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useTranslation } from "react-i18next";
@@ -58,16 +59,30 @@ const workflows: Workflow[] = [
   },
   {
     id: "marketplace",
-    title: "Marketplace & Sales",
-    subtitle: "Sell aggregated materials to recyclers",
+    title: "Marketplace & My Catalogue",
+    subtitle: "Sell aggregated materials and run a branded storefront",
     icon: Store,
     color: "text-secondary",
-    tip: "List your materials on the marketplace to reach more buyers and get better prices.",
+    tip: "Your marketplace listings can be auto-pulled into 'My Catalogue' so recyclers always see your latest stock and prices.",
     steps: [
-      { label: "List Materials", description: "Post available materials with quantity and asking price", icon: Store, color: "bg-secondary/10 text-secondary" },
-      { label: "Receive Inquiries", description: "Recyclers and buyers will contact you for materials", icon: Users, color: "bg-secondary/10 text-secondary" },
-      { label: "Generate Invoice", description: "Create an invoice for the agreed sale", icon: FileText, color: "bg-secondary/10 text-secondary" },
-      { label: "Arrange Logistics", description: "Coordinate pickup or delivery of materials", icon: Truck, color: "bg-secondary/10 text-secondary" },
+      { label: "List Materials", description: "Post available materials with quantity, unit price and photos", icon: Store, color: "bg-secondary/10 text-secondary" },
+      { label: "Build Your Catalogue", description: "Open Marketplace → My Catalogue to add logo, banner, about, and contact details", icon: LayoutGrid, color: "bg-secondary/10 text-secondary" },
+      { label: "Publish & Share", description: "Publish your storefront and share the public link or QR code with buyers", icon: Share2, color: "bg-secondary/10 text-secondary" },
+      { label: "Close the Sale", description: "Generate a quotation → invoice → receipt directly from inventory", icon: FileText, color: "bg-secondary/10 text-secondary" },
+    ],
+  },
+  {
+    id: "procurement",
+    title: "Procurement (PO / GRN)",
+    subtitle: "Order materials from suppliers professionally",
+    icon: ClipboardSignature,
+    color: "text-primary",
+    tip: "Use Purchase Orders for any large incoming delivery and confirm with a Goods Received Note so stock is updated automatically.",
+    steps: [
+      { label: "Add Supplier", description: "Save waste picker or supplier contacts in your directory", icon: Users, color: "bg-primary/10 text-primary" },
+      { label: "Raise Purchase Order", description: "Create a PO with material, quantity, unit price and expected delivery", icon: FileText, color: "bg-primary/10 text-primary" },
+      { label: "Receive & GRN", description: "Confirm delivered quantity and generate a Goods Received Note", icon: Truck, color: "bg-primary/10 text-primary" },
+      { label: "Auto Stock Update", description: "Inventory and supplier balances update the moment GRN is confirmed", icon: CheckCircle2, color: "bg-primary/10 text-primary" },
     ],
   },
   {
@@ -122,6 +137,44 @@ const workflows: Workflow[] = [
       { label: "Track EPR Progress", description: "Monitor your Extended Producer Responsibility targets", icon: Leaf, color: "bg-secondary/10 text-secondary" },
       { label: "ESG Reports", description: "Generate environmental, social, and governance reports", icon: BarChart3, color: "bg-secondary/10 text-secondary" },
       { label: "Carbon Offset", description: "See how much CO₂ your collections help avoid", icon: Leaf, color: "bg-secondary/10 text-secondary" },
+    ],
+  },
+  {
+    id: "team",
+    title: "Team Collaboration",
+    subtitle: "Invite teammates to your workspace",
+    icon: UserPlus,
+    color: "text-primary",
+    tip: "Team members inherit your subscription and branding — great for shift workers, drivers and accountants.",
+    steps: [
+      { label: "Invite Members", description: "Open Team and send an invite by email with a role", icon: UserPlus, color: "bg-primary/10 text-primary" },
+      { label: "Members Join", description: "They accept via the email link and access shared inventory and sales", icon: CheckCircle2, color: "bg-primary/10 text-primary" },
+      { label: "Manage Access", description: "Remove or change member roles any time from the Team panel", icon: Settings, color: "bg-primary/10 text-primary" },
+    ],
+  },
+  {
+    id: "ai-assistant",
+    title: "Duara AI Assistant",
+    subtitle: "Your in-dashboard business helper",
+    icon: Bot,
+    color: "text-secondary",
+    tip: "Ask the assistant to summarise sales, find a picker, or guide you through any workflow — just tap the chat bubble.",
+    steps: [
+      { label: "Open Chat", description: "Tap the floating chat button on any dashboard page", icon: Bot, color: "bg-secondary/10 text-secondary" },
+      { label: "Ask Anything", description: "Get insights about inventory, payments, pickers and compliance", icon: BookOpen, color: "bg-secondary/10 text-secondary" },
+      { label: "Quick Navigation", description: "Ask the assistant to take you to a specific panel or action", icon: ArrowRight, color: "bg-secondary/10 text-secondary" },
+    ],
+  },
+  {
+    id: "trash",
+    title: "Trash & Recovery",
+    subtitle: "Safely delete and restore records",
+    icon: Trash2,
+    color: "text-primary",
+    steps: [
+      { label: "Delete Anywhere", description: "Deletions across all panels move items to Trash instead of erasing them", icon: Trash2, color: "bg-primary/10 text-primary" },
+      { label: "Review in Trash", description: "Open the Trash panel to see what was removed and when", icon: ClipboardList, color: "bg-primary/10 text-primary" },
+      { label: "Restore or Purge", description: "Restore items back to where they belong, or permanently delete them", icon: CheckCircle2, color: "bg-primary/10 text-primary" },
     ],
   },
 ];
