@@ -290,16 +290,62 @@ const ACTION_TOOLS = [
     type: "function",
     function: {
       name: "query_data",
-      description: "Query specific data from the platform database to answer detailed data questions. Use discover_platform_features first if unsure which table to query.",
+      description: "Query/READ records from any platform table. Use this for analysis, lookups, finding IDs before update/delete, or answering data questions. Returns rows scoped to the current user automatically (RLS enforced).",
       parameters: {
         type: "object",
         properties: {
-          table: { type: "string", description: "Table name to query (use discover_platform_features to find available tables)" },
-          filters: { type: "string", description: "Description of what to filter (e.g. 'last 30 days', 'status is pending')" },
-          aggregation: { type: "string", description: "What aggregation to perform (e.g. 'sum of amount', 'count', 'group by material_type')" },
-          limit: { type: "number", description: "Max rows to return (default 50)" },
+          table: { type: "string", description: "Table name (use discover_platform_features if unsure)" },
+          select: { type: "string", description: "Comma-separated columns or '*' (default '*')" },
+          filters: {
+            type: "array",
+            description: "Array of filter conditions. Each: { column, op, value }. Supported ops: eq, neq, gt, gte, lt, lte, like, ilike, in, is",
+            items: {
+              type: "object",
+              properties: {
+                column: { type: "string" },
+                op: { type: "string", enum: ["eq", "neq", "gt", "gte", "lt", "lte", "like", "ilike", "in", "is"] },
+                value: {},
+              },
+              required: ["column", "op", "value"],
+            },
+          },
+          order_by: { type: "string", description: "Column to order by" },
+          ascending: { type: "boolean", description: "Order direction (default false = newest first)" },
+          limit: { type: "number", description: "Max rows (default 50, max 200)" },
         },
         required: ["table"],
+      },
+    },
+  },
+  {
+    type: "function",
+    function: {
+      name: "update_record",
+      description: "UPDATE an existing record in a user-owned table by id. Use after query_data to find the record id. Only updates rows the user owns (RLS enforced).",
+      parameters: {
+        type: "object",
+        properties: {
+          table: { type: "string", description: "Table name" },
+          record_id: { type: "string", description: "UUID of the row to update" },
+          updates: { type: "object", description: "Object of column → new value pairs", additionalProperties: true },
+        },
+        required: ["table", "record_id", "updates"],
+      },
+    },
+  },
+  {
+    type: "function",
+    function: {
+      name: "delete_record",
+      description: "DELETE a record from a user-owned table by id. Use ONLY after explicit user confirmation for destructive actions.",
+      parameters: {
+        type: "object",
+        properties: {
+          table: { type: "string", description: "Table name" },
+          record_id: { type: "string", description: "UUID of the row to delete" },
+          confirmed: { type: "boolean", description: "Must be true — confirms user explicitly approved deletion" },
+        },
+        required: ["table", "record_id", "confirmed"],
       },
     },
   },
@@ -343,22 +389,46 @@ const ACTION_TOOLS = [
     type: "function",
     function: {
       name: "discover_platform_features",
-      description: "Discover what features, tables, and capabilities are available on the platform. Use this when you're unsure about what data exists, what tables are available, or what a panel can do. This helps you stay up-to-date with new features.",
+      description: "Discover what features, tables, and capabilities are available on the platform. Use this when you're unsure about what data exists, what tables are available, or what a panel can do.",
       parameters: {
         type: "object",
         properties: {
           discovery_type: {
             type: "string",
             enum: ["tables", "table_columns", "panel_actions", "all"],
-            description: "What to discover: 'tables' for available DB tables, 'table_columns' for columns in a specific table, 'panel_actions' for UI actions available, 'all' for everything"
+            description: "What to discover"
           },
-          table_name: { type: "string", description: "When discovery_type is 'table_columns', specify which table to inspect" },
+          table_name: { type: "string", description: "When discovery_type is 'table_columns', specify which table" },
         },
         required: ["discovery_type"],
       },
     },
   },
 ];
+
+// Tables that allow AI-driven update/delete (user-owned, safe).
+const EDITABLE_TABLES = new Set([
+  "financial_transactions", "financial_budgets", "balance_sheet_items",
+  "customers", "suppliers", "marketplace_listings", "product_catalogues", "product_catalogue_items",
+  "recycler_products", "recycler_orders", "aggregator_purchase_orders",
+  "pickup_requests", "pickup_schedules", "client_collections",
+  "compliance_documents", "cleanup_exercises", "community_training_logs",
+  "ngo_programs", "ngo_sponsorships", "recovery_commitments",
+  "plastic_declarations", "material_transformations",
+]);
+
+// Forbidden columns (never let AI overwrite ownership/identity)
+const PROTECTED_COLUMNS = new Set([
+  "user_id", "waste_picker_id", "ngo_user_id", "seller_user_id",
+  "id", "created_at", "created_by",
+]);
+
+function ownerColumnFor(table: string): string {
+  if (table === "client_collections") return "waste_picker_id";
+  if (["ngo_programs", "ngo_sponsorships", "ngo_program_documents"].includes(table)) return "ngo_user_id";
+  if (table === "marketplace_listings") return "seller_user_id";
+  return "user_id";
+}
 
 // ============================================================
 // EXECUTE ACTIONS on behalf of the user
@@ -529,19 +599,79 @@ async function executeAction(
 
       case "query_data": {
         const table = args.table as string;
-        const limit = (args.limit as number) || 50;
-        const userIdCol = ["client_collections"].includes(table) ? "waste_picker_id"
-          : ["ngo_programs", "ngo_sponsorships", "ngo_program_documents"].includes(table) ? "ngo_user_id"
-          : ["marketplace_listings"].includes(table) ? "seller_user_id"
-          : "user_id";
-        const globalTables = ["material_types"];
-        let query = supabase.from(table).select("*").limit(limit);
+        const limit = Math.min((args.limit as number) || 50, 200);
+        const select = (args.select as string) || "*";
+        const filters = (args.filters as Array<{ column: string; op: string; value: unknown }>) || [];
+        const orderBy = args.order_by as string | undefined;
+        const ascending = args.ascending as boolean | undefined;
+        const ownerCol = ownerColumnFor(table);
+        const globalTables = ["material_types", "financial_categories", "organizations", "forms"];
+
+        let query = supabase.from(table).select(select).limit(limit);
         if (!globalTables.includes(table)) {
-          query = query.eq(userIdCol, userId);
+          query = query.eq(ownerCol, userId);
         }
+        for (const f of filters) {
+          // deno-lint-ignore no-explicit-any
+          query = (query as any)[f.op](f.column, f.value);
+        }
+        if (orderBy) query = query.order(orderBy, { ascending: ascending ?? false });
+
         const { data, error } = await query;
         if (error) throw error;
         return { success: true, message: `Retrieved ${data?.length || 0} records from ${table}`, data };
+      }
+
+      case "update_record": {
+        const table = args.table as string;
+        const recordId = args.record_id as string;
+        const updates = (args.updates as Record<string, unknown>) || {};
+        if (!EDITABLE_TABLES.has(table)) {
+          return { success: false, message: `Table "${table}" is not editable via the assistant.` };
+        }
+        const safeUpdates: Record<string, unknown> = {};
+        for (const [k, v] of Object.entries(updates)) {
+          if (!PROTECTED_COLUMNS.has(k)) safeUpdates[k] = v;
+        }
+        if (!Object.keys(safeUpdates).length) {
+          return { success: false, message: "No valid fields to update." };
+        }
+        const ownerCol = ownerColumnFor(table);
+        const { data, error } = await supabase
+          .from(table)
+          .update(safeUpdates)
+          .eq("id", recordId)
+          .eq(ownerCol, userId)
+          .select();
+        if (error) throw error;
+        if (!data?.length) {
+          return { success: false, message: `No matching record found (or you don't own it).` };
+        }
+        return { success: true, message: `Updated record in ${table}.`, data };
+      }
+
+      case "delete_record": {
+        const table = args.table as string;
+        const recordId = args.record_id as string;
+        const confirmed = args.confirmed as boolean;
+        if (!confirmed) {
+          return { success: false, message: "Deletion requires explicit user confirmation (confirmed=true)." };
+        }
+        if (!EDITABLE_TABLES.has(table)) {
+          return { success: false, message: `Table "${table}" cannot be deleted via the assistant.` };
+        }
+        const ownerCol = ownerColumnFor(table);
+        const { data, error } = await supabase
+          .from(table)
+          .delete()
+          .eq("id", recordId)
+          .eq(ownerCol, userId)
+          .select();
+        if (error) throw error;
+        if (!data?.length) {
+          return { success: false, message: `No matching record found (or you don't own it).` };
+        }
+        return { success: true, message: `Deleted record from ${table}.` };
       }
 
       case "update_profile": {
@@ -1047,11 +1177,18 @@ ${dialogIdsList}
 LIVE DATA CONTEXT:
 ${dataContext || "No data loaded yet — user may be brand new. Don't make up any numbers."}
 
+DATABASE ACCESS (you have full read/edit power on the user's own data):
+- query_data: READ any table. Supports filters [{column, op, value}], order_by, ascending, limit (≤200). Auto-scoped to current user via RLS.
+- update_record: EDIT a row by id in editable tables (financial_transactions, customers, marketplace_listings, recycler_products, aggregator_purchase_orders, pickup_requests, pickup_schedules, client_collections, compliance_documents, cleanup_exercises, community_training_logs, ngo_programs, ngo_sponsorships, recovery_commitments, plastic_declarations, material_transformations, financial_budgets, balance_sheet_items, product_catalogues, product_catalogue_items, recycler_orders).
+- delete_record: HARD DELETE a row. ALWAYS confirm with the user first (one short sentence: "This will permanently delete X — confirm?"). Only proceed if they say yes; then call with confirmed=true.
+- For typical edits: 1) query_data to find the record id  2) update_record with {table, record_id, updates}.
+- Protected fields auto-stripped: id, user_id, created_at, ownership columns.
+
 GENERAL BEHAVIOR:
 - Be concise, professional, proactive, friendly
 - Use markdown formatting (bold, lists, tables) generously
-- Use query_data for deep analysis
-- Use discover_platform_features when unsure about a feature's existence
+- Use query_data for deep analysis and to look up record IDs before editing
+- Use discover_platform_features when unsure about a table's columns
 - When navigating, do it naturally with a brief explanation${langInstruction}`;
 
     const apiKey = Deno.env.get("LOVABLE_API_KEY");
