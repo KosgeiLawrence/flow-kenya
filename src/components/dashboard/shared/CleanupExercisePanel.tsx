@@ -23,8 +23,6 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { generateCleanupReportPDF } from "@/lib/cleanupReportPdf";
 import { useTranslation } from "react-i18next";
 import { useChatbotUIAction } from "@/hooks/useChatbotUIAction";
-import { encodeImageForUpload } from "@/lib/imageEncoder";
-import { cdnImage, imagePresets } from "@/lib/imageUtils";
 
 interface CleanupExercise {
   id: string;
@@ -360,12 +358,8 @@ const CleanupExercisePanel = ({ isAdmin = false }: Props) => {
 
   const uploadPhoto = async (file: File, category: string) => {
     setUploading(category);
-    const encoded = await encodeImageForUpload(file);
-    const ext = encoded.name.split(".").pop() || "jpg";
-    const path = `${user!.id}/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
-    const { error } = await supabase.storage
-      .from("cleanup-photos")
-      .upload(path, encoded, { contentType: encoded.type });
+    const path = `${user!.id}/${Date.now()}-${file.name}`;
+    const { error } = await supabase.storage.from("cleanup-photos").upload(path, file);
     if (error) {
       toast.error("Upload failed: " + error.message);
       setUploading(null);
@@ -944,13 +938,13 @@ const CleanupExercisePanel = ({ isAdmin = false }: Props) => {
                     <Separator />
                     <h4 className="font-semibold text-foreground">{t("cleanupPanel.photos", "Photos")}</h4>
                     {viewCleanup.before_photos.length > 0 && (
-                      <div><p className="text-xs text-muted-foreground mb-1">Before</p><div className="flex flex-wrap gap-2">{viewCleanup.before_photos.map((url, i) => <img key={i} src={cdnImage(url, imagePresets.thumb)} alt="Before" loading="lazy" decoding="async" className="w-24 h-24 object-cover rounded-md border border-border" />)}</div></div>
+                      <div><p className="text-xs text-muted-foreground mb-1">Before</p><div className="flex flex-wrap gap-2">{viewCleanup.before_photos.map((url, i) => <img key={i} src={url} alt="Before" className="w-24 h-24 object-cover rounded-md border border-border" />)}</div></div>
                     )}
                     {viewCleanup.during_photos.length > 0 && (
-                      <div><p className="text-xs text-muted-foreground mb-1">During</p><div className="flex flex-wrap gap-2">{viewCleanup.during_photos.map((url, i) => <img key={i} src={cdnImage(url, imagePresets.thumb)} alt="During" loading="lazy" decoding="async" className="w-24 h-24 object-cover rounded-md border border-border" />)}</div></div>
+                      <div><p className="text-xs text-muted-foreground mb-1">During</p><div className="flex flex-wrap gap-2">{viewCleanup.during_photos.map((url, i) => <img key={i} src={url} alt="During" className="w-24 h-24 object-cover rounded-md border border-border" />)}</div></div>
                     )}
                     {viewCleanup.after_photos.length > 0 && (
-                      <div><p className="text-xs text-muted-foreground mb-1">After</p><div className="flex flex-wrap gap-2">{viewCleanup.after_photos.map((url, i) => <img key={i} src={cdnImage(url, imagePresets.thumb)} alt="After" loading="lazy" decoding="async" className="w-24 h-24 object-cover rounded-md border border-border" />)}</div></div>
+                      <div><p className="text-xs text-muted-foreground mb-1">After</p><div className="flex flex-wrap gap-2">{viewCleanup.after_photos.map((url, i) => <img key={i} src={url} alt="After" className="w-24 h-24 object-cover rounded-md border border-border" />)}</div></div>
                     )}
                   </>
                 )}

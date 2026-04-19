@@ -1,14 +1,11 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { MapPin, Phone, Mail, Eye, Package, Clock, Pencil } from "lucide-react";
+import { MapPin, Phone, Mail, Eye, Package, Clock } from "lucide-react";
 import MaterialIcon from "@/components/dashboard/shared/MaterialIcon";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useState } from "react";
 import { formatDistanceToNow } from "date-fns";
-import { cdnImage, imagePresets } from "@/lib/imageUtils";
-import { useAuth } from "@/hooks/useAuth";
-import EditListingDialog from "./EditListingDialog";
 
 interface Listing {
   id: string;
@@ -62,21 +59,18 @@ const roleBadgeColors: Record<string, string> = {
   recycler: "bg-purple-500/20 text-purple-400 border-purple-500/30",
 };
 
-export default function MarketplaceListingCard({ listing, isPublic = false }: { listing: Listing & { seller_user_id?: string }; isPublic?: boolean }) {
+export default function MarketplaceListingCard({ listing, isPublic = false }: { listing: Listing; isPublic?: boolean }) {
   const [open, setOpen] = useState(false);
-  const [editOpen, setEditOpen] = useState(false);
-  const { user } = useAuth();
   const totalPrice = listing.price_per_unit * listing.quantity;
   const sellerName = listing.seller_profile?.organizations?.name || listing.seller_profile?.full_name || "Seller";
-  const isOwner = !!user && (listing as any).seller_user_id === user.id;
 
   return (
     <>
       <Card className="group hover:border-primary/30 transition-all duration-300 cursor-pointer overflow-hidden" onClick={() => setOpen(true)}>
         {/* Image */}
-        <div className="relative aspect-[16/10] bg-muted/30 overflow-hidden">
+        <div className="relative h-40 bg-muted/30 overflow-hidden">
           {listing.images?.length > 0 ? (
-            <img src={cdnImage(listing.images[0], imagePresets.card)} alt={listing.title} loading="lazy" decoding="async" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+            <img src={listing.images[0]} alt={listing.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
           ) : (
             <div className="w-full h-full flex items-center justify-center">
               <Package className="w-12 h-12 text-muted-foreground/30" />
@@ -133,8 +127,8 @@ export default function MarketplaceListingCard({ listing, isPublic = false }: { 
 
           {/* Images carousel */}
           {listing.images?.length > 0 && (
-            <div className="relative aspect-[16/10] rounded-lg overflow-hidden bg-muted/30">
-              <img src={cdnImage(listing.images[0], imagePresets.detail)} alt={listing.title} loading="lazy" decoding="async" className="w-full h-full object-cover" />
+            <div className="relative h-56 rounded-lg overflow-hidden bg-muted/30">
+              <img src={listing.images[0]} alt={listing.title} className="w-full h-full object-cover" />
               {listing.images.length > 1 && (
                 <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1">
                   {listing.images.map((_, i) => (
@@ -183,7 +177,7 @@ export default function MarketplaceListingCard({ listing, isPublic = false }: { 
             <h4 className="text-sm font-semibold">Seller</h4>
             <div className="flex items-center gap-3">
               {listing.seller_profile?.avatar_url ? (
-                <img src={cdnImage(listing.seller_profile.avatar_url, imagePresets.avatar)} alt="" loading="lazy" decoding="async" className="w-10 h-10 rounded-full object-cover" />
+                <img src={listing.seller_profile.avatar_url} alt="" className="w-10 h-10 rounded-full object-cover" />
               ) : (
                 <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-sm font-bold text-primary">
                   {sellerName[0]?.toUpperCase()}
@@ -222,25 +216,11 @@ export default function MarketplaceListingCard({ listing, isPublic = false }: { 
             )}
           </div>
 
-          {isOwner && (
-            <Button
-              variant="outline"
-              className="w-full"
-              onClick={() => { setOpen(false); setEditOpen(true); }}
-            >
-              <Pencil className="w-4 h-4 mr-2" /> Edit Listing
-            </Button>
-          )}
-
           <p className="text-[10px] text-muted-foreground flex items-center gap-1">
             <Eye className="w-3 h-3" /> {listing.views_count} views · Listed {formatDistanceToNow(new Date(listing.created_at), { addSuffix: true })}
           </p>
         </DialogContent>
       </Dialog>
-
-      {isOwner && (
-        <EditListingDialog listing={listing} open={editOpen} onOpenChange={setEditOpen} />
-      )}
     </>
   );
 }
