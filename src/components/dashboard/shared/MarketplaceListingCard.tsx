@@ -74,9 +74,9 @@ export default function MarketplaceListingCard({ listing, isPublic = false }: { 
     <>
       <Card className="group hover:border-primary/30 transition-all duration-300 cursor-pointer overflow-hidden" onClick={() => setOpen(true)}>
         {/* Image */}
-        <div className="relative h-40 bg-muted/30 overflow-hidden">
+        <div className="relative h-48 bg-muted/30 overflow-hidden flex items-center justify-center">
           {listing.images?.length > 0 ? (
-            <img src={cdnImage(listing.images[0], imagePresets.card)} alt={listing.title} loading="lazy" decoding="async" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+            <img src={cdnImage(listing.images[0], imagePresets.card)} alt={listing.title} loading="lazy" decoding="async" className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-500" />
           ) : (
             <div className="w-full h-full flex items-center justify-center">
               <Package className="w-12 h-12 text-muted-foreground/30" />
@@ -133,8 +133,8 @@ export default function MarketplaceListingCard({ listing, isPublic = false }: { 
 
           {/* Images carousel */}
           {listing.images?.length > 0 && (
-            <div className="relative h-56 rounded-lg overflow-hidden bg-muted/30">
-              <img src={cdnImage(listing.images[0], imagePresets.detail)} alt={listing.title} loading="lazy" decoding="async" className="w-full h-full object-cover" />
+            <div className="relative h-64 rounded-lg overflow-hidden bg-muted/30 flex items-center justify-center">
+              <img src={cdnImage(listing.images[0], imagePresets.detail)} alt={listing.title} loading="lazy" decoding="async" className="w-full h-full object-contain" />
               {listing.images.length > 1 && (
                 <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1">
                   {listing.images.map((_, i) => (
