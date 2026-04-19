@@ -1,12 +1,14 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { MapPin, Phone, Mail, Eye, Package, Clock } from "lucide-react";
+import { MapPin, Phone, Mail, Eye, Package, Clock, Pencil } from "lucide-react";
 import MaterialIcon from "@/components/dashboard/shared/MaterialIcon";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useState } from "react";
 import { formatDistanceToNow } from "date-fns";
 import { cdnImage, imagePresets } from "@/lib/imageUtils";
+import { useAuth } from "@/hooks/useAuth";
+import EditListingDialog from "./EditListingDialog";
 
 interface Listing {
   id: string;
@@ -60,10 +62,13 @@ const roleBadgeColors: Record<string, string> = {
   recycler: "bg-purple-500/20 text-purple-400 border-purple-500/30",
 };
 
-export default function MarketplaceListingCard({ listing, isPublic = false }: { listing: Listing; isPublic?: boolean }) {
+export default function MarketplaceListingCard({ listing, isPublic = false }: { listing: Listing & { seller_user_id?: string }; isPublic?: boolean }) {
   const [open, setOpen] = useState(false);
+  const [editOpen, setEditOpen] = useState(false);
+  const { user } = useAuth();
   const totalPrice = listing.price_per_unit * listing.quantity;
   const sellerName = listing.seller_profile?.organizations?.name || listing.seller_profile?.full_name || "Seller";
+  const isOwner = !!user && (listing as any).seller_user_id === user.id;
 
   return (
     <>
@@ -217,11 +222,25 @@ export default function MarketplaceListingCard({ listing, isPublic = false }: { 
             )}
           </div>
 
+          {isOwner && (
+            <Button
+              variant="outline"
+              className="w-full"
+              onClick={() => { setOpen(false); setEditOpen(true); }}
+            >
+              <Pencil className="w-4 h-4 mr-2" /> Edit Listing
+            </Button>
+          )}
+
           <p className="text-[10px] text-muted-foreground flex items-center gap-1">
             <Eye className="w-3 h-3" /> {listing.views_count} views · Listed {formatDistanceToNow(new Date(listing.created_at), { addSuffix: true })}
           </p>
         </DialogContent>
       </Dialog>
+
+      {isOwner && (
+        <EditListingDialog listing={listing} open={editOpen} onOpenChange={setEditOpen} />
+      )}
     </>
   );
 }
