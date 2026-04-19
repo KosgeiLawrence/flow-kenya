@@ -1513,6 +1513,144 @@ export type Database = {
         }
         Relationships: []
       }
+      product_catalogue_items: {
+        Row: {
+          catalogue_id: string
+          category: string
+          created_at: string
+          currency: string
+          description: string | null
+          display_order: number
+          id: string
+          images: string[] | null
+          is_visible: boolean
+          marketplace_listing_id: string | null
+          material_type: string | null
+          price_per_unit: number
+          quantity: number | null
+          title: string
+          unit: string
+          updated_at: string
+        }
+        Insert: {
+          catalogue_id: string
+          category?: string
+          created_at?: string
+          currency?: string
+          description?: string | null
+          display_order?: number
+          id?: string
+          images?: string[] | null
+          is_visible?: boolean
+          marketplace_listing_id?: string | null
+          material_type?: string | null
+          price_per_unit?: number
+          quantity?: number | null
+          title: string
+          unit?: string
+          updated_at?: string
+        }
+        Update: {
+          catalogue_id?: string
+          category?: string
+          created_at?: string
+          currency?: string
+          description?: string | null
+          display_order?: number
+          id?: string
+          images?: string[] | null
+          is_visible?: boolean
+          marketplace_listing_id?: string | null
+          material_type?: string | null
+          price_per_unit?: number
+          quantity?: number | null
+          title?: string
+          unit?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "product_catalogue_items_catalogue_id_fkey"
+            columns: ["catalogue_id"]
+            isOneToOne: false
+            referencedRelation: "product_catalogues"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "product_catalogue_items_marketplace_listing_id_fkey"
+            columns: ["marketplace_listing_id"]
+            isOneToOne: false
+            referencedRelation: "marketplace_listings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      product_catalogues: {
+        Row: {
+          about: string | null
+          banner_url: string | null
+          business_name: string
+          contact_email: string | null
+          contact_phone: string | null
+          contact_whatsapp: string | null
+          county: string | null
+          created_at: string
+          id: string
+          is_published: boolean
+          physical_address: string | null
+          slug: string
+          sub_county: string | null
+          tagline: string | null
+          theme_color: string | null
+          updated_at: string
+          user_id: string
+          view_count: number
+          website: string | null
+        }
+        Insert: {
+          about?: string | null
+          banner_url?: string | null
+          business_name: string
+          contact_email?: string | null
+          contact_phone?: string | null
+          contact_whatsapp?: string | null
+          county?: string | null
+          created_at?: string
+          id?: string
+          is_published?: boolean
+          physical_address?: string | null
+          slug: string
+          sub_county?: string | null
+          tagline?: string | null
+          theme_color?: string | null
+          updated_at?: string
+          user_id: string
+          view_count?: number
+          website?: string | null
+        }
+        Update: {
+          about?: string | null
+          banner_url?: string | null
+          business_name?: string
+          contact_email?: string | null
+          contact_phone?: string | null
+          contact_whatsapp?: string | null
+          county?: string | null
+          created_at?: string
+          id?: string
+          is_published?: boolean
+          physical_address?: string | null
+          slug?: string
+          sub_county?: string | null
+          tagline?: string | null
+          theme_color?: string | null
+          updated_at?: string
+          user_id?: string
+          view_count?: number
+          website?: string | null
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           approval_status: Database["public"]["Enums"]["approval_status"]
@@ -2314,7 +2452,9 @@ export type Database = {
         Args: { payload: Json; queue_name: string }
         Returns: number
       }
+      generate_catalogue_slug: { Args: { _name: string }; Returns: string }
       get_platform_stats: { Args: never; Returns: Json }
+      get_public_catalogue: { Args: { _slug: string }; Returns: Json }
       get_team_user_ids: { Args: { _user_id: string }; Returns: string[] }
       get_user_role: {
         Args: { _user_id: string }
@@ -2327,6 +2467,7 @@ export type Database = {
         }
         Returns: boolean
       }
+      increment_catalogue_view: { Args: { _slug: string }; Returns: undefined }
       is_cleanup_owner: {
         Args: { _cleanup_id: string; _user_id: string }
         Returns: boolean
