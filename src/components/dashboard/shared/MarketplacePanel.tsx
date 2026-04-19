@@ -309,7 +309,7 @@ export default function MarketplacePanelShared({ role }: Props) {
           </TabsContent>
 
           <TabsContent value="my-catalogue">
-            <CatalogueManagerPanel />
+            <CatalogueManagerPanel role={role as "waste_picker" | "aggregator" | "recycler"} />
           </TabsContent>
         </Tabs>
       ) : (
