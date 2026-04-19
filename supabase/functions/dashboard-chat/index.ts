@@ -290,16 +290,62 @@ const ACTION_TOOLS = [
     type: "function",
     function: {
       name: "query_data",
-      description: "Query specific data from the platform database to answer detailed data questions. Use discover_platform_features first if unsure which table to query.",
+      description: "Query/READ records from any platform table. Use this for analysis, lookups, finding IDs before update/delete, or answering data questions. Returns rows scoped to the current user automatically (RLS enforced).",
       parameters: {
         type: "object",
         properties: {
-          table: { type: "string", description: "Table name to query (use discover_platform_features to find available tables)" },
-          filters: { type: "string", description: "Description of what to filter (e.g. 'last 30 days', 'status is pending')" },
-          aggregation: { type: "string", description: "What aggregation to perform (e.g. 'sum of amount', 'count', 'group by material_type')" },
-          limit: { type: "number", description: "Max rows to return (default 50)" },
+          table: { type: "string", description: "Table name (use discover_platform_features if unsure)" },
+          select: { type: "string", description: "Comma-separated columns or '*' (default '*')" },
+          filters: {
+            type: "array",
+            description: "Array of filter conditions. Each: { column, op, value }. Supported ops: eq, neq, gt, gte, lt, lte, like, ilike, in, is",
+            items: {
+              type: "object",
+              properties: {
+                column: { type: "string" },
+                op: { type: "string", enum: ["eq", "neq", "gt", "gte", "lt", "lte", "like", "ilike", "in", "is"] },
+                value: {},
+              },
+              required: ["column", "op", "value"],
+            },
+          },
+          order_by: { type: "string", description: "Column to order by" },
+          ascending: { type: "boolean", description: "Order direction (default false = newest first)" },
+          limit: { type: "number", description: "Max rows (default 50, max 200)" },
         },
         required: ["table"],
+      },
+    },
+  },
+  {
+    type: "function",
+    function: {
+      name: "update_record",
+      description: "UPDATE an existing record in a user-owned table by id. Use after query_data to find the record id. Only updates rows the user owns (RLS enforced).",
+      parameters: {
+        type: "object",
+        properties: {
+          table: { type: "string", description: "Table name" },
+          record_id: { type: "string", description: "UUID of the row to update" },
+          updates: { type: "object", description: "Object of column → new value pairs", additionalProperties: true },
+        },
+        required: ["table", "record_id", "updates"],
+      },
+    },
+  },
+  {
+    type: "function",
+    function: {
+      name: "delete_record",
+      description: "DELETE a record from a user-owned table by id. Use ONLY after explicit user confirmation for destructive actions.",
+      parameters: {
+        type: "object",
+        properties: {
+          table: { type: "string", description: "Table name" },
+          record_id: { type: "string", description: "UUID of the row to delete" },
+          confirmed: { type: "boolean", description: "Must be true — confirms user explicitly approved deletion" },
+        },
+        required: ["table", "record_id", "confirmed"],
       },
     },
   },
@@ -343,22 +389,46 @@ const ACTION_TOOLS = [
     type: "function",
     function: {
       name: "discover_platform_features",
-      description: "Discover what features, tables, and capabilities are available on the platform. Use this when you're unsure about what data exists, what tables are available, or what a panel can do. This helps you stay up-to-date with new features.",
+      description: "Discover what features, tables, and capabilities are available on the platform. Use this when you're unsure about what data exists, what tables are available, or what a panel can do.",
       parameters: {
         type: "object",
         properties: {
           discovery_type: {
             type: "string",
             enum: ["tables", "table_columns", "panel_actions", "all"],
-            description: "What to discover: 'tables' for available DB tables, 'table_columns' for columns in a specific table, 'panel_actions' for UI actions available, 'all' for everything"
+            description: "What to discover"
           },
-          table_name: { type: "string", description: "When discovery_type is 'table_columns', specify which table to inspect" },
+          table_name: { type: "string", description: "When discovery_type is 'table_columns', specify which table" },
         },
         required: ["discovery_type"],
       },
     },
   },
 ];
+
+// Tables that allow AI-driven update/delete (user-owned, safe).
+const EDITABLE_TABLES = new Set([
+  "financial_transactions", "financial_budgets", "balance_sheet_items",
+  "customers", "suppliers", "marketplace_listings", "product_catalogues", "product_catalogue_items",
+  "recycler_products", "recycler_orders", "aggregator_purchase_orders",
+  "pickup_requests", "pickup_schedules", "client_collections",
+  "compliance_documents", "cleanup_exercises", "community_training_logs",
+  "ngo_programs", "ngo_sponsorships", "recovery_commitments",
+  "plastic_declarations", "material_transformations",
+]);
+
+// Forbidden columns (never let AI overwrite ownership/identity)
+const PROTECTED_COLUMNS = new Set([
+  "user_id", "waste_picker_id", "ngo_user_id", "seller_user_id",
+  "id", "created_at", "created_by",
+]);
+
+function ownerColumnFor(table: string): string {
+  if (table === "client_collections") return "waste_picker_id";
+  if (["ngo_programs", "ngo_sponsorships", "ngo_program_documents"].includes(table)) return "ngo_user_id";
+  if (table === "marketplace_listings") return "seller_user_id";
+  return "user_id";
+}
 
 // ============================================================
 // EXECUTE ACTIONS on behalf of the user
