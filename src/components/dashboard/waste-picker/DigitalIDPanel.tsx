@@ -96,65 +96,88 @@ const DigitalIDPanel = () => {
   return (
     <div className="space-y-4 max-w-md mx-auto">
       {/* Downloadable card */}
-      <div ref={cardRef} className="rounded-2xl overflow-hidden shadow-elevated border border-border bg-card">
+      <div
+        ref={cardRef}
+        className="rounded-2xl overflow-hidden shadow-elevated border"
+        style={{
+          background: "linear-gradient(160deg, #0f2a1d 0%, #1a4530 55%, #2b5e3f 100%)",
+          borderColor: "rgba(255,255,255,0.12)",
+          color: "#ffffff",
+        }}
+      >
         {/* Header strip */}
-        <div className="bg-gradient-to-r from-primary to-primary/80 px-5 py-4 flex items-center gap-3">
-          <img src="/images/duara-flow-logo.svg" alt="Duara Flow" className="h-7 brightness-0 invert" />
+        <div
+          className="px-5 py-4 flex items-center gap-3"
+          style={{ background: "rgba(0,0,0,0.25)", borderBottom: "1px solid rgba(255,255,255,0.1)" }}
+        >
+          <img
+            src="/images/duara-flow-logo.svg"
+            alt="Duara Flow"
+            className="h-7"
+            style={{ filter: "brightness(0) invert(1)" }}
+          />
           <div className="flex-1" />
-          <Badge
-            variant={isVerified ? "default" : "secondary"}
-            className="gap-1 text-xs font-semibold"
+          <span
+            className="inline-flex items-center gap-1 text-[11px] font-semibold px-2 py-1 rounded-full"
+            style={{
+              background: isVerified ? "#ffffff" : "rgba(255,255,255,0.15)",
+              color: isVerified ? "#1a4530" : "#ffffff",
+              border: "1px solid rgba(255,255,255,0.25)",
+            }}
           >
             {isVerified ? <CheckCircle2 className="w-3 h-3" /> : <Clock className="w-3 h-3" />}
             {isVerified ? t("common.verified") : t("digitalIdPanel.unverified", "Unverified")}
-          </Badge>
+          </span>
         </div>
 
-        <div className="p-5 space-y-4">
+        <div className="p-5 space-y-4" style={{ color: "#ffffff" }}>
           {/* Identity */}
           <div className="flex items-start gap-4">
             {profile?.avatar_url || orgData?.logo_url ? (
               <img
                 src={profile?.avatar_url || orgData?.logo_url || ""}
                 alt="Photo"
-                className="w-16 h-16 rounded-xl object-cover border-2 border-primary/20"
+                className="w-16 h-16 rounded-xl object-cover"
+                style={{ border: "2px solid rgba(255,255,255,0.3)" }}
               />
             ) : (
-              <div className="w-16 h-16 rounded-xl bg-muted flex items-center justify-center border-2 border-primary/20">
-                <User className="w-7 h-7 text-muted-foreground" />
+              <div
+                className="w-16 h-16 rounded-xl flex items-center justify-center"
+                style={{ background: "rgba(255,255,255,0.1)", border: "2px solid rgba(255,255,255,0.3)" }}
+              >
+                <User className="w-7 h-7" style={{ color: "rgba(255,255,255,0.7)" }} />
               </div>
             )}
             <div className="flex-1 min-w-0">
-              <h2 className="text-lg font-display font-bold text-foreground leading-tight truncate">
+              <h2 className="text-base font-display font-bold leading-tight break-words" style={{ color: "#ffffff" }}>
                 {isOrg ? orgData?.name || profile?.full_name : profile?.full_name}
               </h2>
               {isOrg && orgData?.name && (
-                <p className="text-xs text-muted-foreground truncate">{profile?.full_name}</p>
+                <p className="text-xs truncate" style={{ color: "rgba(255,255,255,0.7)" }}>{profile?.full_name}</p>
               )}
-              <p className="text-xs font-mono text-primary mt-0.5">{duaraId}</p>
+              <p className="text-xs font-mono mt-1" style={{ color: "#9be7b8" }}>{duaraId}</p>
             </div>
           </div>
 
-          {/* Divider */}
-          <div className="border-t border-border" />
+          <div style={{ borderTop: "1px solid rgba(255,255,255,0.12)" }} />
 
           {/* Contact */}
           <div className="grid grid-cols-1 gap-2 text-sm">
             {profile?.phone_number && (
-              <div className="flex items-center gap-2 text-muted-foreground">
-                <Phone className="w-3.5 h-3.5 text-primary shrink-0" />
+              <div className="flex items-center gap-2" style={{ color: "rgba(255,255,255,0.85)" }}>
+                <Phone className="w-3.5 h-3.5 shrink-0" style={{ color: "#9be7b8" }} />
                 <span className="truncate">{profile.phone_number}</span>
               </div>
             )}
             {profile?.email && (
-              <div className="flex items-center gap-2 text-muted-foreground">
-                <Mail className="w-3.5 h-3.5 text-primary shrink-0" />
+              <div className="flex items-center gap-2" style={{ color: "rgba(255,255,255,0.85)" }}>
+                <Mail className="w-3.5 h-3.5 shrink-0" style={{ color: "#9be7b8" }} />
                 <span className="truncate">{profile.email}</span>
               </div>
             )}
             {(profile?.county || profile?.area_of_operation) && (
-              <div className="flex items-center gap-2 text-muted-foreground">
-                <MapPin className="w-3.5 h-3.5 text-primary shrink-0" />
+              <div className="flex items-center gap-2" style={{ color: "rgba(255,255,255,0.85)" }}>
+                <MapPin className="w-3.5 h-3.5 shrink-0" style={{ color: "#9be7b8" }} />
                 <span className="truncate">
                   {[profile.area_of_operation, profile.county].filter(Boolean).join(", ")}
                 </span>
@@ -162,85 +185,88 @@ const DigitalIDPanel = () => {
             )}
           </div>
 
-          {/* Divider */}
-          <div className="border-t border-border" />
+          <div style={{ borderTop: "1px solid rgba(255,255,255,0.12)" }} />
 
           {/* Business Info */}
           <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-xs">
             <div>
-              <p className="text-muted-foreground">{t("common.type")}</p>
-              <p className="font-medium text-foreground">{isOrg ? t("profilePanel.organization") : t("digitalIdPanel.individual", "Individual")}</p>
+              <p style={{ color: "rgba(255,255,255,0.6)" }}>{t("common.type")}</p>
+              <p className="font-medium" style={{ color: "#ffffff" }}>{isOrg ? t("profilePanel.organization") : t("digitalIdPanel.individual", "Individual")}</p>
             </div>
             <div>
-              <p className="text-muted-foreground">{t("digitalIdPanel.valueChainRole", "Value Chain Role")}</p>
-              <p className="font-medium text-foreground">{roleLabelMap[role || ""] || "—"}</p>
+              <p style={{ color: "rgba(255,255,255,0.6)" }}>{t("digitalIdPanel.valueChainRole", "Value Chain Role")}</p>
+              <p className="font-medium" style={{ color: "#ffffff" }}>{roleLabelMap[role || ""] || "—"}</p>
             </div>
             {isOrg && orgData?.name && (
               <div className="col-span-2">
-                <p className="text-muted-foreground">{t("digitalIdPanel.businessName", "Business Name")}</p>
-                <p className="font-medium text-foreground">{orgData.name}</p>
+                <p style={{ color: "rgba(255,255,255,0.6)" }}>{t("digitalIdPanel.businessName", "Business Name")}</p>
+                <p className="font-medium break-words" style={{ color: "#ffffff" }}>{orgData.name}</p>
               </div>
             )}
           </div>
 
-          {/* Divider */}
-          <div className="border-t border-border" />
+          <div style={{ borderTop: "1px solid rgba(255,255,255,0.12)" }} />
 
           {/* Verification & Registration */}
           <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-xs">
             <div>
-              <p className="text-muted-foreground flex items-center gap-1">
+              <p className="flex items-center gap-1" style={{ color: "rgba(255,255,255,0.6)" }}>
                 <Shield className="w-3 h-3" /> {t("digitalIdPanel.verificationStatus")}
               </p>
-              <p className={`font-medium ${isVerified ? "text-primary" : "text-muted-foreground"}`}>
+              <p className="font-medium" style={{ color: isVerified ? "#9be7b8" : "rgba(255,255,255,0.7)" }}>
                 {isVerified ? t("common.verified") : t("digitalIdPanel.unverified", "Unverified")}
               </p>
             </div>
             <div>
-              <p className="text-muted-foreground">{t("digitalIdPanel.idTypeUsed", "ID Type Used")}</p>
-              <p className="font-medium text-foreground">{idVerificationType}</p>
+              <p style={{ color: "rgba(255,255,255,0.6)" }}>{t("digitalIdPanel.idTypeUsed", "ID Type Used")}</p>
+              <p className="font-medium" style={{ color: "#ffffff" }}>{idVerificationType}</p>
             </div>
             <div>
-              <p className="text-muted-foreground flex items-center gap-1">
+              <p className="flex items-center gap-1" style={{ color: "rgba(255,255,255,0.6)" }}>
                 <CalendarDays className="w-3 h-3" /> {t("digitalIdPanel.memberSince")}
               </p>
-              <p className="font-medium text-foreground">{joinDate}</p>
+              <p className="font-medium" style={{ color: "#ffffff" }}>{joinDate}</p>
             </div>
             <div>
-              <p className="text-muted-foreground flex items-center gap-1">
+              <p className="flex items-center gap-1" style={{ color: "rgba(255,255,255,0.6)" }}>
                 <Activity className="w-3 h-3" /> {t("common.status")}
               </p>
-              <p className="font-medium text-primary">Active</p>
+              <p className="font-medium" style={{ color: "#9be7b8" }}>Active</p>
             </div>
           </div>
 
-          {/* Divider */}
-          <div className="border-t border-border" />
+          <div style={{ borderTop: "1px solid rgba(255,255,255,0.12)" }} />
 
           {/* QR Code */}
           <div className="flex items-center gap-4">
-            <div className="p-2 bg-card rounded-lg border border-border">
-              <QRCodeSVG value={qrData} size={80} level="H" bgColor="transparent" fgColor="hsl(150, 30%, 10%)" />
+            <div
+              className="p-2 rounded-lg shrink-0"
+              style={{ background: "rgba(0,0,0,0.35)", border: "1px solid rgba(255,255,255,0.2)" }}
+            >
+              <QRCodeSVG value={qrData} size={84} level="H" bgColor="transparent" fgColor="#ffffff" />
             </div>
-            <div className="flex-1 text-xs text-muted-foreground space-y-1">
-              <p className="font-medium text-foreground">{t("digitalIdPanel.scanToVerify")}</p>
+            <div className="flex-1 text-xs space-y-1" style={{ color: "rgba(255,255,255,0.75)" }}>
+              <p className="font-medium" style={{ color: "#ffffff" }}>{t("digitalIdPanel.scanToVerify")}</p>
               <p>{t("digitalIdPanel.scanDescription", "Scan this QR code to view this member's profile and impact data on Duara Flow.")}</p>
             </div>
           </div>
 
           {/* Impact summary footer */}
-          <div className="bg-muted/50 rounded-lg p-3 grid grid-cols-3 gap-2 text-center">
+          <div
+            className="rounded-lg p-3 grid grid-cols-3 gap-2 text-center"
+            style={{ background: "rgba(0,0,0,0.3)", border: "1px solid rgba(255,255,255,0.1)" }}
+          >
             <div>
-              <p className="text-sm font-display font-bold text-foreground">{impact.totalKg.toFixed(0)}</p>
-              <p className="text-[10px] text-muted-foreground">{t("digitalIdPanel.kgCollected", "kg collected")}</p>
+              <p className="text-sm font-display font-bold" style={{ color: "#ffffff" }}>{impact.totalKg.toFixed(0)}</p>
+              <p className="text-[10px]" style={{ color: "rgba(255,255,255,0.65)" }}>{t("digitalIdPanel.kgCollected", "kg collected")}</p>
             </div>
             <div>
-              <p className="text-sm font-display font-bold text-primary">{impact.co2Avoided.toFixed(0)}</p>
-              <p className="text-[10px] text-muted-foreground">{t("digitalIdPanel.co2Saved", "kg CO₂ saved")}</p>
+              <p className="text-sm font-display font-bold" style={{ color: "#9be7b8" }}>{impact.co2Avoided.toFixed(0)}</p>
+              <p className="text-[10px]" style={{ color: "rgba(255,255,255,0.65)" }}>{t("digitalIdPanel.co2Saved", "kg CO₂ saved")}</p>
             </div>
             <div>
-              <p className="text-sm font-display font-bold text-foreground">{collections?.length || 0}</p>
-              <p className="text-[10px] text-muted-foreground">{t("digitalIdPanel.entries", "entries")}</p>
+              <p className="text-sm font-display font-bold" style={{ color: "#ffffff" }}>{collections?.length || 0}</p>
+              <p className="text-[10px]" style={{ color: "rgba(255,255,255,0.65)" }}>{t("digitalIdPanel.entries", "entries")}</p>
             </div>
           </div>
         </div>
