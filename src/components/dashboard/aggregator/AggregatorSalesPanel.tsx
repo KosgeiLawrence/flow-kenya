@@ -19,6 +19,7 @@ import { format } from "date-fns";
 import { addCleanHeader, addDocMeta, drawTableHeader, drawTableRow, drawVatTotalBlock, finalizeCleanPdf, loadImageAsBase64, buildPdfOrgInfo } from "@/lib/pdfBranding";
 import VatOptions, { DEFAULT_VAT, type VatConfig } from "@/components/dashboard/shared/VatOptions";
 import { useTranslation } from "react-i18next";
+import { useTrash } from "@/hooks/useTrash";
 
 type SaleStep = "details" | "quotation_sent" | "invoice_sent" | "receipt_done";
 
@@ -56,6 +57,7 @@ const AggregatorSalesPanel = () => {
   const { user, profile } = useAuth();
   const { orgInfo } = useOrgInfo();
   const queryClient = useQueryClient();
+  const { softDelete: softDeleteSale } = useTrash();
   const [saleDialog, setSaleDialog] = useState(false);
   const [sale, setSale] = useState<SaleState>(initialSale);
   const [vat, setVat] = useState<VatConfig>(DEFAULT_VAT);
@@ -517,6 +519,21 @@ const AggregatorSalesPanel = () => {
                       <p className="text-sm font-bold text-primary">KES {Number(tx.amount).toLocaleString()}</p>
                       {tx.reference_number && <p className="text-[10px] text-muted-foreground">Ref: {tx.reference_number}</p>}
                     </div>
+                    <Button
+                      size="icon"
+                      variant="ghost"
+                      className="h-7 w-7 shrink-0"
+                      title="Delete sale"
+                      onClick={async () => {
+                        const ok = await softDeleteSale("financial_transactions", tx.id, tx, `Sale: ${customerName} • KES ${Number(tx.amount).toLocaleString()}`);
+                        if (ok) {
+                          queryClient.invalidateQueries({ queryKey: ["agg_sales_history"] });
+                          queryClient.invalidateQueries({ queryKey: ["financial_transactions"] });
+                        }
+                      }}
+                    >
+                      <Trash2 className="w-3.5 h-3.5 text-destructive" />
+                    </Button>
                   </div>
                 );
               })}
