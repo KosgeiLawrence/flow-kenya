@@ -56,6 +56,7 @@ const WastePickerSalesPanel = () => {
   const { user, profile } = useAuth();
   const { orgInfo } = useOrgInfo();
   const queryClient = useQueryClient();
+  const { softDelete: softDeleteSale } = useTrash();
   const [saleDialog, setSaleDialog] = useState(false);
   const [sale, setSale] = useState<SaleState>(initialSale);
   const [vat, setVat] = useState<VatConfig>(DEFAULT_VAT);
