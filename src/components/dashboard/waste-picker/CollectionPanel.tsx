@@ -16,6 +16,7 @@ import { calculateImpact } from "@/lib/impactUtils";
 import ClientCollectionFlow from "./ClientCollectionFlow";
 import jsPDF from "jspdf";
 import { useOrgInfo } from "@/hooks/useOrgInfo";
+import { useTrash } from "@/hooks/useTrash";
 import {
   PDF_COLORS, addCleanHeader, addDocMeta, drawTableHeader,
   drawTableRow, drawVatTotalBlock, finalizeCleanPdf, loadImageAsBase64, buildPdfOrgInfo,
@@ -27,6 +28,7 @@ const CollectionPanel = () => {
   const { user, profile } = useAuth();
   const { orgInfo } = useOrgInfo();
   const queryClient = useQueryClient();
+  const { softDelete } = useTrash();
   const [materialTypeId, setMaterialTypeId] = useState("");
   const [quantity, setQuantity] = useState("");
   const [locationName, setLocationName] = useState("");
@@ -333,6 +335,22 @@ const CollectionPanel = () => {
                     </div>
                     <Button size="sm" variant="outline" className="text-xs h-7" onClick={() => generateCollectionReceipt(c)}>
                       <FileText className="w-3 h-3 mr-1" /> Receipt
+                    </Button>
+                    <Button
+                      size="icon"
+                      variant="ghost"
+                      className="h-7 w-7"
+                      title={t("common.delete", "Delete")}
+                      onClick={async () => {
+                        const table = c.source === "client" ? "client_collections" : "collections";
+                        const ok = await softDelete(table, c.id, c as any, `${(c as any).material_types?.name || "Material"} • ${Number(c.quantity).toFixed(1)} kg`);
+                        if (ok) {
+                          queryClient.invalidateQueries({ queryKey: ["collections", user?.id] });
+                          queryClient.invalidateQueries({ queryKey: ["client_collections_for_log", user?.id] });
+                        }
+                      }}
+                    >
+                      <Trash2 className="w-3.5 h-3.5 text-destructive" />
                     </Button>
                   </div>
                 </div>
