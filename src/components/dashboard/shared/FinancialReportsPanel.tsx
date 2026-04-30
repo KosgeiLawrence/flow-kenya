@@ -49,8 +49,10 @@ const FinancialReportsPanel = ({ role }: Props) => {
   const [bsDialogOpen, setBsDialogOpen] = useState(false);
   const [newBsItem, setNewBsItem] = useState({ sub_section: "current_asset", account_name: "", amount: "", notes: "" });
 
-  const { data: transactions, isLoading } = useQuery({
-    queryKey: ["financial_transactions_reports", user?.id],
+  // Use the SAME query key as EarningsExpensesPanel so adding/editing income or
+  // expenses anywhere in the dashboard immediately reflects in the reports.
+  const { data: rawTransactions, isLoading } = useQuery({
+    queryKey: ["financial_transactions", user?.id],
     queryFn: async () => {
       const { data, error } = await supabase
         .from("financial_transactions")
@@ -62,6 +64,43 @@ const FinancialReportsPanel = ({ role }: Props) => {
     },
     enabled: !!user,
   });
+
+  // For admin: also pull completed platform payments so reports match the
+  // Income & Expenses / Business Insights view.
+  const { data: platformPayments } = useQuery({
+    queryKey: ["admin_platform_payments_for_insights"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("payments")
+        .select("*")
+        .eq("status", "completed")
+        .order("created_at", { ascending: false });
+      if (error) throw error;
+      return data as any[];
+    },
+    enabled: role === "admin" && !!user,
+  });
+
+  const transactions = useMemo(() => {
+    const base = rawTransactions || [];
+    if (role !== "admin" || !platformPayments?.length) return base;
+    const paymentTxs = platformPayments.map((p: any) => ({
+      id: `payment-${p.id}`,
+      user_id: p.user_id,
+      type: "income",
+      amount: p.amount,
+      description: p.description || "Subscription Payment",
+      transaction_date: (p.completed_at || p.created_at || "").slice(0, 10),
+      payment_method: p.mpesa_receipt_number ? "mpesa" : "other",
+      category_id: null,
+      financial_categories: { name: "Platform Revenue", icon: null, type: "income" },
+      created_at: p.created_at,
+      _isPayment: true,
+    }));
+    return [...base, ...paymentTxs].sort((a, b) =>
+      (a.transaction_date || "").localeCompare(b.transaction_date || "")
+    );
+  }, [rawTransactions, platformPayments, role]);
 
   // Fetch balance sheet manual items
   const { data: bsItems } = useQuery({
