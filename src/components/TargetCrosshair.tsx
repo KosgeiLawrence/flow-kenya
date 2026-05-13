@@ -1,7 +1,10 @@
 import { useEffect, useRef, useState } from "react";
+import { useLocation } from "react-router-dom";
 
 const TargetCrosshair = () => {
   const [enabled, setEnabled] = useState(false);
+  const location = useLocation();
+  const onDashboard = location.pathname.startsWith("/dashboard");
   const hLineRef = useRef<HTMLDivElement>(null);
   const vLineRef = useRef<HTMLDivElement>(null);
   const dotRef = useRef<HTMLDivElement>(null);
@@ -50,7 +53,7 @@ const TargetCrosshair = () => {
     };
   }, []);
 
-  if (!enabled) return null;
+  if (!enabled || onDashboard) return null;
 
   return (
     <div
