@@ -3,6 +3,7 @@ import { useLocation } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import Hero from "@/components/Hero";
 import NeuralBackground from "@/components/NeuralBackground";
+import MouseBlob from "@/components/MouseBlob";
 import Features from "@/components/Features";
 import TrendingMarketplace from "@/components/TrendingMarketplace";
 import TraceabilityFlow from "@/components/TraceabilityFlow";
@@ -27,6 +28,7 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-background bg-radial-glow relative">
       <NeuralBackground />
+      <MouseBlob />
       <div className="relative z-10">
         <Navbar />
         <Hero />
