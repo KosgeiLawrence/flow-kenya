@@ -36,6 +36,7 @@ import Unsubscribe from "./pages/Unsubscribe";
 import Marketplace from "./pages/Marketplace";
 import PublicCatalogue from "./pages/PublicCatalogue";
 import PWAInstallPrompt from "./components/PWAInstallPrompt";
+import TargetCrosshair from "./components/TargetCrosshair";
 
 import BiometricLockScreen from "./components/auth/BiometricLockScreen";
 import BiometricSetupPrompt from "./components/auth/BiometricSetupPrompt";
@@ -133,6 +134,7 @@ const App = () => {
             <AuthProvider>
               <BiometricGate>
                 <PWAInstallPrompt />
+                <TargetCrosshair />
                 
                 <Routes>
                   <Route path="/" element={<Index />} />
