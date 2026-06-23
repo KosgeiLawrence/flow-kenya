@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=DM+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,100..900;1,100..900&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -6,82 +6,83 @@
 
 @layer base {
   :root {
-    --background: 220 14% 12%;
-    --foreground: 220 10% 92%;
+    /* Light theme inspired by twendegreen.co.ke */
+    --background: 0 0% 100%;
+    --foreground: 208 100% 11%;
 
-    --card: 220 14% 15%;
-    --card-foreground: 220 10% 92%;
+    --card: 0 0% 100%;
+    --card-foreground: 208 100% 11%;
 
-    --popover: 220 14% 15%;
-    --popover-foreground: 220 10% 92%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 208 100% 11%;
 
-    --primary: 152 45% 42%;
-    --primary-foreground: 220 10% 98%;
+    --primary: 132 56% 55%;
+    --primary-foreground: 208 100% 11%;
 
-    --secondary: 40 55% 55%;
-    --secondary-foreground: 220 16% 8%;
+    --secondary: 208 100% 11%;
+    --secondary-foreground: 0 0% 100%;
 
-    --muted: 220 12% 20%;
-    --muted-foreground: 220 8% 68%;
+    --muted: 210 20% 96%;
+    --muted-foreground: 215 16% 40%;
 
-    --accent: 220 12% 22%;
-    --accent-foreground: 220 10% 92%;
+    --accent: 132 56% 95%;
+    --accent-foreground: 208 100% 11%;
 
     --destructive: 0 72% 51%;
-    --destructive-foreground: 220 10% 98%;
+    --destructive-foreground: 0 0% 100%;
 
-    --border: 220 12% 22%;
-    --input: 220 12% 22%;
-    --ring: 152 45% 42%;
+    --border: 214 20% 90%;
+    --input: 214 20% 90%;
+    --ring: 132 56% 55%;
 
     --radius: 1rem;
 
-    --sidebar-background: 220 16% 10%;
-    --sidebar-foreground: 220 10% 88%;
-    --sidebar-primary: 152 45% 42%;
-    --sidebar-primary-foreground: 220 16% 8%;
-    --sidebar-accent: 220 14% 18%;
-    --sidebar-accent-foreground: 220 10% 92%;
-    --sidebar-border: 220 12% 18%;
-    --sidebar-ring: 152 45% 42%;
+    --sidebar-background: 208 100% 11%;
+    --sidebar-foreground: 0 0% 95%;
+    --sidebar-primary: 132 56% 55%;
+    --sidebar-primary-foreground: 208 100% 11%;
+    --sidebar-accent: 208 60% 18%;
+    --sidebar-accent-foreground: 0 0% 95%;
+    --sidebar-border: 208 50% 22%;
+    --sidebar-ring: 132 56% 55%;
 
     /* Brand tokens */
-    --gold: 40 55% 55%;
-    --gold-light: 40 60% 75%;
-    --forest: 152 45% 42%;
-    --forest-deep: 220 16% 10%;
-    --earth: 25 30% 35%;
-    --earth-light: 30 25% 65%;
-    --sky: 195 60% 50%;
+    --gold: 30 62% 37%;          /* #985e23 brown accent */
+    --gold-light: 30 55% 60%;
+    --forest: 132 56% 55%;       /* #4CCB6A */
+    --forest-deep: 208 100% 11%; /* #001d39 */
+    --earth: 30 62% 37%;
+    --earth-light: 30 50% 70%;
+    --sky: 215 80% 48%;
 
     /* Glass system */
-    --glass-bg: rgba(255, 255, 255, 0.08);
-    --glass-bg-strong: rgba(255, 255, 255, 0.12);
-    --glass-bg-subtle: rgba(255, 255, 255, 0.04);
-    --glass-border: rgba(255, 255, 255, 0.15);
-    --glass-border-subtle: rgba(255, 255, 255, 0.08);
-    --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
-    --glass-shadow-lg: 0 16px 48px rgba(0, 0, 0, 0.3);
+    --glass-bg: rgba(255, 255, 255, 0.7);
+    --glass-bg-strong: rgba(255, 255, 255, 0.85);
+    --glass-bg-subtle: rgba(255, 255, 255, 0.5);
+    --glass-border: rgba(0, 29, 57, 0.08);
+    --glass-border-subtle: rgba(0, 29, 57, 0.05);
+    --glass-shadow: 0 8px 32px rgba(0, 29, 57, 0.08);
+    --glass-shadow-lg: 0 16px 48px rgba(0, 29, 57, 0.12);
     --glass-blur: blur(20px);
     --glass-radius: 16px;
 
     /* Gradients */
-    --gradient-hero: linear-gradient(135deg, hsl(220 16% 10%) 0%, hsl(220 14% 14%) 50%, hsl(225 14% 16%) 100%);
-    --gradient-gold: linear-gradient(135deg, hsl(40 55% 55%) 0%, hsl(35 65% 60%) 100%);
-    --gradient-radial-primary: radial-gradient(ellipse at 20% 50%, hsl(152 45% 42% / 0.08) 0%, transparent 60%);
-    --gradient-radial-accent: radial-gradient(ellipse at 80% 20%, hsl(40 55% 55% / 0.06) 0%, transparent 50%);
+    --gradient-hero: linear-gradient(180deg, hsl(0 0% 100%) 0%, hsl(210 30% 96%) 60%, hsl(210 20% 88%) 100%);
+    --gradient-gold: linear-gradient(135deg, hsl(132 56% 55%) 0%, hsl(132 60% 45%) 100%);
+    --gradient-radial-primary: radial-gradient(ellipse at 20% 50%, hsl(132 56% 55% / 0.12) 0%, transparent 60%);
+    --gradient-radial-accent: radial-gradient(ellipse at 80% 20%, hsl(208 100% 11% / 0.06) 0%, transparent 50%);
     --gradient-mesh: var(--gradient-radial-primary), var(--gradient-radial-accent);
 
     /* Shadows */
-    --shadow-soft: 0 4px 16px rgba(0, 0, 0, 0.12);
-    --shadow-elevated: 0 12px 40px rgba(0, 0, 0, 0.2);
-    --shadow-gold: 0 8px 32px hsl(40 55% 55% / 0.2);
-    --shadow-glow-primary: 0 0 24px hsl(152 45% 42% / 0.2);
-    --shadow-glow-gold: 0 0 24px hsl(40 55% 55% / 0.25);
+    --shadow-soft: 0 4px 16px rgba(0, 29, 57, 0.06);
+    --shadow-elevated: 0 12px 40px rgba(0, 29, 57, 0.10);
+    --shadow-gold: 0 8px 32px hsl(132 56% 55% / 0.25);
+    --shadow-glow-primary: 0 0 24px hsl(132 56% 55% / 0.35);
+    --shadow-glow-gold: 0 0 24px hsl(132 56% 55% / 0.30);
 
     /* Typography */
-    --font-display: 'Space Grotesk', system-ui, sans-serif;
-    --font-body: 'DM Sans', system-ui, sans-serif;
+    --font-display: 'Inter', system-ui, sans-serif;
+    --font-body: 'Inter', system-ui, sans-serif;
 
     /* Timing */
     --ease-smooth: cubic-bezier(0.4, 0, 0.2, 1);
