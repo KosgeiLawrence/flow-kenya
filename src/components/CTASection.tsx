@@ -14,7 +14,7 @@ function FooterMenuLinks({ links }: { links: { label: string; to: string; isRout
         if (link.isRoute) {
           return (
             <li key={link.to}>
-              <Link to={link.to} className="text-sm text-muted-foreground transition-colors duration-200 hover:text-foreground">
+              <Link to={link.to} className="text-sm text-sidebar-foreground/70 transition-colors duration-200 hover:text-sidebar-foreground">
                 {link.label}
               </Link>
             </li>
@@ -25,7 +25,7 @@ function FooterMenuLinks({ links }: { links: { label: string; to: string; isRout
           <li key={link.to}>
             <button
               onClick={() => handleHashClick(hash)}
-              className="text-sm text-muted-foreground transition-colors duration-200 hover:text-foreground cursor-pointer"
+              className="text-sm text-sidebar-foreground/70 transition-colors duration-200 hover:text-sidebar-foreground cursor-pointer"
             >
               {link.label}
             </button>
