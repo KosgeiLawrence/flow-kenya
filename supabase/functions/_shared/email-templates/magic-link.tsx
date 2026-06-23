@@ -26,15 +26,15 @@ export const MagicLinkEmail = ({
 }: MagicLinkEmailProps) => (
   <Html lang="en" dir="ltr">
     <Head />
-    <Preview>Your Twende Green Ecocycle sign-in link</Preview>
+    <Preview>Your Duara Flow sign-in link</Preview>
     <Body style={main}>
       <Container style={container}>
         <Section style={logoSection}>
-          <Img src={LOGO_URL} width="180" height="auto" alt="Twende Green Ecocycle" style={logoImg} />
+          <Img src={LOGO_URL} width="180" height="auto" alt="Duara Flow" style={logoImg} />
         </Section>
         <Heading style={h1}>Your sign-in link</Heading>
         <Text style={text}>
-          Click the button below to sign in to Twende Green Ecocycle. This link will expire shortly.
+          Click the button below to sign in to Duara Flow. This link will expire shortly.
         </Text>
         <Section style={buttonSection}>
           <Button style={button} href={confirmationUrl}>
@@ -44,7 +44,7 @@ export const MagicLinkEmail = ({
         <Text style={footer}>
           If you didn't request this link, you can safely ignore this email.
         </Text>
-        <Text style={footerBrand}>© Twende Green Ecocycle · Circular Economy Traceability</Text>
+        <Text style={footerBrand}>© Duara Flow · Circular Economy Traceability</Text>
       </Container>
     </Body>
   </Html>

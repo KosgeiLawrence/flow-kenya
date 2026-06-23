@@ -223,7 +223,7 @@ export default function MarketplaceListingCard({ listing, isPublic = false }: { 
             )}
             {listing.contact_phone && (
               <a
-                href={`https://wa.me/${listing.contact_phone.replace(/[^0-9]/g, "")}?text=${encodeURIComponent(`Hi, I'm interested in your listing: "${listing.title}" on Twende Green Ecocycle Marketplace.`)}`}
+                href={`https://wa.me/${listing.contact_phone.replace(/[^0-9]/g, "")}?text=${encodeURIComponent(`Hi, I'm interested in your listing: "${listing.title}" on Duara Flow Marketplace.`)}`}
                 target="_blank"
                 rel="noopener noreferrer"
               >

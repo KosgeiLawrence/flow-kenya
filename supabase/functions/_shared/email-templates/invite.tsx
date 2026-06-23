@@ -31,17 +31,17 @@ export const InviteEmail = ({
 }: InviteEmailProps) => (
   <Html lang="en" dir="ltr">
     <Head />
-    <Preview>You've been invited to join Twende Green Ecocycle</Preview>
+    <Preview>You've been invited to join Duara Flow</Preview>
     <Body style={main}>
       <Container style={container}>
         <Section style={logoSection}>
-          <Img src={LOGO_URL} width="180" height="auto" alt="Twende Green Ecocycle" style={logoImg} />
+          <Img src={LOGO_URL} width="180" height="auto" alt="Duara Flow" style={logoImg} />
         </Section>
         <Heading style={h1}>You've been invited 🎉</Heading>
         <Text style={text}>
           You've been invited to join{' '}
           <Link href={siteUrl} style={link}>
-            <strong>Twende Green Ecocycle</strong>
+            <strong>Duara Flow</strong>
           </Link>
           — Kenya's circular economy traceability platform. Click below to create your account and get started.
         </Text>
@@ -60,7 +60,7 @@ export const InviteEmail = ({
         <Text style={footer}>
           If you weren't expecting this invitation, you can safely ignore this email.
         </Text>
-        <Text style={footerBrand}>© Twende Green Ecocycle · Circular Economy Traceability</Text>
+        <Text style={footerBrand}>© Duara Flow · Circular Economy Traceability</Text>
       </Container>
     </Body>
   </Html>

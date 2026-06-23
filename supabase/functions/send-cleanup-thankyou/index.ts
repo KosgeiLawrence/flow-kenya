@@ -154,7 +154,7 @@ function ThankYouEmail({ participantName, cleanupTitle, cleanupDate, locationNam
         },
           React.createElement('p', {
             style: { fontSize: '12px', color: '#999', margin: '0 0 4px 0' }
-          }, '© Twende Green Ecocycle · Circular Economy Traceability Platform'),
+          }, '© Duara Flow · Circular Economy Traceability Platform'),
           React.createElement('a', {
             href: 'https://duaraflow.co.ke',
             style: { fontSize: '12px', color: '#1B5E20', textDecoration: 'none' }
@@ -278,7 +278,7 @@ Deno.serve(async (req) => {
         )
 
         await transporter.sendMail({
-          from: '"Twende Green Ecocycle" <info@duaraflow.co.ke>',
+          from: '"Duara Flow" <info@duaraflow.co.ke>',
           to: participant.email,
           subject: `Thank You for Participating in "${cleanup.title}" 🌿`,
           html: emailHtml,

@@ -128,7 +128,7 @@ const addReportFooter = async (doc: jsPDF, orgName: string) => {
 
     doc.setFontSize(6.5);
     doc.setTextColor(...PDF_COLORS.mutedText);
-    doc.text(`${orgName}  •  Powered by Twende Green Ecocycle`, pw / 2, footerY + 6, { align: "center" });
+    doc.text(`${orgName}  •  Powered by Duara Flow`, pw / 2, footerY + 6, { align: "center" });
     doc.text("www.duaraflow.co.ke  •  info@duaraflow.co.ke  •  +254 741 027 140", pw / 2, footerY + 10, { align: "center" });
 
     doc.setFontSize(7);
@@ -635,7 +635,7 @@ const AggregatorESGPanel = () => {
 
     doc.setFontSize(6);
     doc.setTextColor(150, 150, 150);
-    doc.text("Verified by Twende Green Ecocycle  •  www.duaraflow.co.ke  •  Powered by Twende Green Ecocycle", pw / 2, ph - 24, { align: "center" });
+    doc.text("Verified by Duara Flow  •  www.duaraflow.co.ke  •  Powered by Duara Intelligence", pw / 2, ph - 24, { align: "center" });
 
     doc.save(`sustainability-certificate-${format(new Date(), "yyyy-MM-dd")}.pdf`);
     toast.success("Sustainability certificate downloaded");

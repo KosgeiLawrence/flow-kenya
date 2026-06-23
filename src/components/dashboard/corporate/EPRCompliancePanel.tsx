@@ -48,7 +48,7 @@ const EPRCompliancePanel = () => {
     { label: "Recovery Commitment Active", pass: (commitments?.length || 0) > 0, detail: `KES ${totalFunded.toLocaleString()} funded` },
     { label: "Recovery Target Progress", pass: eprProgress >= 100, detail: `${eprProgress.toFixed(0)}% of obligation met` },
     { label: "Audit Documentation", pass: !!profile?.company_registration, detail: profile?.company_registration ? `Reg: ${profile.company_registration}` : "Upload registration" },
-    { label: "Verified Supply Chain", pass: true, detail: "Twende Green Ecocycle verified traceability" },
+    { label: "Verified Supply Chain", pass: true, detail: "Duara Flow verified traceability" },
   ];
   const score = (checks.filter((c) => c.pass).length / checks.length) * 100;
 

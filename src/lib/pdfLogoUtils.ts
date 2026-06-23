@@ -1,5 +1,5 @@
 /**
- * Renders the Twende Green Ecocycle brand logo (matching the landing page navbar)
+ * Renders the Duara Flow brand logo (matching the landing page navbar)
  * as a base64 PNG for embedding in jsPDF documents.
  */
 export const renderDuaraFlowLogo = (size = 120): Promise<string> => {

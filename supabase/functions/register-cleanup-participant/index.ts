@@ -101,7 +101,7 @@ function RegistrationConfirmEmail({ participantName, cleanupTitle, cleanupDate, 
 
         // Footer
         el('div', { style: { backgroundColor: '#f5f5f5', padding: '20px 24px', textAlign: 'center' as const, borderTop: '1px solid #e0e0e0' } },
-          el('p', { style: { fontSize: '12px', color: '#999', margin: '0 0 4px 0' } }, '© Twende Green Ecocycle · Circular Economy Traceability Platform'),
+          el('p', { style: { fontSize: '12px', color: '#999', margin: '0 0 4px 0' } }, '© Duara Flow · Circular Economy Traceability Platform'),
           el('a', { href: 'https://duaraflow.co.ke', style: { fontSize: '12px', color: '#1B5E20', textDecoration: 'none' } }, 'duaraflow.co.ke'),
         ),
       )
@@ -217,7 +217,7 @@ Deno.serve(async (req) => {
 
         const transporter = createTransporter()
         await transporter.sendMail({
-          from: '"Twende Green Ecocycle" <info@duaraflow.co.ke>',
+          from: '"Duara Flow" <info@duaraflow.co.ke>',
           to: trimmedEmail,
           subject: `Registration Confirmed: ${cleanup.title} 🌿`,
           html: emailHtml,

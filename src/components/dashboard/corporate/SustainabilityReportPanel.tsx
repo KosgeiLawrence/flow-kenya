@@ -30,7 +30,7 @@ const SustainabilityReportPanel = () => {
     let y = await addBrandedHeader(doc, "Annual Sustainability Report", `${year} — ${profile?.full_name || "Corporate Entity"}`);
     y += 20;
     doc.setFontSize(10);
-    doc.text(`Prepared via Twende Green Ecocycle | ${format(new Date(), "MMM d, yyyy")}`, 15, y);
+    doc.text(`Prepared via Duara Flow | ${format(new Date(), "MMM d, yyyy")}`, 15, y);
 
     // Page 2
     doc.addPage();
@@ -40,7 +40,7 @@ const SustainabilityReportPanel = () => {
       `This report covers the environmental and social impact of ${profile?.full_name || "our organization"}'s`,
       `waste management and circular economy initiatives for the year ${year}.`,
       "",
-      "Through our partnership with the Twende Green Ecocycle platform, we have successfully",
+      "Through our partnership with the Duara Flow platform, we have successfully",
       "diverted waste from landfills, offset carbon emissions, and supported",
       "community livelihoods through the formal waste collection value chain.",
     ].forEach((line) => { doc.text(line, 15, y); y += 8; });

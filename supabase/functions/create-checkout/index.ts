@@ -71,7 +71,7 @@ serve(async (req) => {
         host: origin,
         channel: "WEBSITE",
         api_ref: `${role}__${billingPeriod}__${user.id}`,
-        comment: `Twende Green Ecocycle ${periodLabel} - ${roleName}`,
+        comment: `Duara Flow ${periodLabel} - ${roleName}`,
         redirect_url: `${origin}/payment`,
         mobile_tarrif: "BUSINESS-PAYS",
         card_tarrif: "BUSINESS-PAYS",

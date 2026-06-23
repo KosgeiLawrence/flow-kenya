@@ -4,7 +4,7 @@ import {
 } from 'npm:@react-email/components@0.0.22'
 import type { TemplateEntry } from './registry.ts'
 
-const SITE_NAME = "Twende Green Ecocycle"
+const SITE_NAME = "Duara Flow"
 
 interface LineItem {
   description: string
@@ -153,7 +153,7 @@ export const template = {
   component: BillingDocumentEmail,
   subject: (data: Record<string, any>) => {
     const type = data.documentType === 'invoice' ? 'Invoice' : data.documentType === 'quotation' ? 'Quotation' : 'Receipt'
-    return `${type} ${data.invoiceNumber || ''} from Twende Green Ecocycle`
+    return `${type} ${data.invoiceNumber || ''} from Duara Flow`
   },
   displayName: 'Billing Document (Invoice/Quotation/Receipt)',
   previewData: {
@@ -175,7 +175,7 @@ export const template = {
   },
 } satisfies TemplateEntry
 
-// Styles — Twende Green Ecocycle brand: forest green primary, gold accent
+// Styles — Duara Flow brand: forest green primary, gold accent
 const main = { backgroundColor: '#ffffff', fontFamily: "'DM Sans', Arial, sans-serif" }
 const container = { padding: '30px 25px', maxWidth: '600px', margin: '0 auto' }
 const headerSection = { textAlign: 'center' as const, marginBottom: '10px' }

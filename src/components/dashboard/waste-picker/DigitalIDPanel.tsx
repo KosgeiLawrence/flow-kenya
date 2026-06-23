@@ -77,7 +77,7 @@ const DigitalIDPanel = () => {
         useCORS: true,
       });
       const link = document.createElement("a");
-      link.download = `Twende-Digital-ID-${profile?.full_name?.replace(/\s+/g, "_") || "card"}.png`;
+      link.download = `Duara-Digital-ID-${profile?.full_name?.replace(/\s+/g, "_") || "card"}.png`;
       link.href = canvas.toDataURL("image/png");
       link.click();
     } catch (e) {
@@ -112,7 +112,7 @@ const DigitalIDPanel = () => {
         >
           <img
             src="/images/duara-flow-logo.svg"
-            alt="Twende Green Ecocycle"
+            alt="Duara Flow"
             className="h-7"
             style={{ filter: "brightness(0) invert(1)" }}
           />
@@ -247,7 +247,7 @@ const DigitalIDPanel = () => {
             </div>
             <div className="flex-1 text-xs space-y-1" style={{ color: "rgba(255,255,255,0.75)" }}>
               <p className="font-medium" style={{ color: "#ffffff" }}>{t("digitalIdPanel.scanToVerify")}</p>
-              <p>{t("digitalIdPanel.scanDescription", "Scan this QR code to view this member's profile and impact data on Twende Green Ecocycle.")}</p>
+              <p>{t("digitalIdPanel.scanDescription", "Scan this QR code to view this member's profile and impact data on Duara Flow.")}</p>
             </div>
           </div>
 

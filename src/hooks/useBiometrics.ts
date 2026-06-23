@@ -79,13 +79,13 @@ export function useBiometrics(userId: string | undefined) {
         publicKey: {
           challenge,
           rp: {
-            name: "Twende Green Ecocycle",
+            name: "Duara Flow",
             id: window.location.hostname,
           },
           user: {
             id: userIdBuffer,
-            name: "Twende Green Ecocycle User",
-            displayName: "Twende Green Ecocycle User",
+            name: "Duara Flow User",
+            displayName: "Duara Flow User",
           },
           pubKeyCredParams: [
             { alg: -7, type: "public-key" },   // ES256

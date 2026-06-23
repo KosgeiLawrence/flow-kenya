@@ -157,7 +157,7 @@ const PublicForm = () => {
         <div className="text-center">
           <img
             src="/images/duara-flow-logo.svg"
-            alt="Twende Green Ecocycle"
+            alt="Duara Flow"
             className="h-16 mx-auto mb-4"
           />
         </div>
@@ -208,7 +208,7 @@ const PublicForm = () => {
           {submitMutation.isPending ? "Submitting..." : "Submit"}
         </Button>
 
-        <p className="text-center text-xs text-muted-foreground">Powered by Twende Green Ecocycle</p>
+        <p className="text-center text-xs text-muted-foreground">Powered by Duara Flow</p>
       </div>
     </div>
   );

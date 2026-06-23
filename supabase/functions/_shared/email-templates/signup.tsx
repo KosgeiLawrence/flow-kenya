@@ -31,17 +31,17 @@ export const SignupEmail = ({
 }: SignupEmailProps) => (
   <Html lang="en" dir="ltr">
     <Head />
-    <Preview>Welcome to Twende Green Ecocycle — verify your email to get started</Preview>
+    <Preview>Welcome to Duara Flow — verify your email to get started</Preview>
     <Body style={main}>
       <Container style={container}>
         <Section style={logoSection}>
-          <Img src={LOGO_URL} width="180" height="auto" alt="Twende Green Ecocycle" style={logoImg} />
+          <Img src={LOGO_URL} width="180" height="auto" alt="Duara Flow" style={logoImg} />
         </Section>
         <Heading style={h1}>Welcome aboard 🌿</Heading>
         <Text style={text}>
           Thanks for joining{' '}
           <Link href={siteUrl} style={link}>
-            <strong>Twende Green Ecocycle</strong>
+            <strong>Duara Flow</strong>
           </Link>
           — Kenya's digital infrastructure for circular economy traceability.
         </Text>
@@ -58,9 +58,9 @@ export const SignupEmail = ({
           </Button>
         </Section>
         <Text style={footer}>
-          If you didn't create an account on Twende Green Ecocycle, you can safely ignore this email.
+          If you didn't create an account on Duara Flow, you can safely ignore this email.
         </Text>
-        <Text style={footerBrand}>© Twende Green Ecocycle · Circular Economy Traceability</Text>
+        <Text style={footerBrand}>© Duara Flow · Circular Economy Traceability</Text>
       </Container>
     </Body>
   </Html>

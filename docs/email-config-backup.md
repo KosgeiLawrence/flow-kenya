@@ -5,7 +5,7 @@
 ## Sender Domain
 - **Domain:** notify.duaraflow.co.ke
 - **Root Domain:** duaraflow.co.ke
-- **From Address:** Twende Green Ecocycle <noreply@duaraflow.co.ke>
+- **From Address:** Duara Flow <noreply@duaraflow.co.ke>
 - **Status:** drifted (DNS propagation pending)
 
 ## Auth Email Hook

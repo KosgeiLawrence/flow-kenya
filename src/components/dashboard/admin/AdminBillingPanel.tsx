@@ -180,7 +180,7 @@ const AdminBillingPanel = () => {
     const doc = new jsPDF();
     const typeLabel = inv.document_type === "invoice" ? "INVOICE" : inv.document_type === "quotation" ? "QUOTATION" : "RECEIPT";
 
-    let y = await addBrandedHeader(doc, typeLabel, `Twende Green Ecocycle — ${typeLabel}`);
+    let y = await addBrandedHeader(doc, typeLabel, `Duara Flow — ${typeLabel}`);
 
     y = addDocMeta(doc, [
       { label: "Document No", value: inv.invoice_number },
@@ -341,7 +341,7 @@ const AdminBillingPanel = () => {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h3 className="text-lg font-semibold">{t("adminPanels.billing", "Twende Green Ecocycle Billing")}</h3>
+        <h3 className="text-lg font-semibold">{t("adminPanels.billing", "Duara Flow Billing")}</h3>
         <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
           <DialogTrigger asChild>
             <Button size="sm" className="gap-2"><Plus className="w-4 h-4" /> {t("adminPanels.newDocument", "New Document")}</Button>

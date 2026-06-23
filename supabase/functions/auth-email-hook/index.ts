@@ -34,7 +34,7 @@ const EMAIL_TEMPLATES: Record<string, React.ComponentType<any>> = {
   reauthentication: ReauthenticationEmail,
 }
 
-const SITE_NAME = "Twende Green Ecocycle"
+const SITE_NAME = "Duara Flow"
 const ROOT_DOMAIN = "duaraflow.co.ke"
 const CUSTOM_DOMAIN_ORIGIN = "https://duaraflow.co.ke"
 
@@ -265,7 +265,7 @@ async function handleWebhook(req: Request): Promise<Response> {
   try {
     const transporter = createTransporter()
     const info = await transporter.sendMail({
-      from: `Twende Green Ecocycle <info@duaraflow.co.ke>`,
+      from: `Duara Flow <info@duaraflow.co.ke>`,
       to: payload.data.email,
       subject: EMAIL_SUBJECTS[emailType] || 'Notification',
       html,

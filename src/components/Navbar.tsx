@@ -45,7 +45,7 @@ const Navbar = () => {
             <Recycle className="h-5 w-5 text-primary-foreground" />
           </div>
           <span className="font-display text-lg font-bold text-primary-foreground tracking-tight">
-            Twende Green Ecocycle
+            Duara Flow
           </span>
         </Link>
 

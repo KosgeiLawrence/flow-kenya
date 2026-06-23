@@ -88,7 +88,7 @@ const PWAInstallPrompt = () => {
                 {/* Content */}
                 <div className="flex-1 min-w-0">
                   <h3 className="text-base font-semibold text-foreground leading-tight">
-                    Add Twende Green Ecocycle to Home Screen
+                    Add Duara Flow to Home Screen
                   </h3>
                   <p className="mt-1 text-sm text-muted-foreground leading-snug">
                     Access the platform instantly — just like a native app. Works offline too!

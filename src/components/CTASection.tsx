@@ -106,7 +106,7 @@ const Footer = () => {
               <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary transition-transform duration-300 group-hover:scale-110">
                 <Recycle className="h-5 w-5 text-primary-foreground" />
               </div>
-              <span className="font-display text-xl font-bold text-foreground tracking-tight">Twende Green Ecocycle</span>
+              <span className="font-display text-xl font-bold text-foreground tracking-tight">Duara Flow</span>
             </Link>
             <p className="text-sm leading-relaxed text-muted-foreground max-w-xs">
               {t("footer.brandDescription")}
@@ -195,7 +195,7 @@ const Footer = () => {
             {t("cta.copyright")}
           </p>
           <p className="text-xs text-muted-foreground/40">
-            {t("footer.productOf")} <span className="text-muted-foreground/60 font-medium">Twende Green Ecocycle</span>
+            {t("footer.productOf")} <span className="text-muted-foreground/60 font-medium">Duara Intelligence</span>
           </p>
         </div>
       </div>

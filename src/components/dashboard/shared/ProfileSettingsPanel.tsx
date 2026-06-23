@@ -703,7 +703,7 @@ const ProfileSettingsPanel = ({ role }: ProfileSettingsPanelProps) => {
                 <div className="flex items-center justify-between rounded-lg border border-border p-3">
                   <div>
                     <p className="text-sm font-medium">Data Usage Consent</p>
-                    <p className="text-xs text-muted-foreground">Allow Twende Green Ecocycle to use your data for impact reporting</p>
+                    <p className="text-xs text-muted-foreground">Allow Duara Flow to use your data for impact reporting</p>
                   </div>
                   <Switch defaultChecked />
                 </div>
