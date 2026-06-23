@@ -55,7 +55,7 @@ const Unsubscribe = () => {
           {status === "loading" && <Loader2 className="w-8 h-8 animate-spin mx-auto text-muted-foreground" />}
           {status === "valid" && (
             <>
-              <p className="text-muted-foreground">Click below to unsubscribe from Duara Flow emails.</p>
+              <p className="text-muted-foreground">Click below to unsubscribe from Twende Green Ecocycle emails.</p>
               <Button onClick={handleUnsubscribe} disabled={processing} variant="destructive">
                 {processing ? <><Loader2 className="w-4 h-4 animate-spin mr-2" /> Processing...</> : "Confirm Unsubscribe"}
               </Button>
@@ -65,7 +65,7 @@ const Unsubscribe = () => {
             <div className="space-y-2">
               <CheckCircle className="w-10 h-10 text-emerald-600 mx-auto" />
               <p className="font-medium">You have been unsubscribed.</p>
-              <p className="text-sm text-muted-foreground">You will no longer receive emails from Duara Flow.</p>
+              <p className="text-sm text-muted-foreground">You will no longer receive emails from Twende Green Ecocycle.</p>
             </div>
           )}
           {status === "already_unsubscribed" && (

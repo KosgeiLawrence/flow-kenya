@@ -13,7 +13,7 @@ const en = {
 
   // Hero
   hero: {
-    badge: "By Duara Intelligence",
+    badge: "By Twende Green Ecocycle",
     title1: "Kenya's Digital",
     traceability: "Traceability",
     title2: "Infrastructure for the",
@@ -121,7 +121,7 @@ const en = {
     title: "Building Kenya's",
     titleHighlight: "Circular Economy",
     titleEnd: "Infrastructure",
-    description: "Duara Flow is a digital platform by Duara Intelligence that connects every link in Kenya's waste value chain — from collection to recycling. We provide traceability, transparency, and fair compensation to create a sustainable circular economy that benefits people and planet.",
+    description: "Twende Green Ecocycle is a digital platform by Twende Green Ecocycle that connects every link in Kenya's waste value chain — from collection to recycling. We provide traceability, transparency, and fair compensation to create a sustainable circular economy that benefits people and planet.",
     missionTitle: "Our Mission",
     missionText: "To digitize and formalize Kenya's waste value chain, ensuring every waste picker is fairly compensated, every kilogram is traceable, and every stakeholder has the data they need to drive sustainable impact.",
     visionTitle: "Our Vision",
@@ -129,7 +129,7 @@ const en = {
     value1Title: "Circular Economy",
     value1Desc: "We believe waste is a resource. Our platform transforms Kenya's linear waste model into a thriving circular economy where every material finds new life.",
     value2Title: "Inclusive Growth",
-    value2Desc: "From informal waste pickers to large corporates — Duara Flow empowers every stakeholder with digital tools, fair pricing, and transparent transactions.",
+    value2Desc: "From informal waste pickers to large corporates — Twende Green Ecocycle empowers every stakeholder with digital tools, fair pricing, and transparent transactions.",
     value3Title: "Environmental Impact",
     value3Desc: "Every kilogram tracked on our platform is a kilogram diverted from landfills. We make environmental impact measurable, verifiable, and bankable.",
     value4Title: "Data-Driven Decisions",
@@ -140,10 +140,10 @@ const en = {
   cta: {
     title1: "Ready to Digitize Your",
     title2: "Waste Value Chain?",
-    subtitle: "Whether you're a waste picker, aggregator, corporate, or county government — Duara Flow has a dashboard built for you.",
+    subtitle: "Whether you're a waste picker, aggregator, corporate, or county government — Twende Green Ecocycle has a dashboard built for you.",
     getStarted: "Get Started",
     signIn: "Sign In",
-    copyright: "© 2026 Duara Intelligence. Building Kenya's circular economy infrastructure.",
+    copyright: "© 2026 Twende Green Ecocycle. Building Kenya's circular economy infrastructure.",
     privacy: "Privacy",
     terms: "Terms",
     contact: "Contact",
@@ -186,7 +186,7 @@ const en = {
   // Auth Pages
   auth: {
     signInTitle: "Welcome Back",
-    signInSubtitle: "Sign in to your Duara Flow account",
+    signInSubtitle: "Sign in to your Twende Green Ecocycle account",
     signUpTitle: "Create Account",
     signUpSubtitle: "Join Kenya's circular economy platform",
     email: "Email",
@@ -211,7 +211,7 @@ const en = {
   // Contact
   contact: {
     title: "Contact Us",
-    subtitle: "Get in touch with the Duara Flow team",
+    subtitle: "Get in touch with the Twende Green Ecocycle team",
     fullName: "Full Name",
     email: "Email",
     subject: "Subject",
@@ -819,7 +819,7 @@ const en = {
     title: "Digital ID",
     qrCode: "QR Code",
     scanToVerify: "Scan to verify identity",
-    scanDescription: "Scan this QR code to view this member's profile and impact data on Duara Flow.",
+    scanDescription: "Scan this QR code to view this member's profile and impact data on Twende Green Ecocycle.",
     memberSince: "Date Joined",
     verificationStatus: "Verification Status",
     downloadId: "Download Digital ID",
@@ -1162,7 +1162,7 @@ const en = {
     investigateCase: "Investigate",
 
     inviteUsers: "Invite Users",
-    inviteDesc: "Send email invitations to join Duara Flow. Each invite automatically includes the PILOT2026 coupon for free access.",
+    inviteDesc: "Send email invitations to join Twende Green Ecocycle. Each invite automatically includes the PILOT2026 coupon for free access.",
     sendInvite: "Send Invite",
     inviteEmail: "Email Address",
     inviteRole: "Role",
@@ -1307,7 +1307,7 @@ const en = {
 
   // Marketplace page
   marketplacePage: {
-    badge: "Duara Flow Marketplace",
+    badge: "Twende Green Ecocycle Marketplace",
     title1: "Circular Economy",
     title2: "Marketplace",
     subtitle: "Browse waste materials, recycled products, and equipment from verified waste pickers, aggregators, and recyclers across Kenya.",

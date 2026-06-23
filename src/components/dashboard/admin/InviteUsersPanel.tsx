@@ -52,7 +52,7 @@ const InviteUsersPanel = () => {
             {t("adminPanels.inviteUsers")}
           </CardTitle>
           <CardDescription>
-            {t("adminPanels.inviteDesc", "Send email invitations to join Duara Flow. Each invite automatically includes the PILOT2026 coupon for free access.")}
+            {t("adminPanels.inviteDesc", "Send email invitations to join Twende Green Ecocycle. Each invite automatically includes the PILOT2026 coupon for free access.")}
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-5">

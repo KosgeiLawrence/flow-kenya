@@ -68,7 +68,7 @@ const ImpactCertificatesPanel = () => {
     doc.setTextColor(0, 0, 0);
     doc.setFontSize(10);
     doc.text("____________________________", 105, 240, { align: "center" });
-    doc.text("Duara Flow Platform", 105, 248, { align: "center" });
+    doc.text("Twende Green Ecocycle Platform", 105, 248, { align: "center" });
 
     await finalizePdf(doc);
     doc.save(`impact-certificate-${certId}.pdf`);
@@ -81,7 +81,7 @@ const ImpactCertificatesPanel = () => {
       <Card className="shadow-elevated">
         <CardContent className="p-8 text-center space-y-6">
           <Award className="w-16 h-16 text-primary mx-auto" />
-          <div><h3 className="text-xl font-display font-bold text-foreground">Impact Certificate</h3><p className="text-sm text-muted-foreground mt-1">Verified Environmental Impact — Duara Flow</p></div>
+          <div><h3 className="text-xl font-display font-bold text-foreground">Impact Certificate</h3><p className="text-sm text-muted-foreground mt-1">Verified Environmental Impact — Twende Green Ecocycle</p></div>
           <div className="inline-block border-2 border-primary/20 rounded-lg p-6 bg-muted/20"><p className="text-sm text-muted-foreground mb-1">Certified to</p><p className="text-lg font-bold text-foreground">{orgName}</p></div>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 max-w-lg mx-auto">{[{ v: `${totalKg.toFixed(0)} kg`, l: "Waste Diverted" }, { v: `${co2Saved} kg`, l: "CO₂ Offset" }, { v: `${(totalKg * 18).toLocaleString()}`, l: "Liters Saved" }, { v: `${(totalKg * 5.8).toFixed(0)}`, l: "kWh Saved" }].map(s => (<div key={s.l}><p className="text-lg font-bold text-foreground">{s.v}</p><p className="text-[10px] text-muted-foreground">{s.l}</p></div>))}</div>
           <div className="flex flex-col items-center gap-2"><QRCodeSVG value={verifyUrl} size={120} fgColor="hsl(152,45%,22%)" /><p className="text-xs text-muted-foreground font-mono">{certId}</p></div>

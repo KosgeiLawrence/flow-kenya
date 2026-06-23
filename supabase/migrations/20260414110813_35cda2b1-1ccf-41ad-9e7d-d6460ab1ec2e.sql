@@ -1,5 +1,5 @@
 
--- Admin invoices/receipts table for Duara Flow billing
+-- Admin invoices/receipts table for Twende Green Ecocycle billing
 CREATE TABLE public.admin_invoices (
   id UUID NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
   invoice_number TEXT NOT NULL DEFAULT ('DF-' || to_char(now(), 'YYYYMMDD') || '-' || substr(gen_random_uuid()::text, 1, 4)),

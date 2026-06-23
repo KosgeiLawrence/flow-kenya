@@ -26,15 +26,15 @@ export const RecoveryEmail = ({
 }: RecoveryEmailProps) => (
   <Html lang="en" dir="ltr">
     <Head />
-    <Preview>Reset your Duara Flow password</Preview>
+    <Preview>Reset your Twende Green Ecocycle password</Preview>
     <Body style={main}>
       <Container style={container}>
         <Section style={logoSection}>
-          <Img src={LOGO_URL} width="180" height="auto" alt="Duara Flow" style={logoImg} />
+          <Img src={LOGO_URL} width="180" height="auto" alt="Twende Green Ecocycle" style={logoImg} />
         </Section>
         <Heading style={h1}>Reset your password</Heading>
         <Text style={text}>
-          We received a request to reset your Duara Flow password. Click the button below to choose a new one.
+          We received a request to reset your Twende Green Ecocycle password. Click the button below to choose a new one.
         </Text>
         <Section style={buttonSection}>
           <Button style={button} href={confirmationUrl}>
@@ -44,7 +44,7 @@ export const RecoveryEmail = ({
         <Text style={text}>
           This link will expire shortly. If you didn't request a password reset, you can safely ignore this — your password won't be changed.
         </Text>
-        <Text style={footerBrand}>© Duara Flow · Circular Economy Traceability</Text>
+        <Text style={footerBrand}>© Twende Green Ecocycle · Circular Economy Traceability</Text>
       </Container>
     </Body>
   </Html>

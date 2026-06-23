@@ -44,7 +44,7 @@ const Contact = () => {
             <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary transition-all duration-300 group-hover:scale-110">
               <Recycle className="h-5 w-5 text-primary-foreground" />
             </div>
-            <span className="font-display text-lg font-bold text-foreground">Duara Flow</span>
+            <span className="font-display text-lg font-bold text-foreground">Twende Green Ecocycle</span>
           </Link>
           <Button variant="ghost" size="sm" asChild>
             <Link to="/"><ArrowLeft className="mr-1 h-4 w-4" /> Back</Link>
@@ -68,7 +68,7 @@ const Contact = () => {
             Get in Touch
           </h1>
           <p className="text-muted-foreground text-lg max-w-xl mx-auto leading-relaxed">
-            Have questions about Duara Flow? Reach out and our team will respond within 24 hours.
+            Have questions about Twende Green Ecocycle? Reach out and our team will respond within 24 hours.
           </p>
         </motion.div>
 

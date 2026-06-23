@@ -90,7 +90,7 @@ Deno.serve(async (req) => {
       : `${SITE_URL}/signup`
 
     const templateProps = {
-      siteName: 'Duara Flow',
+      siteName: 'Twende Green Ecocycle',
       siteUrl: SITE_URL,
       confirmationUrl: signupUrl,
       couponCode: couponCode || undefined,
@@ -103,11 +103,11 @@ Deno.serve(async (req) => {
 
     const transporter = createTransporter()
     const info = await transporter.sendMail({
-      from: 'Duara Flow <info@duaraflow.co.ke>',
+      from: 'Twende Green Ecocycle <info@duaraflow.co.ke>',
       to: email,
       subject: couponCode
-        ? "You've been invited to Duara Flow 🎁"
-        : "You've been invited to Duara Flow",
+        ? "You've been invited to Twende Green Ecocycle 🎁"
+        : "You've been invited to Twende Green Ecocycle",
       html,
       text,
     })

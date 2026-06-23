@@ -82,7 +82,7 @@ serve(async (req) => {
         amount: amount,
         phone_number: formattedPhone,
         api_ref: apiRef,
-        narrative: `Duara Flow ${periodLabel} - ${roleName}`,
+        narrative: `Twende Green Ecocycle ${periodLabel} - ${roleName}`,
       }),
     });
 

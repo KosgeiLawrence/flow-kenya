@@ -168,7 +168,7 @@ const workflows: Workflow[] = [
   },
   {
     id: "ai-assistant",
-    title: "Duara AI Assistant",
+    title: "Twende AI Assistant",
     subtitle: "Your in-dashboard business helper",
     icon: Bot,
     color: "text-primary",

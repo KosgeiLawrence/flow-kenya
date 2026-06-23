@@ -119,7 +119,7 @@ const WastePickerDashboard = () => {
       )}>
         <div className="p-6 border-b border-[rgba(255,255,255,0.08)]">
           <div className="flex items-center justify-between">
-            <h1 className="text-lg font-display font-bold">Duara Flow</h1>
+            <h1 className="text-lg font-display font-bold">Twende Green Ecocycle</h1>
             <Button variant="ghost" size="icon" className="lg:hidden text-sidebar-foreground" onClick={() => setSidebarOpen(false)}>
               <X className="w-5 h-5" />
             </Button>
