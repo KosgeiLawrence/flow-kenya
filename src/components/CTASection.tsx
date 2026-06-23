@@ -14,7 +14,7 @@ function FooterMenuLinks({ links }: { links: { label: string; to: string; isRout
         if (link.isRoute) {
           return (
             <li key={link.to}>
-              <Link to={link.to} className="text-sm text-muted-foreground transition-colors duration-200 hover:text-foreground">
+              <Link to={link.to} className="text-sm text-sidebar-foreground/70 transition-colors duration-200 hover:text-sidebar-foreground">
                 {link.label}
               </Link>
             </li>
@@ -25,7 +25,7 @@ function FooterMenuLinks({ links }: { links: { label: string; to: string; isRout
           <li key={link.to}>
             <button
               onClick={() => handleHashClick(hash)}
-              className="text-sm text-muted-foreground transition-colors duration-200 hover:text-foreground cursor-pointer"
+              className="text-sm text-sidebar-foreground/70 transition-colors duration-200 hover:text-sidebar-foreground cursor-pointer"
             >
               {link.label}
             </button>
@@ -95,8 +95,8 @@ const Footer = () => {
   ];
 
   return (
-    <footer className="relative border-t border-[rgba(255,255,255,0.06)] bg-[rgba(0,0,0,0.4)] backdrop-blur-[24px]">
-      <div className="absolute inset-0 bg-gradient-to-b from-transparent to-[rgba(0,0,0,0.3)] pointer-events-none" />
+    <footer className="relative border-t border-[rgba(255,255,255,0.08)] bg-sidebar text-sidebar-foreground">
+      <div className="absolute inset-0 bg-gradient-to-b from-transparent to-[rgba(0,0,0,0.25)] pointer-events-none" />
       <div className="container relative z-10">
         {/* Main footer grid */}
         <div className="grid grid-cols-1 gap-10 py-16 md:grid-cols-12 md:gap-8">
@@ -106,21 +106,21 @@ const Footer = () => {
               <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary transition-transform duration-300 group-hover:scale-110">
                 <Recycle className="h-5 w-5 text-primary-foreground" />
               </div>
-              <span className="font-display text-xl font-bold text-foreground tracking-tight">Duara Flow</span>
+              <span className="font-display text-xl font-bold text-sidebar-foreground tracking-tight">Duara Flow</span>
             </Link>
-            <p className="text-sm leading-relaxed text-muted-foreground max-w-xs">
+            <p className="text-sm leading-relaxed text-sidebar-foreground/70 max-w-xs">
               {t("footer.brandDescription")}
             </p>
             <div className="flex flex-col gap-2.5 pt-1">
-              <a href="mailto:hello@duaraflow.co.ke" className="inline-flex items-center gap-2 text-sm text-muted-foreground transition-colors duration-200 hover:text-foreground">
+              <a href="mailto:hello@duaraflow.co.ke" className="inline-flex items-center gap-2 text-sm text-sidebar-foreground/70 transition-colors duration-200 hover:text-sidebar-foreground">
                 <Mail className="h-3.5 w-3.5 text-primary/70" />
                 hello@duaraflow.co.ke
               </a>
-              <a href="tel:+254741027140" className="inline-flex items-center gap-2 text-sm text-muted-foreground transition-colors duration-200 hover:text-foreground">
+              <a href="tel:+254741027140" className="inline-flex items-center gap-2 text-sm text-sidebar-foreground/70 transition-colors duration-200 hover:text-sidebar-foreground">
                 <Phone className="h-3.5 w-3.5 text-primary/70" />
                 +254 741 027 140
               </a>
-              <span className="inline-flex items-center gap-2 text-sm text-muted-foreground">
+              <span className="inline-flex items-center gap-2 text-sm text-sidebar-foreground/70">
                 <MapPin className="h-3.5 w-3.5 text-primary/70" />
                 Mombasa, Kenya
               </span>
@@ -132,7 +132,7 @@ const Footer = () => {
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="Instagram"
-                className="flex h-9 w-9 items-center justify-center rounded-lg bg-[rgba(255,255,255,0.04)] border border-[rgba(255,255,255,0.06)] text-muted-foreground transition-all duration-200 hover:text-foreground hover:bg-primary/10 hover:border-primary/30"
+                className="flex h-9 w-9 items-center justify-center rounded-lg bg-[rgba(255,255,255,0.06)] border border-[rgba(255,255,255,0.10)] text-sidebar-foreground/70 transition-all duration-200 hover:text-sidebar-foreground hover:bg-primary/20 hover:border-primary/40"
               >
                 <Instagram className="h-4 w-4" />
               </a>
@@ -141,7 +141,7 @@ const Footer = () => {
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="Facebook"
-                className="flex h-9 w-9 items-center justify-center rounded-lg bg-[rgba(255,255,255,0.04)] border border-[rgba(255,255,255,0.06)] text-muted-foreground transition-all duration-200 hover:text-foreground hover:bg-primary/10 hover:border-primary/30"
+                className="flex h-9 w-9 items-center justify-center rounded-lg bg-[rgba(255,255,255,0.06)] border border-[rgba(255,255,255,0.10)] text-sidebar-foreground/70 transition-all duration-200 hover:text-sidebar-foreground hover:bg-primary/20 hover:border-primary/40"
               >
                 <Facebook className="h-4 w-4" />
               </a>
@@ -150,7 +150,7 @@ const Footer = () => {
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="X (Twitter)"
-                className="flex h-9 w-9 items-center justify-center rounded-lg bg-[rgba(255,255,255,0.04)] border border-[rgba(255,255,255,0.06)] text-muted-foreground transition-all duration-200 hover:text-foreground hover:bg-primary/10 hover:border-primary/30"
+                className="flex h-9 w-9 items-center justify-center rounded-lg bg-[rgba(255,255,255,0.06)] border border-[rgba(255,255,255,0.10)] text-sidebar-foreground/70 transition-all duration-200 hover:text-sidebar-foreground hover:bg-primary/20 hover:border-primary/40"
               >
                 <svg viewBox="0 0 24 24" fill="currentColor" className="h-3.5 w-3.5" aria-hidden="true">
                   <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
@@ -161,7 +161,7 @@ const Footer = () => {
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="LinkedIn"
-                className="flex h-9 w-9 items-center justify-center rounded-lg bg-[rgba(255,255,255,0.04)] border border-[rgba(255,255,255,0.06)] text-muted-foreground transition-all duration-200 hover:text-foreground hover:bg-primary/10 hover:border-primary/30"
+                className="flex h-9 w-9 items-center justify-center rounded-lg bg-[rgba(255,255,255,0.06)] border border-[rgba(255,255,255,0.10)] text-sidebar-foreground/70 transition-all duration-200 hover:text-sidebar-foreground hover:bg-primary/20 hover:border-primary/40"
               >
                 <Linkedin className="h-4 w-4" />
               </a>
@@ -170,17 +170,17 @@ const Footer = () => {
 
           {/* Menu links */}
           <div className="md:col-span-3 md:col-start-7">
-            <h4 className="mb-4 font-display text-xs font-semibold uppercase tracking-widest text-foreground/60">{t("footer.menuHeading")}</h4>
+            <h4 className="mb-4 font-display text-xs font-semibold uppercase tracking-widest text-sidebar-foreground/60">{t("footer.menuHeading")}</h4>
              <FooterMenuLinks links={menuLinks} />
           </div>
 
           {/* Legal links */}
           <div className="md:col-span-2">
-            <h4 className="mb-4 font-display text-xs font-semibold uppercase tracking-widest text-foreground/60">{t("footer.legalHeading")}</h4>
+            <h4 className="mb-4 font-display text-xs font-semibold uppercase tracking-widest text-sidebar-foreground/60">{t("footer.legalHeading")}</h4>
             <ul className="space-y-2.5">
               {legalLinks.map((link) => (
                 <li key={link.to}>
-                  <Link to={link.to} className="text-sm text-muted-foreground transition-colors duration-200 hover:text-foreground">
+                  <Link to={link.to} className="text-sm text-sidebar-foreground/70 transition-colors duration-200 hover:text-sidebar-foreground">
                     {link.label}
                   </Link>
                 </li>
@@ -190,12 +190,12 @@ const Footer = () => {
         </div>
 
         {/* Bottom bar */}
-        <div className="flex flex-col items-center justify-between gap-4 border-t border-[rgba(255,255,255,0.06)] py-6 md:flex-row">
-          <p className="text-xs text-muted-foreground/60">
+        <div className="flex flex-col items-center justify-between gap-4 border-t border-[rgba(255,255,255,0.08)] py-6 md:flex-row">
+          <p className="text-xs text-sidebar-foreground/60">
             {t("cta.copyright")}
           </p>
-          <p className="text-xs text-muted-foreground/40">
-            {t("footer.productOf")} <span className="text-muted-foreground/60 font-medium">Duara Intelligence</span>
+          <p className="text-xs text-sidebar-foreground/50">
+            {t("footer.productOf")} <span className="text-sidebar-foreground/70 font-medium">Duara Intelligence</span>
           </p>
         </div>
       </div>
