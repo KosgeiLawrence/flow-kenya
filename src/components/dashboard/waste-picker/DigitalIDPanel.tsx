@@ -77,7 +77,7 @@ const DigitalIDPanel = () => {
         useCORS: true,
       });
       const link = document.createElement("a");
-      link.download = `Duara-Digital-ID-${profile?.full_name?.replace(/\s+/g, "_") || "card"}.png`;
+      link.download = `Twende-Digital-ID-${profile?.full_name?.replace(/\s+/g, "_") || "card"}.png`;
       link.href = canvas.toDataURL("image/png");
       link.click();
     } catch (e) {
