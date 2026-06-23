@@ -52,8 +52,8 @@ const PublicReport = () => {
         {/* Logo / Branding */}
         <div className="text-center space-y-2">
           <div className="flex items-center justify-center gap-2 mb-4">
-            <img src={reportIcon} alt="Duara Flow" className="w-10 h-10" />
-            <span className="text-2xl font-bold font-display text-foreground">Duara Flow</span>
+            <img src={reportIcon} alt="Twende Green Ecocycle" className="w-10 h-10" />
+            <span className="text-2xl font-bold font-display text-foreground">Twende Green Ecocycle</span>
           </div>
           <h1 className="text-xl font-semibold text-foreground">Cleanup Exercise Report</h1>
           <p className="text-sm text-muted-foreground">
@@ -116,12 +116,12 @@ const PublicReport = () => {
         <div className="text-center">
           <Link to="/" className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-primary transition-colors">
             <ArrowLeft className="w-3 h-3" />
-            Learn more about Duara Flow
+            Learn more about Twende Green Ecocycle
           </Link>
         </div>
 
         <p className="text-xs text-center text-muted-foreground">
-          © Duara Flow · Circular Economy Traceability Platform
+          © Twende Green Ecocycle · Circular Economy Traceability Platform
         </p>
       </div>
     </div>

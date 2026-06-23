@@ -31,15 +31,15 @@ export const EmailChangeEmail = ({
 }: EmailChangeEmailProps) => (
   <Html lang="en" dir="ltr">
     <Head />
-    <Preview>Confirm your email change on Duara Flow</Preview>
+    <Preview>Confirm your email change on Twende Green Ecocycle</Preview>
     <Body style={main}>
       <Container style={container}>
         <Section style={logoSection}>
-          <Img src={LOGO_URL} width="180" height="auto" alt="Duara Flow" style={logoImg} />
+          <Img src={LOGO_URL} width="180" height="auto" alt="Twende Green Ecocycle" style={logoImg} />
         </Section>
         <Heading style={h1}>Confirm your email change</Heading>
         <Text style={text}>
-          You requested to change your Duara Flow email from{' '}
+          You requested to change your Twende Green Ecocycle email from{' '}
           <Link href={`mailto:${email}`} style={link}>{email}</Link>{' '}
           to{' '}
           <Link href={`mailto:${newEmail}`} style={link}>{newEmail}</Link>.
@@ -52,7 +52,7 @@ export const EmailChangeEmail = ({
         <Text style={footer}>
           If you didn't request this change, please secure your account immediately.
         </Text>
-        <Text style={footerBrand}>© Duara Flow · Circular Economy Traceability</Text>
+        <Text style={footerBrand}>© Twende Green Ecocycle · Circular Economy Traceability</Text>
       </Container>
     </Body>
   </Html>

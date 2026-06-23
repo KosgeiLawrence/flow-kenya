@@ -21,11 +21,11 @@ interface ReauthenticationEmailProps {
 export const ReauthenticationEmail = ({ token }: ReauthenticationEmailProps) => (
   <Html lang="en" dir="ltr">
     <Head />
-    <Preview>Your Duara Flow verification code</Preview>
+    <Preview>Your Twende Green Ecocycle verification code</Preview>
     <Body style={main}>
       <Container style={container}>
         <Section style={logoSection}>
-          <Img src={LOGO_URL} width="180" height="auto" alt="Duara Flow" style={logoImg} />
+          <Img src={LOGO_URL} width="180" height="auto" alt="Twende Green Ecocycle" style={logoImg} />
         </Section>
         <Heading style={h1}>Verification code</Heading>
         <Text style={text}>Use the code below to confirm your identity:</Text>
@@ -33,7 +33,7 @@ export const ReauthenticationEmail = ({ token }: ReauthenticationEmailProps) => 
         <Text style={footer}>
           This code will expire shortly. If you didn't request this, you can safely ignore this email.
         </Text>
-        <Text style={footerBrand}>© Duara Flow · Circular Economy Traceability</Text>
+        <Text style={footerBrand}>© Twende Green Ecocycle · Circular Economy Traceability</Text>
       </Container>
     </Body>
   </Html>

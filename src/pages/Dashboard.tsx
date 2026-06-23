@@ -37,7 +37,7 @@ const Dashboard = () => {
       <header className="border-b border-border bg-card">
         <div className="container mx-auto flex items-center justify-between h-16 px-4">
           <div className="flex items-center gap-3">
-            <h1 className="text-lg font-display font-bold text-foreground">Duara Flow</h1>
+            <h1 className="text-lg font-display font-bold text-foreground">Twende Green Ecocycle</h1>
             <span className="text-xs bg-primary/10 text-primary px-2 py-1 rounded-full font-medium">
               {roleLabels[role || ""] || role}
             </span>

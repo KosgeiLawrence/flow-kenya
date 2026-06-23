@@ -83,7 +83,7 @@ const drawMetricCard = (doc: jsPDF, x: number, y: number, w: number, value: stri
   doc.text(label, x + 6, y + 22);
 };
 
-// ── PDF Helper: add org header with Duara Flow logo ──
+// ── PDF Helper: add org header with Twende Green Ecocycle logo ──
 const addOrgHeader = async (doc: jsPDF, orgName: string, logoBase64: string | null, contactDetails: string[]) => {
   const pw = doc.internal.pageSize.getWidth();
   const duaraLogo = await getDuaraFlowLogo();
@@ -94,7 +94,7 @@ const addOrgHeader = async (doc: jsPDF, orgName: string, logoBase64: string | nu
   doc.setFillColor(...PDF_COLORS.gold);
   doc.rect(0, 6, pw, 1.5, "F");
 
-  // Duara Flow logo (right side)
+  // Twende Green Ecocycle logo (right side)
   if (duaraLogo) {
     try { doc.addImage(duaraLogo, "PNG", pw - 60, 10, 46, 18); } catch {}
   }
@@ -119,7 +119,7 @@ const addOrgHeader = async (doc: jsPDF, orgName: string, logoBase64: string | nu
   return Math.max(cy + 2, 36);
 };
 
-// ── PDF Helper: add footer with Duara Intelligence branding ──
+// ── PDF Helper: add footer with Twende Green Ecocycle branding ──
 const addReportFooter = async (doc: jsPDF, orgName: string) => {
   const pages = doc.getNumberOfPages();
   const pw = doc.internal.pageSize.getWidth();
@@ -135,7 +135,7 @@ const addReportFooter = async (doc: jsPDF, orgName: string) => {
     doc.setLineWidth(0.3);
     doc.line(15, footerY, pw - 15, footerY);
 
-    // Duara Intelligence logo (left)
+    // Twende Green Ecocycle logo (left)
     if (intelLogo) {
       try { doc.addImage(intelLogo, "PNG", 15, footerY + 2, 25, 13); } catch {}
     }
@@ -143,7 +143,7 @@ const addReportFooter = async (doc: jsPDF, orgName: string) => {
     // Contact info (center)
     doc.setFontSize(6.5);
     doc.setTextColor(...PDF_COLORS.mutedText);
-    doc.text(`${orgName}  •  Powered by Duara Flow`, pw / 2, footerY + 6, { align: "center" });
+    doc.text(`${orgName}  •  Powered by Twende Green Ecocycle`, pw / 2, footerY + 6, { align: "center" });
     doc.text("www.duaraflow.co.ke  •  info@duaraflow.co.ke  •  +254 741 027 140", pw / 2, footerY + 10, { align: "center" });
 
     // Page number (right)
@@ -628,7 +628,7 @@ const ESGPanel = () => {
     doc.setTextColor(120, 120, 120);
     doc.text("Authorized Signatory", pw / 2, y, { align: "center" });
 
-    // Duara Flow + Intelligence branding at bottom
+    // Twende Green Ecocycle + Intelligence branding at bottom
     const duaraLogo = await getDuaraFlowLogo();
     const intelLogo = await getDuaraIntelLogo();
 
@@ -647,7 +647,7 @@ const ESGPanel = () => {
 
     doc.setFontSize(6);
     doc.setTextColor(150, 150, 150);
-    doc.text("Verified by Duara Flow  •  www.duaraflow.co.ke  •  Powered by Duara Intelligence", pw / 2, ph - 24, { align: "center" });
+    doc.text("Verified by Twende Green Ecocycle  •  www.duaraflow.co.ke  •  Powered by Twende Green Ecocycle", pw / 2, ph - 24, { align: "center" });
 
     doc.save(`sustainability-certificate-${format(new Date(), "yyyy-MM-dd")}.pdf`);
     toast.success("Sustainability certificate downloaded");

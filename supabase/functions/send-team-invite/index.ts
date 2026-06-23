@@ -109,15 +109,15 @@ Deno.serve(async (req) => {
           orgName,
           role: existing.role,
           joinUrl,
-          siteName: 'Duara Flow',
+          siteName: 'Twende Green Ecocycle',
         })
       )
 
       const transporter = createTransporter()
       const info = await transporter.sendMail({
-        from: 'Duara Flow <info@duaraflow.co.ke>',
+        from: 'Twende Green Ecocycle <info@duaraflow.co.ke>',
         to: existing.email,
-        subject: `Reminder: You've been invited to join a team on Duara Flow`,
+        subject: `Reminder: You've been invited to join a team on Twende Green Ecocycle`,
         html,
       })
 
@@ -177,15 +177,15 @@ Deno.serve(async (req) => {
         orgName,
         role: roleData.role,
         joinUrl,
-        siteName: 'Duara Flow',
+        siteName: 'Twende Green Ecocycle',
       })
     )
 
     const transporter = createTransporter()
     const info = await transporter.sendMail({
-      from: 'Duara Flow <info@duaraflow.co.ke>',
+      from: 'Twende Green Ecocycle <info@duaraflow.co.ke>',
       to: email,
-      subject: `You've been invited to join a team on Duara Flow`,
+      subject: `You've been invited to join a team on Twende Green Ecocycle`,
       html,
     })
 

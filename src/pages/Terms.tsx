@@ -5,13 +5,13 @@ import { Button } from "@/components/ui/button";
 import { Footer } from "@/components/CTASection";
 
 const sections = [
-  { title: "1. Acceptance of Terms", body: "By accessing or using the Duara Flow platform, you agree to be bound by these Terms of Service. If you do not agree, you may not use the platform. These terms apply to all users including waste pickers, aggregators, recyclers, NGOs, corporates, and county government officials." },
-  { title: "2. Platform Description", body: "Duara Flow is a digital platform for waste value chain traceability, connecting stakeholders across Kenya's circular economy. The platform provides collection tracking, payment processing, compliance management, impact reporting, and ESG analytics tools." },
-  { title: "3. User Accounts", body: "You must register for an account and select your appropriate role to use Duara Flow. You are responsible for maintaining the confidentiality of your credentials. All activities under your account are your responsibility. You must provide accurate and complete information during registration." },
+  { title: "1. Acceptance of Terms", body: "By accessing or using the Twende Green Ecocycle platform, you agree to be bound by these Terms of Service. If you do not agree, you may not use the platform. These terms apply to all users including waste pickers, aggregators, recyclers, NGOs, corporates, and county government officials." },
+  { title: "2. Platform Description", body: "Twende Green Ecocycle is a digital platform for waste value chain traceability, connecting stakeholders across Kenya's circular economy. The platform provides collection tracking, payment processing, compliance management, impact reporting, and ESG analytics tools." },
+  { title: "3. User Accounts", body: "You must register for an account and select your appropriate role to use Twende Green Ecocycle. You are responsible for maintaining the confidentiality of your credentials. All activities under your account are your responsibility. You must provide accurate and complete information during registration." },
   { title: "4. Acceptable Use", body: "You agree not to misuse the platform, submit fraudulent collection or transaction data, impersonate other users, attempt to circumvent security measures, or use the platform for any unlawful purpose. Violation may result in immediate suspension or termination of your account." },
-  { title: "5. Payments & Transactions", body: "Payments processed through Duara Flow via M-Pesa or other integrated payment methods are subject to the respective payment provider's terms. Duara Flow facilitates but does not guarantee payment processing. Transaction records are maintained for audit and compliance purposes." },
-  { title: "6. Intellectual Property", body: "All content, features, and functionality of the Duara Flow platform are owned by Duara Intelligence and are protected by intellectual property laws. You retain ownership of data you submit but grant us a license to use it for platform operations." },
-  { title: "7. Limitation of Liability", body: "Duara Flow is provided \"as is\" without warranties. We are not liable for indirect, incidental, or consequential damages arising from your use of the platform. Our total liability shall not exceed the amount you have paid us in the 12 months preceding the claim." },
+  { title: "5. Payments & Transactions", body: "Payments processed through Twende Green Ecocycle via M-Pesa or other integrated payment methods are subject to the respective payment provider's terms. Twende Green Ecocycle facilitates but does not guarantee payment processing. Transaction records are maintained for audit and compliance purposes." },
+  { title: "6. Intellectual Property", body: "All content, features, and functionality of the Twende Green Ecocycle platform are owned by Twende Green Ecocycle and are protected by intellectual property laws. You retain ownership of data you submit but grant us a license to use it for platform operations." },
+  { title: "7. Limitation of Liability", body: "Twende Green Ecocycle is provided \"as is\" without warranties. We are not liable for indirect, incidental, or consequential damages arising from your use of the platform. Our total liability shall not exceed the amount you have paid us in the 12 months preceding the claim." },
   { title: "8. Governing Law", body: "These terms are governed by the laws of the Republic of Kenya. Any disputes shall be resolved through arbitration in Nairobi, Kenya, in accordance with the Arbitration Act of Kenya." },
 ];
 
@@ -23,7 +23,7 @@ const Terms = () => (
           <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary transition-all duration-300 group-hover:scale-110">
             <Recycle className="h-5 w-5 text-primary-foreground" />
           </div>
-          <span className="font-display text-lg font-bold text-foreground">Duara Flow</span>
+          <span className="font-display text-lg font-bold text-foreground">Twende Green Ecocycle</span>
         </Link>
         <Button variant="ghost" size="sm" asChild>
           <Link to="/"><ArrowLeft className="mr-1 h-4 w-4" /> Back</Link>

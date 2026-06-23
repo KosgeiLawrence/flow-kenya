@@ -60,8 +60,8 @@ export default function PublicCatalogue() {
   useEffect(() => {
     const c = data?.catalogue;
     if (!c) return;
-    document.title = `${c.business_name} — Product Catalogue | Duara Flow`;
-    const desc = c.tagline || c.about?.slice(0, 155) || `Browse products from ${c.business_name} on Duara Flow.`;
+    document.title = `${c.business_name} — Product Catalogue | Twende Green Ecocycle`;
+    const desc = c.tagline || c.about?.slice(0, 155) || `Browse products from ${c.business_name} on Twende Green Ecocycle.`;
     let metaDesc = document.querySelector('meta[name="description"]');
     if (!metaDesc) { metaDesc = document.createElement("meta"); metaDesc.setAttribute("name", "description"); document.head.appendChild(metaDesc); }
     metaDesc.setAttribute("content", desc);
@@ -219,7 +219,7 @@ export default function PublicCatalogue() {
         {/* Footer */}
         <footer className="text-center pt-6 border-t border-border">
           <p className="text-xs text-muted-foreground">
-            Powered by <Link to="/" className="text-primary hover:underline font-medium">Duara Flow</Link> · Circular economy platform
+            Powered by <Link to="/" className="text-primary hover:underline font-medium">Twende Green Ecocycle</Link> · Circular economy platform
           </p>
         </footer>
       </main>

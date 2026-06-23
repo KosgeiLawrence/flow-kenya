@@ -146,7 +146,7 @@ const JoinTeam = () => {
     <div className="min-h-screen flex items-center justify-center bg-background p-4">
       <Card className="max-w-md w-full">
         <CardHeader className="text-center pb-2">
-          <img src="/images/duara-flow-logo.svg" alt="Duara Flow" className="h-10 mx-auto mb-4" />
+          <img src="/images/duara-flow-logo.svg" alt="Twende Green Ecocycle" className="h-10 mx-auto mb-4" />
           {orgInfo?.logo_url && (
             <img src={orgInfo.logo_url} alt={orgInfo.name} className="h-12 mx-auto mb-2 rounded" />
           )}

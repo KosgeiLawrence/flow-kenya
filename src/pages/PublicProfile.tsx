@@ -83,7 +83,7 @@ const PublicProfile = () => {
         <div className="rounded-2xl overflow-hidden shadow-elevated border border-border bg-card">
           {/* Header */}
           <div className="bg-gradient-to-r from-primary to-primary/80 px-5 py-4 flex items-center gap-3">
-            <img src="/images/duara-flow-logo.svg" alt="Duara Flow" className="h-7 brightness-0 invert" />
+            <img src="/images/duara-flow-logo.svg" alt="Twende Green Ecocycle" className="h-7 brightness-0 invert" />
             <div className="flex-1" />
             <Badge variant={isVerified ? "default" : "secondary"} className="gap-1 text-xs font-semibold">
               {isVerified ? <CheckCircle2 className="w-3 h-3" /> : <Clock className="w-3 h-3" />}
@@ -214,7 +214,7 @@ const PublicProfile = () => {
 
         {/* Footer */}
         <p className="text-center text-xs text-muted-foreground">
-          Powered by <span className="font-semibold text-primary">Duara Flow</span>
+          Powered by <span className="font-semibold text-primary">Twende Green Ecocycle</span>
         </p>
       </div>
     </div>

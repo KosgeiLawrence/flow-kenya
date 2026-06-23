@@ -13,7 +13,7 @@ const sw = {
 
   // Hero
   hero: {
-    badge: "Na Duara Intelligence",
+    badge: "Na Twende Green Ecocycle",
     title1: "Miundombinu ya Dijitali ya",
     traceability: "Ufuatiliaji",
     title2: "ya Kenya kwa",
@@ -121,7 +121,7 @@ const sw = {
     title: "Kujenga",
     titleHighlight: "Uchumi wa Mzunguko",
     titleEnd: "Miundombinu ya Kenya",
-    description: "Duara Flow ni jukwaa la dijitali la Duara Intelligence linalounganisha kila kiungo katika mlolongo wa thamani ya taka wa Kenya — kutoka ukusanyaji hadi usindikaji. Tunatoa ufuatiliaji, uwazi, na fidia ya haki ili kuunda uchumi endelevu wa mzunguko unaofaidisha watu na sayari.",
+    description: "Twende Green Ecocycle ni jukwaa la dijitali linalounganisha kila kiungo katika mlolongo wa thamani ya taka wa Kenya — kutoka ukusanyaji hadi usindikaji. Tunatoa ufuatiliaji, uwazi, na fidia ya haki ili kuunda uchumi endelevu wa mzunguko unaofaidisha watu na sayari.",
     missionTitle: "Dhamira Yetu",
     missionText: "Kudigitali na kurasimisha mlolongo wa thamani ya taka wa Kenya, kuhakikisha kila mkusanyaji taka analipwa kwa haki, kila kilogramu inafuatiliwa, na kila mdau ana data wanayohitaji kuendesha athari endelevu.",
     visionTitle: "Maono Yetu",
@@ -129,7 +129,7 @@ const sw = {
     value1Title: "Uchumi wa Mzunguko",
     value1Desc: "Tunaamini taka ni rasilimali. Jukwaa letu linabadilisha mtindo wa taka wa mstari wa Kenya kuwa uchumi unaostawi wa mzunguko ambapo kila nyenzo inapata maisha mapya.",
     value2Title: "Ukuaji Jumuishi",
-    value2Desc: "Kutoka kwa wakusanyaji taka wasio rasmi hadi makampuni makubwa — Duara Flow inawezesha kila mdau na zana za dijitali, bei ya haki, na miamala ya uwazi.",
+    value2Desc: "Kutoka kwa wakusanyaji taka wasio rasmi hadi makampuni makubwa — Twende Green Ecocycle inawezesha kila mdau na zana za dijitali, bei ya haki, na miamala ya uwazi.",
     value3Title: "Athari ya Mazingira",
     value3Desc: "Kila kilogramu inayofuatiliwa kwenye jukwaa letu ni kilogramu iliyoelekezwa kutoka kwenye dampo. Tunafanya athari ya mazingira ipimike, ithibitishwe, na iweze kuwa ya benki.",
     value4Title: "Maamuzi Yanayoongozwa na Data",
@@ -140,10 +140,10 @@ const sw = {
   cta: {
     title1: "Tayari Kudigitali",
     title2: "Mlolongo Wako wa Thamani ya Taka?",
-    subtitle: "Iwe wewe ni mkusanyaji taka, mkusanyaji, kampuni, au serikali ya kaunti — Duara Flow ina dashibodi iliyojengwa kwa ajili yako.",
+    subtitle: "Iwe wewe ni mkusanyaji taka, mkusanyaji, kampuni, au serikali ya kaunti — Twende Green Ecocycle ina dashibodi iliyojengwa kwa ajili yako.",
     getStarted: "Anza Sasa",
     signIn: "Ingia",
-    copyright: "© 2026 Duara Intelligence. Kujenga miundombinu ya uchumi wa mzunguko wa Kenya.",
+    copyright: "© 2026 Twende Green Ecocycle. Kujenga miundombinu ya uchumi wa mzunguko wa Kenya.",
     privacy: "Faragha",
     terms: "Masharti",
     contact: "Wasiliana",
@@ -186,7 +186,7 @@ const sw = {
   // Auth Pages
   auth: {
     signInTitle: "Karibu Tena",
-    signInSubtitle: "Ingia kwenye akaunti yako ya Duara Flow",
+    signInSubtitle: "Ingia kwenye akaunti yako ya Twende Green Ecocycle",
     signUpTitle: "Unda Akaunti",
     signUpSubtitle: "Jiunge na jukwaa la uchumi wa mzunguko wa Kenya",
     email: "Barua pepe",
@@ -211,7 +211,7 @@ const sw = {
   // Contact
   contact: {
     title: "Wasiliana Nasi",
-    subtitle: "Wasiliana na timu ya Duara Flow",
+    subtitle: "Wasiliana na timu ya Twende Green Ecocycle",
     fullName: "Jina Kamili",
     email: "Barua pepe",
     subject: "Mada",
@@ -819,7 +819,7 @@ const sw = {
     title: "Kitambulisho cha Dijitali",
     qrCode: "Msimbo wa QR",
     scanToVerify: "Scan kuthibitisha utambulisho",
-    scanDescription: "Scan msimbo huu wa QR ili kuona profaili na data ya athari ya mwanachama huyu kwenye Duara Flow.",
+    scanDescription: "Scan msimbo huu wa QR ili kuona profaili na data ya athari ya mwanachama huyu kwenye Twende Green Ecocycle.",
     memberSince: "Tarehe ya Kujiunga",
     verificationStatus: "Hali ya Uthibitishaji",
     downloadId: "Pakua Kitambulisho cha Dijitali",
@@ -1162,7 +1162,7 @@ const sw = {
     investigateCase: "Chunguza",
 
     inviteUsers: "Alika Watumiaji",
-    inviteDesc: "Tuma mialiko ya barua pepe kujiunga na Duara Flow. Kila mwaliko unajumuisha kuponi ya PILOT2026 kwa ufikiaji wa bure.",
+    inviteDesc: "Tuma mialiko ya barua pepe kujiunga na Twende Green Ecocycle. Kila mwaliko unajumuisha kuponi ya PILOT2026 kwa ufikiaji wa bure.",
     sendInvite: "Tuma Mwaliko",
     inviteEmail: "Anwani ya Barua Pepe",
     inviteRole: "Jukumu",
@@ -1307,7 +1307,7 @@ const sw = {
 
   // Marketplace page
   marketplacePage: {
-    badge: "Soko la Duara Flow",
+    badge: "Soko la Twende Green Ecocycle",
     title1: "Soko la Uchumi",
     title2: "wa Mzunguko",
     subtitle: "Vinjari nyenzo za taka, bidhaa zilizosindikwa, na vifaa kutoka kwa wakusanyaji taka, wasambazaji, na wasindikaji waliothibitishwa kote Kenya.",

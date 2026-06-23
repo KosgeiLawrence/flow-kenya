@@ -27,8 +27,8 @@ export default defineConfig(({ mode }) => ({
         maximumFileSizeToCacheInBytes: 5 * 1024 * 1024, // 5 MB
       },
       manifest: {
-        name: "Duara Flow — Circular Economy Platform",
-        short_name: "Duara Flow",
+        name: "Twende Green Ecocycle — Circular Economy Platform",
+        short_name: "Twende Green Ecocycle",
         description: "Kenya's end-to-end digital traceability and compliance infrastructure for the circular economy.",
         theme_color: "#2b5e3f",
         background_color: "#f7f3ee",

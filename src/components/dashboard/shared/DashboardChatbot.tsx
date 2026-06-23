@@ -198,7 +198,7 @@ const DashboardChatbot = ({ role, navItems, onNavigate }: DashboardChatbotProps)
             </div>
             <div className="flex-1">
               <h3 className="text-sm font-semibold text-foreground">
-                {currentLang === "sw" ? "Msaidizi wa Duara AI" : "Duara AI Assistant"}
+                {currentLang === "sw" ? "Msaidizi wa Twende AI" : "Twende AI Assistant"}
               </h3>
               <p className="text-xs text-muted-foreground">
                 {currentLang === "sw" ? "Ninaweza kufanya vitendo, kuchambua data na kusogeza" : "I can do actions, analyze data & navigate"}
@@ -219,8 +219,8 @@ const DashboardChatbot = ({ role, navItems, onNavigate }: DashboardChatbotProps)
                   </div>
                    <div className="text-sm text-muted-foreground leading-relaxed">
                      {currentLang === "sw"
-                       ? "Habari! Mimi ni msaidizi wako wa Duara AI. Ninaweza kukusaidia kusogeza dashibodi yako, kuchambua data yako, na kujibu maswali. Ninawezaje kukusaidia leo?"
-                       : "Hi! I'm your Duara AI assistant. I can help you navigate your dashboard, analyze your data, and answer questions. How can I help you today?"}
+                       ? "Habari! Mimi ni msaidizi wako wa Twende AI. Ninaweza kukusaidia kusogeza dashibodi yako, kuchambua data yako, na kujibu maswali. Ninawezaje kukusaidia leo?"
+                       : "Hi! I'm your Twende AI assistant. I can help you navigate your dashboard, analyze your data, and answer questions. How can I help you today?"}
                    </div>
                 </div>
                 <div className="space-y-2 pl-10">
