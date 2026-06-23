@@ -121,7 +121,7 @@ const sw = {
     title: "Kujenga",
     titleHighlight: "Uchumi wa Mzunguko",
     titleEnd: "Miundombinu ya Kenya",
-    description: "Twende Green Ecocycle ni jukwaa la dijitali la Twende Green Ecocycle linalounganisha kila kiungo katika mlolongo wa thamani ya taka wa Kenya — kutoka ukusanyaji hadi usindikaji. Tunatoa ufuatiliaji, uwazi, na fidia ya haki ili kuunda uchumi endelevu wa mzunguko unaofaidisha watu na sayari.",
+    description: "Twende Green Ecocycle ni jukwaa la dijitali linalounganisha kila kiungo katika mlolongo wa thamani ya taka wa Kenya — kutoka ukusanyaji hadi usindikaji. Tunatoa ufuatiliaji, uwazi, na fidia ya haki ili kuunda uchumi endelevu wa mzunguko unaofaidisha watu na sayari.",
     missionTitle: "Dhamira Yetu",
     missionText: "Kudigitali na kurasimisha mlolongo wa thamani ya taka wa Kenya, kuhakikisha kila mkusanyaji taka analipwa kwa haki, kila kilogramu inafuatiliwa, na kila mdau ana data wanayohitaji kuendesha athari endelevu.",
     visionTitle: "Maono Yetu",

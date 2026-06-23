@@ -121,7 +121,7 @@ const en = {
     title: "Building Kenya's",
     titleHighlight: "Circular Economy",
     titleEnd: "Infrastructure",
-    description: "Twende Green Ecocycle is a digital platform by Twende Green Ecocycle that connects every link in Kenya's waste value chain — from collection to recycling. We provide traceability, transparency, and fair compensation to create a sustainable circular economy that benefits people and planet.",
+    description: "Twende Green Ecocycle is a digital platform that connects every link in Kenya's waste value chain — from collection to recycling. We provide traceability, transparency, and fair compensation to create a sustainable circular economy that benefits people and planet.",
     missionTitle: "Our Mission",
     missionText: "To digitize and formalize Kenya's waste value chain, ensuring every waste picker is fairly compensated, every kilogram is traceable, and every stakeholder has the data they need to drive sustainable impact.",
     visionTitle: "Our Vision",
