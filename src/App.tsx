@@ -6,6 +6,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, useNavigate } from "react-router-dom";
 import { AuthProvider, useAuth } from "@/hooks/useAuth";
 import { useBiometrics } from "@/hooks/useBiometrics";
+import { useAndroidBackButton } from "@/hooks/useAndroidBackButton";
 import Index from "./pages/Index";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
@@ -66,6 +67,7 @@ const BiometricGate = ({ children }: { children: React.ReactNode }) => {
   const bio = useBiometrics(user?.id);
   const navigate = useNavigate();
   const [showSetup, setShowSetup] = useState(false);
+  useAndroidBackButton();
 
   const navigateToDashboard = useCallback(() => {
     const path = role ? `/dashboard/${role.replace("_", "-")}` : "/dashboard";
