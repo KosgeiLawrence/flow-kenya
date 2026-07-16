@@ -27,9 +27,10 @@ export const useAndroidBackButton = () => {
       try {
         // Dynamic import: only resolved inside the native shell where the
         // plugin is bundled. On web this line is never reached.
-        const mod = await import(/* @vite-ignore */ "@capacitor/app").catch(
-          () => null,
-        );
+        // Use a string variable so TypeScript does not resolve the module at
+        // compile time — the plugin only exists inside the native shell.
+        const pkg = "@capacitor/app";
+        const mod: any = await import(/* @vite-ignore */ pkg).catch(() => null);
         if (!mod?.App) return;
 
         const handle = await mod.App.addListener("backButton", () => {
