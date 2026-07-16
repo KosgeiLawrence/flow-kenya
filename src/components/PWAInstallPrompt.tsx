@@ -14,6 +14,16 @@ const PWAInstallPrompt = () => {
   const [dismissed, setDismissed] = useState(false);
 
   useEffect(() => {
+    // Never show the browser install prompt inside a native Capacitor shell.
+    const isNative =
+      window.location.protocol === "capacitor:" ||
+      // @ts-expect-error – Capacitor global
+      typeof window.Capacitor !== "undefined";
+    if (isNative) {
+      setDismissed(true);
+      return;
+    }
+
     const wasDismissed = localStorage.getItem("pwa-install-dismissed");
     if (wasDismissed) {
       setDismissed(true);
