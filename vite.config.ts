@@ -5,7 +5,13 @@ import { componentTagger } from "lovable-tagger";
 import { VitePWA } from "vite-plugin-pwa";
 
 // https://vitejs.dev/config/
-export default defineConfig(({ mode }) => ({
+export default defineConfig(({ mode }) => {
+  // Use relative asset paths when packaging for Capacitor (Android/iOS WebView
+  // loads index.html from a non-root origin). Falls back to root-relative for
+  // normal web deploys so BrowserRouter and OG tags keep working.
+  const isCapacitor = process.env.CAPACITOR === "true";
+  return ({
+  base: isCapacitor ? "./" : "/",
   server: {
     host: "::",
     port: 8080,
@@ -13,10 +19,36 @@ export default defineConfig(({ mode }) => ({
       overlay: false,
     },
   },
+  build: {
+    target: "es2020",
+    sourcemap: false,
+    chunkSizeWarningLimit: 1500,
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          "react-vendor": ["react", "react-dom", "react-router-dom"],
+          "ui-vendor": [
+            "@radix-ui/react-dialog",
+            "@radix-ui/react-dropdown-menu",
+            "@radix-ui/react-popover",
+            "@radix-ui/react-select",
+            "@radix-ui/react-tabs",
+            "@radix-ui/react-toast",
+            "@radix-ui/react-tooltip",
+          ],
+          "chart-vendor": ["recharts"],
+          "pdf-vendor": ["jspdf", "html2canvas"],
+          "supabase-vendor": ["@supabase/supabase-js"],
+          "motion-vendor": ["framer-motion"],
+          "query-vendor": ["@tanstack/react-query"],
+        },
+      },
+    },
+  },
   plugins: [
     react(),
     mode === "development" && componentTagger(),
-    VitePWA({
+    !isCapacitor && VitePWA({
       registerType: "autoUpdate",
       devOptions: {
         enabled: false,
@@ -64,4 +96,5 @@ export default defineConfig(({ mode }) => ({
       "@": path.resolve(__dirname, "./src"),
     },
   },
-}));
+  });
+});

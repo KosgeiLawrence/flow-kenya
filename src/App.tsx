@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, lazy, Suspense } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -6,35 +6,19 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, useNavigate } from "react-router-dom";
 import { AuthProvider, useAuth } from "@/hooks/useAuth";
 import { useBiometrics } from "@/hooks/useBiometrics";
+import { useAndroidBackButton } from "@/hooks/useAndroidBackButton";
 import Index from "./pages/Index";
-import ImpactDashboard from "./pages/ImpactDashboard";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
 import AuthConfirm from "./pages/AuthConfirm";
-import Dashboard from "./pages/Dashboard";
-import WastePickerDashboard from "./pages/WastePickerDashboard";
-import AggregatorDashboard from "./pages/AggregatorDashboard";
-import RecyclerDashboard from "./pages/RecyclerDashboard";
-import NGODashboard from "./pages/NGODashboard";
-import CorporateDashboard from "./pages/CorporateDashboard";
-import AdminDashboard from "./pages/AdminDashboard";
-import CountyGovernmentDashboard from "./pages/CountyGovernmentDashboard";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
 import Payment from "./pages/Payment";
 import NotFound from "./pages/NotFound";
 import Privacy from "./pages/Privacy";
 import Terms from "./pages/Terms";
 import Contact from "./pages/Contact";
-import PublicReport from "./pages/PublicReport";
-import CleanupRegister from "./pages/CleanupRegister";
-import PublicForm from "./pages/PublicForm";
-import JoinTeam from "./pages/JoinTeam";
-import PublicProfile from "./pages/PublicProfile";
-import Unsubscribe from "./pages/Unsubscribe";
-import Marketplace from "./pages/Marketplace";
-import PublicCatalogue from "./pages/PublicCatalogue";
 import PWAInstallPrompt from "./components/PWAInstallPrompt";
 import TargetCrosshair from "./components/TargetCrosshair";
 
@@ -42,6 +26,33 @@ import BiometricLockScreen from "./components/auth/BiometricLockScreen";
 import BiometricSetupPrompt from "./components/auth/BiometricSetupPrompt";
 import SplashScreen from "./components/SplashScreen";
 import ErrorBoundary from "./components/ErrorBoundary";
+import { Loader2 } from "lucide-react";
+
+// Route-level code splitting — keep the initial bundle lean for slow
+// connections and Android WebView first-paint.
+const ImpactDashboard = lazy(() => import("./pages/ImpactDashboard"));
+const Dashboard = lazy(() => import("./pages/Dashboard"));
+const WastePickerDashboard = lazy(() => import("./pages/WastePickerDashboard"));
+const AggregatorDashboard = lazy(() => import("./pages/AggregatorDashboard"));
+const RecyclerDashboard = lazy(() => import("./pages/RecyclerDashboard"));
+const NGODashboard = lazy(() => import("./pages/NGODashboard"));
+const CorporateDashboard = lazy(() => import("./pages/CorporateDashboard"));
+const AdminDashboard = lazy(() => import("./pages/AdminDashboard"));
+const CountyGovernmentDashboard = lazy(() => import("./pages/CountyGovernmentDashboard"));
+const PublicReport = lazy(() => import("./pages/PublicReport"));
+const CleanupRegister = lazy(() => import("./pages/CleanupRegister"));
+const PublicForm = lazy(() => import("./pages/PublicForm"));
+const JoinTeam = lazy(() => import("./pages/JoinTeam"));
+const PublicProfile = lazy(() => import("./pages/PublicProfile"));
+const Unsubscribe = lazy(() => import("./pages/Unsubscribe"));
+const Marketplace = lazy(() => import("./pages/Marketplace"));
+const PublicCatalogue = lazy(() => import("./pages/PublicCatalogue"));
+
+const RouteFallback = () => (
+  <div className="min-h-screen flex items-center justify-center bg-background">
+    <Loader2 className="w-8 h-8 animate-spin text-primary" />
+  </div>
+);
 
 const queryClient = new QueryClient();
 
@@ -56,6 +67,7 @@ const BiometricGate = ({ children }: { children: React.ReactNode }) => {
   const bio = useBiometrics(user?.id);
   const navigate = useNavigate();
   const [showSetup, setShowSetup] = useState(false);
+  useAndroidBackButton();
 
   const navigateToDashboard = useCallback(() => {
     const path = role ? `/dashboard/${role.replace("_", "-")}` : "/dashboard";
@@ -136,6 +148,7 @@ const App = () => {
                 <PWAInstallPrompt />
                 <TargetCrosshair />
                 
+                <Suspense fallback={<RouteFallback />}>
                 <Routes>
                   <Route path="/" element={<Index />} />
                   <Route path="/impact" element={<ImpactDashboard />} />
@@ -222,6 +235,7 @@ const App = () => {
                   <Route path="/catalogue/:slug" element={<PublicCatalogue />} />
                   <Route path="*" element={<NotFound />} />
                 </Routes>
+                </Suspense>
               </BiometricGate>
             </AuthProvider>
           </BrowserRouter>
