@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=DM+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=DM+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Outfit:wght@400;500;600;700&family=Figtree:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -255,4 +255,203 @@
     33% { transform: translateY(-6px) rotate(0.5deg); }
     66% { transform: translateY(3px) rotate(-0.3deg); }
   }
+}
+
+/* ══════════════════════════════════════════════════════════════
+   Soft UI (Neumorphic) theme — scoped to dashboard routes via
+   the `.soft-ui` class on <html>. Matte porcelain surfaces,
+   floating white cards, diffuse ambient shadows, forest accent.
+   ══════════════════════════════════════════════════════════════ */
+html.soft-ui {
+  --background: 220 14% 96%;
+  --foreground: 210 12% 16%;
+
+  --card: 0 0% 100%;
+  --card-foreground: 210 12% 16%;
+
+  --popover: 0 0% 100%;
+  --popover-foreground: 210 12% 16%;
+
+  --primary: 150 37% 27%;
+  --primary-foreground: 0 0% 100%;
+
+  --secondary: 150 12% 92%;
+  --secondary-foreground: 150 37% 22%;
+
+  --muted: 220 14% 93%;
+  --muted-foreground: 215 10% 45%;
+
+  --accent: 152 14% 90%;
+  --accent-foreground: 150 37% 24%;
+
+  --destructive: 0 68% 52%;
+  --destructive-foreground: 0 0% 100%;
+
+  --border: 220 13% 90%;
+  --input: 220 13% 90%;
+  --ring: 150 37% 35%;
+
+  --radius: 1.5rem;
+
+  --sidebar-background: 220 14% 96%;
+  --sidebar-foreground: 210 12% 22%;
+  --sidebar-primary: 150 37% 27%;
+  --sidebar-primary-foreground: 0 0% 100%;
+  --sidebar-accent: 0 0% 100%;
+  --sidebar-accent-foreground: 150 37% 22%;
+  --sidebar-border: 220 13% 90%;
+  --sidebar-ring: 150 37% 35%;
+
+  /* Brand tokens re-tuned for light surfaces */
+  --gold: 40 48% 45%;
+  --gold-light: 40 55% 62%;
+  --forest: 150 37% 27%;
+  --forest-deep: 150 30% 18%;
+  --earth: 25 28% 38%;
+  --earth-light: 30 24% 58%;
+  --sky: 198 48% 42%;
+
+  /* Neumorphic glass system */
+  --glass-bg: rgba(255, 255, 255, 0.72);
+  --glass-bg-strong: rgba(255, 255, 255, 0.92);
+  --glass-bg-subtle: rgba(255, 255, 255, 0.55);
+  --glass-border: rgba(255, 255, 255, 0.9);
+  --glass-border-subtle: rgba(15, 25, 20, 0.05);
+  --glass-shadow: 10px 10px 28px rgba(163, 173, 183, 0.38), -10px -10px 28px rgba(255, 255, 255, 0.95);
+  --glass-shadow-lg: 16px 18px 42px rgba(150, 162, 173, 0.42), -14px -14px 38px rgba(255, 255, 255, 1);
+  --glass-blur: blur(18px);
+  --glass-radius: 24px;
+
+  --gradient-hero: linear-gradient(135deg, hsl(220 16% 97%) 0%, hsl(220 14% 95%) 100%);
+  --gradient-gold: linear-gradient(135deg, hsl(40 48% 48%) 0%, hsl(35 55% 55%) 100%);
+
+  --shadow-soft: 8px 8px 20px rgba(163, 173, 183, 0.28), -8px -8px 20px rgba(255, 255, 255, 0.92);
+  --shadow-elevated: 14px 16px 36px rgba(150, 162, 173, 0.34), -12px -12px 32px rgba(255, 255, 255, 1);
+  --shadow-gold: 8px 8px 24px hsl(40 48% 45% / 0.18), -8px -8px 20px rgba(255, 255, 255, 0.9);
+  --shadow-glow-primary: 0 10px 30px hsl(150 37% 27% / 0.18);
+  --shadow-glow-gold: 0 10px 30px hsl(40 48% 45% / 0.2);
+
+  --soft-inset: inset 4px 4px 10px rgba(163, 173, 183, 0.28), inset -4px -4px 10px rgba(255, 255, 255, 0.95);
+
+  --font-display: 'Outfit', system-ui, sans-serif;
+  --font-body: 'Figtree', system-ui, sans-serif;
+
+  color-scheme: light;
+}
+
+html.soft-ui body {
+  background-color: hsl(var(--background));
+}
+
+/* Ambient light wash instead of the dark radial glow */
+html.soft-ui .bg-radial-glow,
+html.soft-ui .bg-mesh {
+  background-image:
+    radial-gradient(ellipse at 15% 0%, rgba(255, 255, 255, 0.95) 0%, transparent 55%),
+    radial-gradient(ellipse at 85% 10%, hsl(150 37% 27% / 0.05) 0%, transparent 55%),
+    radial-gradient(ellipse at 50% 100%, hsl(150 20% 60% / 0.07) 0%, transparent 60%);
+}
+
+html.soft-ui .bg-hero { background: var(--gradient-hero); }
+
+/* ── Floating matte cards ── */
+html.soft-ui .glass,
+html.soft-ui .glass-card,
+html.soft-ui .glass-strong {
+  background: rgba(255, 255, 255, 0.86);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid rgba(255, 255, 255, 0.85);
+  box-shadow: var(--glass-shadow);
+  border-radius: var(--glass-radius);
+}
+
+html.soft-ui .glass:hover,
+html.soft-ui .glass-card:hover {
+  background: var(--glass-bg-strong);
+  box-shadow: var(--glass-shadow-lg);
+}
+
+html.soft-ui .glass-subtle {
+  background: var(--glass-bg-subtle);
+  border: 1px solid var(--glass-border-subtle);
+  box-shadow: none;
+}
+
+html.soft-ui .glass-sidebar {
+  background: hsl(var(--sidebar-background));
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  border-right: 1px solid rgba(15, 25, 20, 0.05);
+  box-shadow: 12px 0 32px rgba(163, 173, 183, 0.16);
+}
+
+html.soft-ui .glass-header {
+  background: rgba(248, 249, 251, 0.82);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(15, 25, 20, 0.05);
+}
+
+html.soft-ui .glass-input {
+  background: hsl(220 14% 96%);
+  border: 1px solid transparent;
+  box-shadow: var(--soft-inset);
+  border-radius: 14px;
+}
+
+html.soft-ui .glass-input:focus,
+html.soft-ui .glass-input:focus-within {
+  background: #fff;
+  border-color: hsl(var(--ring) / 0.35);
+  box-shadow: var(--soft-inset), 0 0 0 3px hsl(var(--ring) / 0.12);
+}
+
+/* ── Pillowed sidebar nav ── */
+html.soft-ui .sidebar-nav-item { border-radius: 16px; }
+html.soft-ui .sidebar-nav-item:hover { background: rgba(255, 255, 255, 0.85); }
+html.soft-ui .sidebar-nav-item.active,
+html.soft-ui aside nav button[class*="bg-[rgba(255,255,255,0.10)]"] {
+  background: #ffffff;
+  color: hsl(var(--sidebar-accent-foreground));
+  box-shadow: 6px 6px 16px rgba(163, 173, 183, 0.3), -6px -6px 16px rgba(255, 255, 255, 0.95);
+}
+
+/* Legacy dark-theme inline rgba borders inside dashboards */
+html.soft-ui .border-\[rgba\(255\,255\,255\,0\.08\)\] { border-color: rgba(15, 25, 20, 0.06) !important; }
+
+/* ── shadcn primitives get soft depth ── */
+html.soft-ui [data-radix-popper-content-wrapper] > * ,
+html.soft-ui [role="dialog"] {
+  border-radius: 24px;
+}
+
+html.soft-ui .shadow-soft { box-shadow: var(--shadow-soft); }
+html.soft-ui .shadow-elevated { box-shadow: var(--shadow-elevated); }
+html.soft-ui .shadow-gold { box-shadow: var(--shadow-gold); }
+
+html.soft-ui .hover-glow:hover {
+  box-shadow: 0 12px 34px hsl(150 37% 27% / 0.18);
+}
+
+/* Tables and separators read lighter */
+html.soft-ui th { color: hsl(var(--muted-foreground)); font-weight: 600; }
+
+/* Cards should settle, not jump, in the Soft UI dashboards */
+html.soft-ui .glass:hover,
+html.soft-ui .glass-card:hover {
+  transform: none;
+}
+
+/* shadcn Card variants that use raw utility classes */
+html.soft-ui .rounded-lg.border.bg-card,
+html.soft-ui .bg-card.border {
+  border-color: transparent;
+  box-shadow: var(--shadow-soft);
+  border-radius: var(--glass-radius);
+}
+
+/* Buttons get a soft tactile press */
+html.soft-ui button:not([role="tab"]):not([role="checkbox"]):not([role="switch"]):active {
+  transform: translateY(1px);
 }
