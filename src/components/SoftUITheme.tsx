@@ -2,8 +2,8 @@ import { useEffect } from "react";
 import { useLocation } from "react-router-dom";
 
 /**
- * Applies the Soft UI (neumorphic) light theme to dashboard routes only.
- * The marketing site keeps its dark glassmorphism identity.
+ * Applies the Soft UI (neumorphic) light theme across the whole product.
+ * `soft-landing` adds the marketing-surface remaps on public routes.
  */
 const SoftUITheme = () => {
   const { pathname } = useLocation();
@@ -11,8 +11,9 @@ const SoftUITheme = () => {
   useEffect(() => {
     const isDashboard = pathname.startsWith("/dashboard");
     const root = document.documentElement;
-    root.classList.toggle("soft-ui", isDashboard);
-    return () => root.classList.remove("soft-ui");
+    root.classList.add("soft-ui");
+    root.classList.toggle("soft-landing", !isDashboard);
+    return () => root.classList.remove("soft-ui", "soft-landing");
   }, [pathname]);
 
   return null;
