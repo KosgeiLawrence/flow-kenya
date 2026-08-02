@@ -539,3 +539,16 @@ html.soft-ui.soft-landing .border-\[rgba\(255\,255\,255\,0\.06\)\],
 html.soft-ui.soft-landing .border-\[rgba\(255\,255\,255\,0\.08\)\] {
   border-color: rgba(15, 25, 20, 0.06) !important;
 }
+
+/* Stat tiles built from translucent white washes become floating cards */
+html.soft-ui.soft-landing .bg-primary-foreground\/5,
+html.soft-ui.soft-landing .bg-primary-foreground\/3 {
+  background-color: rgba(255, 255, 255, 0.9);
+  box-shadow: var(--shadow-soft);
+}
+html.soft-ui.soft-landing header .bg-primary-foreground\/5,
+html.soft-ui.soft-landing header .hover\:bg-primary-foreground\/5:hover,
+html.soft-ui.soft-landing header .hover\:bg-primary-foreground\/10:hover {
+  background-color: rgba(255, 255, 255, 0.9);
+  box-shadow: none;
+}
