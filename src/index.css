@@ -436,3 +436,22 @@ html.soft-ui .hover-glow:hover {
 
 /* Tables and separators read lighter */
 html.soft-ui th { color: hsl(var(--muted-foreground)); font-weight: 600; }
+
+/* Cards should settle, not jump, in the Soft UI dashboards */
+html.soft-ui .glass:hover,
+html.soft-ui .glass-card:hover {
+  transform: none;
+}
+
+/* shadcn Card variants that use raw utility classes */
+html.soft-ui .rounded-lg.border.bg-card,
+html.soft-ui .bg-card.border {
+  border-color: transparent;
+  box-shadow: var(--shadow-soft);
+  border-radius: var(--glass-radius);
+}
+
+/* Buttons get a soft tactile press */
+html.soft-ui button:not([role="tab"]):not([role="checkbox"]):not([role="switch"]):active {
+  transform: translateY(1px);
+}
