@@ -343,6 +343,25 @@ html.soft-ui body {
   background-color: hsl(var(--background));
 }
 
+/* ── Icon legibility: `secondary` is a near-white surface tint in Soft UI,
+   so any icon/text painted with it disappears. Remap the foreground uses
+   to the readable deep-green ink while keeping tinted chips subtle. ── */
+html.soft-ui .text-secondary,
+html.soft-ui .text-secondary\/80,
+html.soft-ui .text-secondary\/70,
+html.soft-ui .text-secondary\/60 {
+  color: hsl(var(--secondary-foreground));
+}
+
+html.soft-ui .stroke-secondary { stroke: hsl(var(--secondary-foreground)); }
+html.soft-ui .fill-secondary { fill: hsl(var(--secondary-foreground)); }
+
+html.soft-ui .bg-secondary\/10,
+html.soft-ui .bg-secondary\/15,
+html.soft-ui .bg-secondary\/20 {
+  background-color: hsl(var(--secondary-foreground) / 0.10);
+}
+
 /* Ambient light wash instead of the dark radial glow */
 html.soft-ui .bg-radial-glow,
 html.soft-ui .bg-mesh {
