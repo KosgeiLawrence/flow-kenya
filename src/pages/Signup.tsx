@@ -135,11 +135,11 @@ const Signup = () => {
         </motion.div>
       </div>
 
-      {/* Right panel — dark */}
-      <div className="relative flex-1 flex items-center justify-center p-6 sm:p-12 overflow-y-auto" style={{ background: "linear-gradient(180deg, hsl(220 16% 10%) 0%, hsl(220 14% 13%) 100%)" }}>
+      {/* Right panel — porcelain */}
+      <div className="relative flex-1 flex items-center justify-center p-6 sm:p-12 overflow-y-auto bg-background">
         <button
           onClick={() => navigate("/")}
-          className="absolute top-6 right-6 p-2 rounded-full glass hover:bg-muted/80 text-muted-foreground hover:text-foreground transition-smooth z-10"
+          className="absolute top-6 right-6 p-2 rounded-full glass shadow-soft text-muted-foreground hover:text-foreground transition-smooth z-10"
           aria-label={t("auth.close")}
         >
           <X className="w-5 h-5" />
@@ -154,7 +154,7 @@ const Signup = () => {
 
           <AnimatePresence mode="wait">
             {step === 1 && (
-              <motion.div key="step1" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="glass-card rounded-2xl p-6 md:p-8">
+              <motion.div key="step1" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="glass-card rounded-3xl p-6 md:p-8 shadow-elevated">
                 <h2 className="text-2xl font-display font-bold text-foreground mb-2">Select Your Role</h2>
                 <p className="text-muted-foreground mb-6">Choose the role that best describes your position in the waste value chain.</p>
                 <RoleSelector selected={role} onSelect={handleRoleSelect} />
@@ -165,7 +165,7 @@ const Signup = () => {
             )}
 
             {step === 2 && role && (
-              <motion.div key="step2" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="glass-card rounded-2xl p-6 md:p-8">
+              <motion.div key="step2" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="glass-card rounded-3xl p-6 md:p-8 shadow-elevated">
                 <h2 className="text-2xl font-display font-bold text-foreground mb-2">Choose Your Plan</h2>
                 <p className="text-muted-foreground mb-6">Select the plan that fits your needs. You can upgrade anytime.</p>
                 <PricingPlans role={role} selectedPlan={selectedPlan} onSelectPlan={setSelectedPlan} billingPeriod={billingPeriod} onBillingPeriodChange={setBillingPeriod} promoCode={promoCode} onPromoCodeChange={setPromoCode} promoValid={promoValid} />
@@ -177,7 +177,7 @@ const Signup = () => {
             )}
 
             {step === 3 && (
-              <motion.div key="step3" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="glass-card rounded-2xl p-6 md:p-8">
+              <motion.div key="step3" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="glass-card rounded-3xl p-6 md:p-8 shadow-elevated">
                 <h2 className="text-2xl font-display font-bold text-foreground mb-2">Personal Information</h2>
                 <p className="text-muted-foreground mb-6">Provide your details to create your account.</p>
                 <div className="space-y-4">
@@ -205,7 +205,7 @@ const Signup = () => {
             )}
 
             {step === 4 && (
-              <motion.div key="step4" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="glass-card rounded-2xl p-6 md:p-8">
+              <motion.div key="step4" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="glass-card rounded-3xl p-6 md:p-8 shadow-elevated">
                 <h2 className="text-2xl font-display font-bold text-foreground mb-2">Organization Information</h2>
                 <p className="text-muted-foreground mb-6">Link your account to an organization or register as independent.</p>
                 {role === "waste_picker" && (
