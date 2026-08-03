@@ -170,7 +170,7 @@ const DashboardChatbot = ({ role, navItems, onNavigate }: DashboardChatbotProps)
         onClick={() => setIsOpen(!isOpen)}
         className={cn(
           "fixed bottom-6 right-6 z-50 w-14 h-14 rounded-2xl flex items-center justify-center",
-          "bg-primary text-primary-foreground shadow-lg",
+          "bg-primary text-primary-foreground shadow-elevated",
           "hover:scale-105 active:scale-95",
           "transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)]",
           isOpen && "rotate-90"
@@ -184,15 +184,13 @@ const DashboardChatbot = ({ role, navItems, onNavigate }: DashboardChatbotProps)
           className={cn(
             "fixed bottom-24 right-6 z-50 w-[380px] max-w-[calc(100vw-48px)]",
             "h-[520px] max-h-[calc(100vh-160px)]",
-            "rounded-2xl overflow-hidden flex flex-col",
-            "bg-[rgba(18,18,22,0.95)] backdrop-blur-[20px]",
-            "border border-[rgba(255,255,255,0.12)]",
-            "shadow-[0_8px_32px_rgba(0,0,0,0.4)]",
+            "rounded-3xl overflow-hidden flex flex-col",
+            "glass-strong shadow-elevated",
             "animate-in slide-in-from-bottom-4 fade-in duration-300"
           )}
         >
           {/* Header */}
-          <div className="px-5 py-4 border-b border-[rgba(255,255,255,0.08)] flex items-center gap-3">
+          <div className="px-5 py-4 border-b border-border/60 flex items-center gap-3">
             <div className="w-9 h-9 rounded-xl bg-primary/20 flex items-center justify-center">
               <Sparkles className="w-5 h-5 text-primary" />
             </div>
@@ -204,7 +202,7 @@ const DashboardChatbot = ({ role, navItems, onNavigate }: DashboardChatbotProps)
                 {currentLang === "sw" ? "Ninaweza kufanya vitendo, kuchambua data na kusogeza" : "I can do actions, analyze data & navigate"}
               </p>
             </div>
-            <button onClick={clearConversation} className="p-1.5 rounded-lg hover:bg-[rgba(255,255,255,0.08)] text-muted-foreground hover:text-foreground transition-colors" title={currentLang === "sw" ? "Futa mazungumzo" : "Clear conversation"}>
+            <button onClick={clearConversation} className="p-1.5 rounded-lg hover:bg-muted text-muted-foreground hover:text-foreground transition-colors" title={currentLang === "sw" ? "Futa mazungumzo" : "Clear conversation"}>
               <Trash2 className="w-4 h-4" />
             </button>
           </div>
@@ -228,7 +226,7 @@ const DashboardChatbot = ({ role, navItems, onNavigate }: DashboardChatbotProps)
                     <button
                       key={action}
                       onClick={() => sendMessage(action)}
-                      className="block w-full text-left text-xs px-3 py-2 rounded-lg bg-[rgba(255,255,255,0.05)] border border-[rgba(255,255,255,0.08)] text-muted-foreground hover:bg-[rgba(255,255,255,0.08)] hover:text-foreground transition-colors"
+                      className="block w-full text-left text-xs px-3 py-2 rounded-xl bg-muted/60 border border-border/60 text-muted-foreground shadow-soft hover:bg-muted hover:text-foreground transition-colors"
                     >
                       {action}
                     </button>
@@ -242,9 +240,9 @@ const DashboardChatbot = ({ role, navItems, onNavigate }: DashboardChatbotProps)
                 <div className={cn("w-7 h-7 rounded-lg flex items-center justify-center shrink-0 mt-0.5", msg.role === "assistant" ? "bg-primary/20" : "bg-secondary/20")}>
                   {msg.role === "assistant" ? <Bot className="w-4 h-4 text-primary" /> : <User className="w-4 h-4 text-secondary" />}
                 </div>
-                <div className={cn("max-w-[80%] text-sm rounded-xl px-3.5 py-2.5 leading-relaxed", msg.role === "assistant" ? "bg-[rgba(255,255,255,0.06)] text-foreground" : "bg-primary/20 text-foreground")}>
+                <div className={cn("max-w-[80%] text-sm rounded-xl px-3.5 py-2.5 leading-relaxed", msg.role === "assistant" ? "bg-muted/70 text-foreground shadow-soft" : "bg-primary text-primary-foreground shadow-soft")}>
                   {msg.role === "assistant" ? (
-                    <div className="prose prose-sm prose-invert max-w-none [&_p]:mb-2 [&_p:last-child]:mb-0 [&_ul]:mb-2 [&_ol]:mb-2 [&_li]:mb-0.5 [&_table]:text-xs [&_th]:p-1.5 [&_td]:p-1.5 [&_strong]:text-foreground [&_h1]:text-base [&_h2]:text-sm [&_h3]:text-sm">
+                    <div className="prose prose-sm dark:prose-invert max-w-none [&_p]:mb-2 [&_p:last-child]:mb-0 [&_ul]:mb-2 [&_ol]:mb-2 [&_li]:mb-0.5 [&_table]:text-xs [&_th]:p-1.5 [&_td]:p-1.5 [&_strong]:text-foreground [&_h1]:text-base [&_h2]:text-sm [&_h3]:text-sm">
                       <ReactMarkdown>{msg.content}</ReactMarkdown>
                     </div>
                   ) : msg.content}
@@ -257,7 +255,7 @@ const DashboardChatbot = ({ role, navItems, onNavigate }: DashboardChatbotProps)
                 <div className="w-7 h-7 rounded-lg bg-primary/20 flex items-center justify-center shrink-0">
                   <Bot className="w-4 h-4 text-primary" />
                 </div>
-                <div className="bg-[rgba(255,255,255,0.06)] rounded-xl px-3.5 py-2.5 flex items-center gap-2">
+                <div className="bg-muted/70 shadow-soft rounded-xl px-3.5 py-2.5 flex items-center gap-2">
                   <Loader2 className="w-4 h-4 animate-spin text-muted-foreground" />
                   <span className="text-sm text-muted-foreground">{currentLang === "sw" ? "Ninafanya kazi..." : "Working on it..."}</span>
                 </div>
@@ -267,7 +265,7 @@ const DashboardChatbot = ({ role, navItems, onNavigate }: DashboardChatbotProps)
           </div>
 
           {/* Input */}
-          <div className="p-3 border-t border-[rgba(255,255,255,0.08)]">
+          <div className="p-3 border-t border-border/60">
             <form onSubmit={(e) => { e.preventDefault(); sendMessage(); }} className="flex items-center gap-2">
               <input
                 ref={inputRef}
@@ -277,13 +275,13 @@ const DashboardChatbot = ({ role, navItems, onNavigate }: DashboardChatbotProps)
                 disabled={isLoading}
                 className={cn(
                   "flex-1 h-10 rounded-xl px-4 text-sm",
-                  "bg-[rgba(255,255,255,0.06)] border border-[rgba(255,255,255,0.08)]",
+                  "glass-input",
                   "text-foreground placeholder:text-muted-foreground",
-                  "focus:outline-none focus:border-[rgba(255,255,255,0.15)] focus:ring-2 focus:ring-primary/20",
+                  "focus:outline-none focus:ring-2 focus:ring-primary/20",
                   "transition-all duration-300 disabled:opacity-50"
                 )}
               />
-              <Button type="submit" size="icon" disabled={!input.trim() || isLoading} className="h-10 w-10 rounded-xl shrink-0">
+              <Button type="submit" size="icon" disabled={!input.trim() || isLoading} className="h-10 w-10 rounded-xl shrink-0 shadow-soft">
                 <Send className="w-4 h-4" />
               </Button>
             </form>
