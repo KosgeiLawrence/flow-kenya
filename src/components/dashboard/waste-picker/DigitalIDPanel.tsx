@@ -93,38 +93,37 @@ const DigitalIDPanel = () => {
     ? "National ID"
     : "Not provided";
 
+  const INK = "#12251b";
+  const MUTED = "rgba(18,37,27,0.55)";
+  const ACCENT = "#2b5e3f";
+
   return (
     <div className="space-y-5 max-w-md mx-auto">
       {/* Soft UI floating frame */}
-      <div className="rounded-[32px] bg-card p-3 shadow-elevated border border-border/40">
+      <div className="rounded-[34px] bg-card p-3 shadow-elevated">
       {/* Downloadable card */}
       <div
         ref={cardRef}
-        className="rounded-[24px] overflow-hidden"
+        className="rounded-[26px] overflow-hidden"
         style={{
-          background: "linear-gradient(160deg, #0f2a1d 0%, #1a4530 55%, #2b5e3f 100%)",
-          boxShadow: "0 18px 40px -18px rgba(15,42,29,0.55), inset 0 1px 0 rgba(255,255,255,0.14)",
-          color: "#ffffff",
+          background: "linear-gradient(160deg, #FFFFFF 0%, #F4F5F3 100%)",
+          boxShadow: "0 18px 44px -22px rgba(18,37,27,0.28), inset 0 1px 0 rgba(255,255,255,0.9)",
+          color: INK,
         }}
       >
         {/* Header strip */}
         <div
           className="px-5 py-4 flex items-center gap-3"
-          style={{ background: "rgba(0,0,0,0.25)", borderBottom: "1px solid rgba(255,255,255,0.1)" }}
+          style={{ background: "rgba(43,94,63,0.06)", borderBottom: "1px solid rgba(18,37,27,0.07)" }}
         >
-          <img
-            src="/images/duara-flow-logo.svg"
-            alt="Duara Flow"
-            className="h-7"
-            style={{ filter: "brightness(0) invert(1)" }}
-          />
+          <img src="/images/duara-flow-logo.svg" alt="Duara Flow" className="h-7" />
           <div className="flex-1" />
           <span
-            className="inline-flex items-center gap-1 text-[11px] font-semibold px-2 py-1 rounded-full"
+            className="inline-flex items-center gap-1 text-[11px] font-semibold px-2.5 py-1 rounded-full"
             style={{
-              background: isVerified ? "#ffffff" : "rgba(255,255,255,0.15)",
-              color: isVerified ? "#1a4530" : "#ffffff",
-              border: "1px solid rgba(255,255,255,0.25)",
+              background: isVerified ? ACCENT : "rgba(18,37,27,0.06)",
+              color: isVerified ? "#ffffff" : MUTED,
+              boxShadow: isVerified ? "0 6px 14px -8px rgba(43,94,63,0.8)" : "inset 0 1px 2px rgba(18,37,27,0.08)",
             }}
           >
             {isVerified ? <CheckCircle2 className="w-3 h-3" /> : <Clock className="w-3 h-3" />}
@@ -132,54 +131,54 @@ const DigitalIDPanel = () => {
           </span>
         </div>
 
-        <div className="p-5 space-y-4" style={{ color: "#ffffff" }}>
+        <div className="p-5 space-y-4" style={{ color: INK }}>
           {/* Identity */}
           <div className="flex items-start gap-4">
             {profile?.avatar_url || orgData?.logo_url ? (
               <img
                 src={profile?.avatar_url || orgData?.logo_url || ""}
                 alt="Photo"
-                className="w-16 h-16 rounded-xl object-cover"
-                style={{ border: "2px solid rgba(255,255,255,0.3)" }}
+                className="w-16 h-16 rounded-2xl object-cover shrink-0"
+                style={{ boxShadow: "0 8px 20px -12px rgba(18,37,27,0.5)" }}
               />
             ) : (
               <div
-                className="w-16 h-16 rounded-xl flex items-center justify-center"
-                style={{ background: "rgba(255,255,255,0.1)", border: "2px solid rgba(255,255,255,0.3)" }}
+                className="w-16 h-16 rounded-2xl flex items-center justify-center shrink-0"
+                style={{ background: "#F2F3F5", boxShadow: "inset 2px 2px 6px rgba(18,37,27,0.10), inset -2px -2px 6px #ffffff" }}
               >
-                <User className="w-7 h-7" style={{ color: "rgba(255,255,255,0.7)" }} />
+                <User className="w-7 h-7" style={{ color: ACCENT }} />
               </div>
             )}
             <div className="flex-1 min-w-0">
-              <h2 className="text-base font-display font-bold leading-tight break-words" style={{ color: "#ffffff" }}>
+              <h2 className="text-base font-display font-bold leading-tight break-words" style={{ color: INK }}>
                 {isOrg ? orgData?.name || profile?.full_name : profile?.full_name}
               </h2>
               {isOrg && orgData?.name && (
-                <p className="text-xs truncate" style={{ color: "rgba(255,255,255,0.7)" }}>{profile?.full_name}</p>
+                <p className="text-xs truncate" style={{ color: MUTED }}>{profile?.full_name}</p>
               )}
-              <p className="text-xs font-mono mt-1" style={{ color: "#9be7b8" }}>{duaraId}</p>
+              <p className="text-xs font-mono mt-1" style={{ color: ACCENT }}>{duaraId}</p>
             </div>
           </div>
 
-          <div style={{ borderTop: "1px solid rgba(255,255,255,0.12)" }} />
+          <div style={{ borderTop: "1px solid rgba(18,37,27,0.08)" }} />
 
           {/* Contact */}
           <div className="grid grid-cols-1 gap-2 text-sm">
             {profile?.phone_number && (
-              <div className="flex items-center gap-2" style={{ color: "rgba(255,255,255,0.85)" }}>
-                <Phone className="w-3.5 h-3.5 shrink-0" style={{ color: "#9be7b8" }} />
+              <div className="flex items-center gap-2" style={{ color: INK }}>
+                <Phone className="w-3.5 h-3.5 shrink-0" style={{ color: ACCENT }} />
                 <span className="truncate">{profile.phone_number}</span>
               </div>
             )}
             {profile?.email && (
-              <div className="flex items-center gap-2" style={{ color: "rgba(255,255,255,0.85)" }}>
-                <Mail className="w-3.5 h-3.5 shrink-0" style={{ color: "#9be7b8" }} />
+              <div className="flex items-center gap-2" style={{ color: INK }}>
+                <Mail className="w-3.5 h-3.5 shrink-0" style={{ color: ACCENT }} />
                 <span className="truncate">{profile.email}</span>
               </div>
             )}
             {(profile?.county || profile?.area_of_operation) && (
-              <div className="flex items-center gap-2" style={{ color: "rgba(255,255,255,0.85)" }}>
-                <MapPin className="w-3.5 h-3.5 shrink-0" style={{ color: "#9be7b8" }} />
+              <div className="flex items-center gap-2" style={{ color: INK }}>
+                <MapPin className="w-3.5 h-3.5 shrink-0" style={{ color: ACCENT }} />
                 <span className="truncate">
                   {[profile.area_of_operation, profile.county].filter(Boolean).join(", ")}
                 </span>
@@ -187,68 +186,68 @@ const DigitalIDPanel = () => {
             )}
           </div>
 
-          <div style={{ borderTop: "1px solid rgba(255,255,255,0.12)" }} />
+          <div style={{ borderTop: "1px solid rgba(18,37,27,0.08)" }} />
 
           {/* Business Info */}
           <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-xs">
             <div>
-              <p style={{ color: "rgba(255,255,255,0.6)" }}>{t("common.type")}</p>
-              <p className="font-medium" style={{ color: "#ffffff" }}>{isOrg ? t("profilePanel.organization") : t("digitalIdPanel.individual", "Individual")}</p>
+              <p style={{ color: MUTED }}>{t("common.type")}</p>
+              <p className="font-medium" style={{ color: INK }}>{isOrg ? t("profilePanel.organization") : t("digitalIdPanel.individual", "Individual")}</p>
             </div>
             <div>
-              <p style={{ color: "rgba(255,255,255,0.6)" }}>{t("digitalIdPanel.valueChainRole", "Value Chain Role")}</p>
-              <p className="font-medium" style={{ color: "#ffffff" }}>{roleLabelMap[role || ""] || "—"}</p>
+              <p style={{ color: MUTED }}>{t("digitalIdPanel.valueChainRole", "Value Chain Role")}</p>
+              <p className="font-medium" style={{ color: INK }}>{roleLabelMap[role || ""] || "—"}</p>
             </div>
             {isOrg && orgData?.name && (
               <div className="col-span-2">
-                <p style={{ color: "rgba(255,255,255,0.6)" }}>{t("digitalIdPanel.businessName", "Business Name")}</p>
-                <p className="font-medium break-words" style={{ color: "#ffffff" }}>{orgData.name}</p>
+                <p style={{ color: MUTED }}>{t("digitalIdPanel.businessName", "Business Name")}</p>
+                <p className="font-medium break-words" style={{ color: INK }}>{orgData.name}</p>
               </div>
             )}
           </div>
 
-          <div style={{ borderTop: "1px solid rgba(255,255,255,0.12)" }} />
+          <div style={{ borderTop: "1px solid rgba(18,37,27,0.08)" }} />
 
           {/* Verification & Registration */}
           <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-xs">
             <div>
-              <p className="flex items-center gap-1" style={{ color: "rgba(255,255,255,0.6)" }}>
+              <p className="flex items-center gap-1" style={{ color: MUTED }}>
                 <Shield className="w-3 h-3" /> {t("digitalIdPanel.verificationStatus")}
               </p>
-              <p className="font-medium" style={{ color: isVerified ? "#9be7b8" : "rgba(255,255,255,0.7)" }}>
+              <p className="font-medium" style={{ color: isVerified ? ACCENT : MUTED }}>
                 {isVerified ? t("common.verified") : t("digitalIdPanel.unverified", "Unverified")}
               </p>
             </div>
             <div>
-              <p style={{ color: "rgba(255,255,255,0.6)" }}>{t("digitalIdPanel.idTypeUsed", "ID Type Used")}</p>
-              <p className="font-medium" style={{ color: "#ffffff" }}>{idVerificationType}</p>
+              <p style={{ color: MUTED }}>{t("digitalIdPanel.idTypeUsed", "ID Type Used")}</p>
+              <p className="font-medium" style={{ color: INK }}>{idVerificationType}</p>
             </div>
             <div>
-              <p className="flex items-center gap-1" style={{ color: "rgba(255,255,255,0.6)" }}>
+              <p className="flex items-center gap-1" style={{ color: MUTED }}>
                 <CalendarDays className="w-3 h-3" /> {t("digitalIdPanel.memberSince")}
               </p>
-              <p className="font-medium" style={{ color: "#ffffff" }}>{joinDate}</p>
+              <p className="font-medium" style={{ color: INK }}>{joinDate}</p>
             </div>
             <div>
-              <p className="flex items-center gap-1" style={{ color: "rgba(255,255,255,0.6)" }}>
+              <p className="flex items-center gap-1" style={{ color: MUTED }}>
                 <Activity className="w-3 h-3" /> {t("common.status")}
               </p>
-              <p className="font-medium" style={{ color: "#9be7b8" }}>Active</p>
+              <p className="font-medium" style={{ color: ACCENT }}>Active</p>
             </div>
           </div>
 
-          <div style={{ borderTop: "1px solid rgba(255,255,255,0.12)" }} />
+          <div style={{ borderTop: "1px solid rgba(18,37,27,0.08)" }} />
 
           {/* QR Code */}
           <div className="flex items-center gap-4">
             <div
-              className="p-2.5 rounded-2xl shrink-0"
-              style={{ background: "rgba(0,0,0,0.35)", border: "1px solid rgba(255,255,255,0.2)" }}
+              className="p-3 rounded-2xl shrink-0"
+              style={{ background: "#FFFFFF", boxShadow: "inset 2px 2px 6px rgba(18,37,27,0.10), inset -2px -2px 6px #ffffff, 0 8px 18px -14px rgba(18,37,27,0.45)" }}
             >
-              <QRCodeSVG value={qrData} size={84} level="H" bgColor="transparent" fgColor="#ffffff" />
+              <QRCodeSVG value={qrData} size={84} level="H" bgColor="#FFFFFF" fgColor={INK} />
             </div>
-            <div className="flex-1 text-xs space-y-1" style={{ color: "rgba(255,255,255,0.75)" }}>
-              <p className="font-medium" style={{ color: "#ffffff" }}>{t("digitalIdPanel.scanToVerify")}</p>
+            <div className="flex-1 text-xs space-y-1" style={{ color: MUTED }}>
+              <p className="font-medium" style={{ color: INK }}>{t("digitalIdPanel.scanToVerify")}</p>
               <p>{t("digitalIdPanel.scanDescription", "Scan this QR code to view this member's profile and impact data on Duara Flow.")}</p>
             </div>
           </div>
@@ -256,19 +255,19 @@ const DigitalIDPanel = () => {
           {/* Impact summary footer */}
           <div
             className="rounded-2xl p-3 grid grid-cols-3 gap-2 text-center"
-            style={{ background: "rgba(0,0,0,0.3)", border: "1px solid rgba(255,255,255,0.1)" }}
+            style={{ background: "#F2F3F5", boxShadow: "inset 2px 2px 6px rgba(18,37,27,0.08), inset -2px -2px 6px #ffffff" }}
           >
             <div>
-              <p className="text-sm font-display font-bold" style={{ color: "#ffffff" }}>{impact.totalKg.toFixed(0)}</p>
-              <p className="text-[10px]" style={{ color: "rgba(255,255,255,0.65)" }}>{t("digitalIdPanel.kgCollected", "kg collected")}</p>
+              <p className="text-sm font-display font-bold" style={{ color: INK }}>{impact.totalKg.toFixed(0)}</p>
+              <p className="text-[10px]" style={{ color: MUTED }}>{t("digitalIdPanel.kgCollected", "kg collected")}</p>
             </div>
             <div>
-              <p className="text-sm font-display font-bold" style={{ color: "#9be7b8" }}>{impact.co2Avoided.toFixed(0)}</p>
-              <p className="text-[10px]" style={{ color: "rgba(255,255,255,0.65)" }}>{t("digitalIdPanel.co2Saved", "kg CO₂ saved")}</p>
+              <p className="text-sm font-display font-bold" style={{ color: ACCENT }}>{impact.co2Avoided.toFixed(0)}</p>
+              <p className="text-[10px]" style={{ color: MUTED }}>{t("digitalIdPanel.co2Saved", "kg CO₂ saved")}</p>
             </div>
             <div>
-              <p className="text-sm font-display font-bold" style={{ color: "#ffffff" }}>{collections?.length || 0}</p>
-              <p className="text-[10px]" style={{ color: "rgba(255,255,255,0.65)" }}>{t("digitalIdPanel.entries", "entries")}</p>
+              <p className="text-sm font-display font-bold" style={{ color: INK }}>{collections?.length || 0}</p>
+              <p className="text-[10px]" style={{ color: MUTED }}>{t("digitalIdPanel.entries", "entries")}</p>
             </div>
           </div>
         </div>
