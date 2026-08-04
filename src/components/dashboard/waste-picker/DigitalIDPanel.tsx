@@ -13,6 +13,7 @@ import { calculateImpact } from "@/lib/impactUtils";
 import { useRef } from "react";
 import { format } from "date-fns";
 import { useTranslation } from "react-i18next";
+import duaraLogo from "@/assets/duara-flow-logo.jpg.asset.json";
 
 const DigitalIDPanel = () => {
   const { user, profile, role } = useAuth();
@@ -116,7 +117,7 @@ const DigitalIDPanel = () => {
           className="px-5 py-4 flex items-center gap-3"
           style={{ background: "rgba(43,94,63,0.06)", borderBottom: "1px solid rgba(18,37,27,0.07)" }}
         >
-          <img src="/images/duara-flow-logo.svg" alt="Duara Flow" className="h-7" />
+          <img src={duaraLogo.url} alt="Duara Flow" className="h-7 w-auto object-contain" crossOrigin="anonymous" />
           <div className="flex-1" />
           <span
             className="inline-flex items-center gap-1 text-[11px] font-semibold px-2.5 py-1 rounded-full"
