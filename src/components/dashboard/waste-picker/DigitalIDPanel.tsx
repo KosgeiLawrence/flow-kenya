@@ -94,14 +94,16 @@ const DigitalIDPanel = () => {
     : "Not provided";
 
   return (
-    <div className="space-y-4 max-w-md mx-auto">
+    <div className="space-y-5 max-w-md mx-auto">
+      {/* Soft UI floating frame */}
+      <div className="rounded-[32px] bg-card p-3 shadow-elevated border border-border/40">
       {/* Downloadable card */}
       <div
         ref={cardRef}
-        className="rounded-2xl overflow-hidden shadow-elevated border"
+        className="rounded-[24px] overflow-hidden"
         style={{
           background: "linear-gradient(160deg, #0f2a1d 0%, #1a4530 55%, #2b5e3f 100%)",
-          borderColor: "rgba(255,255,255,0.12)",
+          boxShadow: "0 18px 40px -18px rgba(15,42,29,0.55), inset 0 1px 0 rgba(255,255,255,0.14)",
           color: "#ffffff",
         }}
       >
@@ -240,7 +242,7 @@ const DigitalIDPanel = () => {
           {/* QR Code */}
           <div className="flex items-center gap-4">
             <div
-              className="p-2 rounded-lg shrink-0"
+              className="p-2.5 rounded-2xl shrink-0"
               style={{ background: "rgba(0,0,0,0.35)", border: "1px solid rgba(255,255,255,0.2)" }}
             >
               <QRCodeSVG value={qrData} size={84} level="H" bgColor="transparent" fgColor="#ffffff" />
@@ -253,7 +255,7 @@ const DigitalIDPanel = () => {
 
           {/* Impact summary footer */}
           <div
-            className="rounded-lg p-3 grid grid-cols-3 gap-2 text-center"
+            className="rounded-2xl p-3 grid grid-cols-3 gap-2 text-center"
             style={{ background: "rgba(0,0,0,0.3)", border: "1px solid rgba(255,255,255,0.1)" }}
           >
             <div>
@@ -271,9 +273,10 @@ const DigitalIDPanel = () => {
           </div>
         </div>
       </div>
+      </div>
 
       {/* Download button outside card */}
-      <Button onClick={handleDownload} className="w-full gap-2">
+      <Button onClick={handleDownload} className="w-full gap-2 rounded-2xl h-12 shadow-soft">
         <Download className="w-4 h-4" /> {t("digitalIdPanel.downloadId")}
       </Button>
     </div>
