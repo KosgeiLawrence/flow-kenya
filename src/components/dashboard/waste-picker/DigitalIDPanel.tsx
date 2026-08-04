@@ -242,7 +242,7 @@ const DigitalIDPanel = () => {
           {/* QR Code */}
           <div className="flex items-center gap-4">
             <div
-              className="p-2 rounded-lg shrink-0"
+              className="p-2.5 rounded-2xl shrink-0"
               style={{ background: "rgba(0,0,0,0.35)", border: "1px solid rgba(255,255,255,0.2)" }}
             >
               <QRCodeSVG value={qrData} size={84} level="H" bgColor="transparent" fgColor="#ffffff" />
