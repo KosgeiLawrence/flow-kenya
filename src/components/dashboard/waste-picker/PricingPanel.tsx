@@ -12,7 +12,7 @@ import MaterialIcon from "@/components/dashboard/shared/MaterialIcon";
 const CO2_FACTORS: Record<string, number> = {
   PET: 3.1, HDPE: 1.8, LDPE: 2.0, PP: 1.7, PS: 3.0,
   Aluminium: 9.1, Glass: 0.6, Paper: 1.1, Cardboard: 0.9,
-  Metal: 4.5, "Mixed Plastic": 2.5,
+  Metal: 4.5, "Mixed Plastic": 2.5, "Textile Waste": 12.0,
 };
 
 const PricingPanel = () => {
