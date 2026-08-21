@@ -19,32 +19,11 @@ export default defineConfig(({ mode }) => {
       overlay: false,
     },
   },
-  build: {
-    target: "es2020",
-    sourcemap: false,
-    chunkSizeWarningLimit: 1500,
-    rollupOptions: {
-      output: {
-        manualChunks: {
-          "react-vendor": ["react", "react-dom", "react-router-dom"],
-          "ui-vendor": [
-            "@radix-ui/react-dialog",
-            "@radix-ui/react-dropdown-menu",
-            "@radix-ui/react-popover",
-            "@radix-ui/react-select",
-            "@radix-ui/react-tabs",
-            "@radix-ui/react-toast",
-            "@radix-ui/react-tooltip",
-          ],
-          "chart-vendor": ["recharts"],
-          "pdf-vendor": ["jspdf", "html2canvas"],
-          "supabase-vendor": ["@supabase/supabase-js"],
-          "motion-vendor": ["framer-motion"],
-          "query-vendor": ["@tanstack/react-query"],
-        },
-      },
+    build: {
+      target: "es2020",
+      sourcemap: false,
+      chunkSizeWarningLimit: 1500,
     },
-  },
   plugins: [
     react(),
     mode === "development" && componentTagger(),
