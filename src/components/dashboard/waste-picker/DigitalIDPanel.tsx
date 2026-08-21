@@ -110,14 +110,11 @@ const DigitalIDPanel = () => {
           className="px-5 py-4 flex items-center gap-3"
           style={{ background: "rgba(0,0,0,0.35)", borderBottom: "1px solid rgba(255,255,255,0.18)" }}
         >
-          <div
-            className="flex items-center rounded-lg px-3 py-1.5 shrink-0"
-            style={{ background: "#ffffff", boxShadow: "0 2px 8px rgba(0,0,0,0.25)" }}
-          >
+          <div className="flex items-center shrink-0">
             <img
-              src="/images/duara-flow-logo.svg"
+              src="/images/duara-flow-logo-white.svg"
               alt="Duara Flow"
-              style={{ height: 22, width: "auto", display: "block" }}
+              style={{ height: 34, width: "auto", display: "block" }}
             />
           </div>
           <div className="flex-1" />
