@@ -110,10 +110,10 @@ export default function CreateListingDialog({ sellerRole }: Props) {
   });
 
   const defaultMaterialSuggestions = sellerRole === "waste_picker"
-    ? ["PET Bottles", "HDPE Containers", "Cardboard", "Scrap Metal", "Glass", "Sachets", "Mixed Plastics"]
+    ? ["PET Bottles", "HDPE Containers", "Cardboard", "Scrap Metal", "Glass", "Sachets", "Mixed Plastics", "Textile Waste"]
     : sellerRole === "aggregator"
-    ? ["Sorted PET", "Baled HDPE", "Sorted Cardboard", "Mixed Metals", "Clean Glass"]
-    : ["PET Flakes", "HDPE Pellets", "Recycled Lumber", "Recycled Boards", "Compost"];
+    ? ["Sorted PET", "Baled HDPE", "Sorted Cardboard", "Mixed Metals", "Clean Glass", "Textile Waste"]
+    : ["PET Flakes", "HDPE Pellets", "Recycled Lumber", "Recycled Boards", "Compost", "Textile Waste"];
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>

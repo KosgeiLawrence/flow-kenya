@@ -18,6 +18,7 @@ export const CO2_FACTORS: Record<string, number> = {
   "Paper/Cardboard": 1.1,
   "Organic Waste": 0.5,
   Metal: 4.5,
+  "Textile Waste": 12.0,
   // Legacy names (kept for backwards compat with older data)
   PET: 3.1,
   HDPE: 1.9,
@@ -26,6 +27,7 @@ export const CO2_FACTORS: Record<string, number> = {
   PS: 3.3,
   Paper: 1.1,
   Cardboard: 0.9,
+  "Textile": 12.0,
 };
 
 export const DEFAULT_CO2_FACTOR = 2.5; // fallback for unknown materials
