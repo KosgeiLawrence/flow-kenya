@@ -100,35 +100,40 @@ const DigitalIDPanel = () => {
         ref={cardRef}
         className="rounded-2xl overflow-hidden shadow-elevated border"
         style={{
-          background: "linear-gradient(160deg, #0f2a1d 0%, #1a4530 55%, #2b5e3f 100%)",
-          borderColor: "rgba(255,255,255,0.12)",
+          background: "linear-gradient(160deg, #0b2318 0%, #17402c 50%, #2b5e3f 100%)",
+          borderColor: "rgba(255,255,255,0.22)",
           color: "#ffffff",
         }}
       >
         {/* Header strip */}
         <div
           className="px-5 py-4 flex items-center gap-3"
-          style={{ background: "rgba(0,0,0,0.25)", borderBottom: "1px solid rgba(255,255,255,0.1)" }}
+          style={{ background: "rgba(0,0,0,0.35)", borderBottom: "1px solid rgba(255,255,255,0.18)" }}
         >
-          <img
-            src="/images/duara-flow-logo.svg"
-            alt="Duara Flow"
-            className="h-7"
-            style={{ filter: "brightness(0) invert(1)" }}
-          />
+          <div
+            className="flex items-center rounded-lg px-3 py-1.5 shrink-0"
+            style={{ background: "#ffffff", boxShadow: "0 2px 8px rgba(0,0,0,0.25)" }}
+          >
+            <img
+              src="/images/duara-flow-logo.svg"
+              alt="Duara Flow"
+              style={{ height: 22, width: "auto", display: "block" }}
+            />
+          </div>
           <div className="flex-1" />
           <span
-            className="inline-flex items-center gap-1 text-[11px] font-semibold px-2 py-1 rounded-full"
+            className="inline-flex items-center gap-1 text-[11px] font-bold px-2.5 py-1 rounded-full"
             style={{
-              background: isVerified ? "#ffffff" : "rgba(255,255,255,0.15)",
-              color: isVerified ? "#1a4530" : "#ffffff",
-              border: "1px solid rgba(255,255,255,0.25)",
+              background: isVerified ? "#ffffff" : "rgba(255,255,255,0.22)",
+              color: isVerified ? "#14402b" : "#ffffff",
+              border: "1px solid rgba(255,255,255,0.45)",
             }}
           >
             {isVerified ? <CheckCircle2 className="w-3 h-3" /> : <Clock className="w-3 h-3" />}
             {isVerified ? t("common.verified") : t("digitalIdPanel.unverified", "Unverified")}
           </span>
         </div>
+
 
         <div className="p-5 space-y-4" style={{ color: "#ffffff" }}>
           {/* Identity */}
@@ -145,7 +150,7 @@ const DigitalIDPanel = () => {
                 className="w-16 h-16 rounded-xl flex items-center justify-center"
                 style={{ background: "rgba(255,255,255,0.1)", border: "2px solid rgba(255,255,255,0.3)" }}
               >
-                <User className="w-7 h-7" style={{ color: "rgba(255,255,255,0.7)" }} />
+                <User className="w-7 h-7" style={{ color: "rgba(255,255,255,0.9)" }} />
               </div>
             )}
             <div className="flex-1 min-w-0">
@@ -153,31 +158,31 @@ const DigitalIDPanel = () => {
                 {isOrg ? orgData?.name || profile?.full_name : profile?.full_name}
               </h2>
               {isOrg && orgData?.name && (
-                <p className="text-xs truncate" style={{ color: "rgba(255,255,255,0.7)" }}>{profile?.full_name}</p>
+                <p className="text-xs truncate" style={{ color: "rgba(255,255,255,0.9)" }}>{profile?.full_name}</p>
               )}
-              <p className="text-xs font-mono mt-1" style={{ color: "#9be7b8" }}>{duaraId}</p>
+              <p className="text-xs font-mono mt-1" style={{ color: "#b9f5cf" }}>{duaraId}</p>
             </div>
           </div>
 
-          <div style={{ borderTop: "1px solid rgba(255,255,255,0.12)" }} />
+          <div style={{ borderTop: "1px solid rgba(255,255,255,0.25)" }} />
 
           {/* Contact */}
           <div className="grid grid-cols-1 gap-2 text-sm">
             {profile?.phone_number && (
-              <div className="flex items-center gap-2" style={{ color: "rgba(255,255,255,0.85)" }}>
-                <Phone className="w-3.5 h-3.5 shrink-0" style={{ color: "#9be7b8" }} />
+              <div className="flex items-center gap-2" style={{ color: "rgba(255,255,255,0.95)" }}>
+                <Phone className="w-3.5 h-3.5 shrink-0" style={{ color: "#b9f5cf" }} />
                 <span className="truncate">{profile.phone_number}</span>
               </div>
             )}
             {profile?.email && (
-              <div className="flex items-center gap-2" style={{ color: "rgba(255,255,255,0.85)" }}>
-                <Mail className="w-3.5 h-3.5 shrink-0" style={{ color: "#9be7b8" }} />
+              <div className="flex items-center gap-2" style={{ color: "rgba(255,255,255,0.95)" }}>
+                <Mail className="w-3.5 h-3.5 shrink-0" style={{ color: "#b9f5cf" }} />
                 <span className="truncate">{profile.email}</span>
               </div>
             )}
             {(profile?.county || profile?.area_of_operation) && (
-              <div className="flex items-center gap-2" style={{ color: "rgba(255,255,255,0.85)" }}>
-                <MapPin className="w-3.5 h-3.5 shrink-0" style={{ color: "#9be7b8" }} />
+              <div className="flex items-center gap-2" style={{ color: "rgba(255,255,255,0.95)" }}>
+                <MapPin className="w-3.5 h-3.5 shrink-0" style={{ color: "#b9f5cf" }} />
                 <span className="truncate">
                   {[profile.area_of_operation, profile.county].filter(Boolean).join(", ")}
                 </span>
@@ -185,57 +190,57 @@ const DigitalIDPanel = () => {
             )}
           </div>
 
-          <div style={{ borderTop: "1px solid rgba(255,255,255,0.12)" }} />
+          <div style={{ borderTop: "1px solid rgba(255,255,255,0.25)" }} />
 
           {/* Business Info */}
           <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-xs">
             <div>
-              <p style={{ color: "rgba(255,255,255,0.6)" }}>{t("common.type")}</p>
+              <p style={{ color: "rgba(255,255,255,0.95)" }}>{t("common.type")}</p>
               <p className="font-medium" style={{ color: "#ffffff" }}>{isOrg ? t("profilePanel.organization") : t("digitalIdPanel.individual", "Individual")}</p>
             </div>
             <div>
-              <p style={{ color: "rgba(255,255,255,0.6)" }}>{t("digitalIdPanel.valueChainRole", "Value Chain Role")}</p>
+              <p style={{ color: "rgba(255,255,255,0.95)" }}>{t("digitalIdPanel.valueChainRole", "Value Chain Role")}</p>
               <p className="font-medium" style={{ color: "#ffffff" }}>{roleLabelMap[role || ""] || "—"}</p>
             </div>
             {isOrg && orgData?.name && (
               <div className="col-span-2">
-                <p style={{ color: "rgba(255,255,255,0.6)" }}>{t("digitalIdPanel.businessName", "Business Name")}</p>
+                <p style={{ color: "rgba(255,255,255,0.95)" }}>{t("digitalIdPanel.businessName", "Business Name")}</p>
                 <p className="font-medium break-words" style={{ color: "#ffffff" }}>{orgData.name}</p>
               </div>
             )}
           </div>
 
-          <div style={{ borderTop: "1px solid rgba(255,255,255,0.12)" }} />
+          <div style={{ borderTop: "1px solid rgba(255,255,255,0.25)" }} />
 
           {/* Verification & Registration */}
           <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-xs">
             <div>
-              <p className="flex items-center gap-1" style={{ color: "rgba(255,255,255,0.6)" }}>
+              <p className="flex items-center gap-1" style={{ color: "rgba(255,255,255,0.95)" }}>
                 <Shield className="w-3 h-3" /> {t("digitalIdPanel.verificationStatus")}
               </p>
-              <p className="font-medium" style={{ color: isVerified ? "#9be7b8" : "rgba(255,255,255,0.7)" }}>
+              <p className="font-medium" style={{ color: isVerified ? "#b9f5cf" : "rgba(255,255,255,0.9)" }}>
                 {isVerified ? t("common.verified") : t("digitalIdPanel.unverified", "Unverified")}
               </p>
             </div>
             <div>
-              <p style={{ color: "rgba(255,255,255,0.6)" }}>{t("digitalIdPanel.idTypeUsed", "ID Type Used")}</p>
+              <p style={{ color: "rgba(255,255,255,0.95)" }}>{t("digitalIdPanel.idTypeUsed", "ID Type Used")}</p>
               <p className="font-medium" style={{ color: "#ffffff" }}>{idVerificationType}</p>
             </div>
             <div>
-              <p className="flex items-center gap-1" style={{ color: "rgba(255,255,255,0.6)" }}>
+              <p className="flex items-center gap-1" style={{ color: "rgba(255,255,255,0.95)" }}>
                 <CalendarDays className="w-3 h-3" /> {t("digitalIdPanel.memberSince")}
               </p>
               <p className="font-medium" style={{ color: "#ffffff" }}>{joinDate}</p>
             </div>
             <div>
-              <p className="flex items-center gap-1" style={{ color: "rgba(255,255,255,0.6)" }}>
+              <p className="flex items-center gap-1" style={{ color: "rgba(255,255,255,0.95)" }}>
                 <Activity className="w-3 h-3" /> {t("common.status")}
               </p>
-              <p className="font-medium" style={{ color: "#9be7b8" }}>Active</p>
+              <p className="font-medium" style={{ color: "#b9f5cf" }}>Active</p>
             </div>
           </div>
 
-          <div style={{ borderTop: "1px solid rgba(255,255,255,0.12)" }} />
+          <div style={{ borderTop: "1px solid rgba(255,255,255,0.25)" }} />
 
           {/* QR Code */}
           <div className="flex items-center gap-4">
@@ -245,7 +250,7 @@ const DigitalIDPanel = () => {
             >
               <QRCodeSVG value={qrData} size={84} level="H" bgColor="transparent" fgColor="#ffffff" />
             </div>
-            <div className="flex-1 text-xs space-y-1" style={{ color: "rgba(255,255,255,0.75)" }}>
+            <div className="flex-1 text-xs space-y-1" style={{ color: "rgba(255,255,255,0.9)" }}>
               <p className="font-medium" style={{ color: "#ffffff" }}>{t("digitalIdPanel.scanToVerify")}</p>
               <p>{t("digitalIdPanel.scanDescription", "Scan this QR code to view this member's profile and impact data on Duara Flow.")}</p>
             </div>
@@ -258,15 +263,15 @@ const DigitalIDPanel = () => {
           >
             <div>
               <p className="text-sm font-display font-bold" style={{ color: "#ffffff" }}>{impact.totalKg.toFixed(0)}</p>
-              <p className="text-[10px]" style={{ color: "rgba(255,255,255,0.65)" }}>{t("digitalIdPanel.kgCollected", "kg collected")}</p>
+              <p className="text-[10px]" style={{ color: "rgba(255,255,255,0.88)" }}>{t("digitalIdPanel.kgCollected", "kg collected")}</p>
             </div>
             <div>
-              <p className="text-sm font-display font-bold" style={{ color: "#9be7b8" }}>{impact.co2Avoided.toFixed(0)}</p>
-              <p className="text-[10px]" style={{ color: "rgba(255,255,255,0.65)" }}>{t("digitalIdPanel.co2Saved", "kg CO₂ saved")}</p>
+              <p className="text-sm font-display font-bold" style={{ color: "#b9f5cf" }}>{impact.co2Avoided.toFixed(0)}</p>
+              <p className="text-[10px]" style={{ color: "rgba(255,255,255,0.88)" }}>{t("digitalIdPanel.co2Saved", "kg CO₂ saved")}</p>
             </div>
             <div>
               <p className="text-sm font-display font-bold" style={{ color: "#ffffff" }}>{collections?.length || 0}</p>
-              <p className="text-[10px]" style={{ color: "rgba(255,255,255,0.65)" }}>{t("digitalIdPanel.entries", "entries")}</p>
+              <p className="text-[10px]" style={{ color: "rgba(255,255,255,0.88)" }}>{t("digitalIdPanel.entries", "entries")}</p>
             </div>
           </div>
         </div>
