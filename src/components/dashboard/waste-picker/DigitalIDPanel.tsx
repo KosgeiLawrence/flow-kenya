@@ -100,35 +100,40 @@ const DigitalIDPanel = () => {
         ref={cardRef}
         className="rounded-2xl overflow-hidden shadow-elevated border"
         style={{
-          background: "linear-gradient(160deg, #0f2a1d 0%, #1a4530 55%, #2b5e3f 100%)",
-          borderColor: "rgba(255,255,255,0.12)",
+          background: "linear-gradient(160deg, #0b2318 0%, #17402c 50%, #2b5e3f 100%)",
+          borderColor: "rgba(255,255,255,0.22)",
           color: "#ffffff",
         }}
       >
         {/* Header strip */}
         <div
           className="px-5 py-4 flex items-center gap-3"
-          style={{ background: "rgba(0,0,0,0.25)", borderBottom: "1px solid rgba(255,255,255,0.1)" }}
+          style={{ background: "rgba(0,0,0,0.35)", borderBottom: "1px solid rgba(255,255,255,0.18)" }}
         >
-          <img
-            src="/images/duara-flow-logo.svg"
-            alt="Duara Flow"
-            className="h-7"
-            style={{ filter: "brightness(0) invert(1)" }}
-          />
+          <div
+            className="flex items-center rounded-lg px-3 py-1.5 shrink-0"
+            style={{ background: "#ffffff", boxShadow: "0 2px 8px rgba(0,0,0,0.25)" }}
+          >
+            <img
+              src="/images/duara-flow-logo.svg"
+              alt="Duara Flow"
+              style={{ height: 22, width: "auto", display: "block" }}
+            />
+          </div>
           <div className="flex-1" />
           <span
-            className="inline-flex items-center gap-1 text-[11px] font-semibold px-2 py-1 rounded-full"
+            className="inline-flex items-center gap-1 text-[11px] font-bold px-2.5 py-1 rounded-full"
             style={{
-              background: isVerified ? "#ffffff" : "rgba(255,255,255,0.15)",
-              color: isVerified ? "#1a4530" : "#ffffff",
-              border: "1px solid rgba(255,255,255,0.25)",
+              background: isVerified ? "#ffffff" : "rgba(255,255,255,0.22)",
+              color: isVerified ? "#14402b" : "#ffffff",
+              border: "1px solid rgba(255,255,255,0.45)",
             }}
           >
             {isVerified ? <CheckCircle2 className="w-3 h-3" /> : <Clock className="w-3 h-3" />}
             {isVerified ? t("common.verified") : t("digitalIdPanel.unverified", "Unverified")}
           </span>
         </div>
+
 
         <div className="p-5 space-y-4" style={{ color: "#ffffff" }}>
           {/* Identity */}
