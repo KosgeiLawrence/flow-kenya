@@ -70,11 +70,11 @@ const Login = () => {
         </motion.div>
       </div>
 
-      {/* Right panel — porcelain */}
-      <div className="relative flex-1 flex items-center justify-center p-6 sm:p-12 bg-background">
+      {/* Right panel — dark */}
+      <div className="relative flex-1 flex items-center justify-center p-6 sm:p-12" style={{ background: "linear-gradient(180deg, hsl(220 16% 10%) 0%, hsl(220 14% 13%) 100%)" }}>
         <button
           onClick={() => navigate("/")}
-          className="absolute top-6 right-6 p-2 rounded-full glass shadow-soft text-muted-foreground hover:text-foreground transition-smooth"
+          className="absolute top-6 right-6 p-2 rounded-full glass hover:bg-muted/80 text-muted-foreground hover:text-foreground transition-smooth"
           aria-label={t("auth.close")}
         >
           <X className="w-5 h-5" />
@@ -86,7 +86,7 @@ const Login = () => {
           transition={{ duration: 0.5, delay: 0.1, ease: [0.4, 0, 0.2, 1] }}
           className="w-full max-w-md"
         >
-          <div className="glass-card rounded-3xl p-8 shadow-elevated">
+          <div className="glass-card rounded-2xl p-8">
             <div className="text-center mb-8">
               <h2 className="text-2xl font-display font-bold text-foreground">{t("nav.signIn")}</h2>
               <p className="text-muted-foreground mt-2">{t("auth.signInSubtitle")}</p>

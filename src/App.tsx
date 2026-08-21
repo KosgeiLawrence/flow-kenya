@@ -21,7 +21,6 @@ import Terms from "./pages/Terms";
 import Contact from "./pages/Contact";
 import PWAInstallPrompt from "./components/PWAInstallPrompt";
 import TargetCrosshair from "./components/TargetCrosshair";
-import SoftUITheme from "./components/SoftUITheme";
 
 import BiometricLockScreen from "./components/auth/BiometricLockScreen";
 import BiometricSetupPrompt from "./components/auth/BiometricSetupPrompt";
@@ -148,7 +147,6 @@ const App = () => {
               <BiometricGate>
                 <PWAInstallPrompt />
                 <TargetCrosshair />
-                <SoftUITheme />
                 
                 <Suspense fallback={<RouteFallback />}>
                 <Routes>

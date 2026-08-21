@@ -42,16 +42,13 @@ const QRIDPanel = () => {
 
   return (
     <div className="space-y-6 max-w-md mx-auto">
-      <Card className="shadow-elevated rounded-[32px] border-border/40">
-        <CardHeader className="text-center pb-2 pt-6">
+      <Card className="shadow-elevated">
+        <CardHeader className="text-center pb-2">
           <CardTitle className="text-base">Digital QR ID</CardTitle>
         </CardHeader>
-        <CardContent className="flex flex-col items-center space-y-5 pb-7">
+        <CardContent className="flex flex-col items-center space-y-4">
           <div className="relative">
-            <div
-              className="p-5 bg-card rounded-3xl border border-border/40"
-              style={{ boxShadow: "inset 0 2px 6px rgba(16,24,32,0.08), 0 10px 24px -16px rgba(16,24,32,0.35)" }}
-            >
+            <div className="p-4 bg-card rounded-xl border border-border">
               <QRCodeSVG value={qrData} size={200} level="H" bgColor="transparent" fgColor="hsl(150, 30%, 10%)" />
             </div>
             {isVerified && (
@@ -71,7 +68,7 @@ const QRIDPanel = () => {
           </div>
 
           {/* Cumulative impact on QR card */}
-          <div className="w-full rounded-2xl bg-muted/40 p-4">
+          <div className="w-full border-t border-border pt-4">
             <div className="flex items-center gap-1.5 mb-2 justify-center">
               <Leaf className="w-4 h-4 text-primary" />
               <p className="text-sm font-medium text-foreground">Cumulative Impact</p>
