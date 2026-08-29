@@ -85,10 +85,30 @@ serve(async (req) => {
       throw new Error(`IntaSend checkout failed [${response.status}]: ${JSON.stringify(checkoutData)}`);
     }
 
+    // Record a pending payment so the webhook can reconcile it later
+    const invoiceId = checkoutData.id || checkoutData.invoice?.invoice_id || null;
+    if (invoiceId) {
+      const adminClient = createClient(
+        Deno.env.get("SUPABASE_URL") ?? "",
+        Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? ""
+      );
+      const { error: insertError } = await adminClient.from("payments").insert({
+        user_id: user.id,
+        amount: amount,
+        phone_number: user.user_metadata?.phone_number ?? "",
+        status: "pending",
+        description: `Subscription: ${roleName} - ${periodLabel}`,
+        checkout_request_id: invoiceId,
+        merchant_request_id: `${role}__${billingPeriod}__${user.id}`,
+      });
+      if (insertError) console.error("Payment record insert failed:", insertError.message);
+    }
+
     return new Response(JSON.stringify({ url: checkoutData.url }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
       status: 200,
     });
+
   } catch (error) {
     console.error("Checkout error:", error.message);
     return new Response(JSON.stringify({ error: error.message }), {
