@@ -13,6 +13,9 @@ project_id = "gbchyukefjnqhvajlehl"
     verify_jwt = false
   [functions.mpesa-stk-push]
     verify_jwt = false
+  [functions.intasend-webhook]
+    verify_jwt = false
+
   [functions.process-email-queue]
     verify_jwt = true
   [functions.send-transactional-email]

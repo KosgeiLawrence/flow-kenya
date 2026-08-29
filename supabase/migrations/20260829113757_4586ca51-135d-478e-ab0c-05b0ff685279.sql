@@ -1,0 +1,1 @@
+CREATE UNIQUE INDEX IF NOT EXISTS payments_checkout_request_id_key ON public.payments (checkout_request_id) WHERE checkout_request_id IS NOT NULL;
