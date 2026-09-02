@@ -29,6 +29,21 @@ if (isPreviewHost || isInIframe || isNative) {
   });
 }
 
+// Dev-only noise filter: the preview's component tagger injects a ref into
+// every JSX element for visual editing, which makes React log a
+// "Function components cannot be given refs" warning for each function
+// component. It's harmless (dev/preview only, never in production builds),
+// so we filter just that exact warning and keep everything else intact.
+if (import.meta.env.DEV) {
+  const originalConsoleError = console.error.bind(console);
+  console.error = (...args: unknown[]) => {
+    if (typeof args[0] === "string" && args[0].includes("Function components cannot be given refs")) {
+      return;
+    }
+    originalConsoleError(...args);
+  };
+}
+
 // Global unhandled rejection logger — surfaces silent async errors in
 // production and Android WebView logcat without crashing the app.
 window.addEventListener("unhandledrejection", (event) => {
