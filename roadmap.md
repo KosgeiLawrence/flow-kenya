@@ -1,6 +1,10 @@
 # Roadmap
 
 ## Done
+- [x] Full Notion-inspired workspace transformation using the selected Cool Workspace palette and system font stack
+  - Intentional light/dark themes with persistent selection
+  - Editorial landing page bands, restrained cards, compact controls, and simpler motion
+  - Shared workspace styling across all seven dashboards and authentication screens
 - [x] Notion-inspired visual restyle of existing Duara Flow site (per user-uploads brief)
   - Design tokens: subtler glass surfaces, thinner borders, radius 1rem → 0.625rem, lighter shadows, calmer hover states (index.css)
   - Shared primitives: Button, Input, Select, Tabs, Dialog, Card refined

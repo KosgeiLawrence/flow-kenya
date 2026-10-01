@@ -36,12 +36,12 @@ const Contact = () => {
   };
 
   return (
-    <div className="min-h-screen bg-mesh">
+    <div className="min-h-screen bg-background">
       {/* Header */}
-      <header className="border-b border-border/50 glass-strong sticky top-0 z-30">
+      <header className="sticky top-0 z-30 border-b border-border bg-background/90 backdrop-blur-xl">
         <div className="container flex items-center justify-between h-16">
           <Link to="/" className="flex items-center gap-2 group">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary transition-all duration-300 group-hover:scale-110">
+            <div className="flex h-8 w-8 items-center justify-center rounded-md bg-primary">
               <Recycle className="h-5 w-5 text-primary-foreground" />
             </div>
             <span className="font-display text-lg font-bold text-foreground">Duara Flow</span>
@@ -60,7 +60,7 @@ const Contact = () => {
           transition={{ duration: 0.5, ease: [0.4, 0, 0.2, 1] }}
           className="text-center mb-16"
         >
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-primary/20 bg-primary/5 mb-6">
+          <div className="mb-6 inline-flex items-center gap-2 border-b border-primary/20 px-1 py-1.5">
             <MessageSquare className="h-4 w-4 text-primary" />
             <span className="text-sm font-medium text-primary">We'd love to hear from you</span>
           </div>
@@ -80,9 +80,9 @@ const Contact = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.1 + i * 0.1, duration: 0.4 }}
-              className="glass-card rounded-2xl p-6 text-center group hover:border-primary/30 transition-all duration-300"
+              className="rounded-lg border border-border bg-card p-6 text-left group transition-colors hover:bg-accent/40"
             >
-              <div className="flex h-12 w-12 mx-auto mb-4 items-center justify-center rounded-xl bg-primary/10 group-hover:bg-primary/20 transition-colors duration-300">
+              <div className="mb-4 flex h-9 w-9 items-center justify-center rounded-md bg-primary/10">
                 <item.icon className="h-5 w-5 text-primary" />
               </div>
               <p className="text-sm font-medium text-muted-foreground mb-1">{item.label}</p>
@@ -105,9 +105,9 @@ const Contact = () => {
           transition={{ delay: 0.4, duration: 0.5 }}
           className="max-w-2xl mx-auto"
         >
-          <div className="glass-card rounded-2xl p-8 md:p-10">
+          <div className="rounded-lg border border-border bg-card p-8 shadow-soft md:p-10">
             <div className="flex items-center gap-3 mb-8">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10">
+              <div className="flex h-9 w-9 items-center justify-center rounded-md bg-primary/10">
                 <Send className="h-5 w-5 text-primary" />
               </div>
               <div>
