@@ -133,7 +133,7 @@ const Navbar = () => {
                     key={item.href}
                     to={item.href}
                     onClick={() => setMobileOpen(false)}
-                    className="px-4 py-3 rounded-xl text-sm font-medium text-primary-foreground/80 hover:text-gold-light hover:bg-primary-foreground/5 transition-all duration-300"
+                    className="px-4 py-3 rounded-xl text-sm font-medium text-foreground/80 hover:text-foreground hover:bg-accent transition-all duration-300"
                   >
                     {item.label}
                   </Link>
@@ -141,13 +141,13 @@ const Navbar = () => {
                   <button
                     key={item.href}
                     onClick={() => handleHashClick(item.href, () => setMobileOpen(false))}
-                    className="px-4 py-3 rounded-xl text-sm font-medium text-primary-foreground/80 hover:text-gold-light hover:bg-primary-foreground/5 transition-all duration-300 text-left"
+                    className="px-4 py-3 rounded-xl text-sm font-medium text-foreground/80 hover:text-foreground hover:bg-accent transition-all duration-300 text-left"
                   >
                     {item.label}
                   </button>
                 )
               )}
-              <div className="mt-4 pt-4 border-t border-primary-foreground/10 flex flex-col gap-3">
+              <div className="mt-4 pt-4 border-t border-border flex flex-col gap-3">
                 <Button variant="hero-outline" asChild className="w-full">
                   <Link to="/login" onClick={() => setMobileOpen(false)}>{t("nav.signIn")}</Link>
                 </Button>
