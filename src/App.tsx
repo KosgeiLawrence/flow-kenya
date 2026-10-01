@@ -27,6 +27,7 @@ import BiometricSetupPrompt from "./components/auth/BiometricSetupPrompt";
 import SplashScreen from "./components/SplashScreen";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { Loader2 } from "lucide-react";
+import { ThemeProvider } from "next-themes";
 
 // Route-level code splitting — keep the initial bundle lean for slow
 // connections and Android WebView first-paint.
@@ -137,8 +138,9 @@ const App = () => {
   }
 
   return (
-    <ErrorBoundary>
-      <QueryClientProvider client={queryClient}>
+    <ThemeProvider attribute="class" defaultTheme="system" enableSystem storageKey="duara-flow-theme">
+      <ErrorBoundary>
+        <QueryClientProvider client={queryClient}>
         <TooltipProvider>
           <Toaster />
           <Sonner />
@@ -240,8 +242,9 @@ const App = () => {
             </AuthProvider>
           </BrowserRouter>
         </TooltipProvider>
-      </QueryClientProvider>
-    </ErrorBoundary>
+        </QueryClientProvider>
+      </ErrorBoundary>
+    </ThemeProvider>
   );
 };
 
