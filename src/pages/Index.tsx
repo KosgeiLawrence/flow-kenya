@@ -2,7 +2,6 @@ import { useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import Hero from "@/components/Hero";
-import NeuralBackground from "@/components/NeuralBackground";
 import Features from "@/components/Features";
 import TrendingMarketplace from "@/components/TrendingMarketplace";
 import TraceabilityFlow from "@/components/TraceabilityFlow";
@@ -25,8 +24,7 @@ const Index = () => {
   }, [location.hash]);
 
   return (
-    <div className="min-h-screen bg-background bg-radial-glow relative">
-      <NeuralBackground />
+    <div className="min-h-screen bg-background relative">
       <div className="relative z-10">
         <Navbar />
         <Hero />
