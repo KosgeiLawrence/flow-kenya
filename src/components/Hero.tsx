@@ -1,26 +1,13 @@
-import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { useTranslation } from "react-i18next";
 import ConsultationDialog from "@/components/ConsultationDialog";
-import heroBg from "@/assets/hero-bg.jpg";
-import heroPlaceholder from "@/assets/hero-bg-placeholder.jpg";
 
 const Hero = () => {
   const { t } = useTranslation();
-  const [loaded, setLoaded] = useState(false);
 
-  useEffect(() => {
-    const img = new Image();
-    img.src = heroBg;
-    if (img.complete) {
-      setLoaded(true);
-    } else {
-      img.onload = () => setLoaded(true);
-    }
-  }, []);
 
   const stats = [
     { value: t("hero.stat1Value"), label: t("hero.stat1Label") },
