@@ -34,7 +34,7 @@ const Hero = () => {
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3, duration: 0.8, ease: [0.4, 0, 0.2, 1] }}
-            className="mb-6 max-w-4xl font-display text-4xl font-semibold leading-[1.08] text-primary-foreground md:text-6xl lg:text-7xl"
+            className="mb-6 max-w-4xl font-display text-4xl font-semibold leading-[1.08] text-foreground md:text-6xl lg:text-7xl"
           >
             {t("hero.title1")}{" "}
             <span className="text-primary">{t("hero.traceability")}</span>{" "}
@@ -46,7 +46,7 @@ const Hero = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.5, duration: 0.7, ease: [0.4, 0, 0.2, 1] }}
-            className="mb-10 max-w-2xl text-base leading-relaxed text-primary-foreground/80 md:text-lg"
+            className="mb-10 max-w-2xl text-base leading-relaxed text-muted-foreground md:text-lg"
           >
             {t("hero.subtitle")}
           </motion.p>
@@ -72,7 +72,7 @@ const Hero = () => {
           initial={{ opacity: 0, y: 40 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.9, duration: 0.8, ease: [0.4, 0, 0.2, 1] }}
-          className="border-t border-primary-foreground/15 bg-background/90 backdrop-blur-xl"
+          className="border-t border-border bg-background"
         >
           <div className="container grid grid-cols-3 divide-x divide-border py-0">
             {stats.map((stat) => (
