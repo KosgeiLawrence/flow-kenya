@@ -30,7 +30,7 @@ const AboutSection = () => {
           <p className="text-lg text-muted-foreground leading-relaxed">{t("about.description")}</p>
         </div>
 
-        <div className="rounded-3xl border border-border/40 bg-card/30 backdrop-blur-xl p-6 md:p-10 mb-16">
+        <div className="rounded-2xl border border-border/40 bg-card/30 backdrop-blur-xl p-6 md:p-10 mb-16">
           <div className="grid md:grid-cols-2 gap-6">
             <motion.div
               initial={{ opacity: 0, x: -30 }}
@@ -66,7 +66,7 @@ const AboutSection = () => {
           </div>
         </div>
 
-        <div className="rounded-3xl border border-border/40 bg-card/30 backdrop-blur-xl p-6 md:p-10 mb-16">
+        <div className="rounded-2xl border border-border/40 bg-card/30 backdrop-blur-xl p-6 md:p-10 mb-16">
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {values.map((value, i) => (
               <motion.div

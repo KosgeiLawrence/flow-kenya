@@ -47,7 +47,7 @@ const CTA = () => {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-100px" }}
           transition={{ duration: 0.8, ease: [0.4, 0, 0.2, 1] }}
-          className="relative overflow-hidden rounded-3xl bg-hero p-10 text-center md:p-20"
+          className="relative overflow-hidden rounded-2xl bg-hero p-10 text-center md:p-20"
         >
           <div className="absolute -right-20 -top-20 h-64 w-64 rounded-full bg-gold/8 blur-2xl" />
           <div className="absolute -bottom-32 -left-32 h-80 w-80 rounded-full bg-gold/6 blur-3xl" />
