@@ -16,26 +16,7 @@ const Hero = () => {
   ];
 
   return (
-    <section className="relative min-h-[92vh] overflow-hidden border-b border-border">
-      <div className="absolute inset-0">
-        {/* Tiny placeholder shown instantly */}
-        <img
-          src={heroPlaceholder}
-          alt=""
-          aria-hidden
-          className="absolute inset-0 h-full w-full object-cover"
-        />
-        {/* Full image fades in once loaded */}
-        <img
-          src={heroBg}
-          alt="Waste collection in Kenya"
-          className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-500 ${loaded ? "opacity-100" : "opacity-0"}`}
-          loading="eager"
-          decoding="async"
-        />
-        <div className="absolute inset-0 bg-foreground/60 dark:bg-background/70" />
-      </div>
-
+    <section className="relative min-h-[92vh] overflow-hidden border-b border-border bg-background">
       <div className="relative z-10 flex min-h-screen flex-col">
         <div className="h-24 md:h-28" />
 
@@ -44,9 +25,9 @@ const Hero = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2, duration: 0.7, ease: [0.4, 0, 0.2, 1] }}
-            className="mb-7 inline-flex items-center gap-2 rounded-md border border-primary-foreground/20 bg-background/15 px-3 py-1.5 backdrop-blur-md"
+            className="mb-7 inline-flex items-center gap-2 rounded-md border border-border bg-muted/50 px-3 py-1.5"
           >
-            <span className="text-xs font-medium text-primary-foreground">{t("hero.badge")}</span>
+            <span className="text-xs font-medium text-muted-foreground">{t("hero.badge")}</span>
           </motion.div>
 
           <motion.h1
