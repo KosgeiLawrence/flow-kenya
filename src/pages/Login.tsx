@@ -42,39 +42,30 @@ const Login = () => {
 
   return (
     <div className="min-h-screen flex">
-      {/* Left panel — deep green */}
-      <div
-        className="hidden lg:flex lg:w-2/5 relative items-center justify-center p-12 overflow-hidden"
-        style={{ background: "linear-gradient(160deg, hsl(152 50% 18%) 0%, hsl(152 45% 28%) 40%, hsl(160 40% 22%) 100%)" }}
-      >
-        <div className="absolute inset-0 opacity-40">
-          <div className="absolute -top-1/4 -right-1/4 h-[60%] w-[60%] rounded-full bg-primary/20 blur-3xl" />
-          <div className="absolute -bottom-1/4 -left-1/4 h-[50%] w-[50%] rounded-full bg-primary/10 blur-3xl" />
-        </div>
+      <div className="hidden lg:flex lg:w-2/5 relative items-center justify-center border-r border-border bg-primary p-12 overflow-hidden">
         <motion.div
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.6, ease: [0.4, 0, 0.2, 1] }}
-          className="relative z-10 text-white max-w-md"
+          className="relative z-10 max-w-md text-primary-foreground"
         >
           <h1 className="text-4xl font-display font-bold mb-4">{t("auth.signInTitle")}</h1>
           <p className="text-lg opacity-80 font-body">{t("auth.heroSubtitle")}</p>
           <div className="mt-10 space-y-4">
             {highlights.map((h) => (
-              <div key={h.text} className="flex items-center gap-3 rounded-xl px-4 py-3" style={{ background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.12)" }}>
-                <h.icon className="w-5 h-5 text-white/80 shrink-0" />
-                <span className="text-sm font-medium text-white/90">{h.text}</span>
+              <div key={h.text} className="flex items-center gap-3 border-t border-primary-foreground/20 px-1 py-3">
+                <h.icon className="w-5 h-5 text-primary-foreground/80 shrink-0" />
+                <span className="text-sm font-medium text-primary-foreground/90">{h.text}</span>
               </div>
             ))}
           </div>
         </motion.div>
       </div>
 
-      {/* Right panel — dark */}
-      <div className="relative flex-1 flex items-center justify-center p-6 sm:p-12" style={{ background: "linear-gradient(180deg, hsl(220 16% 10%) 0%, hsl(220 14% 13%) 100%)" }}>
+      <div className="relative flex-1 flex items-center justify-center bg-background p-6 sm:p-12">
         <button
           onClick={() => navigate("/")}
-          className="absolute top-6 right-6 p-2 rounded-full glass hover:bg-muted/80 text-muted-foreground hover:text-foreground transition-smooth"
+          className="absolute top-6 right-6 p-2 rounded-md border border-border bg-card text-muted-foreground hover:text-foreground transition-colors"
           aria-label={t("auth.close")}
         >
           <X className="w-5 h-5" />
@@ -86,7 +77,7 @@ const Login = () => {
           transition={{ duration: 0.5, delay: 0.1, ease: [0.4, 0, 0.2, 1] }}
           className="w-full max-w-md"
         >
-          <div className="glass-card rounded-2xl p-8">
+          <div className="rounded-lg border border-border bg-card p-8 shadow-soft">
             <div className="text-center mb-8">
               <h2 className="text-2xl font-display font-bold text-foreground">{t("nav.signIn")}</h2>
               <p className="text-muted-foreground mt-2">{t("auth.signInSubtitle")}</p>

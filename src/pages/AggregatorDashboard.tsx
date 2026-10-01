@@ -136,16 +136,16 @@ const AggregatorDashboard = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background bg-radial-glow flex">
+    <div className="min-h-screen bg-background flex">
       {sidebarOpen && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40 lg:hidden" onClick={() => setSidebarOpen(false)} />
+        <div className="fixed inset-0 bg-foreground/25 backdrop-blur-[2px] z-40 lg:hidden" onClick={() => setSidebarOpen(false)} />
       )}
 
       <aside className={cn(
         "fixed inset-y-0 left-0 z-50 w-64 glass-sidebar text-sidebar-foreground flex flex-col transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] lg:relative lg:translate-x-0",
         sidebarOpen ? "translate-x-0" : "-translate-x-full"
       )}>
-        <div className="p-6 border-b border-[rgba(255,255,255,0.08)]">
+        <div className="p-5 border-b border-sidebar-border">
           <div className="flex items-center justify-between">
             <h1 className="text-lg font-display font-bold">Duara Flow</h1>
             <Button variant="ghost" size="icon" className="lg:hidden text-sidebar-foreground" onClick={() => setSidebarOpen(false)}>
@@ -178,8 +178,8 @@ const AggregatorDashboard = () => {
               className={cn(
                 "w-full flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-sm font-medium sidebar-nav-item",
                 activePanel === item.id
-                  ? "bg-[rgba(255,255,255,0.08)] text-sidebar-accent-foreground shadow-[inset_0_0_0_1px_rgba(255,255,255,0.06)]"
-                  : "text-sidebar-foreground/75 hover:bg-[rgba(255,255,255,0.05)] hover:text-sidebar-foreground"
+                  ? "bg-sidebar-accent text-sidebar-accent-foreground"
+                  : "text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-foreground"
               )}
             >
               <item.icon className="w-4 h-4 shrink-0" />
@@ -189,7 +189,7 @@ const AggregatorDashboard = () => {
           ))}
         </nav>
 
-        <div className="p-4 border-t border-[rgba(255,255,255,0.08)] space-y-1">
+        <div className="p-3 border-t border-sidebar-border space-y-1">
           <LanguageToggle />
           <Button variant="ghost" size="sm" onClick={handleSignOut} className="w-full justify-start gap-2 text-sidebar-foreground/70 hover:text-sidebar-foreground hover:bg-sidebar-accent/50">
             <LogOut className="w-4 h-4" /> {t("dashboard.signOut")}
@@ -198,15 +198,15 @@ const AggregatorDashboard = () => {
       </aside>
 
       <div className="flex-1 flex flex-col min-w-0">
-        <header className="sticky top-0 z-30 glass-header h-16 flex items-center px-6 gap-4">
+        <header className="sticky top-0 z-30 glass-header h-14 flex items-center px-4 md:px-6 gap-3">
           <Button variant="ghost" size="icon" className="lg:hidden" onClick={() => setSidebarOpen(true)}>
             <Menu className="w-5 h-5" />
           </Button>
-          <h2 className="text-lg font-display font-semibold text-foreground">
+          <h2 className="text-base font-display font-semibold text-foreground">
             {translatedNavItems.find(n => n.id === activePanel)?.label}
           </h2>
         </header>
-        <main className="flex-1 p-6 md:p-8 overflow-y-auto">
+        <main className="flex-1 p-4 md:p-6 lg:p-8 overflow-y-auto">
           {renderPanel()}
         </main>
       </div>

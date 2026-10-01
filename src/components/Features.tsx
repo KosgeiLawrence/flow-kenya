@@ -15,22 +15,21 @@ const Features = () => {
   ];
 
   return (
-    <section id="features" className="relative py-20 md:py-32 bg-mesh">
+    <section id="features" className="relative border-b border-border py-20 md:py-28">
       <div className="container">
-        <div className="mb-16 text-center">
-          <span className="mb-4 inline-block rounded-full bg-primary/10 px-4 py-1.5 text-sm font-semibold text-primary backdrop-blur-sm">
+        <div className="mb-14 border-b border-border pb-10 text-left md:grid md:grid-cols-[1fr_1fr] md:gap-16">
+          <div><span className="mb-4 inline-block text-xs font-semibold uppercase text-primary">
             {t("features.badge")}
           </span>
-          <h2 className="mb-4 font-display text-3xl font-bold text-foreground md:text-5xl">
+          <h2 className="font-display text-3xl font-semibold text-foreground md:text-5xl">
             {t("features.title")}
-          </h2>
-          <p className="mx-auto max-w-2xl text-muted-foreground">
+          </h2></div>
+          <p className="mt-5 max-w-2xl self-end leading-relaxed text-muted-foreground md:mt-0">
             {t("features.subtitle")}
           </p>
         </div>
 
-        <div className="rounded-2xl border border-border/40 bg-card/30 backdrop-blur-xl p-6 md:p-10">
-          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid grid-cols-1 border-l border-t border-border sm:grid-cols-2 lg:grid-cols-3">
             {features.map((f, i) => (
               <motion.div
                 key={i}
@@ -38,10 +37,10 @@ const Features = () => {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, amount: 0.1 }}
                 transition={{ delay: i * 0.08, duration: 0.5, ease: [0.4, 0, 0.2, 1] }}
-                className="group flex gap-4 glass p-6"
+                className="group flex gap-4 border-b border-r border-border bg-card p-6 transition-colors hover:bg-accent/50"
               >
-                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-primary/10 transition-all duration-300 group-hover:bg-primary group-hover:scale-110">
-                  <f.icon className="h-6 w-6 text-primary transition-colors duration-300 group-hover:text-primary-foreground" />
+                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md bg-primary/10">
+                  <f.icon className="h-4 w-4 text-primary" />
                 </div>
                 <div>
                   <h3 className="mb-1 font-display text-base font-bold text-foreground">{f.title}</h3>
@@ -49,7 +48,6 @@ const Features = () => {
                 </div>
               </motion.div>
             ))}
-          </div>
         </div>
       </div>
     </section>

@@ -29,7 +29,7 @@ const ForgotPassword = () => {
   };
 
   return (
-    <div className="min-h-screen bg-mesh flex items-center justify-center p-6">
+    <div className="min-h-screen bg-background flex items-center justify-center p-6">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -40,7 +40,7 @@ const ForgotPassword = () => {
           <ArrowLeft className="w-4 h-4" /> Back to login
         </Link>
 
-        <div className="glass-card rounded-2xl p-8">
+        <div className="rounded-lg border border-border bg-card p-8 shadow-soft">
           {sent ? (
             <div className="text-center">
               <CheckCircle2 className="w-12 h-12 text-primary mx-auto mb-4" />

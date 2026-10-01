@@ -5,6 +5,7 @@ import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { useTranslation } from "react-i18next";
 import { useHashNavigation } from "@/hooks/useHashNavigation";
+import ThemeToggle from "@/components/ThemeToggle";
 
 const Navbar = () => {
   const { t, i18n } = useTranslation();
@@ -34,7 +35,7 @@ const Navbar = () => {
     <header
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] ${
         scrolled
-          ? "bg-[rgba(255,255,255,0.05)] backdrop-blur-[16px] border-b border-[rgba(255,255,255,0.07)] shadow-[0_1px_0_rgba(255,255,255,0.04),0_4px_16px_rgba(0,0,0,0.15)]"
+          ? "bg-background/90 backdrop-blur-xl border-b border-border shadow-soft"
           : "bg-transparent"
       }`}
     >
@@ -44,7 +45,7 @@ const Navbar = () => {
           <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary transition-all duration-300 group-hover:bg-primary/90">
             <Recycle className="h-5 w-5 text-primary-foreground" />
           </div>
-          <span className="font-display text-lg font-bold text-primary-foreground tracking-tight">
+          <span className="font-display text-[15px] font-semibold text-foreground">
             Duara Flow
           </span>
         </Link>
@@ -56,19 +57,17 @@ const Navbar = () => {
               <Link
                 key={item.href}
                 to={item.href}
-                className="relative px-4 py-2 text-sm font-medium text-primary-foreground/70 transition-all duration-300 hover:text-gold-light group"
+                className="rounded-md px-3 py-1.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
               >
                 {item.label}
-                <span className="absolute bottom-0 left-1/2 -translate-x-1/2 h-0.5 w-0 bg-gold rounded-full transition-all duration-300 group-hover:w-1/2" />
               </Link>
             ) : (
               <button
                 key={item.href}
                 onClick={() => handleHashClick(item.href)}
-                className="relative px-4 py-2 text-sm font-medium text-primary-foreground/70 transition-all duration-300 hover:text-gold-light group"
+                className="rounded-md px-3 py-1.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
               >
                 {item.label}
-                <span className="absolute bottom-0 left-1/2 -translate-x-1/2 h-0.5 w-0 bg-gold rounded-full transition-all duration-300 group-hover:w-1/2" />
               </button>
             )
           )}
@@ -76,9 +75,10 @@ const Navbar = () => {
 
         {/* Desktop CTA + Lang */}
         <div className="hidden md:flex items-center gap-3">
+          <ThemeToggle className="text-muted-foreground" />
           <button
             onClick={toggleLang}
-            className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-primary-foreground/70 rounded-lg hover:text-gold-light hover:bg-primary-foreground/5 transition-all duration-300"
+            className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-muted-foreground rounded-md hover:text-foreground hover:bg-accent transition-colors"
             aria-label="Switch language"
           >
             <Globe className="h-4 w-4" />
@@ -86,7 +86,7 @@ const Navbar = () => {
           </button>
           <Link
             to="/login"
-            className="px-4 py-2 text-sm font-medium text-primary-foreground/80 transition-all duration-300 hover:text-gold-light"
+            className="px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
           >
             {t("nav.signIn")}
           </Link>
@@ -97,9 +97,10 @@ const Navbar = () => {
 
         {/* Mobile toggle */}
         <div className="md:hidden flex items-center gap-2">
+          <ThemeToggle className="text-foreground" />
           <button
             onClick={toggleLang}
-            className="flex items-center gap-1 px-2 py-1.5 text-xs font-medium text-primary-foreground/70 rounded-lg hover:text-gold-light hover:bg-primary-foreground/5 transition-all duration-300"
+            className="flex items-center gap-1 px-2 py-1.5 text-xs font-medium text-muted-foreground rounded-md hover:text-foreground hover:bg-accent transition-colors"
             aria-label="Switch language"
           >
             <Globe className="h-3.5 w-3.5" />
@@ -107,7 +108,7 @@ const Navbar = () => {
           </button>
           <button
             onClick={() => setMobileOpen(!mobileOpen)}
-            className="flex items-center justify-center h-10 w-10 rounded-xl text-primary-foreground/80 hover:bg-primary-foreground/10 transition-all duration-300"
+            className="flex items-center justify-center h-10 w-10 rounded-md text-foreground hover:bg-accent transition-colors"
             aria-label="Toggle menu"
           >
             {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
@@ -123,7 +124,7 @@ const Navbar = () => {
             animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
             transition={{ duration: 0.3, ease: [0.4, 0, 0.2, 1] }}
-            className="md:hidden overflow-hidden bg-[rgba(255,255,255,0.06)] backdrop-blur-[20px] border-t border-[rgba(255,255,255,0.08)]"
+            className="md:hidden overflow-hidden bg-background/95 backdrop-blur-xl border-t border-border"
           >
             <div className="container py-6 flex flex-col gap-2">
               {navItems.map((item) =>

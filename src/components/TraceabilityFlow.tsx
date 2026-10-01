@@ -13,28 +13,23 @@ const TraceabilityFlow = () => {
   ];
 
   return (
-    <section id="traceability" className="relative py-20 md:py-32 overflow-hidden bg-mesh">
-      <div className="absolute inset-0">
-        <div className="absolute top-0 right-0 h-[40%] w-[40%] rounded-full bg-gold/5 blur-3xl" />
-        <div className="absolute bottom-0 left-0 h-[30%] w-[30%] rounded-full bg-forest/5 blur-3xl" />
-      </div>
-
+    <section id="traceability" className="relative border-b border-border bg-muted/30 py-20 md:py-28 overflow-hidden">
       <div className="container relative">
-        <div className="mb-16 text-center">
-          <span className="mb-4 inline-block rounded-full bg-primary/10 px-4 py-1.5 text-sm font-semibold text-primary backdrop-blur-sm">
+        <div className="mb-14 max-w-2xl">
+          <span className="mb-4 inline-block text-xs font-semibold uppercase text-primary">
             {t("traceability.badge")}
           </span>
-          <h2 className="mb-4 font-display text-3xl font-bold text-foreground md:text-5xl">
+          <h2 className="mb-4 font-display text-3xl font-semibold text-foreground md:text-5xl">
             {t("traceability.title")}
           </h2>
-          <p className="mx-auto max-w-2xl text-muted-foreground">
+          <p className="max-w-2xl leading-relaxed text-muted-foreground">
             {t("traceability.subtitle")}
           </p>
         </div>
 
         {/* Background container for the flow steps */}
-        <div className="rounded-2xl border border-border/40 bg-card/30 backdrop-blur-xl p-6 md:p-10">
-          <div className="relative grid grid-cols-1 gap-6 md:grid-cols-4">
+        <div className="border-y border-border bg-card">
+          <div className="relative grid grid-cols-1 md:grid-cols-4">
             {steps.map((step, i) => (
               <motion.div
                 key={step.step}
@@ -44,8 +39,8 @@ const TraceabilityFlow = () => {
                 transition={{ delay: i * 0.12, duration: 0.5, ease: [0.4, 0, 0.2, 1] }}
                 className="relative"
               >
-                <div className="rounded-2xl glass-card p-6">
-                  <div className={`mb-4 flex h-12 w-12 items-center justify-center rounded-xl ${step.color} transition-transform duration-300 hover:scale-110`}>
+                <div className="h-full border-x border-border p-6 md:border-r-0">
+                  <div className={`mb-4 flex h-9 w-9 items-center justify-center rounded-md ${step.color}`}>
                     <span className="font-display text-lg font-bold text-primary-foreground">{step.step}</span>
                   </div>
                   <h3 className="mb-1 font-display text-lg font-bold text-foreground">{step.title}</h3>
@@ -53,7 +48,7 @@ const TraceabilityFlow = () => {
                   <p className="text-sm text-muted-foreground">{step.description}</p>
                 </div>
                 {i < steps.length - 1 && (
-                  <div className="flex justify-center py-2 md:absolute md:-right-3 md:top-1/2 md:-translate-y-1/2 md:py-0">
+                  <div className="flex justify-center py-2 md:absolute md:-right-2.5 md:top-1/2 md:z-10 md:-translate-y-1/2 md:rounded-full md:bg-card md:py-1">
                     <ArrowRight className="h-5 w-5 rotate-90 text-muted-foreground/40 md:rotate-0" />
                   </div>
                 )}
