@@ -34,14 +34,14 @@ const Navbar = () => {
     <header
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] ${
         scrolled
-          ? "bg-[rgba(255,255,255,0.06)] backdrop-blur-[20px] border-b border-[rgba(255,255,255,0.08)] shadow-[0_8px_32px_rgba(0,0,0,0.2)]"
+          ? "bg-[rgba(255,255,255,0.05)] backdrop-blur-[16px] border-b border-[rgba(255,255,255,0.07)] shadow-[0_1px_0_rgba(255,255,255,0.04),0_4px_16px_rgba(0,0,0,0.15)]"
           : "bg-transparent"
       }`}
     >
       <div className="container flex items-center justify-between h-16 md:h-20 pt-2">
         {/* Logo */}
         <Link to="/" className="flex items-center gap-2.5 group">
-          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary transition-all duration-300 group-hover:scale-110 group-hover:shadow-primary">
+          <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary transition-all duration-300 group-hover:bg-primary/90">
             <Recycle className="h-5 w-5 text-primary-foreground" />
           </div>
           <span className="font-display text-lg font-bold text-primary-foreground tracking-tight">

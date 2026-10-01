@@ -29,7 +29,7 @@ const Features = () => {
           </p>
         </div>
 
-        <div className="rounded-3xl border border-border/40 bg-card/30 backdrop-blur-xl p-6 md:p-10">
+        <div className="rounded-2xl border border-border/40 bg-card/30 backdrop-blur-xl p-6 md:p-10">
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {features.map((f, i) => (
               <motion.div

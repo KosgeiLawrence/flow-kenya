@@ -33,7 +33,7 @@ const TraceabilityFlow = () => {
         </div>
 
         {/* Background container for the flow steps */}
-        <div className="rounded-3xl border border-border/40 bg-card/30 backdrop-blur-xl p-6 md:p-10">
+        <div className="rounded-2xl border border-border/40 bg-card/30 backdrop-blur-xl p-6 md:p-10">
           <div className="relative grid grid-cols-1 gap-6 md:grid-cols-4">
             {steps.map((step, i) => (
               <motion.div
