@@ -176,10 +176,10 @@ const AggregatorDashboard = () => {
               key={item.id}
               onClick={() => { setActivePanel(item.id); setSidebarOpen(false); }}
               className={cn(
-                "w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium sidebar-nav-item",
+                "w-full flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-sm font-medium sidebar-nav-item",
                 activePanel === item.id
-                  ? "bg-[rgba(255,255,255,0.10)] text-sidebar-accent-foreground shadow-[inset_0_0_0_1px_rgba(255,255,255,0.08)]"
-                  : "text-sidebar-foreground/75 hover:bg-[rgba(255,255,255,0.06)] hover:text-sidebar-foreground"
+                  ? "bg-[rgba(255,255,255,0.08)] text-sidebar-accent-foreground shadow-[inset_0_0_0_1px_rgba(255,255,255,0.06)]"
+                  : "text-sidebar-foreground/75 hover:bg-[rgba(255,255,255,0.05)] hover:text-sidebar-foreground"
               )}
             >
               <item.icon className="w-4 h-4 shrink-0" />
