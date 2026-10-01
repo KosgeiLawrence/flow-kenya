@@ -44,7 +44,6 @@ const Hero = () => {
           alt="Waste collection in Kenya"
           className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-500 ${loaded ? "opacity-100" : "opacity-0"}`}
           loading="eager"
-          fetchPriority="high"
           decoding="async"
         />
         <div className="absolute inset-0 bg-foreground/60 dark:bg-background/70" />
