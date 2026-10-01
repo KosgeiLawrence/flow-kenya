@@ -47,18 +47,14 @@ const CTA = () => {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-100px" }}
           transition={{ duration: 0.8, ease: [0.4, 0, 0.2, 1] }}
-          className="relative overflow-hidden rounded-2xl bg-hero p-10 text-center md:p-20"
+          className="relative overflow-hidden border-y border-border bg-card p-10 text-center md:p-20"
         >
-          <div className="absolute -right-20 -top-20 h-64 w-64 rounded-full bg-gold/8 blur-2xl" />
-          <div className="absolute -bottom-32 -left-32 h-80 w-80 rounded-full bg-gold/6 blur-3xl" />
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 h-[120%] w-[120%] rounded-full bg-primary-foreground/3 blur-3xl" />
-
           <div className="relative z-10">
-            <h2 className="mb-4 font-display text-3xl font-bold text-primary-foreground md:text-5xl">
+            <h2 className="mb-4 font-display text-3xl font-semibold text-foreground md:text-5xl">
               {t("cta.title1")} <br className="hidden md:block" />
-              <span className="text-gradient-gold">{t("cta.title2")}</span>
+              <span className="text-primary">{t("cta.title2")}</span>
             </h2>
-            <p className="mx-auto mb-10 max-w-xl text-primary-foreground/70">{t("cta.subtitle")}</p>
+            <p className="mx-auto mb-10 max-w-xl text-muted-foreground">{t("cta.subtitle")}</p>
             <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
               <ConsultationDialog>
                 <Button variant="hero" size="lg" className="text-base hover-glow">
@@ -95,15 +91,14 @@ const Footer = () => {
   ];
 
   return (
-    <footer className="relative border-t border-[rgba(255,255,255,0.06)] bg-[rgba(0,0,0,0.4)] backdrop-blur-[24px]">
-      <div className="absolute inset-0 bg-gradient-to-b from-transparent to-[rgba(0,0,0,0.3)] pointer-events-none" />
+    <footer className="relative border-t border-border bg-muted/30">
       <div className="container relative z-10">
         {/* Main footer grid */}
         <div className="grid grid-cols-1 gap-10 py-16 md:grid-cols-12 md:gap-8">
           {/* Brand column */}
           <div className="md:col-span-5 space-y-5">
             <Link to="/" className="inline-flex items-center gap-2.5 group">
-              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary transition-transform duration-300 group-hover:scale-110">
+                <div className="flex h-9 w-9 items-center justify-center rounded-md bg-primary">
                 <Recycle className="h-5 w-5 text-primary-foreground" />
               </div>
               <span className="font-display text-xl font-bold text-foreground tracking-tight">Duara Flow</span>
@@ -132,7 +127,7 @@ const Footer = () => {
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="Instagram"
-                className="flex h-9 w-9 items-center justify-center rounded-lg bg-[rgba(255,255,255,0.04)] border border-[rgba(255,255,255,0.06)] text-muted-foreground transition-all duration-200 hover:text-foreground hover:bg-primary/10 hover:border-primary/30"
+                className="flex h-9 w-9 items-center justify-center rounded-md border border-border bg-background text-muted-foreground transition-colors hover:text-foreground hover:bg-accent"
               >
                 <Instagram className="h-4 w-4" />
               </a>
@@ -141,7 +136,7 @@ const Footer = () => {
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="Facebook"
-                className="flex h-9 w-9 items-center justify-center rounded-lg bg-[rgba(255,255,255,0.04)] border border-[rgba(255,255,255,0.06)] text-muted-foreground transition-all duration-200 hover:text-foreground hover:bg-primary/10 hover:border-primary/30"
+                className="flex h-9 w-9 items-center justify-center rounded-md border border-border bg-background text-muted-foreground transition-colors hover:text-foreground hover:bg-accent"
               >
                 <Facebook className="h-4 w-4" />
               </a>
@@ -150,7 +145,7 @@ const Footer = () => {
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="X (Twitter)"
-                className="flex h-9 w-9 items-center justify-center rounded-lg bg-[rgba(255,255,255,0.04)] border border-[rgba(255,255,255,0.06)] text-muted-foreground transition-all duration-200 hover:text-foreground hover:bg-primary/10 hover:border-primary/30"
+                className="flex h-9 w-9 items-center justify-center rounded-md border border-border bg-background text-muted-foreground transition-colors hover:text-foreground hover:bg-accent"
               >
                 <svg viewBox="0 0 24 24" fill="currentColor" className="h-3.5 w-3.5" aria-hidden="true">
                   <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
@@ -161,7 +156,7 @@ const Footer = () => {
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="LinkedIn"
-                className="flex h-9 w-9 items-center justify-center rounded-lg bg-[rgba(255,255,255,0.04)] border border-[rgba(255,255,255,0.06)] text-muted-foreground transition-all duration-200 hover:text-foreground hover:bg-primary/10 hover:border-primary/30"
+                className="flex h-9 w-9 items-center justify-center rounded-md border border-border bg-background text-muted-foreground transition-colors hover:text-foreground hover:bg-accent"
               >
                 <Linkedin className="h-4 w-4" />
               </a>
@@ -190,7 +185,7 @@ const Footer = () => {
         </div>
 
         {/* Bottom bar */}
-        <div className="flex flex-col items-center justify-between gap-4 border-t border-[rgba(255,255,255,0.06)] py-6 md:flex-row">
+        <div className="flex flex-col items-center justify-between gap-4 border-t border-border py-6 md:flex-row">
           <p className="text-xs text-muted-foreground/60">
             {t("cta.copyright")}
           </p>

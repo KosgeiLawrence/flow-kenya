@@ -57,17 +57,15 @@ export default function TrendingMarketplace() {
   if (!isLoading && (!listings || listings.length === 0)) return null;
 
   return (
-    <section className="relative py-20 md:py-32 overflow-hidden">
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full bg-primary/5 blur-3xl pointer-events-none" />
-
+    <section className="relative border-b border-border bg-muted/30 py-20 md:py-28 overflow-hidden">
       <div className="container relative z-10">
-        <div className="mb-12 text-center">
+        <div className="mb-12 max-w-3xl">
           <motion.span
             initial={{ opacity: 0, y: 10 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.5 }}
-            className="mb-4 inline-flex items-center gap-2 rounded-full bg-gold/10 px-4 py-1.5 text-sm font-semibold text-gold backdrop-blur-sm"
+            className="mb-4 inline-flex items-center gap-2 text-xs font-semibold uppercase text-primary"
           >
             <TrendingUp className="w-4 h-4" /> {t("trending.badge")}
           </motion.span>
@@ -76,7 +74,7 @@ export default function TrendingMarketplace() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6, delay: 0.1 }}
-            className="mb-4 font-display text-3xl font-bold text-foreground md:text-5xl"
+            className="mb-4 font-display text-3xl font-semibold text-foreground md:text-5xl"
           >
             {t("trending.title1")} <span className="text-gradient-gold">{t("trending.title2")}</span>
           </motion.h2>
@@ -85,7 +83,7 @@ export default function TrendingMarketplace() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6, delay: 0.2 }}
-            className="mx-auto max-w-2xl text-muted-foreground"
+            className="max-w-2xl leading-relaxed text-muted-foreground"
           >
             {t("trending.subtitle")}
           </motion.p>
@@ -94,7 +92,7 @@ export default function TrendingMarketplace() {
         {isLoading ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
             {[1, 2, 3, 4].map(i => (
-              <div key={i} className="h-72 rounded-2xl bg-muted/20 animate-pulse" />
+              <div key={i} className="h-72 rounded-lg border border-border bg-card animate-pulse" />
             ))}
           </div>
         ) : (
@@ -108,13 +106,13 @@ export default function TrendingMarketplace() {
                 transition={{ delay: i * 0.06, duration: 0.5, ease: [0.4, 0, 0.2, 1] }}
               >
                 <Link to="/marketplace" className="block group">
-                  <div className="rounded-2xl border border-border/40 bg-card/30 backdrop-blur-xl overflow-hidden transition-all duration-300 hover:border-primary/30 hover:shadow-[0_0_30px_rgba(43,94,63,0.1)]">
+                  <div className="rounded-lg border border-border bg-card overflow-hidden transition-colors hover:border-primary/40">
                     <div className="relative h-40 bg-muted/20 overflow-hidden">
                       {listing.images?.length > 0 ? (
                         <img
                           src={listing.images[0]}
                           alt={listing.title}
-                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                          className="w-full h-full object-cover transition-opacity duration-200 group-hover:opacity-90"
                           loading="lazy"
                         />
                       ) : (

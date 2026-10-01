@@ -37,22 +37,19 @@ const ImpactMetrics = () => {
   ];
 
   return (
-    <section id="impact" className="relative bg-hero py-20 md:py-32 overflow-hidden" ref={ref}>
-      <div className="absolute top-1/4 -left-20 h-64 w-64 rounded-full bg-gold/8 blur-3xl" />
-      <div className="absolute bottom-1/4 -right-20 h-48 w-48 rounded-full bg-sky/8 blur-3xl" />
-
+    <section id="impact" className="relative border-b border-border bg-foreground py-20 text-background md:py-28 overflow-hidden" ref={ref}>
       <div className="container relative">
-        <div className="mb-16 text-center">
-          <span className="mb-4 inline-block rounded-full border border-gold-light/20 bg-gold/10 px-4 py-1.5 text-sm font-semibold text-gold-light backdrop-blur-md">
+        <div className="mb-14 max-w-3xl">
+          <span className="mb-4 inline-block text-xs font-semibold uppercase text-primary">
             {t("impact.badge")}
           </span>
-          <h2 className="mb-4 font-display text-3xl font-bold text-primary-foreground md:text-5xl">
+          <h2 className="mb-4 font-display text-3xl font-semibold text-background md:text-5xl">
             {t("impact.title")}
           </h2>
-          <p className="mx-auto max-w-2xl text-primary-foreground/60">{t("impact.subtitle")}</p>
+          <p className="max-w-2xl text-background/65">{t("impact.subtitle")}</p>
         </div>
 
-        <div className="grid grid-cols-2 gap-6 md:grid-cols-4">
+        <div className="grid grid-cols-2 border-l border-t border-background/15 md:grid-cols-4">
           {metrics.map((m, i) => (
             <motion.div
               key={i}
@@ -60,12 +57,12 @@ const ImpactMetrics = () => {
               whileInView={{ opacity: 1, scale: 1 }}
               viewport={{ once: true, amount: 0.1 }}
               transition={{ delay: i * 0.1, duration: 0.5, ease: [0.4, 0, 0.2, 1] }}
-              className="rounded-2xl border border-primary-foreground/10 bg-primary-foreground/5 p-6 text-center backdrop-blur-xl transition-all duration-300 hover:bg-primary-foreground/10 hover:-translate-y-1"
+              className="border-b border-r border-background/15 p-6 text-left transition-colors hover:bg-background/5"
             >
-              <div className="mb-2 font-display text-3xl font-bold text-gold-light md:text-4xl">
+              <div className="mb-2 font-display text-3xl font-semibold text-background md:text-4xl">
                 <Counter target={m.target} suffix={m.suffix} inView={isInView} />
               </div>
-              <p className="text-sm text-primary-foreground/60">{m.label}</p>
+              <p className="text-sm text-background/60">{m.label}</p>
             </motion.div>
           ))}
         </div>
